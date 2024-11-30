@@ -1,0 +1,72 @@
+.maor_hidden {
+    display: none !important;
+}
+
+label.maor_download input[type=checkbox] {
+    cursor: pointer;
+    margin: 0 0 0 5px;
+}
+
+label.maor_download div, .maor_flex {
+    display: inline-flex;
+    align-items: center;
+}
+
+a.maor_download, label.maor_download {
+    cursor: pointer;
+    display: inline-block !important;
+    padding: 0.25rem 0.7rem;
+    line-height: 1rem;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    text-decoration: none !important;
+    letter-spacing: 0.03rem;
+    font-family: 'Segoe UI', arial;
+    margin: 2px;
+    background-color: rgb(246, 198, 54);
+    color: #0c0c0d !important;
+    border: 0;
+    font-weight: 500;
+    box-shadow: 0px 3px 1px -2px rgba(255, 214, 214, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, .12);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+a.maor_download:hover {
+    background-color: rgb(238, 154, 65);
+}
+
+label.maor_download {
+    background-color: rgb(205, 114, 19);
+    color: #f9f9fa !important;
+}
+
+label.maor_download:hover {
+    background-color: rgb(119, 64, 6);
+}
+
+div.maor_fieldset {
+    text-align: right;
+}
+
+div.maor_fieldset fieldset {
+    display: inline-block;
+    border: 1px solid #ddd;
+    padding: 6px 11px 12px;
+    margin: 0 4px 20px;
+}
+
+div.maor_fieldset fieldset legend {
+    padding: 1px 6px 5px;
+    color: #043766;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    direction: ltr;
+}
+
+div.maor_fieldset fieldset legend::after {
+    content: "+";
+    display: inline-block;
+    vertical-align: super;
+}

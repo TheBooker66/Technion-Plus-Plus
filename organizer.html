@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta http-equiv="cache-control" content="no-cache"/>
+    <meta charset="utf-8">
+    <title>Technion Plus</title>
+    <link rel="stylesheet" href="css/organizer.css" type="text/css">
+</head>
+<body>
+<div class="wrapper">
+    <div id="koteret">
+        <div class="mod_name">
+            <div><img src="icons/calendar.svg" style="margin: 0 0 0 0.5ch;"/> ארגונית פלוס<sup>+</sup></div>
+        </div>
+        <div>
+            <img src="icons/icon-32.png"/> Technion Plus<sup>+</sup>
+        </div>
+    </div>
+
+    <div id="calendar-main">
+        <div id="tabs">
+            <div class="tab current"><img src="icons/calendar.svg"/> מטלות לביצוע</div>
+            <div class="tab"><img src="icons/calendar_done.svg"/> מטלות שהושלמו</div>
+            <div class="tab"><img src="icons/plus.svg"/> הוסף מטלה</div>
+            <div class="dummy">
+                <label for="fullscreen"><input type="checkbox" id="fullscreen"/> פתח ארגונית במסך מלא</label>
+                <label for="darkmode"><input type="checkbox" id="darkmode"/> מצב לילה</label>
+                <a class="button" id="filters_toggle">סינון מטלות</a>
+            </div>
+        </div>
+
+        <div id="message">
+            <div id="filtering" class="hidden">
+                <span>סינון</span>
+                <span>
+					קורס לתצוגה: 
+					<select id="course_filter">
+						<option value="">הצג הכל</option>
+						<option value="user-course">מטלות שנוספו ידנית</option>
+					</select>
+				</span>
+            </div>
+            <div id="spinner"></div>
+            <div id="new_assignments"></div>
+            <div id="finished_assignments"></div>
+            <div id="add_assignment">
+                <form>
+                    <input type="hidden" value="0" name="edit"/>
+                    <div>📝 עריכת מטלה</div>
+                    <div>
+                        נושא:
+                    </div>
+                    <div>
+                        <input type="text" maxlength="50" value="" name="subject" required/> (<span>0</span>/50)
+                    </div>
+                    <div>
+                        הערות:
+                    </div>
+                    <div>
+                        <textarea maxlength="280" name="notes"></textarea> (<span>0</span>/280)
+                    </div>
+                    <div>
+                        תאריך סיום:
+                    </div>
+                    <div>
+                        <label><input type="checkbox" name="no_end" checked/> ללא תאריך סיום (המטלה לא תימחק
+                            אוטומטית)</label>
+                        <div style="margin-top: 6px;"><input type="date" lang="he" name="end_time"/> (המטלה תימחק
+                            אוטומטית יומיים לאחר סיומה)
+                        </div>
+                    </div>
+                    <div style="grid-column: 1 / 3;">
+                        <a class="button" style="display: inline-block">שמור מטלה</a>
+                        <a class="button" style="display: inline-block">ביטול</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div id="error">
+            <div class="error_bar" id="need_refresh" style="display: none;">
+                נמצאו מטלות חדשות! <a class="button" style="display: inline-block; margin: 0 1ch 0 0">רענן</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div>
+            <b>אודות</b><br/>
+            התוסף <b dir="ltr">Technion Plus<sup>+</sup></b> פותח על ידי <b>מאור לוי</b> ותוקן על ידי <b>איתן
+            "67"</b><br/>
+            <small>( לא מוגש מטעם הטכניון )</small>
+        </div>
+        <div>
+            <b>קישורים</b><br/>
+            <li><a id="goToSettings">הגדרות <b dir="ltr">Technion Plus<sup>+</sup></b></a></li>
+            <li><a id="mailtome">פניה אל מפתח התוסף בדוא"ל</a></li>
+        </div>
+        <div>
+            <b>טיפ למפתח התוסף</b><br/>
+            <small>עזרו לי לעזור לכם 🙂</small><br/>
+            <a class="button" target="_blank" href="https://www.paypal.me/maorlevy/15ILS">טיפ ב-<img
+                    src="icons/PayPal_logo.svg" style="height: 0.9rem; vertical-align: text-bottom;"></a>
+        </div>
+    </footer>
+</div>
+
+<div style="display: none;">
+    <div id="lastcheck">בדיקה אחרונה:</div>
+    <div id="recheck"><a>בדוק מחדש כעת</a></div>
+    <input type="checkbox" id="appeals_toggle" checked/>
+</div>
+
+<template id="assignment">
+    <div class="list_item" data-course="">
+        <div><img class="system"/></div>
+        <div>
+            <b class="assignment_header"></b>
+            <div class="course_name">קורס: </div>
+        </div>
+        <div class="assignment_descripion"></div>
+        <div class="end_time">תאריך סיום: <br/><span></span></div>
+        <a title="עבור אל אתר ההגשה" class="button">פתח מטלה</a>
+        <a title='העבר מטלה אל רשימת "מטלות שהושלמו"' class="button finish">סמן כהושלמה</a>
+        <a title='העבר מטלה אל רשימת "מטלות לביצוע"' class="button restore">סמן לביצוע</a>
+    </div>
+</template>
+
+<template id="userAgenda">
+    <div class="list_item">
+        <div><img class="system" src="icons/bookmark.svg" title="מטלת משתמש"/></div>
+        <div>
+            <b class="assignment_header"></b>
+        </div>
+        <div class="assignment_descripion"><textarea disabled readonly></textarea></div>
+        <div class="end_time">תאריך סיום:<br/><span></span></div>
+        <div class="actions">
+            <a title="ערוך מטלה" class="button">ערוך</a>
+            <a title="מחק מטלה" class="button">מחק</a>
+        </div>
+        <a title='העבר מטלה אל רשימת "מטלות שהושלמו"' class="button finish">סמן כהושלמה</a>
+        <a title='העבר מטלה אל רשימת "מטלות לביצוע"' class="button restore">סמן לביצוע</a>
+    </div>
+</template>
+
+<script src="scripts/bg_common.js"></script>
+<script src="scripts/organizer.js"></script>
+<script src="scripts/p_cal_moodle.js"></script>
+<script src="scripts/p_cal_cs.js"></script>
+<script src="scripts/p_cal_webwork.js"></script>
+</body>
+</html>

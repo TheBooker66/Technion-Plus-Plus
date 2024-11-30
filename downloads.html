@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache"/>
+    <title>Technion Plus</title>
+    <link rel="stylesheet" href="css/popup.css" type="text/css">
+    <script src="scripts/common_popup.js"></script>
+</head>
+<body>
+<div class="wrapper">
+    <div class="main-content">
+        <h4>כרגע בהורדה:</h4>
+        <div id="current">
+            <div><span style="max-height: 50px; overflow-y: auto; word-wrap: break-all;"></span></div>
+            <div id="myform">
+                <div style="text-align: right"><b>מצב: </b><span></span></div>
+                <div id="progress"><span></span></div>
+                <input type="button" class="submit" value="השהה / המשך" id="pause"/>
+                <input type="button" class="submit" value="בטל" id="cancel"/>
+                <input type="button" class="submit" value="בטל הכל" id="cancelAll"/>
+            </div>
+        </div>
+        <h3>הורדות בהמתנה</h3>
+        <div id="queue">
+
+        </div>
+    </div>
+</div>
+
+<template id="dl_item">
+    <div class="list_item">
+        <span><img class="dl_from" src="icons/blank.png"/></span>
+        <div>
+            <b class="dl_name"></b>
+        </div>
+        <span><img src="icons/x-red.svg" title="הסר" class="remove"/></span>
+    </div>
+</template>
+
+<script src="scripts/p_downloads.js"></script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+/* mark videos that the user already watched */
+.content-table .details-table .thumbnail-row .detail-cell .item-title a:visited {
+    color: #ff0039
+}
+
+/* actions */
+a.maor_panopto_action {
+    background-color: rgb(246, 198, 54) !important;
+    color: #0c0c0d !important;
+    border: 0 !important;
+    cursor: pointer !important;
+    font-weight: 500 !important;
+    box-shadow: 0px 3px 1px -2px rgba(255, 214, 214, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, .12);
+    font-family: 'Segoe UI', arial !important;
+    letter-spacing: 0.03rem;
+    font-size: 0.9rem !important;
+}
+
+a.maor_panopto_action:hover {
+    background-color: rgb(238, 154, 65) !important;
+}
+
+/*
+*	=====================================
+*	panopto menu
+*	=====================================
+*/
+
+.maor_menu_divider {
+    width: 1px;
+}
+
+.maor_menu_divider::after {
+    border-left: 1px solid #ccc;
+    height: 75%;
+    content: "";
+    display: block;
+}
+
+#maor_menu_container {
+    width: 140px;
+    filter: none !important;
+    padding: 7px;
+    box-sizing: content-box;
+}
+
+#maor_koteret {
+    text-align: left;
+    direction: ltr;
+    padding: 4px;
+    padding-left: 34px;
+    display: block;
+    border-radius: 4px;
+    background-color: #16253D;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    font-size: 12px;
+    right: 0;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-position: 10px;
+    height: 31px;
+    letter-spacing: 1px;
+}
+
+#maor_menu:hover #maor_koteret {
+    position: absolute;
+    border-radius: 0 0 4px 4px;
+}
+
+#maor_menu {
+    position: absolute;
+    bottom: 7px;
+    display: block;
+    background-color: #061123;
+    padding: 0;
+    transition: all ease .5s;
+    width: 140px;
+    min-height: 33px;
+    border-radius: 4px;
+    border: 1px solid black;
+    z-index: 3 !important;
+    cursor: default;
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    color: #f9f9fa;
+    direction: rtl;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#maor_menu, #maor_menu * {
+    box-sizing: border-box;
+    filter: none !important;
+}
+
+#maor_menu:hover, #maor_menu.start {
+    min-height: 100px;
+}
+
+#maor_menu #maor_content {
+    padding: 0;
+    display: block;
+    transition: all ease 0.1s;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    width: 100%;
+    text-align: right;
+}
+
+#maor_menu:hover #maor_content, #maor_menu.start #maor_content {
+    padding: 4px;
+    opacity: 1;
+    max-height: 800px;
+    padding-bottom: 40px;
+    transition: all ease 0.5s 0.1s;
+}
+
+#maor_content a {
+    cursor: pointer;
+    display: block;
+    color: #f9f9fa;
+    padding: 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 12px;
+    background-repeat: no-repeat;
+    background-position-x: 6px;
+    background-position-y: center;
+}
+
+#maor_content a:hover {
+    background-color: #043766;
+}
+
+#maor_content a > div, #m_vid_list {
+    position: fixed;
+    background-color: rgb(22, 37, 61);
+    padding: 2px;
+    border: 1px solid #000;
+    display: none;
+    margin: -11px 120px -11px 0;
+    border-radius: 4px;
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: 2px;
+    color: #bbb;
+    vertical-align: middle;
+}
+
+/* overlay */
+#maor_overlay {
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 138px;
+    height: 100%;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+}
+
+#maor_menu.overlaid #maor_overlay {
+    display: block;
+}
+
+#maor_menu.overlaid a {
+    filter: blur(1px) !important;
+}
+
+/* speeds and snapshots */
+#m_vid_list.maor_persist {
+    display: flex;
+    align-items: center;
+    margin: 0 120px 0 0;
+    z-index: 3;
+}
+
+#m_vid_list span {
+    color: #f9f9fa;
+    font-style: normal;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#maor_content a:hover > div {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+#maor_content a#m_speed > div > span::after {
+    content: "x";
+}
+
+#maor_content a:hover > div > span, #m_vid_list.maor_persist > span, #m_vid_list.maor_persist > div {
+    padding: 8px;
+    border-radius: 4px;
+}
+
+#maor_content a:hover > div > span:hover, .maor_selected, #m_vid_list.maor_persist > span:hover {
+    background-color: #043766;
+}
+
+.maor_selected {
+    color: #f9f9fa;
+}
+
+#maor_content canvas {
+    height: 28px;
+    display: block;
+    cursor: pointer;
+    border: 1px solid #000;
+}
+
+/* darkmode and settings */
+#maor_content label a {
+    display: flex;
+}
+
+#maor_content label input[type=checkbox] {
+    cursor: pointer;
+    align-self: flex-end;
+    margin-right: auto;
+}
+
+
+/*
+===================================
+sounds control panel
+===================================
+*/
+
+#maor_sound {
+    color: #f9f9fa;
+    width: 400px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background-color: #043766;
+    box-shadow: 4px 4px 8px #4444;
+    position: absolute;
+    z-index: 2;
+    direction: rtl;
+    font-size: 10px;
+    font-family: 'Segoe UI', arial !important;
+    bottom: 60px;
+    right: 30px;
+    opacity: 0.95;
+    text-align: right;
+    user-select: none;
+    display: none;
+}
+
+#maor_sound > div.m_header, #maor_sound b, #maor_sound select {
+    font-size: 11px
+}
+
+#maor_sound > div.m_header {
+    background-color: #16253D;
+    border-bottom: 1px solid #0004;
+    padding: 8px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+#maor_sound > div.m_header > sup {
+    color: #ff0039;
+    font-style: italic;
+    background-color: #0003;
+    padding: 1px 2px;
+    border-radius: 3px;
+}
+
+#maor_sound > div.m_header > span {
+    float: left;
+    border: 1px solid #000;
+    padding: 0.3em 0.5em;
+    border-radius: 4px;
+    background-color: #ff0039;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+#maor_sound > div.m_header > span:hover {
+    background-color: #d70022;
+}
+
+#maor_sound > div.m_grid {
+    display: grid;
+    grid-template-columns: 1fr 70px;
+    gap: 12px 8px;
+    padding: 8px;
+}
+
+#maor_sound > div.m_grid > div:nth-of-type(2n) {
+    text-align: left;
+}
+
+
+#maor_sound select {
+    width: 60px
+}

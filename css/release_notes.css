@@ -1,0 +1,109 @@
+
+:root {
+    --prim-dark: #16253D;
+    --prim-cool: #043766; /*002c54;*/
+    --prim-kot: #061123;
+    --sec-light: rgb(247, 199, 56); /*EFB509*/
+    --sec-norm: rgb(238, 154, 65);
+    --sec-dark: #CD7213;
+    --sec-darker: rgb(119, 64, 6);
+}
+
+body {
+    font-family: 'Segoe UI', arial;
+    font-size: 15px;
+    margin: 0;
+    background-image: linear-gradient(to bottom, #efefef, #f7f7f7);
+    color: #0c0c0c;
+}
+
+.tpclass {
+    direction: ltr;
+    display: inline-block;
+}
+
+.wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+#header {
+    font-size: 24px;
+    color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-image: linear-gradient(15deg, var(--prim-cool) 50%, var(--prim-dark) 100%);
+    box-shadow: 0 1px 4px 2px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid #000;
+}
+
+#logo {
+    float: left;
+}
+
+#header img {
+    vertical-align: middle;
+}
+
+hr {
+    border: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    margin: 30px auto;
+    width: 80%;
+}
+
+a {
+    color: #0060df;
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--prim-dark);
+}
+
+.divTable {
+    display: table;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 40px auto;
+    width: 90%;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.tableRow {
+    display: table-row;
+}
+
+.section {
+    display: table-cell;
+    width: 180px;
+    text-align: center;
+    font-size: 18px;
+    vertical-align: top;
+    padding: 0;
+}
+
+.section img {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.section span {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.info {
+    display: table-cell;
+    font-size: 13px;
+    vertical-align: top;
+    padding: 0 10px 0 0;
+}
+
+.info ul {
+    margin-top: 10px;
+    margin-bottom: 25px;
+    list-style-type: circle;
+}

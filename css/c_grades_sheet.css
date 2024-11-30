@@ -1,0 +1,271 @@
+:root {
+    /*--prim-dark: #16253D;
+    --prim-cool: #043766;
+    --prim-kot: #061123;*/
+    --sec-light: hsl(45, 92%, 59%);
+    --sec-light-t: hsla(45, 92%, 59%, .3);
+    --prim-dark: hsl(208, 80%, 15%);
+    --prim-cool: hsl(208, 90%, 23%);
+    --prim-kot: hsl(208, 100%, 5%);
+    /*--sec-light: hsl(35, 100%, 64%);*/
+    --sec-darker: hsl(35, 100%, 25%);
+}
+
+@media print {
+    .no-print {
+        display: none;
+    }
+}
+
+.maor_wrapper, .maor_norm_wrapper {
+    font-size: 13px;
+    font-family: 'Segoe UI', arial;
+    color: #000;
+}
+
+.maor_wrapper {
+    text-align: center;
+}
+
+.maor_norm_wrapper {
+    min-width: 1280px;
+}
+
+.maor_table {
+    margin: 5px auto 5ch;
+    display: table;
+    width: 100%;
+}
+
+.maor_table_header {
+    font-weight: 600;
+    background-color: #eee;
+    line-height: 200%;
+}
+
+.maor_norm_wrapper .maor_table .maor_table_header div:first-of-type {
+    border-radius: 0 4px 4px 0 !important;
+    width: 6ch;
+}
+
+.maor_norm_wrapper .maor_table .maor_table_header div:last-of-type {
+    border-radius: 4px 0 0 4px !important;
+}
+
+
+.maor_table_header div.op {
+    text-align: center;
+    padding: 1px;
+}
+
+.maor_table_row, .maor_table_header {
+    display: table-row;
+}
+
+.maor_table_row div, .maor_table_header div {
+    display: table-cell;
+    padding: 1px 5px;
+    text-align: right;
+    width: auto;
+}
+
+.maor_norm_wrapper .maor_table_row div:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, .02);
+}
+
+.maor_table_header div {
+    padding: 1px 5px 1px 20px;
+}
+
+.maor_norm_wrapper .maor_table_row:not(:last-of-type) div {
+    border-bottom: 1px dotted #0002;
+}
+
+.maor_table_row:nth-of-type(odd) {
+    background-color: #fcfcfc;
+}
+
+.maor_table_row div.grade {
+    min-width: 16.5ch;
+}
+
+.maor_table_row div.center {
+    text-align: center;
+    font-size: 0;
+}
+
+.maor_table_row.ignored > div.course_name::after {
+    content: "התעלמות קבועה";
+    display: inline-block;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: var(--sec-darker);
+    margin-right: 1ch;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background-color: var(--sec-light-t);
+}
+
+.maor_attention {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.maor_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    margin-top: 10px;
+}
+
+.maor_norm_wrapper h1, .maor_norm_wrapper h2, .maor_norm_wrapper h3, .maor_norm_wrapper h4 {
+    border-radius: 4px;
+    margin: 0;
+    padding: 6px;
+}
+
+.maor_norm_wrapper h1 {
+    background-color: var(--prim-cool);
+    color: #fff;
+    padding: 8px;
+}
+
+.maor_norm_wrapper h2 {
+    background-color: var(--prim-dark);
+    color: #fff;
+}
+
+.maor_norm_wrapper h3 {
+    background-color: var(--sec-light);
+}
+
+.maor_norm_wrapper h4 {
+    background-color: #ddd;
+    font-weight: 400;
+}
+
+.maor_norm_wrapper input {
+    font-size: 15px;
+    font-family: 'Segoe UI', arial;
+    margin: 5px 2px;
+    padding: 2px 5px;
+}
+
+.maor_norm_wrapper input[type=telephone] {
+    width: 50px;
+}
+
+.maor_table button {
+    padding: 2px 6px;
+    font-size: 12px;
+    margin: 4px 2px;
+    background-color: #0060df;
+    min-width: 7ch;
+    text-align: center;
+    border: 0;
+    color: #fff;
+    border-radius: 4px;
+    font-family: 'Segoe UI', arial;
+    box-sizing: border-box;
+}
+
+.maor_table button:hover {
+    background-color: #003eaa;
+}
+
+#inlist .center button {
+    background-color: #d70022;
+}
+
+#inlist .center button:hover {
+    background-color: #a4000f;
+}
+
+.maor_table input[type="number"]:disabled {
+    color: #000;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    background-color: transparent;
+}
+
+.maor_table input[type="number"] {
+    margin: 0;
+    font-size: inherit;
+    background-color: #eee;
+    border: 0;
+    border-bottom: 1px solid;
+    color: #0060df;
+    width: 6ch;
+    -webkit-appearance: textfield;
+    border-radius: 2px;
+}
+
+#inlist .grade:disabled {
+    border-bottom-color: #ccc;
+}
+
+.maor_table .failed input[type="number"]:disabled {
+    color: #ff0039;
+}
+
+.maor_norm_wrapper .failed, .maor_norm_wrapper form.failed * {
+    color: #ff0039;
+    border-color: #ff0039;
+    transition: color 0.5s linear;
+}
+
+#maor_footer {
+    margin: 100px 0 0;
+    text-align: center;
+    font-weight: 600;
+    position: absolute;
+    border-radius: 0 !important;
+    background-color: #eee;
+    width: 100%;
+    right: 0;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.op_remove, .temporary .center button:not(.op_remove) {
+    display: none;
+}
+
+.temporary .op_remove {
+    display: inline-block;
+}
+
+.maor_norm_wrapper .maor_table_row.animate div {
+    animation: rowinsert 1.2s linear 0s;
+}
+
+#inlist {
+    --color: #30e60b;
+}
+
+#outlist {
+    --color: #ff0039;
+}
+
+@keyframes rowinsert {
+    from {
+        color: transparent;
+        background-color: var(--color);
+    }
+}
+
+
+/* over binary */
+.binary_text {
+    display: none;
+}
+
+.over_binary .binary_text {
+    display: block;
+}
+
+.over_binary .grade, .over_binary .grade + button {
+    display: none;
+}

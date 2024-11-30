@@ -1,0 +1,294 @@
+
+a.maor_download {
+    background-color: rgb(246, 198, 54);
+    color: #0c0c0d !important;
+    border: 0;
+    font-weight: 500;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, .12);
+}
+
+a.maor_download, a.maor_download_light {
+    cursor: pointer;
+    float: left;
+    display: block;
+    line-height: 2.2rem;
+    padding: 0 0.7rem;
+    font-size: 0.95rem;
+    border-radius: 4px;
+    text-decoration: none !important;
+    letter-spacing: 0.03rem;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+a.maor_download:hover {
+    background-color: rgb(238, 154, 65);
+}
+
+a.maor_download_light {
+    /*color: #fff !important;
+    background-color: rgba(255,255,255,0.1);
+    border: 1px solid #fff;*/
+    background-color: rgb(246, 198, 54);
+    color: #0c0c0d !important;
+    font-weight: 400;
+}
+
+a.maor_download_light:hover {
+    /*background-color: #fff;
+    color: #16253D !important;*/
+    background-color: rgb(238, 154, 65);
+}
+
+.card.tplus_block {
+    border-color: #16253D80;
+    color: #16253D;
+}
+
+.tplus_block h5.card-title {
+    text-align: center;
+    display: block !important;
+    font-weight: 400;
+}
+
+.tplus_block .tp_float_button {
+    height: 45px;
+    width: 50px;
+    background: #043766 no-repeat center center;
+    border-radius: 4px;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, .12);
+    display: none;
+    position: fixed;
+    left: 20px;
+    bottom: 80px;
+    z-index: 3;
+    margin: 1px;
+    border: 0;
+    box-sizing: content-box;
+}
+
+.tplus_block .switch input {
+    display: none;
+}
+
+.tplus_block .switch input + label {
+    display: flex;
+    padding-right: 0;
+    padding-left: 3.95rem;
+}
+
+.tplus_block .switch input:checked + label::before {
+    background-color: var(--success);
+}
+
+.tplus_block .switch input + label::before, .tplus_block .switch input + label::after {
+    right: initial !important;
+    left: 0;
+}
+
+.tplus_block .switch input + label::after {
+    right: initial !important;
+    left: 2px;
+}
+
+.tplus_block .switch input:not(:checked) + label::after {
+    margin-left: 1.725rem;
+}
+
+#tp_colorswitcher {
+    display: none;
+    align-items: center;
+}
+
+#tp_colorswitcher input[type=range] {
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 5px;
+    /*background-image: linear-gradient(to left, hsl(87, 77%, 25%) 0 8.3%, hsl(117, 77%, 25%) 8.3% 16.6%, hsl(147, 77%, 25%) 16.6% 25%, hsl(177, 77%, 25%) 25% 33.3%, hsl(207, 77%, 25%) 33.3% 41.6%, hsl(237, 77%, 25%) 41.6% 50%,hsl(267, 77%, 25%) 50% 58.3%,hsl(297, 77%, 25%) 58.3% 66.6%,hsl(327, 77%, 25%) 66.6% 75%, hsl(357, 77%, 25%) 75% 83.3%, hsl(27, 77%, 25%) 83.3% 91.6%, hsl(57, 77%, 25%) 91.6% 100%);*/
+    background-image: linear-gradient(to left, hsl(82, 100%, 25%) 0 8.3%, hsl(112, 100%, 25%) 8.3% 16.6%, hsl(142, 100%, 25%) 16.6% 25%, hsl(172, 100%, 25%) 25% 33.3%, hsl(202, 100%, 25%) 33.3% 41.6%, hsl(232, 100%, 25%) 41.6% 50%, hsl(262, 100%, 25%) 50% 58.3%, hsl(292, 100%, 25%) 58.3% 66.6%, hsl(322, 100%, 25%) 66.6% 75%, hsl(352, 100%, 25%) 75% 83.3%, hsl(22, 100%, 25%) 83.3% 91.6%, hsl(52, 100%, 25%) 91.6% 100%);
+    height: 0.8rem;
+    width: 100%;
+    outline: none;
+    opacity: 0.8;
+}
+
+#tp_colorswitcher input[type=range]:hover, #tp_colorswitcher input[type=range]:focus {
+    opacity: 1;
+}
+
+#tp_colorswitcher input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--navbar_bg);
+    border: 2px solid #ccc;
+    height: 1rem;
+    width: 1rem;
+    border-radius: 100%;
+}
+
+#tp_colorswitcher input[type=range]::-moz-range-thumb {
+    appearance: none;
+    background-color: var(--navbar_bg);
+    border: 2px solid #ccc;
+    height: 0.8rem !important;
+    width: 0.8rem !important;
+    border-radius: 100%;
+}
+
+#tp_colorswitcher input[type=range]::-webkit-slider-thumb:active {
+    background-color: transparent;
+    border-color: #fff;
+}
+
+#tp_colorswitcher input[type=range]::-moz-range-thumb:active {
+    background-color: transparent;
+    border-color: #fff;
+}
+
+#coursecontentcollapse1 .tplus_block {
+    margin-top: 8px;
+    border-radius: 8px;
+}
+
+.tplus_main_actions {
+    display: grid;
+    text-align: center;
+    grid-row-gap: 0.5rem;
+}
+
+.tplus_main_actions a.cmenu {
+    display: block;
+    padding: 2px 4px;
+    margin: 8px auto;
+}
+
+#coursecontentcollapse1 .tplus_main_actions {
+    display: flex;
+    gap: 8px;
+    text-align: right;
+}
+
+#coursecontentcollapse1 .tplus_main_actions > div {
+    background-color: #fff1;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #0003;
+    flex: 0 1 100%;
+}
+
+#coursecontentcollapse1 .tplus_main_actions > div.custom-switch {
+    padding-right: calc(2.6875rem + 8px);
+}
+
+
+#coursecontentcollapse1 .tplus_block h5.card-title {
+    border: 0;
+    border-radius: 8px;
+    background-color: var(--dark);
+    margin: 0;
+    padding: 8px;
+    font-weight: 600;
+    text-align: center;
+    color: #eee;
+}
+
+/*
+@media (max-width:1299px) {
+	
+	.tplus_block .tp_float_button {
+		display: block;
+	}
+
+	.tplus_block .card-body, [tplus="dm"] .tplus_block .card-body {
+		display: none;
+		position: fixed;
+		left: 20px;
+		bottom: 80px;
+		z-index: 3;
+		background-color: #061123;
+		border: 1px solid #000 !important;
+		padding-bottom: calc(1.25rem + 45px);
+		color: #fff;
+		border-radius: 4px;
+		box-shadow: 0 16px 24px 2px rgba(0,0,0,0.14),0 6px 30px 5px rgba(0,0,0,0.12),0 8px 10px -7px rgba(0,0,0,0.2);
+		width: 300px;
+	}
+
+	[tplus="dm"] .tplus_block h5.card-title, .tplus_block h5.card-title {
+		position: absolute;
+		border: 0;
+		bottom: 0;
+		width: 298px;
+		height: 46px;
+		background-color: #043766;
+		margin: 0 -1.25rem !important;
+		display: flex !important;
+		align-items: center;
+		padding-left: 50px;
+		border-top: 1px solid #000;
+		border-radius: 4px;
+		cursor: default;
+	}
+
+	.tplus_block:hover .card-body {
+		display: block;
+	}
+
+	.tplus_block:hover .tp_float_button {
+		box-shadow: none;
+	}
+}*/
+
+.row.maor_mgrid {
+    display: grid;
+    grid-template-areas: "a b" "a c";
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 70% 30%;
+}
+
+.row.maor_mgrid > div:not(.maor_mgrid_expanded) .card-text.content {
+    display: none;
+}
+
+.row.maor_mgrid > div {
+    max-width: unset;
+}
+
+.row.maor_mgrid > div.maor_mgrid_expanded {
+    grid-area: a;
+}
+
+a.fa.maor_download {
+    border-radius: 20px;
+    padding: 4px 8px;
+    box-sizing: content-box;
+    height: 1em;
+    line-height: 1em;
+    position: absolute;
+    left: .75rem;
+    top: .75rem;
+}
+
+.row a.fa.maor_download::after {
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    padding-right: 4px;
+}
+
+.row a.fa.maor_download.fa-compress::after {
+    content: "שחזר"
+}
+
+.row.maor_mgrid a.fa.maor_download.fa-expand::after {
+    content: "הרחב"
+}
+
+.row.maor_mgrid a.fa.maor_download.fa-expand {
+    position: unset;
+    float: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10ch;
+    margin: 0 auto;
+}

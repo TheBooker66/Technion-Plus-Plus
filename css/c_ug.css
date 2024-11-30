@@ -1,0 +1,81 @@
+:root {
+
+    --prim-dark: hsl(208, 80%, 15%);
+    --prim-cool: hsl(208, 90%, 23%);
+    --prim-kot: hsl(208, 100%, 5%);
+}
+
+#TP_infobox {
+    border: solid var(--prim-dark);
+    border-width: 0px 5px;
+    clear: both;
+    margin: 0;
+    border-radius: 4px;
+}
+
+#TP_infobox .properties-section {
+    background: var(--prim-dark);
+    color: #fff;
+    padding: 10px 8px;
+    width: auto;
+}
+
+#TP_infobox iframe {
+    width: 100%;
+    height: 200px;
+    border: 0;
+    display: block;
+}
+
+#TP_infobox .TP_expand {
+    float: left;
+    display: flex;
+    align-items: center;
+    padding: 0.2em 0.4em;
+    background-color: var(--prim-kot);
+    border-radius: 4px;
+    box-sizing: content-box;
+    border: 1px solid #fff;
+    height: calc(0.8em - 2px);
+    cursor: pointer;
+    margin-right: 0.5em;
+}
+
+#TP_infobox .TP_expand:hover {
+    background-color: var(--prim-cool);
+}
+
+#TP_infobox .TP_expand::before {
+    content: "הרחב";
+    font-size: small;
+    font-size: 0.6em;
+    margin-left: 0.4em;
+}
+
+#TP_infobox .TP_expand[data-expanded="true"]::before {
+    content: "צמצם";
+}
+
+#TP_infobox .TP_expand[data-expanded="true"] .icon-resize-full {
+    background-position: -384px -96px;
+}
+
+#TP_infobox small {
+    font-size: 0.5em;
+    font-weight: 400;
+}
+
+#TP_infobox label {
+    float: right;
+    margin-bottom: 0;
+    font-size: inherit;
+    line-height: initial;
+    display: flex;
+    align-items: center;
+    gap: 0.2em;
+    font-size: 1.125em;
+}
+
+#TP_infobox input[type=checkbox] {
+    margin-top: 0;
+}

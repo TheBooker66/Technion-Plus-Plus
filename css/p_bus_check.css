@@ -1,0 +1,116 @@
+.drow, .blat {
+    display: table-row;
+}
+
+.drow:nth-of-type(odd) {
+    background-color: #f9f9fa;
+}
+
+.drow.chosen {
+    background-color: rgba(69, 161, 255, 0.2);
+}
+
+.drow:nth-of-type(odd).chosen {
+    background-color: rgba(69, 161, 255, 0.6);
+}
+
+.drow:hover {
+    background-color: rgba(69, 161, 255, 0.9) !important;
+    cursor: pointer;
+}
+
+.drow.blat {
+    background-color: rgba(215, 0, 34, 0.8) !important;
+    transition: all .25s linear;
+}
+
+.blat:hover {
+    cursor: pointer;
+}
+
+.dcell, .dcellM {
+    display: table-cell;
+    padding: 4px;
+}
+
+.dcellM {
+    text-align: center;
+}
+
+#captions {
+    display: table-row;
+    font-weight: 700;
+    font-size: 11px;
+    color: #000f40;
+    background-image: linear-gradient(to bottom, #fff, #ededf0);
+}
+
+#captions div {
+    display: table-cell;
+    border-bottom: 1px solid #000f40;
+    padding: 4px;
+    vertical-align: middle;
+}
+
+#additional .settings {
+    padding: 6px 4px;
+}
+
+.settings small {
+    display: block;
+    color: #737373;
+    font-size: 11px;
+}
+
+.settings select {
+    border: 0;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    color: #0c0c0d;
+    display: inline-block;
+    margin: 0;
+    padding: 0 0 0 14px;
+    font-family: 'Segoe UI', arial;
+    text-align: left;
+    direction: ltr;
+    background: url("../icons/arrowhead-down-12-0.svg") no-repeat 0 50%;
+    opacity: 0.7;
+}
+
+.settings select:hover {
+    color: #003eaa;
+    background: url("../icons/arrowhead-down-12-0.svg") no-repeat 0 50%;
+    opacity: 1;
+    cursor: pointer;
+}
+
+#spinner:before {
+    content: '';
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 50%;
+    margin: 20px -10px;
+    border-radius: 50%;
+    border-top: 4px solid rgba(0, 120, 220, 1.0);
+    border-right: 4px solid rgba(0, 120, 220, 0.0);
+    animation: spinner .3s linear infinite;
+}
+
+@keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+h3 {
+    border-top: 1px solid #d7d7db;
+    background-color: #f9f9fa;
+    color: #0060df;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 8px;
+    text-align: right;
+    margin: 2px 0 5px 0;
+}

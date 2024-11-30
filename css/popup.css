@@ -1,0 +1,390 @@
+
+:root {
+    /*--prim-dark: #16253D;
+    --prim-cool: #043766;
+    --prim-kot: #061123;
+    --sec-light: rgb(246, 198, 54);
+    --sec-norm: rgb(238, 154, 65);
+    --sec-dark: rgb(205, 114, 19);
+    --sec-darker: rgb(119, 64, 6);*/
+    --prim-dark: hsl(208, 80%, 15%);
+    /*--prim-effect: #0A5191;*/
+    --prim-cool: hsl(208, 90%, 23%);
+    --prim-kot: hsl(208, 100%, 5%);
+    --sec-light: hsl(35, 100%, 64%);
+    --sec-norm: hsl(35, 100%, 48%);
+    --sec-dark: hsl(35, 100%, 35%);
+    --sec-darker: hsl(35, 100%, 25%);
+}
+
+html {
+    overflow: hidden;
+}
+
+body {
+    background: #fff;
+    color: #0c0c0d;
+    cursor: default;
+    font-family: 'Segoe UI', arial;
+    font-size: 13px;
+    margin: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+}
+
+.wrapper {
+    width: 270px;
+    max-width: 270px;
+    padding: 0;
+    margin: 0;
+    z-index: 0;
+}
+
+.wrapper::after {
+    display: block;
+    content: '';
+    background-color: var(--prim-dark);
+    height: 4px;
+    margin: 1px;
+    background-image: linear-gradient(15deg, var(--prim-dark), var(--prim-cool));
+}
+
+#koteret {
+    background-color: var(--prim-kot);
+    text-align: left;
+    color: rgba(237, 237, 240, 1);
+    display: block;
+    margin: 0;
+    padding: 4px 8px;
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    height: 30px;
+    box-sizing: border-box;
+    line-height: 22px;
+}
+
+#koteret > sup {
+    position: absolute;
+    margin-right: -9px;
+    margin-top: -5px;
+}
+
+.options {
+    cursor: pointer;
+    float: right;
+    border-radius: 4px;
+    background-color: var(--prim-dark);
+    border: 1px solid transparent;
+    line-height: 12px;
+    font-size: 12px;
+    box-sizing: border-box;
+    padding: 1px 2px;
+    margin: 1px 0 0 6px;
+}
+
+.options:hover {
+    border-color: var(--prim-cool);
+    background-color: var(--prim-cool);
+}
+
+.options img {
+    vertical-align: middle;
+}
+
+.options:after {
+    padding: 0;
+    display: inline-block;
+    transition: all ease 0.5s;
+    max-width: 0;
+    opacity: 0;
+    content: attr(title);
+    position: relative;
+    z-index: -1;
+    vertical-align: middle;
+}
+
+.options:hover:after {
+    padding: 0 4px 0 0;
+    max-width: 70px;
+    opacity: 1;
+    z-index: 0;
+}
+
+#myform input[type=text] {
+    border: 1px solid rgba(12, 12, 13, 0.3);
+    border-radius: 2px;
+    color: #0c0c0d;
+    display: inline-block !important;
+    font-size: 11px;
+    font-family: 'Segoe UI', arial;
+    margin: 1px;
+    padding: 4px;
+    width: 143px;
+}
+
+#myform input[type=text]:hover {
+    border: 1px solid rgba(12, 12, 13, 0.5);
+}
+
+#myform input[type=text]:focus {
+    outline: none !important;
+    border: 1px solid var(--sec-darker);
+    box-shadow: 0 0 4px 1px var(--sec-light);
+}
+
+#myform .submit {
+    display: inline-block;
+    margin: 2px;
+    text-decoration: none;
+    color: #fff;
+    padding: 5px;
+    background-color: var(--sec-norm);
+    font-size: 11px;
+    font-family: 'Segoe UI', arial;
+    min-width: 70px;
+    border-radius: 2px;
+    border: 0;
+    cursor: pointer;
+}
+
+#myform .submit:hover {
+    background-color: var(--sec-dark);
+}
+
+h2 {
+    background-color: var(--prim-dark);
+    box-shadow: 0 6px 4px -3px rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.87);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px;
+    text-align: center;
+    z-index: 1;
+    margin: 0 0 8px 0;
+}
+
+.returner {
+    opacity: .8;
+    float: right;
+    margin: -3px 0;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    background-image: url('../icons/backward.svg');
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: 14px;
+    display: block;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.returner:hover {
+    opacity: 1;
+    background-color: var(--prim-cool);
+}
+
+/*---------------------------------------*/
+/* CHECKBOX 							 */
+/* #toggles in use by p_main.css !!!! 	 */
+/*---------------------------------------*/
+input[type="checkbox"] {
+    display: none;
+}
+
+:not(#toggles) > * > [type="checkbox"]:not(:checked) + label,
+:not(#toggles) > * > [type="checkbox"]:checked + label {
+    position: relative;
+    padding-left: 4em;
+    padding-top: .25em;
+    cursor: pointer;
+}
+
+:not(#toggles) > * > [type="checkbox"]:not(:checked) + label:before,
+:not(#toggles) > * > [type="checkbox"]:checked + label:before,
+:not(#toggles) > * > [type="checkbox"]:not(:checked) + label:after,
+:not(#toggles) > * > [type="checkbox"]:checked + label:after {
+    content: '';
+    position: absolute;
+    transition: all .25s ease;
+}
+
+:not(#toggles) > * > [type="checkbox"]:not(:checked) + label:before,
+:not(#toggles) > * > [type="checkbox"]:checked + label:before {
+    left: 0.1em;
+    top: 0.4em;
+    width: 2.75em;
+    height: 1em;
+    background: #d7d7db;
+    border-radius: 1.1em;
+}
+
+:not(#toggles) > * > [type="checkbox"]:not(:checked) + label:after,
+:not(#toggles) > * > [type="checkbox"]:checked + label:after {
+    left: 1.4em;
+    top: 0.14em;
+    background-color: var(--sec-dark);
+    border: 0;
+    height: 1.5em;
+    border-radius: 50%;
+    width: 1.5em;
+    box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.05), 0 0 1px 0px rgba(0, 0, 0, 0.12) inset;
+    z-index: 1;
+}
+
+:not(#toggles) > * > [type="checkbox"]:not(:checked) + label:after {
+    background-color: #b1b1b3;
+}
+
+:not(#toggles) > * > [type="checkbox"]:checked + label:after {
+    left: 0em;
+}
+
+:not(#toggles) > * > [type="checkbox"]:checked + label:before {
+    background-color: var(--sec-light);
+}
+
+/*
+* info bars
+*/
+.attention {
+    display: block;
+    background: #ffe900 url('../icons/warning-16.svg') 98% 50% no-repeat;
+    color: #3e2800;
+    border-radius: 4px;
+    padding: 4px 28px 4px 4px;
+    margin: 8px 4px;
+}
+
+.error_bar {
+    background: #d70022 url('../icons/error.png') 98% 50% no-repeat;
+    color: #fff;
+    border-radius: 4px;
+    padding: 4px 28px 4px 4px;
+    margin: 8px 4px;
+}
+
+/*
+* toggle table
+*/
+.toggle_table {
+    direction: ltr;
+    display: table;
+    padding: 10px;
+    border-top: 1px solid #d7d7db;
+}
+
+.table_row {
+    display: table-row;
+}
+
+.toggle_cell {
+    display: table-cell;
+    width: 1%;
+}
+
+.table_cell {
+    direction: rtl;
+    display: table-cell;
+}
+
+.toggle_table .table_cell label {
+    display: block;
+    cursor: pointer;
+}
+
+/*
+* tabs
+*/
+#tabs {
+    background-color: var(--prim-dark);
+    text-align: center;
+    margin: 0 0 6px 0;
+    padding: 0 8px;
+    box-shadow: 0 6px 4px -3px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 6px;
+}
+
+#tabs .tab {
+    display: inline-block;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 0px 6px;
+    border-bottom: 3px solid transparent;
+}
+
+#tabs .tab:hover {
+    color: rgba(255, 255, 255, 0.87);
+    background: var(--prim-cool);
+}
+
+#tabs .current {
+    color: rgba(255, 255, 255, .87);
+    border-bottom-color: rgba(255, 255, 255, .87);
+}
+
+/*
+* secondary tabs
+* currently in use only in main popup
+*/
+#secondary_tabs {
+    background-color: #f9f9fa;
+    text-align: center;
+    margin: 8px 0 0 0;
+    padding: 0 2px;
+    box-shadow: 0 -5px 4px -4px rgba(0, 0, 0, 0.12);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 4px;
+}
+
+#secondary_tabs .tab {
+    cursor: pointer;
+    color: rgba(12, 12, 13, 0.4);
+    font-size: 12px;
+    font-weight: 400;
+    padding: 6px 0px 8px;
+    border-top: 2px solid transparent;
+}
+
+#secondary_tabs .tab:hover:not(.current) {
+    color: rgba(12, 12, 13, 0.75);
+}
+
+#secondary_tabs .current {
+    color: var(--prim-cool);
+    cursor: default;
+    font-weight: 600;
+    border-top-color: var(--prim-cool);
+}
+
+/*
+* list items
+*/
+.list_item {
+    font-size: 11px;
+    padding: 8px 4px;
+}
+
+.list_item b {
+    font-size: 13px;
+    line-height: 13px;
+}
+
+.divider {
+    border: 0;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.12);
+    display: block;
+    width: 80%;
+    padding: 0;
+    margin: 0 auto;
+}
