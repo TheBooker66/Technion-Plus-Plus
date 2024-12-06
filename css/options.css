@@ -174,3 +174,28 @@ small, .description {
     font-weight: 700;
     line-height: 300%;
 }
+
+.dark-mode {
+    background: #16253D;
+    color: lightgrey;
+}
+
+.dark-mode .container {
+    border: 1px solid darkslateblue;
+    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.12);
+    background: darkslateblue;
+}
+
+.dark-mode h2 {
+    color: lightgrey;
+}
+
+.dark-mode .description, .dark-mode small {
+    color: slategrey;
+}
+
+.dark-mode #fixed_footer {
+    background-color: #16253D;
+    border-top: 1px solid #16253D;
+    box-shadow: 0 -5px 4px -4px rgba(0, 0, 0, 0.12);
+}

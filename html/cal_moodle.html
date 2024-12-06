@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="no-cache"/>
+    <title>Technion Plus</title>
+    <link rel="stylesheet" href="../css/popup.css" type="text/css">
+    <link rel="stylesheet" href="../css/p_calendar.css" type="text/css">
+    <script type="module" src="../js/common_popup.js"></script>
+</head>
+<body>
+<div class="wrapper">
+    <div class="main-content">
+        <div id="tabs">
+            <div class="tab current">מטלות לביצוע</div>
+            <div class="tab">מטלות שהושלמו</div>
+        </div>
+
+        <div id="message">
+            <div id="spinner"></div>
+            <div id="new_assignments"></div>
+            <div id="finished_assignments"></div>
+        </div>
+
+        <div id="error"></div>
+
+        <div class="toggle_table" id="appeals">
+            <div class="table_row">
+                <div class="toggle_cell">
+                    <input type="checkbox" id="appeals_toggle"/>
+                    <label for="appeals_toggle"></label>
+                </div>
+                <div class="table_cell">
+                    <label>סנן ערעורים וזומים מהרשימה (יכול להיות שבור)</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="goto"><a href="https://moodle.technion.ac.il/my/" target="_blank">מעבר לרשימת ההגשות במודל</a></div>
+    </div>
+</div>
+<script type="module" src="../js/p_cal_common.js"></script>
+<script type="module" src="../js/p_cal_moodle.js"></script>
+</body>
+</html>

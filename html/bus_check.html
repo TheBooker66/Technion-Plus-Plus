@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="no-cache"/>
+    <title>Technion Plus</title>
+    <link rel="stylesheet" href="../css/popup.css" type="text/css">
+    <link rel="stylesheet" href="../css/p_bus_check.css" type="text/css">
+    <script type="module" src="../js/common_popup.js"></script>
+</head>
+<body>
+
+<template id="busline">
+    <div class="drow">
+        <div class="dcell"></div>
+        <div class="dcell"></div>
+        <div class="dcellM"></div>
+    </div>
+</template>
+
+<div class="wrapper">
+    <div class="main-content">
+        <div style="padding: 0px 4px; overflow-y: scroll; max-height: 340px; min-height: 100px">
+            <div id="bus_table" style="display: table; width: 100%">
+                <div id="captions">
+                    <div style="width: 25px">קו</div>
+                    <div>יעד</div>
+                    <div style="width: 5px; text-align: center">דקות לתחנה</div>
+                </div>
+            </div>
+            <div id="spinner"></div>
+        </div>
+        <div id="additional">
+            <div style="font-size: 13px; background-color: #ffe900; border-radius: 4px; color: #3e2800; margin: 8px 4px; padding: 8px 4px;">
+                להפעלת/כיבוי התראה, לחץ על הקו המבוקש.
+            </div>
+            <h3>הגדרות</h3>
+            <div class="settings" style="border: 0;">
+                <div style="text-align: left">
+                    <span style="float: right">תחנה:</span>
+                    <select id="station_select"></select>
+                </div>
+                <small>שינוי ימחק התראות קיימות.</small>
+            </div>
+            <div class="settings">
+                התראה לפני הגעה לתחנה:
+                <span style="float: left">
+					<select id="min_select">
+						<option value="5">5 דקות</option>
+						<option value="10">10 דקות</option>
+						<option value="15">15 דקות</option>
+					</select>
+				</span>
+                <small>שינוי ישפיע על ההתראות הקיימות.</small>
+            </div>
+        </div>
+        <div id="error" class="error_bar" style="display: none"></div>
+    </div>
+</div>
+<script type="module" src="../js/p_bus_check.js"></script>
+</body>
+</html>

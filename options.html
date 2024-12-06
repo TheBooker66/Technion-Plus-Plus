@@ -2,7 +2,7 @@
 <html dir="rtl">
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="css/options.css" type="text/css">
+    <link rel="stylesheet" href="./css/options.css" type="text/css">
     <title>Technion Plus - Options</title>
 </head>
 <body>
@@ -18,7 +18,7 @@
         </div>
         <div>
             ניתן לפנות אל מפתח התוסף המקורי, <b>מאור לוי</b>, בדואר אלקטרוני בכתובת <span>maorlevy.ext@gmail.com</span>,
-            ואל המפתח הנוכחי, <b>איתן "67"</b>, בכתובת thebooker666@gmail.com.<br/>
+            ואל המפתח הנוכחי, <b>איתן "67" עמירן</b>, בכתובת ethan.amiran@gmail.com.<br/>
             לחיצה על הכפתור הבא תפתח מיידית חלון לשליחת מייל למפתח התוסף דרך ג'ימייל/שרת האימייל האהוב עליכם בהתאם
             להעדפה המסומנת בהמשך דף הגדרות זה.
         </div>
@@ -57,6 +57,7 @@
     <h2>הגדרות כלליות</h2>
     <div class="container">
         <div><label><input type="checkbox" id="quick_login"/> הפעל התחברות אוטומטית בכניסה לאתרי הטכניון</label></div>
+        <div><label><input type="checkbox" id="dark_mode"/>הפעל מצב חשוך בעמוד זה</label></div>
         <div>
             <label><input type="checkbox" id="panopto_save"/> שמירת העדפות בפנופטו</label>
             <span class="description">תאפשר שמירה של מהירות ההפעלה ומצב התאורה בפנופטו.</span>
@@ -135,6 +136,6 @@
     <div id="status"></div>
     <div style="text-align: left"><input type="button" id="save" value="שמור שינויים" class="submit"/></div>
 </div>
-<script src="scripts/options.js"></script>
+<script type="module" src="js/options.js"></script>
 </body>
 </html>
