@@ -305,17 +305,20 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 	}
 
 	function d(c, h, k) {
-		for (let g = 0; g < c.length; g++) c[g].addEventListener("click", () => {
-			if (!c[g].classList.contains("current")) {
-				for (let m = 0; m < c.length; m++) c[m].className = m === g ? "tab current" : "tab", h[m].style.display = m === g ? "block" : "none";
-				k && k(g)
-			}
-		})
+		for (let g = 0; g < c.length; g++)
+			c[g].addEventListener("click", () => {
+				if (!c[g].classList.contains("current")) {
+					for (let m = 0; m < c.length; m++)
+						c[m].className = m === g ? "tab current" : "tab", h[m].style.display = m === g ? "block" : "none";
+					k && k(g)
+				}
+			})
 	}
 
 	var e = new CommonPopup;
 	e.css_list = ["main"];
 	e.popupWrap();
+
 	function checkOS() {
 		if (navigator.userAgentData) {
 			const hints = ["architecture", "model", "platform", "platformVersion", "uaFullVersion"];
@@ -342,15 +345,13 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 	});
 	e = document.getElementById("more_links");
 	var l = document.getElementById("print"), n = document.getElementById("apps_links");
-	[{b: "gotoPrint", from: e, to: l}, {b: "gotoApps", from: e, to: n}, {
-		b: "returnFromPrint",
-		from: l,
-		to: e
-	}, {b: "returnFromApps", from: n, to: e}].forEach(c => {
+	[{b: "gotoPrint", from: e, to: l},
+		{b: "gotoApps", from: e, to: n},
+		{b: "returnFromPrint", from: l, to: e},
+		{b: "returnFromApps", from: n, to: e}].forEach(c => {
 		document.getElementById(c.b).addEventListener("click", () => {
-			var h = c.from;
 			c.to.style.display = "block";
-			h.style.display = "none";
+			c.from.style.display = "none";
 			f.className = "collapse"
 		})
 	});
@@ -362,16 +363,16 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 	r.left = parseInt((window.screen.width - r.width) / 2);
 	document.getElementById("organizer").addEventListener("click", () => chrome.windows.create(r));
 	var t = document.getElementById("tools_content").getElementsByTagName("a");
-	for (let c = 0; c < t.length; c++) [1, 2, 3].includes(c) || t[c].addEventListener("click", () => {
-		window.location.href = "html/" + t[c].id + ".html"
-	});
+	for (let c = 0; c < t.length; c++)
+		[3, 4, 6].includes(c) || t[c].addEventListener("click", () => { // 3 - Organiser, 4 - grades sheet, 6 - printer
+			window.location.href = "html/" + t[c].id + ".html"
+		});
 	e = document.querySelectorAll("#more_links > div");
 	d(e[0].querySelectorAll(".tab"), Array.from(e).slice(1), c => {
 		f.className = "collapse"
 	});
 	e = document.getElementById("secondary_tabs").getElementsByTagName("div");
 	l = document.getElementById("print").getElementsByTagName("div");
-	l = document.querySelectorAll("#print > div");
 	d(e, l, null);
 	document.getElementById("cantlogin").getElementsByTagName("u")[0].addEventListener("click", function () {
 		chrome.runtime.openOptionsPage(function () {
@@ -415,22 +416,22 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 		var h = ["cal_moodle", "cal_cs", "cal_mathnet", "cal_webwork"];
 		for (var k = 0; k < h.length; k++)
 			c.cal_seen & Math.pow(2, k) && (document.getElementById(h[k]).className = "major hw");
-		0 != c.dl_current &&
-		document.getElementById("downloads").classList.add("active");
+		0 != c.dl_current && document.getElementById("downloads").classList.add("active");
 		h = a(b(c.uidn_arr[0] + "", c.uidn_arr[1]));
-		h = "" == h ? "\u05d4\u05e7\u05dc\u05d3 \u05de\u05e1\u05e4\u05e8 \u05d6\u05d4\u05d5\u05ea \u05db\u05d0\u05df" : h;
+		h = "" == h ? "הקלד מספר זהות כאן" : h;
 		k = c.gmail && !chrome.runtime.lastError;
 		var g = document.getElementById("print").getElementsByTagName("a");
-		for (let p = 0; p < g.length; p++) g[p].setAttribute("href", k ? "https://mail.google.com/mail/u/0/?view=cm&to=print." + g[p].id + "@campus.technion.ac.il&su=" + h + "&fs=1&tf=1" : "mailto:print." + g[p].id + "@campus.technion.ac.il?subject=" +
-			h), "\u05d4\u05e7\u05dc\u05d3 \u05de\u05e1\u05e4\u05e8 \u05d6\u05d4\u05d5\u05ea \u05db\u05d0\u05df" === h && g[p].addEventListener("click", () => {
-			chrome.runtime.sendMessage({
-					mess_t: "silent_notification",
-					message: '\u05de\u05d9\u05d3 \u05d9\u05d9\u05e4\u05ea\u05d7 \u05d7\u05dc\u05d5\u05df \u05dc\u05e9\u05dc\u05d9\u05d7\u05ea \u05de\u05d9\u05d9\u05dc \u05d1\u05d4\u05ea\u05d0\u05dd \u05dc\u05d1\u05d7\u05d9\u05e8\u05ea\u05da. \u05e2\u05dc\u05d9\u05d9\u05da \u05dc\u05de\u05dc\u05d0 \u05de\u05e1\u05e4\u05e8 \u05ea"\u05d6 \u05d1\u05e0\u05d5\u05e9\u05d0 \u05d5\u05dc\u05e6\u05e8\u05e3 \u05d0\u05ea \u05d4\u05e7\u05d1\u05e6\u05d9\u05dd \u05d4\u05de\u05d1\u05d5\u05e7\u05e9\u05d9\u05dd \u05dc\u05d4\u05d3\u05e4\u05e1\u05d4.'
-				},
-				{}, () => {
-					chrome.runtime.lastError && console.log("TE_popup_printers: " + chrome.runtime.lastError.message)
-				})
-		});
+		for (let p = 0; p < g.length; p++)
+			g[p].setAttribute("href", k ? "https://mail.google.com/mail/u/0/?view=cm&to=print." + g[p].id + "@campus.technion.ac.il&su=" + h + "&fs=1&tf=1" : "mailto:print." + g[p].id + "@campus.technion.ac.il?subject=" +
+				h), "הקלד מספר זהות כאן" === h && g[p].addEventListener("click", () => {
+				chrome.runtime.sendMessage({
+						mess_t: "silent_notification",
+						message: 'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.'
+					},
+					{}, () => {
+						chrome.runtime.lastError && console.log("TE_popup_printers: " + chrome.runtime.lastError.message)
+					})
+			});
 		var m = document.getElementById("UGS_Link"), v = () => {
 			m.textContent = 7 > m.textContent.length ? m.textContent + "." : "\u05d8\u05d5\u05e2\u05df"
 		};

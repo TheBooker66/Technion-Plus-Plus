@@ -48,9 +48,10 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 	}
 
 	function n() {
+		var a;
 		switch (document.getElementById("min_select").value) {
 			case "10":
-				var a = 10;
+				a = 10;
 				break;
 			case "15":
 				a = 15;

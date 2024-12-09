@@ -1,7 +1,9 @@
 {
-  "name": "Technion Plus 2",
-  "author": "Maor Levy & Ethan \"67\"",
+  "name": "Technion Plus Plus",
+  "short_name": "Technion++",
+  "author": "Ethan \"67\"",
   "description": "Get the Technion's web-experience out of the stone age.",
+  "homepage_url": "https://sites.google.com/view/technion-plus-plus/home",
   "version": "3.0.0",
   "minimum_chrome_version": "88.0",
   "manifest_version": 3,
@@ -10,13 +12,14 @@
     "type": "module"
   },
   "options_ui": {
-    "page": "options.html"
+    "page": "options.html",
+    "open_in_tab": true
   },
   "action": {
     "browser_style": false,
-    "default_icon": "icons/icon-16.png",
+    "default_icon": "icons/technion plus plus/icon-16.png",
     "default_popup": "popup.html",
-    "default_title": "Technion Plus 2"
+    "default_title": "Technion Plus Plus"
   },
   "update_url": "https://clients2.google.com/service/update2/crx",
   "permissions": [
@@ -33,12 +36,12 @@
     "https://mslworld.egged.co.il/"
   ],
   "icons": {
-    "128": "icons/icon-128.png",
-    "16": "icons/icon-16.png",
-    "19": "icons/icon-19.png",
-    "32": "icons/icon-32.png",
-    "48": "icons/icon-48.png",
-    "96": "icons/icon-96.png"
+    "16": "icons/technion plus plus/icon-16.png",
+    "19": "icons/technion plus plus/icon-19.png",
+    "32": "icons/technion plus plus/icon-32.png",
+    "48": "icons/technion plus plus/icon-48.png",
+    "96": "icons/technion plus plus/icon-96.png",
+    "128": "icons/technion plus plus/icon-128.png"
   },
   "content_scripts": [
     {
@@ -227,7 +230,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "icons/icon-*.png",
+        "icons/technion plus plus/icon-*.png",
         "audio/notification.mp3",
         "js/panopto_new.js",
         "cheesefork/share-histograms.js",

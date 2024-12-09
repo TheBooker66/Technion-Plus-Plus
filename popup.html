@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="content-type" content="no-cache"/>
-    <title>Technion Plus</title>
+    <title>Technion++</title>
     <link rel="stylesheet" href="css/popup.css" type="text/css">
     <script type="module" src="js/common_popup.js"></script>
 </head>
@@ -12,14 +12,9 @@
     <div class="main-content">
         <div id="quick_links">
             <a href="https://moodle.technion.ac.il" title="אתר הקורסים של הטכניון" target="_blank">מודל</a>
+            <a href="https://portalex.technion.ac.il/irj/portal/external"
+               title="שירותים לסטודנט - אישורים, תדפיסים, כרטיסי בחינות ומערכת כלי רכב" target="_blank">SAP</a>
             <a href="https://panoptotech.cloud.panopto.eu" title="מאגר קורסים מצולמים" target="_blank">פנופטו</a>
-            <a href="https://bookme.technion.ac.il/booked/Web/search-availability.php" target="_blank"
-               title="הזמנת חדרי לימוד בקמפוס">BookMe</a>
-            <a href="https://portalex.technion.ac.il/irj/portal/external" title="מערכת אישורי רכבים לדיירי מעונות"
-               target="_blank">SAP</a>
-            <a href="https://grades.cs.technion.ac.il" title='אתר הקורסים של הפקולטה למדמ"ח'
-               target="_blank" dir="ltr">GR++</a>
-            <a title="שירותים לסטודנט - אישורים, תדפיסים, כרטיסי בחינות" id="UGS_Link">Students</a>
         </div>
 
         <div id="toggles">
@@ -50,20 +45,20 @@
                 </div>
                 <!-- errors end -->
 
-                <a id="course_find" class="major"><span class="img_container"><img src="icons/video.png"/></span> חיפוש
-                    קורס מוקלט</a>
-                <a id="gotoPrint" class="major"><span class="img_container"><img src="icons/print.svg"/></span> שליחה
-                    להדפסה בטכניון</a>
-                <a id="gotoSheets" href="https://students.technion.ac.il/local/tcurricular/grades?TP=2" target="_blank"><span
-                        class="img_container"><img src="icons/academic.svg"/></span> מחשבון ממוצע אקדמי</a>
-                <a id="organizer" class="active"><span class="img_container"><img src="icons/calendar.svg"/></span>
-                    ארגונית פלוס - כל המטלות במקום אחד</a>
                 <a id="cal_moodle" class="major"><span class="img_container"><img src="icons/moodle.svg"/></span> מטלות
                     קרובות (מודל)</a>
-                <a id="cal_cs" class="major"><span class="img_container"><img src="icons/cslist.svg"/></span> מטלות
+                <a id="cal_cs" class="major"><span class="img_container"><img src="icons/compsci.svg"/></span> מטלות
                     קרובות (מדמ"ח)</a>
                 <a id="cal_webwork" class="major"><span class="img_container"><img src="icons/webwork.svg"/></span>
                     מטלות קרובות (וובוורק)</a>
+                <a id="organizer" class="active"><span class="img_container"><img src="icons/calendar.svg"/></span>
+                    ארגונית<sup>++</sup> – כל המטלות במקום אחד</a>
+                <a id="gotoSheets" href="https://students.technion.ac.il/local/tcurricular/grades?TP=2" target="_blank"><span
+                        class="img_container"><img src="icons/academic.svg"/></span> מחשבון ממוצע אקדמי</a>
+                <a id="course_find" class="major"><span class="img_container"><img src="icons/video.svg"/></span> חיפוש
+                    קורס מוקלט</a>
+                <a id="gotoPrint" class="major"><span class="img_container"><img src="icons/print.svg"/></span> שליחה
+                    להדפסה בטכניון</a>
                 <a id="bus_check" class="major"><span class="img_container"><img src="icons/bus.svg"/></span> אוטובוסים
                     קרובים - זמן אמת</a>
                 <a id="food" class="major"><span class="img_container"><img src="icons/food.svg"/></span> לו"ז מסעדות
@@ -72,11 +67,15 @@
                     הורדות</a>
             </div>
             <div id="links_content" style="display: none">
-                <a href="https://bookme.technion.ac.il/booked/Web/calendar.php" target="_blank"><span
-                        class="img_container"><img src="icons/room.png"/></span> BookMe - הזמנת חדרי לימוד בקמפוס</a>
                 <a href="https://grades.technion.ac.il" target="_blank"><span class="img_container"><img
                         src="icons/bookmark.svg"/></span> אפגרייד (ציונים)</a>
-                <a href="http://www.admin.technion.ac.il/dpcalendar/Student.aspx" target="_blank"><span
+                <a id="UGS_Link"><span class="img_container"><img
+                        src="icons/technion.svg"/></span>Students – לשעבר האתר הראשי</a>
+                <a href="https://grades.cs.technion.ac.il" target="_blank"><span
+                        class="img_container"><img src="icons/grpp.ico"/></span> אתר הקורסים של הפקולטה למדמ"ח </a>
+                <a href="https://bookme.technion.ac.il/booked/Web/calendar.php" target="_blank"><span
+                        class="img_container"><img src="icons/room.svg"/></span> BookMe - הזמנת חדרי לימוד בקמפוס</a>
+                <a href="https://www.admin.technion.ac.il/dpcalendar/Student.aspx" target="_blank"><span
                         class="img_container"><img src="icons/academic.svg"/></span> לוח שנה אקדמי</a>
                 <a id="gotoApps" class="major"><span class="img_container"><img src="icons/downloads.svg"/></span>
                     תוכנות ברישיון טכניוני</a>
@@ -91,8 +90,8 @@
                 <div>תוכנות ברישיון טכניוני</div>
             </h2>
             <a href="https://portal.office.com/OLS/MySoftware.aspx" target="_blank"><span class="img_container"><img
-                    src="icons/office_black.png"/></span> אופיס 365</a>
-            <a id="microsoft_open" class="collapse"><span class="img_container"><img src="icons/microsoft.png"/></span>
+                    src="icons/office.svg"/></span> אופיס 365</a>
+            <a id="microsoft_open" class="collapse"><span class="img_container"><img src="icons/microsoft.svg"/></span>
                 חנות Microsoft (כלל טכניוני)
                 <div style="font-size: 11px; padding: 2px 25px 0 6px; display: none;" id="microsoft_link">לחץ <u
                         style="color: #0060df; cursor: pointer">כאן</u> והתחבר לניהול המשתמש הטכניוני שלך, בחר באפשרות
@@ -100,8 +99,8 @@
                 </div>
             </a>
             <a href="https://elms.cs.technion.ac.il/?action=signin" target="_blank"><span class="img_container"><img
-                    src="icons/microsoft.png"/></span> חנויות Microsoft & VMWare (מדמ"ח)</a>
-            <a href="http://matlab.technion.ac.il/" target="_blank"><span class="img_container"><img
+                    src="icons/microsoft.svg"/></span> חנויות Microsoft & VMWare (מדמ"ח)</a>
+            <a href="https://matlab.technion.ac.il/" target="_blank"><span class="img_container"><img
                     src="icons/chart.svg"/></span> מטלב</a>
         </div>
 

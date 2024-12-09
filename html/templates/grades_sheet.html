@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html dir="rtl" lang="he">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="content-type" content="no-cache"/>
-    <title>Technion Plus - מחשבון ממוצע אקדמי</title>
+    <title>Technion++ - מחשבון ממוצע אקדמי</title>
 </head>
 <body>
 <div class="maor_norm_wrapper">
-    <h1>מחשבון ממוצע ציונים אקדמי<span style="float: left">Technion Plus</span></h1>
+    <h1>מחשבון ממוצע ציונים אקדמי<span style="float: left">Technion</span></h1>
     <div id="stats" class="maor_grid" style="grid-template-columns: repeat(3, 1fr);">
         <h3>ממוצע ציונים מחושב: <span id="avg_grade"></span></h3>
         <h3>נקודות מחושבות: <span id="curr_points"></span> (מתוכן <span id="ex_points"></span> נקודות פטור)</h3>
@@ -80,8 +80,8 @@
             <h3>הוסף ציון</h3>
             <form id="c_form">
                 <input type="text" name="name" placeholder="שם הקורס">
-                <input type="telephone" name="points" placeholder="נקודות" maxlength="4">
-                <input type="telephone" name="grade" placeholder="ציון" maxlength="3">
+                <input type="number" name="points" placeholder="נקודות" maxlength="4">
+                <input type="number" name="grade" placeholder="ציון" maxlength="3">
                 <input type="submit" value="הוסף!">
             </form>
 
@@ -212,7 +212,7 @@
     </p>
 
     <footer id="maor_footer">
-        <div>מחשבון ממוצע ציונים אקדמי - Technion Plus</div>
+        <div>מחשבון ממוצע ציונים אקדמי - Technion</div>
         <div style="font-size: 0.8em">לא מהווה מסמך רשמי • לא מוגש מטעם הטכניון</div>
     </footer>
 </div>

@@ -232,7 +232,7 @@ input[type="checkbox"] {
     height: 1.5em;
     border-radius: 50%;
     width: 1.5em;
-    box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.05), 0 0 1px 0px rgba(0, 0, 0, 0.12) inset;
+    box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.05), 0 0 1px 0 rgba(0, 0, 0, 0.12) inset;
     z-index: 1;
 }
 
@@ -241,7 +241,7 @@ input[type="checkbox"] {
 }
 
 :not(#toggles) > * > [type="checkbox"]:checked + label:after {
-    left: 0em;
+    left: 0;
 }
 
 :not(#toggles) > * > [type="checkbox"]:checked + label:before {
@@ -253,7 +253,7 @@ input[type="checkbox"] {
 */
 .attention {
     display: block;
-    background: #ffe900 url('../icons/warning-16.svg') 98% 50% no-repeat;
+    background: #ffe900 url('../icons/warning.svg') 98% 50% no-repeat;
     color: #3e2800;
     border-radius: 4px;
     padding: 4px 28px 4px 4px;
@@ -261,7 +261,7 @@ input[type="checkbox"] {
 }
 
 .error_bar {
-    background: #d70022 url('../icons/error.png') 98% 50% no-repeat;
+    background: #d70022 url('../icons/error.svg') 98% 50% no-repeat;
     color: #fff;
     border-radius: 4px;
     padding: 4px 28px 4px 4px;
@@ -318,7 +318,7 @@ input[type="checkbox"] {
     color: rgba(255, 255, 255, 0.5);
     font-size: 12px;
     font-weight: 600;
-    padding: 8px 0px 6px;
+    padding: 8px 0 6px;
     border-bottom: 3px solid transparent;
 }
 
@@ -352,7 +352,7 @@ input[type="checkbox"] {
     color: rgba(12, 12, 13, 0.4);
     font-size: 12px;
     font-weight: 400;
-    padding: 6px 0px 8px;
+    padding: 6px 0 8px;
     border-top: 2px solid transparent;
 }
 

@@ -29,8 +29,8 @@
 	function t(a) {
 		var b = f("section", "block block_material_download card mb-3 tplus_block", {}, "", document.getElementById("block-region-side-pre"), !0),
 			c = f("div", "card-body", {}, "", b),
-			g = f("h5", "card-title d-inline", {dir: "ltr"}, "Technion Plus", c);
-		f("sup", "", {}, "+", g);
+			g = f("h5", "card-title d-inline", {dir: "ltr"}, "Technion", c);
+		f("sup", "", {}, "++", g);
 		a = a ? f("div", "card-text mt-3", {style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(128,128,128,.3);"}, "", c) : null;
 		c = f("div", "card-text mt-3 tplus_main_actions", {}, "", c);
 		g = f("div", "custom-control custom-switch", {style: "text-align: right"}, "", c);
@@ -40,7 +40,7 @@
 		c = f("div", "", {id: "tp_colorswitcher"}, "", c);
 		f("div", "", {style: "text-align: right; width: 8rem"}, "\u05e6\u05d1\u05e2 \u05de\u05e9\u05e0\u05d9", c); // צבע משני
 		var k = f("input", "", {type: "range", min: "0", max: "330", step: "30"}, "", c);
-		f("div", "tp_float_button", {style: "background-image: url(" + chrome.runtime.getURL("../icons/icon-16.png") + ");"}, "", b);
+		f("div", "tp_float_button", {style: "background-image: url(" + chrome.runtime.getURL("../icons/technion plus plus/icon-16.png") + ");"}, "", b);
 		chrome.storage.local.get({remoodle: !1, remoodle_angle: 120}, m => {
 			d.checked = m.remoodle;
 			k.value = m.remoodle_angle

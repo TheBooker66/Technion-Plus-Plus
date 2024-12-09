@@ -248,15 +248,14 @@ let cheeseforkShareHistograms = function () {
 
 		const imgSrc = doc.querySelector('img#CourseChart').src;
 		const propertyNodes = doc.querySelectorAll('table#gvChart tbody td');
-		const n = propertyNodes;
 		const properties = {
-			students: n[5] ? n[5].textContent : '',
-			passFail: n[6] ? n[6].textContent : '',
-			passPercent: n[7] ? n[7].textContent : '',
-			min: n[9] ? n[9].textContent : '',
-			max: n[10] ? n[10].textContent : '',
-			average: n[11] ? n[11].textContent : '',
-			median: n[12] ? n[12].textContent : ''
+			students: propertyNodes[5] ? propertyNodes[5].textContent : '',
+			passFail: propertyNodes[6] ? propertyNodes[6].textContent : '',
+			passPercent: propertyNodes[7] ? propertyNodes[7].textContent : '',
+			min: propertyNodes[9] ? propertyNodes[9].textContent : '',
+			max: propertyNodes[10] ? propertyNodes[10].textContent : '',
+			average: propertyNodes[11] ? propertyNodes[11].textContent : '',
+			median: propertyNodes[12] ? propertyNodes[12].textContent : ''
 		};
 
 		return {

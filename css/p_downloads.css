@@ -82,7 +82,7 @@ small {
         background-position-x: 200%;
     }
     to {
-        background-position-x: 0%;
+        background-position-x: 0;
     }
 }
 

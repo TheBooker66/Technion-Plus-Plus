@@ -49,7 +49,7 @@
 					u]) : b.includes(".zip") ? w.push([b, u]) : k.push([b, u])
 			}
 		}
-		0 < g.length + h.length + e.length + k.length && (n = document.createElement("fieldset"), n.appendChild(document.createElement("legend")).textContent = "Technion Plus", d = document.createElement("div"), d.className = "maor_flex", k = g.concat(h, e, w, k), k.length > g.length && k.length > h.length && k.length > e.length && k.length > w.length && q(k, d, "\u05d4\u05db\u05dc", a), q(g, d, "PDF", a), q(h, d, "PowerPoint", a), q(e, d, "Word", a), q(w, d, "ZIP", a), g = document.createElement("label"), g.className =
+		0 < g.length + h.length + e.length + k.length && (n = document.createElement("fieldset"), n.appendChild(document.createElement("legend")).textContent = "Technion", d = document.createElement("div"), d.className = "maor_flex", k = g.concat(h, e, w, k), k.length > g.length && k.length > h.length && k.length > e.length && k.length > w.length && q(k, d, "\u05d4\u05db\u05dc", a), q(g, d, "PDF", a), q(h, d, "PowerPoint", a), q(e, d, "Word", a), q(w, d, "ZIP", a), g = document.createElement("label"), g.className =
 			"maor_download", h = document.createElement("div"), e = document.createElement("input"), e.setAttribute("type", "checkbox"), e.id = "maor_sub_" + a, h.appendChild(e), e = document.createElement("span"), e.textContent = "\u05d4\u05d5\u05e8\u05d3 \u05db\u05dc \u05db\u05d5\u05ea\u05e8\u05ea \u05dc\u05ea\u05d9\u05e7\u05d9\u05d4 \u05e0\u05e4\u05e8\u05d3\u05ea", h.appendChild(e), g.appendChild(h), d.appendChild(g), n.appendChild(d), l[a].insertBefore(document.createElement("div").appendChild(n).parentNode, l[a].firstChild).className =
 			"maor_fieldset")
 	}

@@ -40,10 +40,17 @@
 
 	function p(a) {
 		var d = () => {
-			var b =
-				document.forms.f1, c = document.getElementById("idSIButton9");
-			b && !document.getElementById("passwordError") && (location.pathname.includes("/oauth2/authorize") || location.pathname.includes("/saml2?")) ? b.passwd || !document.getElementById("tilesHolder") || location.href.includes("select_account") || location.href.includes("login_hint") ? location.href.includes("login_hint") && !location.href.includes("select_account") && (document.title = "Technion Plus - \u05d7\u05d9\u05d1\u05d5\u05e8 \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9",
-				b.passwd.value = a.password, b.submit()) : (document.title = "Technion Plus - \u05d7\u05d9\u05d1\u05d5\u05e8 \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9", b = location.href.split("?"), c = new URLSearchParams(b[1]), c.delete("prompt"), c.delete("login_hint"), c.append("login_hint", a.username + "@" + (a.server ? "campus." : "") + "technion.ac.il"), location.href = b[0] + "?" + c.toString()) : document.forms[0] && c && "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/login" == location.href && c.click()
+			var b = document.forms.f1, c = document.getElementById("idSIButton9");
+			b && !document.getElementById("passwordError") && (location.pathname.includes("/oauth2/authorize") ||
+				location.pathname.includes("/saml2")) ? b.passwd || !document.getElementById("tilesHolder") ||
+			location.href.includes("select_account") || location.href.includes("login_hint") ?
+				location.href.includes("login_hint") && !location.href.includes("select_account") &&
+				(document.title = "Technion - חיבור אוטומטי", b.passwd.value = a.password, b.submit()) :
+				(document.title = "Technion - חיבור אוטומטי", b = location.href.split("?"), c = new URLSearchParams(b[1]),
+					c.delete("prompt"), c.delete("login_hint"), c.append("login_hint", a.username + "@" +
+					(a.server ? "campus." : "") + "technion.ac.il"), location.href = b[0] + "?" + c.toString()) :
+				document.forms[0] && c && "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/login"
+					== location.href && c.click()
 		};
 		document.querySelector(".banner-logo") ?
 			d() : (new MutationObserver((b, c) => {
@@ -114,7 +121,9 @@
 			if (a.enable_login && a.quick_login) {
 				a.password = k(l(a.term + a.phrase, a.maor_p));
 				var b = window.location.hostname;
-				if (/moodle[0-9]+.technion.ac.il/.test(b)) h(a); else switch (b) {
+				if (/moodle[0-9]+.technion.ac.il/.test(b))
+					h(a);
+				else switch (b) {
 					case "moodle.technion.ac.il":
 						h(a);
 						break;
@@ -133,9 +142,9 @@
 							b.id = "box";
 							var c = document.createElement("div");
 							c.id = "koteret";
-							c.textContent = "Technion Plus";
+							c.textContent = "Technion";
 							var e = document.createElement("sup");
-							e.textContent = "+";
+							e.textContent = "++";
 							c.appendChild(e);
 							b.appendChild(c);
 							c = document.createElement("div");

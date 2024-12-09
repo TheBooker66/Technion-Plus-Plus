@@ -50,7 +50,7 @@
 }
 
 .more_links a.major, .more_links a.collapse {
-    background-image: url("../icons/arrowhead-left-16.svg");
+    background-image: url("../icons/arrowhead-left.svg");
     background-repeat: no-repeat;
     background-position: 8px center;
     background-size: 10px 10px;
@@ -158,7 +158,7 @@
 #remoodle_select:focus, #remoodle_select:hover {
     width: 50px;
     right: 109px;
-    background: url('../icons/arrowhead-down-12-0.svg') no-repeat 0 2px #fff;
+    background: url('../icons/arrowhead-down.svg') no-repeat 0 2px #fff;
 }
 
 #remoodle_select:focus, #remoodle_select:hover, #remoodle_select .opt:hover, #remoodle_select :not(#rmshidden) .opt {

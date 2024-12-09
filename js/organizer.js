@@ -546,12 +546,13 @@ function addAssignmentsToList(a, b) {
 var po_list = [document.getElementById("new_assignments"), document.getElementById("finished_assignments"), document.getElementById("add_assignment")],
 	po_tabs = document.querySelectorAll("#tabs > .tab");
 for (let a = 0; a < po_tabs.length; a++) po_tabs[a].addEventListener("click", () => {
-	for (let b = 0; b < po_tabs.length; b++) po_tabs[b].className = b === a ? "tab current" : "tab", po_list[b].style.display = b === a ? "block" : "none"
+	for (let b = 0; b < po_tabs.length; b++)
+		po_tabs[b].className = b === a ? "tab current" : "tab", po_list[b].style.display = b === a ? "block" : "none"
 });
 chrome.storage.local.get({gmail: !0}, a => {
 	var b = {
-			ad: "ethan.amiran@gmail.com", //"maorlevy.ext@gmail.com",
-			su: "יצירת קשר - Technion Plus"
+			ad: "ethan.amiran@gmail.com",
+			su: "יצירת קשר - Technion++"
 		},
 		c = a.gmail ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1" : "mailto:{1}?subject={2}";
 	c = c.replace("{1}", b.ad).replace("{2}", b.su);

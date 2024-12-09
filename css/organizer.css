@@ -87,13 +87,13 @@ body {
 }
 
 .attention {
-    background: #ffe900 url('../icons/warning-16.svg') calc(100% - 8px) 50% no-repeat;
+    background: #ffe900 url('../icons/warning.svg') calc(100% - 8px) 50% no-repeat;
     color: #3e2800;
 
 }
 
 .error_bar {
-    background: #d70022 url('../icons/error.png') calc(100% - 8px) 50% no-repeat;
+    background: #d70022 url('../icons/error.svg') calc(100% - 8px) 50% no-repeat;
     color: #fff;
 }
 
@@ -485,7 +485,7 @@ input[type="hidden"][value="0"] + div {
     background: var(--sec-light) !important;
     border: solid var(--sec-dark) !important;
     border-width: 1px 3px !important;
-    border-radius: 0px;
+    border-radius: 0;
 }
 
 /* Handle on hover */

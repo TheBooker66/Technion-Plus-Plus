@@ -1,6 +1,6 @@
 'use strict';
 (function () {
-	var h = (new DOMParser).parseFromString('\n<div style="color: #777; font-style: italic; z-index:1; width: 250px; margin:auto; display:block; padding: 10px; line-height:1; position: relative;text-align: center; direction: rtl; display: none">\n\t<h4 dir="ltr">Technion Plus<sup>+</sup></h4>\n\t\u05d4\u05d5\u05d5\u05d9\u05d3\u05d0\u05d5 \u05e0\u05e4\u05ea\u05d7 \u05dc\u05ea\u05e6\u05d5\u05d2\u05d4 \u05d1\u05d7\u05dc\u05d5\u05df \u05d7\u05d3\u05e9, \u05d9\u05e9 \u05dc\u05e1\u05d2\u05d5\u05e8 \u05d0\u05ea \u05d4\u05d7\u05dc\u05d5\u05df \u05d4\u05d7\u05d3\u05e9 \u05db\u05d3\u05d9 \u05dc\u05d7\u05d6\u05d5\u05e8 \u05d5\u05dc\u05e6\u05e4\u05d5\u05ea \u05d1\u05d5\u05d5\u05d9\u05d3\u05d0\u05d5 \u05db\u05d0\u05df.\n</div>\n',
+	var h = (new DOMParser).parseFromString('\n<div style="color: #777; font-style: italic; z-index:1; width: 250px; margin:auto; display:block; padding: 10px; line-height:1; position: relative;text-align: center; direction: rtl; display: none">\n\t<h4 dir="ltr">Technion<sup>++</sup></h4>\n\t\u05d4\u05d5\u05d5\u05d9\u05d3\u05d0\u05d5 \u05e0\u05e4\u05ea\u05d7 \u05dc\u05ea\u05e6\u05d5\u05d2\u05d4 \u05d1\u05d7\u05dc\u05d5\u05df \u05d7\u05d3\u05e9, \u05d9\u05e9 \u05dc\u05e1\u05d2\u05d5\u05e8 \u05d0\u05ea \u05d4\u05d7\u05dc\u05d5\u05df \u05d4\u05d7\u05d3\u05e9 \u05db\u05d3\u05d9 \u05dc\u05d7\u05d6\u05d5\u05e8 \u05d5\u05dc\u05e6\u05e4\u05d5\u05ea \u05d1\u05d5\u05d5\u05d9\u05d3\u05d0\u05d5 \u05db\u05d0\u05df.\n</div>\n',
 		"text/html").querySelector("div");
 	document.getElementById("secondaryScreen").insertBefore(h, document.getElementById("secondaryScreen").childNodes[0]);
 	var e = document.getElementById("m_expand");
@@ -13,8 +13,8 @@
 	e.addEventListener("click", function () {
 		if (.3 != e.style.opacity) {
 			l(!0);
-			var a = window.open("", "Technion Plus", "width=830,height=655,menubar=no,statusbar=no,titlebar=no,toolbar=no");
-			a.document.title = "Technion Plus - " + document.title;
+			var a = window.open("", "Technion", "width=830,height=655,menubar=no,statusbar=no,titlebar=no,toolbar=no");
+			a.document.title = "Technion - " + document.title;
 			a.document.body.setAttribute("style", "text-align: center; background: #000; font-family: arial; direction: rtl; font-size: 11px; color: #f9f9fa;");
 			var c = document.createElement("canvas");
 			a.document.body.appendChild(c);

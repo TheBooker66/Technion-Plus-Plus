@@ -209,7 +209,7 @@
 			href: "https://students.technion.ac.il/local/tcurricular/grades?TP=2",
 			target: "_blank",
 			style: "border-radius: 4px; color: #000; background-color: var(--sec-light); padding: 4px 8px;"
-		}, "פתח מחשבון ממוצע אקדמי - Technion Plus",
+		}, "פתח מחשבון ממוצע אקדמי - Technion",
 		document.querySelector("#page-header div.card-body > .flex-wrap"), !1); else {
 		var p = [], E = [], J = [], K = [], h = {}, r = "";
 		h.total_points_tried = 0;

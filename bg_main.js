@@ -351,7 +351,7 @@ function TE_notification(a, b, c) {
 	var d = new Date, e = d.getHours();
 	d = d.getMinutes();
 	a += "\n\u05d4\u05ea\u05e8\u05d0\u05d4 \u05d4\u05ea\u05e7\u05d1\u05dc\u05d4 \u05d1\u05e9\u05e2\u05d4: " + (10 > e ? "0" + e : e) + ":" + (10 > d ? "0" + d : d);
-	a = {type: "basic", iconUrl: chrome.runtime.getURL("../icons/icon-48.png"), title: "Technion Plus", message: a};
+	a = {type: "basic", iconUrl: chrome.runtime.getURL("../icons/technion plus plus/icon-48.png"), title: "Technion", message: a};
 	"Chromium" == TE_getBrowser() && (a.silent = !0);
 	"" != c && chrome.notifications.clear(c);
 	chrome.notifications.create(c, a, h => {
@@ -981,10 +981,10 @@ function TE_nextDownload() {
 				url: e, filename: d.n,
 				saveAs: !1
 			}, f => {
-				chrome.runtime.lastError ? (console.log("TE_bg_dls: " + chrome.runtime.lastError.message), console.log(` - filename: ${d.n}\n - url: ${e}`)) : (b.dl_current = f, chrome.action.setIcon({path: "../icons/icon-green.png"}), setTimeout(() => {
-					chrome.action.setIcon({path: "../icons/icon-16.png"});
+				chrome.runtime.lastError ? (console.log("TE_bg_dls: " + chrome.runtime.lastError.message), console.log(` - filename: ${d.n}\n - url: ${e}`)) : (b.dl_current = f, chrome.action.setIcon({path: "../icons/technion plus plus/icon-green.png"}), setTimeout(() => {
+					chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"});
 					setTimeout(() => {
-						chrome.action.setIcon({path: "../icons/icon-green.png"})
+						chrome.action.setIcon({path: "../icons/technion plus plus/icon-green.png"})
 					}, 250)
 				}, 250), TE_setStorage({dl_current: b.dl_current, dl_queue: b.dl_queue}))
 			})
@@ -998,12 +998,12 @@ chrome.downloads.onChanged.addListener(a => {
 			"interrupted" === c[0].state && (console.log(`TE_dlFailed ${a.id} : ${["moodle", "panopto", "GR++", "webcourse"][b.dl_queue[0].sys]}`), b.dl_queue[0].list.length || b.dl_queue.shift(), b.dl_current = 0, TE_setStorage({
 				dl_current: b.dl_current,
 				dl_queue: b.dl_queue
-			}), chrome.action.setIcon({path: "../icons/icon-16.png"}),
+			}), chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"}),
 				TE_nextDownload())
 		}) : a.id == b.dl_current && a.state && ("interrupted" === a.state.current && console.log(`TE_dlFailed ${a.id} : ${["moodle", "panopto", "GR++", "webcourse"][b.dl_queue[0].sys]}`), "interrupted" === a.state.current || "complete" === a.state.current) && (b.dl_queue[0].list.length || b.dl_queue.shift(), b.dl_current = 0, TE_setStorage({
 			dl_current: b.dl_current,
 			dl_queue: b.dl_queue
-		}), chrome.action.setIcon({path: "../icons/icon-16.png"}), TE_nextDownload())
+		}), chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"}), TE_nextDownload())
 	})
 });
 
@@ -1239,7 +1239,7 @@ function TE_startExtension() {
 	chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
 	TE_setStorage({buses_alerts: []});
 	chrome.storage.local.get({dl_current: 0, dl_queue: []}, a => {
-		chrome.action.setIcon({path: "../icons/icon-16.png"});
+		chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"});
 		TE_setStorage({dl_queue: [], dl_current: 0})
 	})
 }

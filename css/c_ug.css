@@ -7,7 +7,7 @@
 
 #TP_infobox {
     border: solid var(--prim-dark);
-    border-width: 0px 5px;
+    border-width: 0 5px;
     clear: both;
     margin: 0;
     border-radius: 4px;

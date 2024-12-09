@@ -86,7 +86,7 @@ import {CommonPopup} from './common_popup.js';
 				dl_queue: []
 			}, () => {
 				0 != a.dl_current && chrome.downloads.cancel(a.dl_current);
-				chrome.action.setIcon({path: "../icons/icon-16.png"})
+				chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"})
 			})
 		})
 	})

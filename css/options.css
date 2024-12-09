@@ -53,7 +53,7 @@ input:not([type="button"]):hover, select:hover {
 
 input:not([type="button"]):focus, select:focus {
     border: 1px solid #0a84ff;
-    box-shadow: 0 0 4px 0px #0a84ff;
+    box-shadow: 0 0 4px 0 #0a84ff;
 }
 
 input[type="range"], input[type="range"]:hover, input[type="range"]:focus {
@@ -109,7 +109,7 @@ h2 {
 }
 
 .attention {
-    background: #ffe900 url('../icons/warning-16.svg') 98% 50% no-repeat;
+    background: #ffe900 url('../icons/warning.svg') 98% 50% no-repeat;
     color: #3e2800;
     border-radius: 4px;
     padding: 4px 28px 4px 4px;
