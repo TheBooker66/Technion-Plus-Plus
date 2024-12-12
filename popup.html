@@ -5,7 +5,7 @@
     <meta http-equiv="content-type" content="no-cache"/>
     <title>Technion++</title>
     <link rel="stylesheet" href="css/popup.css" type="text/css">
-    <script type="module" src="js/common_popup.js"></script>
+    <script type="module" src="js/p_common.js"></script>
 </head>
 <body>
 <div class="wrapper">
@@ -40,10 +40,14 @@
                 </div>
                 <div id="cantlogin" style="display: none; border-bottom: 1px solid #d7d7db;">
                     <div class="attention">עדיין לא הוגדרו שם משתמש וסיסמה!<br/>לחץ <u style='cursor:pointer'>כאן</u>
-                        להגדרת פרטי ההתחברות.<br/> תזכורת: התוסף אינו מעלה את הפרטים שלכם לאף שרת והם נשארים כאן, על המחשב שלכם.
+                        להגדרת פרטי ההתחברות.<br/> תזכורת: התוסף אינו מעלה את הפרטים שלכם לאף שרת והם נשארים כאן, על
+                        המחשב שלכם.
                     </div>
                 </div>
                 <!-- errors end -->
+
+                <a id="release_notes" class="active"><span class="img_container"><img src="icons/release_notes/release-notes.svg"/>
+                </span> חדש בתוסף</a>
 
                 <a id="cal_moodle" class="major"><span class="img_container"><img src="icons/moodle.svg"/></span> מטלות
                     קרובות (מודל)</a>
@@ -63,21 +67,24 @@
                     קרובים - זמן אמת</a>
                 <a id="food" class="major"><span class="img_container"><img src="icons/food.svg"/></span> לו"ז מסעדות
                     בטכניון</a>
-                <a id="downloads" class="major"><span class="img_container"><img src="icons/downloads.svg"/></span> מנהל
+                <a id="downloads" class="major"><span class="img_container"><img src="icons/download.svg"/></span> מנהל
                     הורדות</a>
             </div>
             <div id="links_content" style="display: none">
                 <a href="https://grades.technion.ac.il" target="_blank"><span class="img_container"><img
                         src="icons/bookmark.svg"/></span> אפגרייד (ציונים)</a>
-                <a id="UGS_Link"><span class="img_container"><img
-                        src="icons/technion.svg"/></span>Students – לשעבר האתר הראשי</a>
+                <a id="UGS_Link"><span class="img_container">
+                    <img src="icons/technion.svg"/></span>Students – לשעבר האתר הראשי</a>
                 <a href="https://grades.cs.technion.ac.il" target="_blank"><span
                         class="img_container"><img src="icons/grpp.ico"/></span> אתר הקורסים של הפקולטה למדמ"ח </a>
                 <a href="https://bookme.technion.ac.il/booked/Web/calendar.php" target="_blank"><span
                         class="img_container"><img src="icons/room.svg"/></span> BookMe - הזמנת חדרי לימוד בקמפוס</a>
                 <a href="https://www.admin.technion.ac.il/dpcalendar/Student.aspx" target="_blank"><span
                         class="img_container"><img src="icons/academic.svg"/></span> לוח שנה אקדמי</a>
-                <a id="gotoApps" class="major"><span class="img_container"><img src="icons/downloads.svg"/></span>
+                <a href="https://experience.arcgis.com/experience/27fc08af23f646b396852c7b5b287e69/"
+                   target="_blank"><span class="img_container"><img src="icons/map.svg"/>
+                </span> מפה רשמית של הטכניון</a>
+                <a id="gotoApps" class="major"><span class="img_container"><img src="icons/download.svg"/></span>
                     תוכנות ברישיון טכניוני</a>
                 <a href="https://techwww.technion.ac.il/cgi-bin/newuser/newuser.pl" target="_blank"><span
                         class="img_container"><img src="icons/account.svg"/></span> ניהול משתמש טכניוני</a>
@@ -109,7 +116,7 @@
                 <span id="returnFromPrint" class="returner"></span>
                 <div>שליחה להדפסה בטכניון</div>
             </h2>
-            <div>
+            <div id="single_page">
                 <a id="bws" target="_blank"><span class="img_container"><img src="icons/page.svg"/></span> שחור לבן,
                     חד-צדדי</a>
                 <a id="bwd" target="_blank"><span class="img_container"><img src="icons/page.svg"/></span> שחור לבן,
@@ -117,13 +124,13 @@
                 <a id="color" target="_blank"><span class="img_container"><img src="icons/page.svg"/></span> צבעוני,
                     חד-צדדי</a>
             </div>
-            <div style="display: none">
+            <div id="double_page" style="display: none">
                 <a id="2pbws" target="_blank"><span class="img_container"><img src="icons/page.svg"/></span> שחור לבן, 2
                     שקופיות בדף, חד-צדדי</a>
                 <a id="2pbwd" target="_blank"><span class="img_container"><img src="icons/page.svg"/></span> שחור לבן, 2
                     שקופיות בדף, דו-צדדי</a>
             </div>
-            <div style="display: none">
+            <div id="quadruple_page" style="display: none">
                 <a id="4pbws" target="_blank"><span class="img_container"><img src="icons/page.svg"/></span> שחור לבן, 4
                     שקופיות בדף, חד-צדדי</a>
                 <a id="4pbwd" target="_blank"><span class="img_container"><img src="icons/page.svg"/></span> שחור לבן, 4

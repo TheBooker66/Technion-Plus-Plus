@@ -1,6 +1,8 @@
 'use strict';
-import {CommonPopup} from './common_popup.js';
+import {CommonPopup} from './p_common.js';
 import {CommonCalendar} from './p_cal_common.js';
+import {OrganizerPopup} from './organizer.js';
+import {OrganizerCalendar} from './organizer.js';
 
 
 (function () {
@@ -22,12 +24,19 @@ import {CommonCalendar} from './p_cal_common.js';
 		})
 	}
 
-	var r = new CommonPopup();
+	var r, v;
+	if (document.title === "ארגונית++") {
+		r = new OrganizerPopup;
+		v = new OrganizerCalendar(r, "cs");
+	}
+	else {
+		r = new CommonPopup;
+		v = new CommonCalendar(r, "cs");
+	}
 	r.title = 'מטלות קרובות - מדמ"ח';
 	r.css_list = ["calendar"];
 	r.popupWrap();
-	var v = new CommonCalendar(r, "cs");
-	v.progress(e => new Promise((b, k) => {
+	v.progress(_ => new Promise((b, k) => {
 		chrome.storage.local.get({
 			cs_cal_finished: {},
 			cs_cal_seen: {},
@@ -113,5 +122,6 @@ import {CommonCalendar} from './p_cal_common.js';
 				}))
 			}
 		})
+		console.log("cs")
 	}))
 })();

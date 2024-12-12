@@ -4,7 +4,7 @@
 		if (!(0 < c.getElementsByClassName("maor_download").length)) {
 			var b = document.createElement("a");
 			b.setAttribute("class", "maor_download");
-			b.textContent = "\u05d4\u05d5\u05e8\u05d3\u05d4";
+			b.textContent = "הורדה";
 			var g = "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/" + a + ".mp4";
 			b.addEventListener("click", function () {
 				chrome.runtime.sendMessage({mess_t: "singledownload", link: g, name: d})
@@ -17,7 +17,7 @@
 					document.createElement("label");
 				b.setAttribute("class", "maor_download");
 				a = document.createElement("div");
-				a.textContent = "\u05d1\u05d7\u05e8";
+				a.textContent = "בחר";
 				var e = document.createElement("input");
 				e.setAttribute("type", "checkbox");
 				e.className = "maor_check";
@@ -223,24 +223,103 @@
 	}
 
 	function C() {
-		var a = (new DOMParser).parseFromString('\n\t<div id="maor_menu_container">\n\t\t<div id="maor_menu" class="start">\n\t\t\t<div id="maor_content">\n\t\t\t\t<div id="maor_overlay"></div>\n\t\t\t\t<div id="m_cant_download"><a><i>\u05d4\u05d5\u05e8\u05d3\u05ea \u05d4\u05d4\u05e7\u05dc\u05d8\u05d4 \u05e0\u05d7\u05e1\u05de\u05d4 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05e6\u05d5\u05d5\u05ea \u05d4\u05e7\u05d5\u05e8\u05e1</i></a></div>\n\t\t\t\t<a id="m_download_mp4" class="maor_hidden">\u05d4\u05d5\u05e8\u05d3\u05ea \u05d4\u05e7\u05dc\u05d8\u05d4</a>\n\t\t\t\t<a id="m_download_mp3" class="maor_hidden">\u05d4\u05d5\u05e8\u05d3\u05ea \u05e9\u05de\u05e2</a>\n\t\t\t\t<div id="m_vid_list" class="maor_hidden">\n\t\t\t\t\t<div>\u05d1\u05d7\u05e8 \u05d5\u05d9\u05d3\u05d0\u05d5: </div>\n\t\t\t\t\t<span><canvas></canvas></span>\n\t\t\t\t\t<span><canvas></canvas></span>\n\t\t\t\t\t<span>\u05e1\u05d2\u05d5\u05e8</span>\n\t\t\t\t</div>\n\t\t\t\t<a id="m_snapshot">\u05e6\u05dc\u05dd \u05ea\u05de\u05d5\u05e0\u05d4</a>\n\t\t\t\t<a id="m_expand" class="maor_hidden">\u05e4\u05e6\u05dc \u05dc\u05e9\u05e0\u05d9 \u05de\u05e1\u05db\u05d9\u05dd</a>\n\t\t\t\t<a id="m_float" class="maor_hidden">\u05e4\u05ea\u05d7 \u05d1\u05d7\u05dc\u05d5\u05df \u05e6\u05e3</a>\n\t\t\t\t<a id="m_speed">\n\t\t\t\t\t<div><span>2.25</span><span>2.5</span><span>2.75</span><span>3</span></div>\n\t\t\t\t\t<span style="display: block">\u05de\u05d4\u05d9\u05e8\u05d5\u05d9\u05d5\u05ea \u05e0\u05d5\u05e1\u05e4\u05d5\u05ea</span>\n\t\t\t\t</a>\n\t\t\t\t<a id="m_sound">\u05e9\u05d9\u05e4\u05d5\u05e8\u05d9 \u05e9\u05de\u05e2</a>\n\t\t\t\t<label for="m_darkmode"><a>\u05de\u05e6\u05d1 \u05dc\u05d9\u05dc\u05d4<input id="m_darkmode" type="checkbox" /></a></label>\n\t\t\t\t<label for="m_save"><a>\u05d6\u05db\u05d5\u05e8 \u05d4\u05d2\u05d3\u05e8\u05d5\u05ea<input id="m_save" type="checkbox" /></a></label>\n\t\t\t</div>\n\t\t\t<div id="maor_koteret">Technion<sup>++</sup></div>\n\t\t</div>\n\n\t\t<div id="maor_sound">\n\t\t\t<div class="m_header">\n\t\t\t\t\u05e9\u05d9\u05e4\u05d5\u05e8\u05d9 \u05e9\u05de\u05e2 <sup>BETA</sup>\n\t\t\t\t<span id="maor_sound_close">\u05e1\u05d2\u05d5\u05e8</span>\n\t\t\t</div>\n\n\t\t\t<div class="m_grid">\n\n\t\t\t\t<div>\n\t\t\t\t\t\u05d4\u05e9\u05d9\u05de\u05d5\u05e9 \u05d1\u05d0\u05e4\u05e7\u05d8\u05d9\u05dd \u05d4\u05d1\u05d0\u05d9\u05dd \u05e2\u05dc\u05d5\u05dc \u05dc\u05d4\u05d2\u05d1\u05d9\u05e8 \u05e8\u05e2\u05e9\u05d9 \u05e8\u05e7\u05e2.\n\t\t\t\t\t<span style="display: none"><br />\u05d1\u05d3\u05e4\u05d3\u05e4\u05df \u05e4\u05d9\u05d9\u05e8\u05e4\u05d5\u05e7\u05e1, \u05d4\u05e9\u05d9\u05de\u05d5\u05e9 \u05d1\u05d0\u05e4\u05e7\u05d8\u05d9\u05dd \u05d4\u05e0"\u05dc \u05d9\u05e0\u05e2\u05dc \u05d0\u05ea \u05d4\u05e8\u05e6\u05ea \u05d4\u05d5\u05d5\u05d9\u05d3\u05d0\u05d5 \u05dc\u05de\u05d4\u05d9\u05e8\u05d5\u05ea x1. \u05db\u05d3\u05d9 \u05dc\u05d1\u05d8\u05dc \u05e0\u05e2\u05d9\u05dc\u05d4 \u05d6\u05d5 \u05d9\u05e9 \u05dc\u05e8\u05e2\u05e0\u05df \u05d0\u05ea \u05d4\u05d3\u05e3.</span>\n\t\t\t\t</div>\n\t\t\t\t<div></div>\n\n\t\t\t\t<div>\n\t\t\t\t\t<b>\u05e8\u05de\u05ea \u05e1\u05d9\u05e0\u05d5\u05df \u05e8\u05e2\u05e9\u05d9 \u05e8\u05e7\u05e2</b><br />\n\t\t\t\t\t\u05e1\u05d9\u05e0\u05d5\u05df \u05d1\u05e1\u05d9\u05e1\u05d9, \u05e9\u05d9\u05de\u05d5\u05e9\u05d9 \u05dc\u05de\u05e9\u05dc \u05e2\u05d1\u05d5\u05e8 \u05d4\u05e7\u05dc\u05d8\u05d5\u05ea \u05e2\u05dd "\u05d6\u05de\u05d6\u05d5\u05dd \u05d7\u05e9\u05de\u05dc\u05d9" \u05d1\u05e8\u05e7\u05e2.\n\t\t\t\t</div>\n\t\t\t\t<div>\n\t\t\t\t\t<select id="maor_sound_noise">\n\t\t\t\t\t\t<option selected value="0">\u05dc\u05dc\u05d0</option>\n\t\t\t\t\t\t<option value="1">\u05e0\u05de\u05d5\u05db\u05d4</option>\n\t\t\t\t\t\t<option value="2">\u05d1\u05d9\u05e0\u05d5\u05e0\u05d9\u05ea</option>\n\t\t\t\t\t\t<option value="3">\u05d2\u05d1\u05d5\u05d4\u05d4</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\n\t\t\t\t<div>\n\t\t\t\t\t<b>\u05ea\u05d5\u05e1\u05e4\u05ea \u05d5\u05d5\u05dc\u05d9\u05d5\u05dd</b><br />\n\t\t\t\t\t\u05e9\u05d9\u05de\u05d5\u05e9\u05d9 \u05db\u05d0\u05e9\u05e8 \u05e2\u05d5\u05e6\u05de\u05ea \u05d4\u05e9\u05de\u05e2 \u05e9\u05dc \u05d4\u05d4\u05e7\u05dc\u05d8\u05d4 \u05e0\u05de\u05d5\u05db\u05d4 \u05de\u05d0\u05d5\u05d3.\n\t\t\t\t</div>\n\t\t\t\t<div>\n\t\t\t\t\t<select id="maor_sound_volume">\n\t\t\t\t\t\t<option selected value="0">\u05dc\u05dc\u05d0</option>\n\t\t\t\t\t\t<option value="1">\u05e0\u05de\u05d5\u05db\u05d4</option>\n\t\t\t\t\t\t<option value="2">\u05d1\u05d9\u05e0\u05d5\u05e0\u05d9\u05ea</option>\n\t\t\t\t\t\t<option value="3">\u05d2\u05d1\u05d5\u05d4\u05d4</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\n\t\t\t\t<div>\n\t\t\t\t\t<b>\u05d0\u05d9\u05d6\u05d5\u05df \u05e6\u05dc\u05d9\u05dc\u05d9\u05dd</b><br />\n\t\t\t\t\t\u05de\u05d2\u05d1\u05d9\u05e8 \u05e6\u05dc\u05d9\u05dc\u05d9\u05dd \u05e0\u05de\u05d5\u05db\u05d9\u05dd \u05d5\u05de\u05e0\u05de\u05d9\u05da \u05e6\u05dc\u05d9\u05dc\u05d9\u05dd \u05d2\u05d1\u05d5\u05d4\u05d9\u05dd \u05de\u05d0\u05d5\u05d3. \u05e9\u05d9\u05de\u05d5\u05e9\u05d9 \u05db\u05d0\u05e9\u05e8 \u05d0\u05d9\u05db\u05d5\u05ea \u05d4\u05d4\u05e7\u05dc\u05d8\u05d4 \u05dc\u05d0 \u05d0\u05d7\u05d9\u05d3\u05d4.\n\t\t\t\t</div>\n\t\t\t\t<div>\n\t\t\t\t\t<select id="maor_sound_compressor">\n\t\t\t\t\t\t<option selected value="0">\u05db\u05d1\u05d5\u05d9</option>\n\t\t\t\t\t\t<option value="1">\u05e4\u05e2\u05d9\u05dc</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\n\t\t\t</div>\n\t\t\t<div class="m_grid" style="display: none">\n\t\t\t\t\u05e2\u05e7\u05d1 \u05de\u05d2\u05d1\u05dc\u05d5\u05ea \u05d8\u05db\u05e0\u05d9\u05d5\u05ea \u05dc\u05d0 \u05e0\u05d9\u05ea\u05df \u05dc\u05d4\u05e9\u05ea\u05de\u05e9 \u05d1\u05e9\u05d9\u05e4\u05d5\u05e8\u05d9 \u05e9\u05de\u05e2 \u05e2\u05d1\u05d5\u05e8 \u05d4\u05e7\u05dc\u05d8\u05d4 \u05d6\u05d5.\n\t\t\t</div>\n\n\t\t</div>\n\n\t</div>\n\t',
+		var a = (new DOMParser).parseFromString(
+			'\n\t<div id="maor_menu_container">' +
+			'\n\t\t<div id="maor_menu" class="start">\n\t\t\t<div id="maor_content">\n\t\t\t\t<div id="maor_overlay">' +
+			'</div>\n\t\t\t\t<div id="m_cant_download"><a><i>הורדת ההקלטה נחסמה על ידי צוות הקורס</i></a></div>\n' +
+			'\t\t\t\t<a id="m_download_mp4" class="maor_hidden">הורדת הקלטה</a>\n' +
+			'\t\t\t\t<a id="m_download_mp3" class="maor_hidden">הורדת שמע</a>\n' +
+			'\t\t\t\t<div id="m_vid_list" class="maor_hidden">\n' +
+			'\t\t\t\t\t<div>בחר וידאו: </div>\n' +
+			'\t\t\t\t\t<span><canvas></canvas></span>\n' +
+			'\t\t\t\t\t<span><canvas></canvas></span>\n' +
+			'\t\t\t\t\t<span>סגור</span>\n' +
+			'\t\t\t\t</div>\n' +
+			'\t\t\t\t<a id="m_snapshot">צלם תמונה</a>\n' +
+			'\t\t\t\t<a id="m_expand" class="maor_hidden">פצל לשני מסכים</a>\n' +
+			'\t\t\t\t<a id="m_float" class="maor_hidden">פתח בחלון צף</a>\n' +
+			'\t\t\t\t<a id="m_speed">\n' +
+			'\t\t\t\t\t<div><span>2.25</span><span>2.5</span><span>2.75</span><span>3</span></div>\n' +
+			'\t\t\t\t\t<span style="display: block">מהירויות נוספות</span>\n' +
+			'\t\t\t\t</a>\n' +
+			'\t\t\t\t<a id="m_sound">שיפורי שמע</a>\n' +
+			'\t\t\t\t<label for="m_darkmode"><a>מצב לילה<input id="m_darkmode" type="checkbox" /></a></label>\n' +
+			'\t\t\t\t<label for="m_save"><a>זכור הגדרות<input id="m_save" type="checkbox" /></a></label>\n' +
+			'\t\t\t</div>\n' +
+			'\t\t\t<div id="maor_koteret">Technion<sup>++</sup></div>\n' +
+			'\t\t</div>\n' +
+			'\n' +
+			'\t\t<div id="maor_sound">\n' +
+			'\t\t\t<div class="m_header">\n' +
+			'\t\t\t\tשיפורי שמע <sup>BETA</sup>\n' +
+			'\t\t\t\t<span id="maor_sound_close">סגור</span>\n' +
+			'\t\t\t</div>\n' +
+			'\n' +
+			'\t\t\t<div class="m_grid">\n' +
+			'\n' +
+			'\t\t\t\t<div>\n' +
+			'\t\t\t\t\tהשימוש באפקטים הבאים עלול להגביר רעשי רקע.\n' +
+			'\t\t\t\t\t<span style="display: none"><br />בדפדפן פיירפוקס, השימוש באפקטים הנ"ל ינעל את הרצת הווידאו למהירות x1. כדי לבטל נעילה זו יש לרענן את הדף.</span>\n' +
+			'\t\t\t\t</div>\n' +
+			'\t\t\t\t<div></div>\n' +
+			'\n' +
+			'\t\t\t\t<div>\n' +
+			'\t\t\t\t\t<b>רמת סינון רעשי רקע</b><br />\n' +
+			'\t\t\t\t\tסינון בסיסי, שימושי למשל עבור הקלטות עם "זמזום חשמלי" ברקע.\n' +
+			'\t\t\t\t</div>\n' +
+			'\t\t\t\t<div>\n' +
+			'\t\t\t\t\t<select id="maor_sound_noise">\n' +
+			'\t\t\t\t\t\t<option selected value="0">ללא</option>\n' +
+			'\t\t\t\t\t\t<option value="1">נמוכה</option>\n' +
+			'\t\t\t\t\t\t<option value="2">בינונית</option>\n' +
+			'\t\t\t\t\t\t<option value="3">גבוהה</option>\n' +
+			'\t\t\t\t\t</select>\n' +
+			'\t\t\t\t</div>\n' +
+			'\t\t\n' +
+			'\t\t\t\t<div>\n' +
+			'\t\t\t\t\t<b>תוספת ווליום</b><br />\n' +
+			'\t\t\t\t\tשימושי כאשר עוצמת השמע של ההקלטה נמוכה מאוד.\n' +
+			'\t\t\t\t</div>\n' +
+			'\t\t\t\t<div>\n' +
+			'\t\t\t\t\t<select id="maor_sound_volume">\n' +
+			'\t\t\t\t\t\t<option selected value="0">ללא</option>\n' +
+			'\t\t\t\t\t\t<option value="1">נמוכה</option>\n' +
+			'\t\t\t\t\t\t<option value="2">בינונית</option>\n' +
+			'\t\t\t\t\t\t<option value="3">גבוהה</option>\n' +
+			'\t\t\t\t\t</select>\n' +
+			'\t\t\t\t</div>\n' +
+			'\t\t\n' +
+			'\t\t\t\t<div>\n' +
+			'\t\t\t\t\t<b>איזון צלילים</b><br />\n' +
+			'\t\t\t\t\tמגביר צלילים נמוכים ומנמיך צלילים גבוהים מאוד. שימושי כאשר איכות ההקלטה לא אחידה.\n' +
+			'\t\t\t\t</div>\n' +
+			'\t\t\t\t<div>\n' +
+			'\t\t\t\t\t<select id="maor_sound_compressor">\n' +
+			'\t\t\t\t\t\t<option selected value="0">כבוי</option>\n' +
+			'\t\t\t\t\t\t<option value="1">פעיל</option>\n' +
+			'\t\t\t\t\t</select>\n' +
+			'\t\t\t\t</div>\n' +
+			'\t\t\n' +
+			'\t\t\t</div>\n' +
+			'\t\t\t<div class="m_grid" style="display: none">\n' +
+			'\t\t\t\tעקב מגבלות טכניות לא ניתן להשתמש בשיפורי שמע עבור הקלטה זו.\n\t\t\t</div>\n\n\t\t</div>\n\n\t</div>\n\t',
 			"text/html").getElementById("maor_menu_container"), c = a.getElementsByTagName("a");
-		for (let d of c) d.id && (d.style.backgroundImage = "url(" + chrome.runtime.getURL("icons/usable/" + d.id.replace(/_mp[34]/, "") + ".svg") + ")");
+		for (let d of c) d.id && (d.style.backgroundImage = "url(" + chrome.runtime.getURL("icons/download_icons/" + d.id.replace(/_mp[34]/, "") + ".svg") + ")");
 		document.getElementById("transportControls").appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
 		document.getElementById("transportControls").appendChild(a);
-		document.getElementById("maor_koteret").style.backgroundImage = "url(" + chrome.runtime.getURL("icons/technion plus plus/icon-16.png") +
-			")"
+		document.getElementById("maor_koteret").style.backgroundImage =
+			"url(" + chrome.runtime.getURL("icons/technion_plus_plus/icon-16.png").toString() + ")"
 	}
 
 	if (!0 === window.location.href.includes("List.aspx")) {
 		if (!0 !== window.location.href.includes("query=")) {
 			var k = document.querySelector("#actionHeader > div"), m = document.createElement("a");
 			m.addEventListener("click", w);
-			m.textContent = "\u05d4\u05d5\u05e8\u05d3 \u05d0\u05ea \u05db\u05dc \u05d4\u05e7\u05d5\u05e8\u05e1";
+			m.textContent = "הורד את כל הקורס";
 			k.insertBefore(m, k.childNodes[0]);
 			var n = document.createElement("a");
 			n.addEventListener("click", y);
-			n.textContent = "\u05d4\u05d5\u05e8\u05d3 \u05e4\u05e8\u05d9\u05d8\u05d9\u05dd \u05e9\u05e0\u05d1\u05d7\u05e8\u05d5";
+			n.textContent = "הורד פריטים שנבחרו";
 			k.insertBefore(n, k.childNodes[1]);
 			t(m, n);
 			window.addEventListener("hashchange", () => {

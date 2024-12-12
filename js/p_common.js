@@ -337,7 +337,7 @@ class CommonPopup {
 		})
 	}
 
-	XHR_bigger(a, b, c, d) {
+	XHR(a, b, c, d) {
 		c = void 0 === c ? "" : c;
 		d = void 0 === d ? !1 : d;
 		return new Promise((e, g) => {

@@ -15,7 +15,7 @@
 
 	function u(a) {
 		var b = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/,
-			c = / - (?:\u05e7\u05d9\u05e5|\u05d7\u05d5\u05e8\u05e3|\u05d0\u05d1\u05d9\u05d1)/, // - קיץ|חורף|אביב
+			c = / - (?:חורף|אביב|קיץ)/,
 			g = {};
 		for (let k = 0; k < a.length; k++) {
 			var d = a[k].getElementsByTagName("h3")[0].textContent.replace(c, "").match(b);
@@ -36,11 +36,11 @@
 		g = f("div", "custom-control custom-switch", {style: "text-align: right"}, "", c);
 		var d = f("input", "custom-control-input", {id: "tp-darkmode", type: "checkbox"}, "", g);
 		f("label", "custom-control-label",
-			{"for": "tp-darkmode"}, "\u05de\u05e6\u05d1 \u05dc\u05d9\u05dc\u05d4", g); // מצב לילה
+			{"for": "tp-darkmode"}, "מצב לילה", g);
 		c = f("div", "", {id: "tp_colorswitcher"}, "", c);
-		f("div", "", {style: "text-align: right; width: 8rem"}, "\u05e6\u05d1\u05e2 \u05de\u05e9\u05e0\u05d9", c); // צבע משני
+		f("div", "", {style: "text-align: right; width: 8rem"}, "צבע משני", c);
 		var k = f("input", "", {type: "range", min: "0", max: "330", step: "30"}, "", c);
-		f("div", "tp_float_button", {style: "background-image: url(" + chrome.runtime.getURL("../icons/technion plus plus/icon-16.png") + ");"}, "", b);
+		f("div", "tp_float_button", {style: "background-image: url(" + chrome.runtime.getURL("../icons/technion_plus_plus/icon-16.png") + ");"}, "", b);
 		chrome.storage.local.get({remoodle: !1, remoodle_angle: 120}, m => {
 			d.checked = m.remoodle;
 			k.value = m.remoodle_angle
@@ -72,11 +72,11 @@
 				document.getElementsByClassName("tilecontainer")[n].appendChild(l);
 				let a = h[n].getElementsByTagName("h3")[0].textContent,
 					b = h[n].getElementsByClassName("coursestyle2url")[0].getAttribute("href");
-				a.includes("\u05d7\u05d5\u05e8\u05e3") ? e[0].push({
-					cname: a.replace(" - \u05d7\u05d5\u05e8\u05e3", ""), // - חורף
+				a.includes("חורף") ? e[0].push({
+					cname: a.replace(" - חורף", ""),
 					clink: b
-				}) : a.includes("\u05d0\u05d1\u05d9\u05d1") ? e[1].push({
-					cname: a.replace(" - \u05d0\u05d1\u05d9\u05d1", ""), // - אביב
+				}) : a.includes("אביב") ? e[1].push({
+					cname: a.replace(" - אביב", ""),
 					clink: b
 				}) : e[2].push({cname: a, clink: b});
 				r(l, h[n].getElementsByClassName("coursestyle2url")[0].getAttribute("href").split("?id=")[1], 0, "\u05d4\u05d5\u05e8\u05d3\u05ea \u05e7\u05d1\u05e6\u05d9 \u05d4\u05e7\u05d5\u05e8\u05e1")
@@ -94,13 +94,11 @@
 		h = window.location.href.split("?id=")[1];
 		var p = (e = document.title.match(/(?<cname>.+)\s-\s(?<cnum>[0-9]+)/)) ? e.groups.cnum.trim() : "", q =
 			t(!0);
-		r(q, h, 0, "\u05d4\u05d5\u05e8\u05d3\u05ea \u05db\u05dc \u05d4\u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05e7\u05d5\u05e8\u05e1");
-		// הורדת כל הקבצים בקורס
+		r(q, h, 0, "הורדת כל הקבצים בקורס");
 		"" != p && (p = p.replace(/^0+/, ""), f("a", "maor_download", {
 			href: "https://students.technion.ac.il/local/technionsearch/course/" + p,
 			target: "_blank"
-		}, "\u05d3\u05e3 \u05d4\u05e7\u05d5\u05e8\u05e1 \u05d1\u05e4\u05d5\u05e8\u05d8\u05dc \u05d4\u05e1\u05d8\u05d5\u05d3\u05e0\u05d8\u05d9\u05dd", q), chrome.storage.local.get({
-			// דף הקורס בפורטל הסטודנטים
+		}, "דף הקורס בפורטל הסטודנטים", q), chrome.storage.local.get({
 			videos_data: {},
 			videos_courses: []
 		}, a => {
@@ -112,19 +110,15 @@
 			}
 			if ("" != b && a.videos_data[b]) for (a = a.videos_data[b], 0 < a.length && f("div", "", {style: "text-align: right; margin: 8px 0 0;"}, "\u05d4\u05e7\u05dc\u05d8\u05d5\u05ea \u05d5\u05d9\u05d3\u05d0\u05d5", q), b = 0; b < a.length; b++) {
 				let g = (c = a[b].p) ? `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${a[b].l}"` : `https://video.technion.ac.il/Courses/${a[b].l}.html`,
-					d = 1 < a.length ? "\u05d5\u05d9\u05d3\u05d0\u05d5 #" + (b + 1) : "\u05d5\u05d9\u05d3\u05d0\u05d5";
-				// וידאו #1 - וידאו #2
+					d = 1 < a.length ? "וידאו #" + (b + 1) : "וידאו";
 				d = 0 < a[b].t ?
-					["\u05d4\u05e8\u05e6\u05d0\u05d4", "\u05ea\u05e8\u05d2\u05d5\u05dc"][a[b].t - 1] : d;
-				// הרצאה - תרגול
-				d += c ? " (\u05e4\u05e0\u05d5\u05e4\u05d8\u05d5)" : " (\u05e9\u05e8\u05ea \u05d4\u05d5\u05d9\u05d3\u05d0\u05d5 \u05d4\u05d9\u05e9\u05df)";
-				// (פנופטו) - (שרת הוידאו הטכניוני)
+					["הרצאה", "תרגול"][a[b].t - 1] : d;
+				d += c ? "(פנופטו)" : "(שרת הוידאו הטכניוני)";
 				f("a", "maor_download", {href: g, target: "_blank", title: a[b].vn ? a[b].vn : p}, d, q)
 			}
 		}));
 		e = document.getElementsByClassName("section main clearfix");
 		for (l = 1; l < e.length; l++) e[l].classList.contains("accesshide") || e[l].classList.contains("hidden") || (n = e[l].getAttribute("id").split("section-")[1], r(e[l].getElementsByClassName("course-section-header")[0],
-			h, n, "\u05d4\u05d5\u05e8\u05d3 \u05d9\u05d7\u05d9\u05d3\u05ea \u05d4\u05d5\u05e8\u05d0\u05d4").style.marginRight = "auto")
-		// הורדת כל הקבצים בקורס
+			h, n, "הורדת כל הקבצים בקורס").style.marginRight = "auto")
 	}
 })();

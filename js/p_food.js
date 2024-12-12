@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from "./common_popup.js";
+import {CommonPopup} from "./p_common.js";
 
 (function () {
 	function p(m) {
@@ -15,7 +15,7 @@ import {CommonPopup} from "./common_popup.js";
 	k.popupWrap();
 	chrome.storage.local.get({allow_timings: !1}, m => {
 		chrome.runtime.lastError ? (console.log("TE_food_err: " + chrome.runtime.lastError.message), p("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.")) :
-			m.allow_timings ? k.XHR_bigger("../json/food.json", "json").then(e => {
+			m.allow_timings ? k.XHR("../json/food.json", "json").then(e => {
 				e = e.response;
 				var f = new Date;
 				f = {day: f.getDay(), hour: f.getHours(), minutes: f.getMinutes(), nt: 0};

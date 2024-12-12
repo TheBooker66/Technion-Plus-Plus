@@ -350,8 +350,13 @@ function TE_notification(a, b, c) {
 	c = void 0 === c ? "" : c;
 	var d = new Date, e = d.getHours();
 	d = d.getMinutes();
-	a += "\n\u05d4\u05ea\u05e8\u05d0\u05d4 \u05d4\u05ea\u05e7\u05d1\u05dc\u05d4 \u05d1\u05e9\u05e2\u05d4: " + (10 > e ? "0" + e : e) + ":" + (10 > d ? "0" + d : d);
-	a = {type: "basic", iconUrl: chrome.runtime.getURL("../icons/technion plus plus/icon-48.png"), title: "Technion", message: a};
+	a += "התראה התקבלה בשעה: " + (10 > e ? "0" + e : e) + ":" + (10 > d ? "0" + d : d);
+	a = {
+		type: "basic",
+		iconUrl: chrome.runtime.getURL("../icons/technion_plus_plus/icon-48.png"),
+		title: "Technion",
+		message: a
+	};
 	"Chromium" == TE_getBrowser() && (a.silent = !0);
 	"" != c && chrome.notifications.clear(c);
 	chrome.notifications.create(c, a, h => {
@@ -769,7 +774,7 @@ export function TE_loginToMoodle(a) {
 
 function TE_getCoursesMoodle(a) {
 	var b = {}, d = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/,
-		c = / - (?:\u05e7\u05d9\u05e5|\u05d7\u05d5\u05e8\u05e3|\u05d0\u05d1\u05d9\u05d1)/; // קיץ|חורף|אביב
+		c = / - (?:קיץ|חורף|אביב)/;
 	a = a.response.getElementsByClassName("coursevisible");
 	if (0 == a.length)
 		console.log("TE_login: failed to fetch courses.");
@@ -850,9 +855,10 @@ function TE_csCalendarCheck(a, b, d) {
 function TE_getWebwork(a, b) {
 	return $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
 		var d = {}, c = /(?<cname>.+)\s*-\s*(?<cnum>[0-9]+)/,
-			e = / - (?:\u05e7\u05d9\u05e5|\u05d7\u05d5\u05e8\u05e3|\u05d0\u05d1\u05d9\u05d1)/,
-			f = /webwork|\u05d5\u05d5\u05d1\u05d5\u05d5\u05e8\u05e7|\u05d5\u05d5\u05d1-\u05d5\u05d5\u05e8\u05e7/i,
-			g = "104000 104003 104004 104012 104013 104016 104018 104019 104022 104031 104032 104033 104034 104035 104036 104038 104041 104042 104043 104044 104064 104065 104066 104131 104136 104166 104174 104192 104195 104215 104220 104221 104228 104281 104285 104295".split(" "),
+			e = / - (?:קיץ|חורף|אביב)/,
+			f = /webwork|וובוורק|ווב-וורק/i, // The Next line is HARDCODED COURSE NUMBERS
+			// g = "104000 104003 104004 104012 104013 104016 104018 104019 104022 104031 104032 104033 104034 104035 104036 104038 104041 104042 104043 104044 104064 104065 104066 104131 104136 104166 104174 104192 104195 104215 104220 104221 104228 104281 104285 104295".split(" "),
+			g = "01040000 01040003 01040004 01040012 01040013 01040016 01040018 01040019 01040022 01040031 01040032 01040033 01040034 01040035 01040036 01040038 01040041 01040042 01040043 01040044 01040064 01040065 01040066 01040131 01040136 01040166 01040174 01040192 01040195 01040215 01040220 01040221 01040228 01040281 01040285 01040295".split(" "),
 			k = a.response.getElementsByClassName("coursevisible");
 		if (0 == k.length) console.log("TE_login: failed to fetch webwork courses."); else {
 			var p = l => {
@@ -981,10 +987,10 @@ function TE_nextDownload() {
 				url: e, filename: d.n,
 				saveAs: !1
 			}, f => {
-				chrome.runtime.lastError ? (console.log("TE_bg_dls: " + chrome.runtime.lastError.message), console.log(` - filename: ${d.n}\n - url: ${e}`)) : (b.dl_current = f, chrome.action.setIcon({path: "../icons/technion plus plus/icon-green.png"}), setTimeout(() => {
-					chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"});
+				chrome.runtime.lastError ? (console.log("TE_bg_dls: " + chrome.runtime.lastError.message), console.log(` - filename: ${d.n}\n - url: ${e}`)) : (b.dl_current = f, chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"}), setTimeout(() => {
+					chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
 					setTimeout(() => {
-						chrome.action.setIcon({path: "../icons/technion plus plus/icon-green.png"})
+						chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"})
 					}, 250)
 				}, 250), TE_setStorage({dl_current: b.dl_current, dl_queue: b.dl_queue}))
 			})
@@ -998,12 +1004,12 @@ chrome.downloads.onChanged.addListener(a => {
 			"interrupted" === c[0].state && (console.log(`TE_dlFailed ${a.id} : ${["moodle", "panopto", "GR++", "webcourse"][b.dl_queue[0].sys]}`), b.dl_queue[0].list.length || b.dl_queue.shift(), b.dl_current = 0, TE_setStorage({
 				dl_current: b.dl_current,
 				dl_queue: b.dl_queue
-			}), chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"}),
+			}), chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"}),
 				TE_nextDownload())
 		}) : a.id == b.dl_current && a.state && ("interrupted" === a.state.current && console.log(`TE_dlFailed ${a.id} : ${["moodle", "panopto", "GR++", "webcourse"][b.dl_queue[0].sys]}`), "interrupted" === a.state.current || "complete" === a.state.current) && (b.dl_queue[0].list.length || b.dl_queue.shift(), b.dl_current = 0, TE_setStorage({
 			dl_current: b.dl_current,
 			dl_queue: b.dl_queue
-		}), chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"}), TE_nextDownload())
+		}), chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"}), TE_nextDownload())
 	})
 });
 
@@ -1158,8 +1164,7 @@ chrome.runtime.onMessage.addListener((a, b, c) => {
 						"sec-fetch-mode": "navigate",
 						"sec-fetch-site": "none"
 					}, body: null, method: "HEAD", mode: "cors", credentials: "include"
-				}).then(d => c(d.url)).catch(d => {
-			});
+				}).then(d => c(d.url)).catch(e => console.log(e));
 			break;
 		case "TE_remoodle_reangle":
 			TE_sendMessageToTabs({
@@ -1169,6 +1174,17 @@ chrome.runtime.onMessage.addListener((a, b, c) => {
 			break;
 		case "TE_remoodle":
 			TE_sendMessageToTabs({mess_t: "TE_remoodle"})
+			break;
+		case "buses":
+			fetch(a.url)
+				.then(response => {
+					response.json().then(response => {
+						console.log(response);
+						c(response);
+					});
+				})
+				.catch(e => console.error("Error:", e));
+			break;
 	}
 	return !0
 });
@@ -1239,21 +1255,10 @@ function TE_startExtension() {
 	chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
 	TE_setStorage({buses_alerts: []});
 	chrome.storage.local.get({dl_current: 0, dl_queue: []}, a => {
-		chrome.action.setIcon({path: "../icons/technion plus plus/icon-16.png"});
+		chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
 		TE_setStorage({dl_queue: [], dl_current: 0})
 	})
 }
 
 chrome.runtime.onStartup.addListener(TE_startExtension);
 chrome.runtime.onInstalled.addListener(TE_startExtension);
-
-// Buses
-chrome.runtime.onMessage.addListener(
-	function(request, sender, sendResponse) {
-		if (request.topic === "buses") {
-			fetch(request.url)
-				.then(response => sendResponse(response))
-				.catch(error => console.error("Error:", error));
-			return true; // Will respond asynchronously.
-		}
-	});

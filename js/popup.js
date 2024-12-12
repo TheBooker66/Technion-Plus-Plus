@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from './common_popup.js';
+import {CommonPopup} from './p_common.js';
 
 var $jscomp = $jscomp || {};
 $jscomp.scope = {};
@@ -304,15 +304,18 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 		return k
 	}
 
-	function d(c, h, k) {
-		for (let g = 0; g < c.length; g++)
-			c[g].addEventListener("click", () => {
-				if (!c[g].classList.contains("current")) {
-					for (let m = 0; m < c.length; m++)
-						c[m].className = m === g ? "tab current" : "tab", h[m].style.display = m === g ? "block" : "none";
+	function m(tabs, popup, k) {
+		for (let g = 0; g < tabs.length; g++) {
+			tabs[g].addEventListener("click", () => {
+				if (!tabs[g].classList.contains("current")) {
+					for (let m = 0; m < tabs.length; m++) {
+						tabs[m].className = m === g ? "tab current" : "tab";
+						popup[m].style.display = m === g ? "block" : "none";
+					}
 					k && k(g)
 				}
 			})
+		}
 	}
 
 	var e = new CommonPopup;
@@ -345,10 +348,8 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 	});
 	e = document.getElementById("more_links");
 	var l = document.getElementById("print"), n = document.getElementById("apps_links");
-	[{b: "gotoPrint", from: e, to: l},
-		{b: "gotoApps", from: e, to: n},
-		{b: "returnFromPrint", from: l, to: e},
-		{b: "returnFromApps", from: n, to: e}].forEach(c => {
+	[{b: "gotoPrint", from: e, to: l}, {b: "gotoApps", from: e, to: n},
+		{b: "returnFromPrint", from: l, to: e}, {b: "returnFromApps", from: n, to: e}].forEach(c => {
 		document.getElementById(c.b).addEventListener("click", () => {
 			c.to.style.display = "block";
 			c.from.style.display = "none";
@@ -360,20 +361,23 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 			40, 720), width: Math.min(window.screen.width - 20, 1200), top: 0, left: 0
 	};
 	r.top = parseInt((window.screen.height - r.height) / 2);
+	r.top = parseInt((window.screen.height - r.height) / 2);
 	r.left = parseInt((window.screen.width - r.width) / 2);
 	document.getElementById("organizer").addEventListener("click", () => chrome.windows.create(r));
+	document.getElementById("release_notes").addEventListener("click", () => chrome.tabs.create({url: "html/release_notes.html"}));
 	var t = document.getElementById("tools_content").getElementsByTagName("a");
 	for (let c = 0; c < t.length; c++)
-		[3, 4, 6].includes(c) || t[c].addEventListener("click", () => { // 3 - Organiser, 4 - grades sheet, 6 - printer
+		[4, 5, 7].includes(c) || t[c].addEventListener("click", () => { // 4 - Organiser, 5 - grades sheet, 7 - printer
 			window.location.href = "html/" + t[c].id + ".html"
 		});
 	e = document.querySelectorAll("#more_links > div");
-	d(e[0].querySelectorAll(".tab"), Array.from(e).slice(1), c => {
+	m(e[0].querySelectorAll(".tab"), Array.from(e).slice(1), _ => {
 		f.className = "collapse"
 	});
 	e = document.getElementById("secondary_tabs").getElementsByTagName("div");
-	l = document.getElementById("print").getElementsByTagName("div");
-	d(e, l, null);
+	l = [document.getElementById("single_page"), document.getElementById("double_page"),
+		document.getElementById("quadruple_page")];
+	m(e, l, null);
 	document.getElementById("cantlogin").getElementsByTagName("u")[0].addEventListener("click", function () {
 		chrome.runtime.openOptionsPage(function () {
 			chrome.runtime.lastError && console.log("TE_p: " + chrome.runtime.lastError.message)

@@ -4,9 +4,9 @@
   "author": "Ethan \"67\"",
   "description": "Get the Technion's web-experience out of the stone age.",
   "homepage_url": "https://sites.google.com/view/technion-plus-plus/home",
-  "version": "3.0.0",
-  "minimum_chrome_version": "88.0",
+  "version": "3.1.0",
   "manifest_version": 3,
+  "minimum_chrome_version": "88.0",
   "background": {
     "service_worker": "./bg_main.js",
     "type": "module"
@@ -17,11 +17,10 @@
   },
   "action": {
     "browser_style": false,
-    "default_icon": "icons/technion plus plus/icon-16.png",
+    "default_icon": "icons/technion_plus_plus/icon-16.png",
     "default_popup": "popup.html",
     "default_title": "Technion Plus Plus"
   },
-  "update_url": "https://clients2.google.com/service/update2/crx",
   "permissions": [
     "downloads",
     "storage",
@@ -36,12 +35,12 @@
     "https://mslworld.egged.co.il/"
   ],
   "icons": {
-    "16": "icons/technion plus plus/icon-16.png",
-    "19": "icons/technion plus plus/icon-19.png",
-    "32": "icons/technion plus plus/icon-32.png",
-    "48": "icons/technion plus plus/icon-48.png",
-    "96": "icons/technion plus plus/icon-96.png",
-    "128": "icons/technion plus plus/icon-128.png"
+    "16": "icons/technion_plus_plus/icon-16.png",
+    "19": "icons/technion_plus_plus/icon-19.png",
+    "32": "icons/technion_plus_plus/icon-32.png",
+    "48": "icons/technion_plus_plus/icon-48.png",
+    "96": "icons/technion_plus_plus/icon-96.png",
+    "128": "icons/technion_plus_plus/icon-128.png"
   },
   "content_scripts": [
     {
@@ -230,15 +229,15 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "icons/technion plus plus/icon-*.png",
+        "icons/technion_plus_plus/icon-*.png",
         "audio/notification.mp3",
         "js/panopto_new.js",
+        "icons/download_icons/*",
+        "html/templates/grades_sheet.html",
         "cheesefork/share-histograms.js",
         "css/dark_moodle.css",
         "css/light_moodle.css",
-        "css/sasonp.css",
-        "icons/usable/*",
-        "html/templates/grades_sheet.html"
+        "css/sasonp.css"
       ],
       "matches": [
         "*://*/*"

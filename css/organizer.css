@@ -408,8 +408,7 @@ label, label input {
     margin-left: 1ch;
     background-color: #ccc5;
     display: flex;
-    padding: 3px;
-    padding-left: 6px;
+    padding: 3px 3px 3px 6px;
     border-radius: 4px;
     text-align: center;
     font-weight: 500;

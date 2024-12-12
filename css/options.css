@@ -14,8 +14,7 @@ body {
     font-family: 'Segoe UI', arial;
     font-size: 13px;
     margin: 0;
-    padding: 4px;
-    padding-bottom: 2px;
+    padding: 4px 4px 2px;
     -moz-user-select: none;
     background: #f9f9fa;
 }

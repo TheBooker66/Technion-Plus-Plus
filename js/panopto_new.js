@@ -1,6 +1,10 @@
 'use strict';
 (function () {
-	var h = (new DOMParser).parseFromString('\n<div style="color: #777; font-style: italic; z-index:1; width: 250px; margin:auto; display:block; padding: 10px; line-height:1; position: relative;text-align: center; direction: rtl; display: none">\n\t<h4 dir="ltr">Technion<sup>++</sup></h4>\n\t\u05d4\u05d5\u05d5\u05d9\u05d3\u05d0\u05d5 \u05e0\u05e4\u05ea\u05d7 \u05dc\u05ea\u05e6\u05d5\u05d2\u05d4 \u05d1\u05d7\u05dc\u05d5\u05df \u05d7\u05d3\u05e9, \u05d9\u05e9 \u05dc\u05e1\u05d2\u05d5\u05e8 \u05d0\u05ea \u05d4\u05d7\u05dc\u05d5\u05df \u05d4\u05d7\u05d3\u05e9 \u05db\u05d3\u05d9 \u05dc\u05d7\u05d6\u05d5\u05e8 \u05d5\u05dc\u05e6\u05e4\u05d5\u05ea \u05d1\u05d5\u05d5\u05d9\u05d3\u05d0\u05d5 \u05db\u05d0\u05df.\n</div>\n',
+	var h = (new DOMParser).parseFromString(
+		'\n<div style="color: #777; font-style: italic; z-index:1; width: 250px; margin:auto; display:block; ' +
+		'padding: 10px; line-height:1; position: relative;text-align: center; direction: rtl; display: none">' +
+		'\n\t<h4 dir="ltr">Technion<sup>++</sup></h4>\n\tהוידאו נפתח לתצוגה בחלון חדש, ' +
+		'יש לסגור את החלון החדש כדי לחזור ולצפות בווידאו כאן.\n</div>\n',
 		"text/html").querySelector("div");
 	document.getElementById("secondaryScreen").insertBefore(h, document.getElementById("secondaryScreen").childNodes[0]);
 	var e = document.getElementById("m_expand");
@@ -38,12 +42,12 @@
 				"function" === typeof c.mozRequestFullScreen ? c.mozRequestFullScreen() : c.webkitRequestFullscreen();
 				g = !0
 			});
-			d.textContent = "\u05de\u05e1\u05da \u05de\u05dc\u05d0";
+			d.textContent = "מסך מלא";
 			d.setAttribute("style", "margin: 8px; cursor: pointer");
 			a.document.body.appendChild(d);
 			a.onbeforeunload = () => l(!1);
 			d = document.createElement("span");
-			d.textContent = "\u05e0\u05d9\u05ea\u05df \u05dc\u05d2\u05e8\u05d5\u05e8 \u05d0\u05ea \u05d4\u05d7\u05dc\u05d5\u05df \u05dc\u05de\u05e1\u05da \u05e9\u05e0\u05d9 \u05d5\u05db\u05da \u05dc\u05e6\u05e4\u05d5\u05ea \u05d1\u05d5\u05d5\u05d9\u05d3\u05d0\u05d5 \u05d1\u05de\u05e6\u05d1 \u05de\u05e1\u05da \u05de\u05dc\u05d0 \u05d1\u05e9\u05e0\u05d9 \u05d4\u05de\u05e1\u05db\u05d9\u05dd.";
+			d.textContent = "ניתן לגרור את החלון למסך שני וכך לצפות בווידאו במצב מסך מלא בשני המסכים.";
 			a.document.body.appendChild(d)
 		}
 	})

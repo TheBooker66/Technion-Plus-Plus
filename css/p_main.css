@@ -142,8 +142,7 @@
     flex-flow: column;
     width: 12px;
     min-height: 1rem;
-    background: url('../icons/arrowhead-down-white.svg') no-repeat 0 2px;
-    background-color: transparent;
+    background: transparent url('../icons/arrowhead-down-white.svg') no-repeat 0 2px;
     opacity: 0.3;
     position: absolute;
     right: 147px;
@@ -243,8 +242,7 @@
     /*background-color: rgba(250,250,250,.1);*/
     padding: 3px 8px;
     border-radius: 8px;
-    background: #0057a2 linear-gradient(45deg, rgba(0, 0, 0, .1) 20%, transparent 50%);
-    background-color: var(--sec-norm);
+    background: var(--sec-norm) linear-gradient(45deg, rgba(0, 0, 0, .1) 20%, transparent 50%);
 }
 
 #toggles [type="checkbox"]:not(:checked) + label:after {
@@ -271,19 +269,19 @@
 }
 
 #changeoptions [type="checkbox"]:not(:checked) + label:after {
-    content: url("../icons/toggles/link_off.svg");
+    content: url("../icons/link_broken.svg");
 }
 
 #changeoptions [type="checkbox"]:checked + label:after {
-    content: url("../icons/toggles/link.svg");
+    content: url("../icons/link.svg");
 }
 
 #mutealerts [type="checkbox"]:not(:checked) + label:after {
-    content: url("../icons/toggles/volume_off.svg");
+    content: url("../icons/volume_off.svg");
 }
 
 #mutealerts [type="checkbox"]:checked + label:after {
-    content: url("../icons/toggles/volume_up.svg");
+    content: url("../icons/volume_up.svg");
 }
 
 

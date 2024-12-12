@@ -81,7 +81,7 @@ import {TE_updateInfo} from "../bg_main.js";
 	document.getElementById("bug_report").addEventListener("click", () => {
 		var a = {
 				ad: "ethan.amiran@gmail.com", //"maorlevy.ext@gmail.com",
-				su: "דיווח תקלה בתוסף Technion",
+				su: "דיווח תקלה בתוסף Technion++",
 				body: encodeURIComponent("מלאו כאן את פרטי התקלה - מומלץ בתוספת תמונות להמחשה.") +
 					"%0D%0A" + encodeURIComponent("תזכורת: התוסף פותח בהתנדבות ולא מטעם הטכניון!")
 			},

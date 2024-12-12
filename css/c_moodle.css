@@ -40,6 +40,11 @@ a.maor_download_light:hover {
     background-color: rgb(238, 154, 65);
 }
 
+.tilecontainer {
+    position: relative;
+    margin: 0 0;
+}
+
 .card.tplus_block {
     border-color: #16253D80;
     color: #16253D;

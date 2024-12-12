@@ -1,6 +1,6 @@
 'use strict';
 
-class CommonCalendar {
+export class CommonCalendar {
 	constructor(a, b) {
 		this.template_file = "calendar";
 		this.common = a;
@@ -98,5 +98,3 @@ class CommonCalendar {
 		a().then(b => this.insertAssignments(b.new_list, b.finished_list)).catch(b => this.insertMessage(b.msg, b.is_error))
 	}
 }
-
-export {CommonCalendar};

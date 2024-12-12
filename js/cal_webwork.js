@@ -1,6 +1,8 @@
 'use strict';
-import {CommonPopup} from './common_popup.js';
+import {CommonPopup} from './p_common.js';
 import {CommonCalendar} from './p_cal_common.js';
+import {OrganizerPopup} from './organizer.js';
+import {OrganizerCalendar} from './organizer.js';
 
 
 (function () {
@@ -14,11 +16,17 @@ import {CommonCalendar} from './p_cal_common.js';
 		return e[1].ts === b[1].ts ? e[1].h.localeCompare(b[1].h) : 0 === e[1].ts ? 1 : 0 === b[1].ts || e[1].ts < b[1].ts ? -1 : e[1].ts > b[1].ts ? 1 : 0
 	}
 
-	var h = new CommonPopup();
+	var h, l;
+	if (document.title === "ארגונית++") {
+		h = new OrganizerPopup;
+		l = new OrganizerCalendar(h, "webwork");
+	} else {
+		h = new CommonPopup;
+		l = new CommonCalendar(h, "webwork");
+	}
 	h.title = "מטלות קרובות - WeBWorK";
 	h.css_list = ["calendar"];
 	h.popupWrap();
-	var l = new CommonCalendar(h, "webwork");
 	var u = (e, b) => chrome.storage.local.get({
 		webwork_cal: {},
 		cal_seen: 0,
@@ -27,10 +35,13 @@ import {CommonCalendar} from './p_cal_common.js';
 	}, function (f) {
 		var m = {};
 		for (var c of Object.values(f.webwork_courses)) m[c.lti] = c.name;
-		if (chrome.runtime.lastError) b({
-			msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
-			is_error: !0
-		}), console.log("TE_ww_cal: " + chrome.runtime.lastError.message); else {
+		if (chrome.runtime.lastError) {
+			b({
+				msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
+				is_error: !0
+			})
+			console.log("TE_ww_cal: " + chrome.runtime.lastError.message);
+		} else {
 			document.getElementById("lastcheck").style.display = "block";
 			c = new Date(f.wwcal_update);
 			var g = function (a) {
@@ -45,7 +56,8 @@ import {CommonCalendar} from './p_cal_common.js';
 			c = [];
 			g = [];
 			for (let a = 0; a < d.length; a++) {
-				let n = d[a][0].split("_")[0], p = {
+				let n = d[a][0].split("_")[0];
+				let p = {
 					header: d[a][1].h,
 					description: "",
 					course: m[n],

@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from "./common_popup.js";
+import {CommonPopup} from "./p_common.js";
 import {TE_shutBusesAlerts} from "../bg_main.js";
 
 (function () {
@@ -16,7 +16,7 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 			a.MinutesToArrivalList[c] <= parseInt(document.getElementById("min_select").value) ? (b.classList.add("blat"), setTimeout(() =>
 				b.classList.remove("blat"), 1E3)) : 0 < c ? (chrome.runtime.sendMessage({
 				mess_t: "silent_notification",
-				message: "\u05e0\u05d9\u05ea\u05df \u05dc\u05d9\u05e6\u05d5\u05e8 \u05d4\u05ea\u05e8\u05d0\u05d4 \u05e8\u05e7 \u05dc\u05d0\u05d5\u05d8\u05d5\u05d1\u05d5\u05e1 \u05d4\u05e8\u05d0\u05e9\u05d5\u05df \u05d4\u05de\u05d5\u05e4\u05d9\u05e2 \u05d1\u05e8\u05e9\u05d9\u05de\u05d4 \u05e2\u05d1\u05d5\u05e8 \u05e7\u05d5 \u05e1\u05e4\u05e6\u05d9\u05e4\u05d9.\n"
+				message: "ניתן ליצור התראה רק לאוטובוס הראשון המופיע ברשימה עבור קו ספציפי.\n"
 			}), b.classList.add("blat"), setTimeout(() => b.classList.remove("blat"),
 				1E3)) : (chrome.runtime.sendMessage({
 				mess_t: "bus_alert",
@@ -26,18 +26,23 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 		})
 	}
 
-	function k(a) { // TODO: Fix CORS
-		var c = "https://mslworld.egged.co.il/MslWebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/" + document.getElementById("station_select").value + "/he/false";
+	function k(a) { // Old url: https://mslworld.egged.co.il/MslWebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/
+		var c = "https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/" + document.getElementById("station_select").value + "/he/false";
 		c = encodeURI(c);
 		chrome.storage.local.get({buses_alerts: []}, e => {
-			chrome.runtime.lastError ? (console.log("TE_bus_err: " + chrome.runtime.lastError.message), g("\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d0\u05d7\u05d6\u05d5\u05e8 \u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05de\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05d4\u05d3\u05e4\u05d3\u05e4\u05df, \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05e0\u05d9\u05ea."),
-				clearInterval(a)) : chrome.runtime.sendMessage({topic: "buses", url: c}, d => {
-				var b = document.getElementById("bus_table");
-				d = d.response;
-				for (var h = 0; h < d.length; h++) for (var l = 0; l < d[h].MinutesToArrivalList.length; l++) q(d[h], l, b, e.buses_alerts);
-				0 == d.length && m(["", "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05e7\u05d5\u05d5\u05d9 \u05d0\u05d5\u05d8\u05d5\u05d1\u05d5\u05e1 \u05dc\u05ea\u05e6\u05d5\u05d2\u05d4.", ""], b);
-				document.getElementById("spinner").style.display = "none"
-			})
+			chrome.runtime.lastError ?
+				(console.log("TE_bus_err: " + chrome.runtime.lastError.message),
+					g("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית."),
+					clearInterval(a)) :
+				chrome.runtime.sendMessage({mess_t: "buses", url: c}, d => {
+					var b = document.getElementById("bus_table");
+					0 == d.length && m(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""], b);
+					for (var h = 0; h < d.length; h++)
+						for (var l = 0; l < d[h].MinutesToArrivalList.length; l++)
+							q(d[h], l, b, e.buses_alerts);
+
+					document.getElementById("spinner").style.display = "none"
+				})
 		})
 	}
 
@@ -122,7 +127,7 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 	}];
 	chrome.storage.local.get({bus_station: 43015, bus_time: 10, allow_timings: !1}, a => {
 		if (chrome.runtime.lastError) console.log("TE_bus_err: " +
-			chrome.runtime.lastError.message), g("\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d0\u05d7\u05d6\u05d5\u05e8 \u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05de\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05d4\u05d3\u05e4\u05d3\u05e4\u05df, \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05e0\u05d9\u05ea."); else if (a.allow_timings) {
+			chrome.runtime.lastError.message), g("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית."); else if (a.allow_timings) {
 			document.getElementById("min_select").getElementsByTagName("option")[a.bus_time / 5 - 1].selected = !0;
 			document.getElementById("min_select").addEventListener("change", n);
 			var c = document.getElementById("station_select");
@@ -139,6 +144,6 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 				k(e)
 			}, 3E4);
 			k(e)
-		} else g('\u05d9\u05e9 \u05dc\u05d0\u05e9\u05e8 \u05e9\u05d9\u05de\u05d5\u05e9 \u05d1"\u05d0\u05d5\u05d8\u05d5\u05d1\u05d5\u05e1\u05d9\u05dd \u05e7\u05e8\u05d5\u05d1\u05d9\u05dd" \u05d1\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05d4\u05ea\u05d5\u05e1\u05e3.')
+		} else g('יש לאשר שימוש ב"אוטובוסים קרובים" בהגדרות התוסף.')
 	})
 })();
