@@ -1,3 +1,9 @@
+/* Configure main menu width */
+:root {
+    --menu-width: 125px;
+    --speed-width: 105px; /* speed and snapshot menu width, 20 px less than menu width */
+}
+
 /* mark videos that the user already watched */
 .content-table .details-table .thumbnail-row .detail-cell .item-title a:visited {
     color: #ff0039
@@ -11,7 +17,7 @@ a.maor_panopto_action {
     cursor: pointer !important;
     font-weight: 500 !important;
     box-shadow: 0 3px 1px -2px rgba(255, 214, 214, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, .12);
-    font-family: 'Segoe UI', arial !important;
+    font-family: 'Segoe UI', arial, sans-serif !important;
     letter-spacing: 0.03rem;
     font-size: 0.9rem !important;
 }
@@ -38,14 +44,14 @@ a.maor_panopto_action:hover {
 }
 
 #maor_menu_container {
-    width: 115px;
+    width: var(--menu-width);
     filter: none !important;
     padding: 7px;
     box-sizing: content-box;
 }
 
 #maor_koteret {
-    text-align: left;
+    text-align: center;
     direction: ltr;
     padding: 4px 4px 4px 34px;
     display: block;
@@ -75,7 +81,7 @@ a.maor_panopto_action:hover {
     background-color: #061123;
     padding: 0;
     transition: all ease .5s;
-    width: 115px;
+    width: var(--menu-width);
     min-height: 33px;
     border-radius: 4px;
     border: 1px solid black;
@@ -139,7 +145,7 @@ a.maor_panopto_action:hover {
     padding: 2px;
     border: 1px solid #000;
     display: none;
-    margin: -11px 120px -11px 0;
+    margin: -11px var(--speed-width) -11px 0;
     border-radius: 4px;
     box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
     text-align: center;
@@ -156,7 +162,7 @@ a.maor_panopto_action:hover {
     position: absolute;
     top: 0;
     right: 0;
-    width: 138px;
+    width: var(--menu-width) - 2;
     height: 100%;
     display: none;
     background-color: rgba(0, 0, 0, 0.5);
@@ -175,7 +181,7 @@ a.maor_panopto_action:hover {
 #m_vid_list.maor_persist {
     display: flex;
     align-items: center;
-    margin: 0 120px 0 0;
+    margin: 0 var(--speed-width) 0 0;
     z-index: 3;
 }
 
@@ -244,7 +250,7 @@ sounds control panel
     z-index: 2;
     direction: rtl;
     font-size: 10px;
-    font-family: 'Segoe UI', arial !important;
+    font-family: 'Segoe UI', arial, sans-serif !important;
     bottom: 60px;
     right: 30px;
     opacity: 0.95;

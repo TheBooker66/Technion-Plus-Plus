@@ -157,7 +157,7 @@
 #remoodle_select:focus, #remoodle_select:hover {
     width: 50px;
     right: 109px;
-    background: url('../icons/arrowhead-down.svg') no-repeat 0 2px #fff;
+    background: url('../icons/arrowhead-down-black.svg') no-repeat 0 2px #fff;
 }
 
 #remoodle_select:focus, #remoodle_select:hover, #remoodle_select .opt:hover, #remoodle_select :not(#rmshidden) .opt {
@@ -281,7 +281,7 @@
 }
 
 #mutealerts [type="checkbox"]:checked + label:after {
-    content: url("../icons/volume_up.svg");
+    content: url("../icons/volume_on.svg");
 }
 
 

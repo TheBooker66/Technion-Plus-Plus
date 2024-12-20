@@ -282,7 +282,7 @@ footer {
     color: #fff;
     padding: 16px calc(1.5vmax + 8px);
     display: grid;
-    grid-template-columns: max-content 1fr max-content;
+    grid-template-columns: max-content max-content 1fr max-content;
     grid-column-gap: 100px;
 }
 

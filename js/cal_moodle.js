@@ -70,7 +70,7 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 	l.title = "מטלות קרובות - מודל";
 	l.css_list = ["calendar"];
 	l.popupWrap();
-	"cal_moodle" == l.moduleName && chrome.storage.local.get({cal_killa: !0}, function (c) {
+	chrome.storage.local.get({cal_killa: !0}, function (c) {
 		chrome.runtime.lastError ? (console.log("TE_cal: " + chrome.runtime.lastError.message), r.insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
 			!0)) : (document.getElementById("appeals_toggle").checked = c.cal_killa, document.getElementById("appeals_toggle").addEventListener("change", function () {
 			chrome.storage.local.set({cal_killa: document.getElementById("appeals_toggle").checked}, () => {

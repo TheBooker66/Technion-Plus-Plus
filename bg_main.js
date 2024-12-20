@@ -1228,16 +1228,13 @@ chrome.runtime.onInstalled.addListener(a => {
 				c = c.user_agenda;
 				var d = Date.now();
 				c[d] = {
-					header: "\u05de\u05d8\u05dc\u05d5\u05ea WeBWorK \u05e9\u05e1\u05d5\u05de\u05e0\u05d5 \u05db\u05d4\u05d5\u05e9\u05dc\u05de\u05d5 \u05d0\u05d5\u05e4\u05e1\u05d5!",
-					// מטלות WeBWorK שסומנו כהושלמו אופסו!
-					description: "\u05dc\u05e6\u05e2\u05e8\u05d9, \u05e2\u05e7\u05d1 \u05d1\u05d0\u05d2 \u05e0\u05d0\u05dc\u05e6\u05ea\u05d9 \u05dc\u05d0\u05e4\u05e1 \u05d0\u05ea \u05de\u05d8\u05dc\u05d5\u05ea \u05d4\u05d5\u05d5\u05d1\u05d5\u05d5\u05e8\u05e7 \u05e9\u05d4\u05d5\u05e9\u05dc\u05de\u05d5. \u05e0\u05d9\u05ea\u05df \u05dc\u05de\u05d7\u05d5\u05e7 \u05d0\u05ea \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4 \u05d4\u05d6\u05d0\u05ea \u05d5\u05dc\u05e1\u05de\u05df \u05d0\u05d5\u05ea\u05df \u05e9\u05d5\u05d1 \u05dc\u05d0\u05d7\u05e8 \u05e9\u05d9\u05d9\u05d8\u05e2\u05e0\u05d5 \u05de\u05d7\u05d3\u05e9 \ud83d\ude42",
-					// לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂
+					header: "מטלות WeBWorK שסומנו כהושלמו אופסו!",
+					description: "לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂",
 					timestamp: -1,
 					done: !1
 				};
 				TE_setStorage({user_agenda: c, webwork_cal: {}});
-				TE_notification("\u05dc\u05e6\u05e2\u05e8\u05d9, \u05e2\u05e7\u05d1 \u05d1\u05d0\u05d2 \u05e0\u05d0\u05dc\u05e6\u05ea\u05d9 \u05dc\u05d0\u05e4\u05e1 \u05d0\u05ea \u05de\u05d8\u05dc\u05d5\u05ea \u05d4\u05d5\u05d5\u05d1\u05d5\u05d5\u05e8\u05e7 \u05e9\u05d4\u05d5\u05e9\u05dc\u05de\u05d5. \u05e0\u05d9\u05ea\u05df \u05dc\u05de\u05d7\u05d5\u05e7 \u05d0\u05ea \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4 \u05d4\u05d6\u05d0\u05ea \u05d5\u05dc\u05e1\u05de\u05df \u05d0\u05d5\u05ea\u05df \u05e9\u05d5\u05d1 \u05dc\u05d0\u05d7\u05e8 \u05e9\u05d9\u05d9\u05d8\u05e2\u05e0\u05d5 \u05de\u05d7\u05d3\u05e9 \ud83d\ude42",
-					// לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂
+				TE_notification("לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂",
 					!1)
 			}
 		});
@@ -1261,4 +1258,4 @@ function TE_startExtension() {
 }
 
 chrome.runtime.onStartup.addListener(TE_startExtension);
-chrome.runtime.onInstalled.addListener(TE_startExtension);
+chrome.runtime.onInstalled.addListener(chrome.tabs.create({url: 'html/release_notes.html'}) && TE_startExtension);

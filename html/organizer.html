@@ -23,6 +23,7 @@
             <div class="tab"><img src="../icons/calendar_done.svg"/> מטלות שהושלמו</div>
             <div class="tab"><img src="../icons/plus.svg"/> הוסף מטלה</div>
             <div class="dummy">
+                <label for="appeals_toggle"><input type="checkbox" id="appeals_toggle"/> סנן ערעורים וזומים מהרשימה*</label>
                 <label for="fullscreen"><input type="checkbox" id="fullscreen"/> פתח ארגונית במסך מלא</label>
                 <label for="darkmode"><input type="checkbox" id="darkmode"/> מצב לילה</label>
                 <a class="button" id="filters_toggle">סינון מטלות</a>
@@ -97,6 +98,11 @@
             <li><a id="mailtome">פניה אל מפתח התוסף בדוא"ל</a></li>
         </div>
         <div>
+            <b>הערה</b><br/>
+            *הסינון לא נבדק כראוי ועשוי להסתיר מטלות שאינן ערעורים וזומים.<br/>
+            זה לא סביר, אך זו אפשרות.
+        </div>
+        <div>
             <b>טיפ למפתח התוסף</b><br/>
             <small>עזרו לי לעזור לכם 🙂</small><br/>
             <a class="button" target="_blank" href="https://www.bitpay.co.il/app/me/5BE56597-841F-4699-A112-319D7ED43CE96539">טיפ ב-<img
@@ -105,10 +111,9 @@
     </footer>
 </div>
 
-<div style="display: none;">
-    <div id="lastcheck">בדיקה אחרונה:</div>
+<div>
+    <div id="lastcheck">בדיקה אחרונה: </div>
     <div id="recheck"><a>בדוק מחדש כעת</a></div>
-    <input type="checkbox" id="appeals_toggle" checked/>
 </div>
 
 <template id="assignment">
@@ -146,5 +151,7 @@
 <script type="module" src="../bg_main.js"></script>
 <script type="module" src="../js/organizer.js"></script>
 <script type="module" src="../js/cal_moodle.js"></script>
+<script type="module" src="../js/cal_webwork.js"></script>
+<script type="module" src="../js/cal_cs.js"></script>
 </body>
 </html>

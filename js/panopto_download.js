@@ -13,8 +13,7 @@
 			c.appendChild(a);
 			c.appendChild(b);
 			if (window.location.href.includes("folderID")) {
-				b =
-					document.createElement("label");
+				b = document.createElement("label");
 				b.setAttribute("class", "maor_download");
 				a = document.createElement("div");
 				a.textContent = "בחר";
@@ -30,9 +29,10 @@
 
 	async function w() {
 		var a = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0],
-			c = document.getElementById("contentHeaderText").textContent.replace(/[0-9]{4,}[swi]: /, "").replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g,
-				"") + "/";
-		const response = await fetch("https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=" + a + "&type=mp4");
+			c = document.getElementById("contentHeaderText").textContent.replace(/[0-9]{4,}[swi]: /, "")
+				.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "") + "/";
+		const response =
+			await fetch("https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=" + a + "&type=mp4");
 		if (4 === response.readyState)
 			if (200 === response.status) {
 				var b = response.response.getElementsByTagName("item"), g = {sys: 1, sub_pre: "", list: []};
@@ -52,27 +52,29 @@
 		c.setAttribute("class", "hidden-command-button");
 		if (!1 !== window.location.href.includes("folderID")) {
 			var d = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0];
-			fetch(`https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=${d}&type=mp4`).then(b => b.text()).then(b => (new DOMParser).parseFromString(b, "text/xml")).then(b => {
-				if (0 != b.getElementsByTagName("item").length) {
-					a.setAttribute("class",
-						"maor_panopto_action css-fehuet");
-					a.setAttribute("style", "margin-right: 8px");
-					c.setAttribute("class", "maor_panopto_action css-fehuet");
-					c.setAttribute("style", "margin-right: 8px");
-					var g = setInterval(() => {
-						if ("none" == document.getElementById("loadingMessage").style.display && 0 < document.getElementsByClassName("thumbnail-link").length && "none" != document.getElementsByClassName("thumbnail-link")[0].style.display) {
-							clearInterval(g);
-							var e = document.getElementById("listViewContainer").getElementsByTagName("tr");
-							for (let f = 0; f < e.length - 1; f++) {
-								var h = e[f].getAttribute("id"), p = e[f].getElementsByClassName("item-title")[0],
-									l = p.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
-								v(h, p, l)
+			fetch(`https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=${d}&type=mp4`)
+				.then(b => b.text())
+				.then(b => (new DOMParser).parseFromString(b, "text/xml"))
+				.then(b => {
+					if (0 != b.getElementsByTagName("item").length) {
+						a.setAttribute("class",
+							"maor_panopto_action css-fehuet");
+						a.setAttribute("style", "margin-right: 8px");
+						c.setAttribute("class", "maor_panopto_action css-fehuet");
+						c.setAttribute("style", "margin-right: 8px");
+						var g = setInterval(() => {
+							if ("none" == document.getElementById("loadingMessage").style.display && 0 < document.getElementsByClassName("thumbnail-link").length && "none" != document.getElementsByClassName("thumbnail-link")[0].style.display) {
+								clearInterval(g);
+								var e = document.getElementById("listViewContainer").getElementsByTagName("tr");
+								for (let f = 0; f < e.length - 1; f++) {
+									var h = e[f].getAttribute("id"), p = e[f].getElementsByClassName("item-title")[0],
+										l = p.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
+									v(h, p, l)
+								}
 							}
-						}
-					}, 2E3)
-				}
-			}).catch(b => {
-			})
+						}, 2E3)
+					}
+				}).catch(err => console.log(err))
 		}
 	}
 
@@ -94,8 +96,7 @@
 				c.panopto_light = document.getElementById("m_darkmode").checked;
 				break;
 			case "speed":
-				c.panopto_speed =
-					document.querySelector(".play-speed.selected").id;
+				c.panopto_speed = document.querySelector(".play-speed.selected").id;
 				break;
 			case "settings":
 				c.panopto_save = document.getElementById("m_save").checked
@@ -121,7 +122,8 @@
 				var d = setInterval(() => {
 					if (document.getElementById("Faster")) {
 						clearInterval(d);
-						c.panopto_hide && "none" != document.getElementById("toggleThumbnailsButton").style.display && document.getElementById("toggleThumbnailsButton").click();
+						c.panopto_hide && "none" != document.getElementById("toggleThumbnailsButton").style.display
+						&& document.getElementById("toggleThumbnailsButton").click();
 						document.getElementById(c.panopto_speed).click();
 						var b = document.getElementsByClassName("play-speed");
 						for (let g of b) g.addEventListener("click", () => {
@@ -207,7 +209,10 @@
 				3: {
 					u: `https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/${a}.mp4?mediaTargetType=audioPodcast`,
 					n: c + "_voice.mp4"
-				}, 4: {u: `https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/${a}.mp4`, n: c + ".mp4"}
+				}, 4: {
+					u: `https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/${a}.mp4`,
+					n: c + ".mp4"
+				}
 			};
 		Object.keys(b).forEach(g => {
 			let e = document.getElementById(`m_download_mp${g}`);
@@ -304,7 +309,7 @@
 			'\t\t\t<div class="m_grid" style="display: none">\n' +
 			'\t\t\t\tעקב מגבלות טכניות לא ניתן להשתמש בשיפורי שמע עבור הקלטה זו.\n\t\t\t</div>\n\n\t\t</div>\n\n\t</div>\n\t',
 			"text/html").getElementById("maor_menu_container"), c = a.getElementsByTagName("a");
-		for (let d of c) d.id && (d.style.backgroundImage = "url(" + chrome.runtime.getURL("icons/download_icons/" + d.id.replace(/_mp[34]/, "") + ".svg") + ")");
+		for (let d of c) d.id && (d.style.backgroundImage = "url(" + chrome.runtime.getURL("icons/panopto_icons/" + d.id.replace(/_mp[34]/, "") + ".svg") + ")");
 		document.getElementById("transportControls").appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
 		document.getElementById("transportControls").appendChild(a);
 		document.getElementById("maor_koteret").style.backgroundImage =

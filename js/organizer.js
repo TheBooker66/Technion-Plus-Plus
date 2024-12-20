@@ -503,7 +503,7 @@ var assignments_promises = {};
 
 function addAssignmentsToList(a, b) {
 	assignments_promises[b] = a;
-	Object.keys(assignments_promises).length <= MAX_CALENDARS && chrome.storage.local.get({
+	Object.keys(assignments_promises).length == MAX_CALENDARS && chrome.storage.local.get({
 		moodle_cal: !0,
 		cs_cal: !1,
 		wwcal_switch: !1,

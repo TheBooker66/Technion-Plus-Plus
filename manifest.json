@@ -1,10 +1,10 @@
 {
   "name": "Technion Plus Plus",
   "short_name": "Technion++",
-  "author": "Ethan \"67\"",
+  "author": "Ethan \"67\" A",
   "description": "Get the Technion's web-experience out of the stone age.",
   "homepage_url": "https://sites.google.com/view/technion-plus-plus/home",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "manifest_version": 3,
   "minimum_chrome_version": "88.0",
   "background": {
@@ -232,7 +232,7 @@
         "icons/technion_plus_plus/icon-*.png",
         "audio/notification.mp3",
         "js/panopto_new.js",
-        "icons/download_icons/*",
+        "icons/panopto_icons/*",
         "html/templates/grades_sheet.html",
         "cheesefork/share-histograms.js",
         "css/dark_moodle.css",
