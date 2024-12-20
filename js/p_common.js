@@ -295,7 +295,6 @@ class CommonPopup {
 		this.css_list = [];
 		this.wrapper = document.getElementsByClassName("wrapper")[0];
 		this.main_content = this.wrapper.getElementsByClassName("main-content")[0];
-		this.moduleName = window.location.pathname.split(".")[0].split("/")[2];
 	}
 
 	useTemplatesFile(a, b) {
@@ -311,17 +310,19 @@ class CommonPopup {
 		return document.importNode(a, !0)
 	}
 
-	popupWrap() {
-		this.useTemplatesFile("common", a => {
-			for (var b = 0; b < this.css_list.length; b++) {
-				var c = this.loadTemplate("head-stylesheets", a);
-				c.querySelector("link").setAttribute("href", "css/p_" + this.css_list[b] + ".css");
-				document.head.appendChild(c)
-			}
-			this.wrapper.insertBefore(this.loadTemplate("header-koteret", a), this.main_content);
-			"" != this.title && (a = this.loadTemplate("header-title", a), a.querySelector("div:not(#returnHome)").textContent = this.title, this.wrapper.insertBefore(a, this.main_content));
-			this.buttonsSetup()
-		})
+	popupWrap(popupEh) {
+		if (popupEh) {
+			this.useTemplatesFile("common", a => {
+				for (var b = 0; b < this.css_list.length; b++) {
+					var c = this.loadTemplate("head-stylesheets", a);
+					c.querySelector("link").setAttribute("href", "css/p_" + this.css_list[b] + ".css");
+					document.head.appendChild(c)
+				}
+				this.wrapper.insertBefore(this.loadTemplate("header-koteret", a), this.main_content);
+				"" != this.title && (a = this.loadTemplate("header-title", a), a.querySelector("div:not(#returnHome)").textContent = this.title, this.wrapper.insertBefore(a, this.main_content));
+				this.buttonsSetup()
+			})
+		}
 	}
 
 	buttonsSetup() {
@@ -337,9 +338,8 @@ class CommonPopup {
 		})
 	}
 
-	XHR(a, b, c, d) {
+	XHR(a, b, c) {
 		c = void 0 === c ? "" : c;
-		d = void 0 === d ? !1 : d;
 		return new Promise((e, g) => {
 			var f = {
 				headers: {
@@ -348,20 +348,32 @@ class CommonPopup {
 					"cache-control": "no-cache",
 					pragma: "no-cache",
 					"sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"'
-				}
+				},
 			};
-			f.method = d ? "head" : "get";
-			"" != c && (f.method = "post", f.body = c, f.headers["Content-type"] = "application/x-www-form-urlencoded");
+			if (c != "") {
+				f.method = "post";
+				f.body = c;
+				f.headers["Content-type"] = "application/x-www-form-urlencoded";
+			}
+			if (b === "csv") {
+				f.headers["Content-type"] = "text/csv;charset=UTF-8";
+			}
 			fetch(a, f).then(h => $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
 				if (h.ok) {
 					var k = {response: "", responseURL: h.url};
-					"json" == b ? k.response = yield h.json() : (k.response = yield h.text(), "document" == b && (k.response = (new DOMParser).parseFromString(k.response,
-						"text/html")));
+					switch (b) {
+						case "json":
+							k.response = yield h.json();
+							break;
+						case "document":
+							k.response = (new DOMParser).parseFromString(yield h.text(), "text/html");
+							break;
+						default:
+							k.response = yield h.text()
+					}
 					e(k)
 				} else g(h.error())
-			})).catch(h => {
-				g(h)
-			})
+			})).catch(h => g(h))
 		})
 	}
 }

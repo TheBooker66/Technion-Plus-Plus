@@ -17,8 +17,7 @@ import {CommonPopup} from './p_common.js';
 				"block" != document.getElementById("myform").style.display && (document.getElementById("myform").style.display = "block");
 				if (b[0].filename) {
 					f(e[0], b[0].filename);
-					let c = b[0].paused ? "\u05de\u05d5\u05e9\u05d4\u05d4" :
-						"\u05e4\u05e2\u05d9\u05dc";
+					let c = b[0].paused ? "מושהה" : "פעיל";
 					f(e[1], c);
 					0 < b[0].totalBytes ? (c += " - " + (b[0].bytesReceived / 1048576).toFixed(1) + "/" + (b[0].totalBytes / 1048576).toFixed(1) + "MB", f(e[1], c), b = (100 * b[0].bytesReceived / b[0].totalBytes).toFixed(1), k(e[2], b)) : k(e[2], 0)
 				}
@@ -43,21 +42,21 @@ import {CommonPopup} from './p_common.js';
 						a.dl_queue.splice(a.dl_queue.indexOf(c), 1);
 						chrome.storage.local.set({dl_queue: a.dl_queue});
 						g.remove();
-						d.firstChild || (d.appendChild(document.createElement("span")).textContent = "\u05d0\u05d9\u05df \u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05d4\u05de\u05ea\u05e0\u05d4 \u05dc\u05d4\u05d5\u05e8\u05d3\u05d4 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d4\u05ea\u05d5\u05e1\u05e3.", d.firstChild.style.padding = "8px")
+						d.firstChild || (d.appendChild(document.createElement("span")).textContent = "אין קבצים בהמתנה להורדה על ידי התוסף.", d.firstChild.style.padding = "8px")
 					});
 					d.appendChild(g);
 					b++
 				}
 			});
-			0 == b && (d.appendChild(document.createElement("span")).textContent = "\u05d0\u05d9\u05df \u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05d4\u05de\u05ea\u05e0\u05d4 \u05dc\u05d4\u05d5\u05e8\u05d3\u05d4 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d4\u05ea\u05d5\u05e1\u05e3.",
+			0 == b && (d.appendChild(document.createElement("span")).textContent = "אין קבצים בהמתנה להורדה על ידי התוסף.",
 				d.firstChild.style.padding = "8px")
 		})
 	}
 
 	var h = new CommonPopup;
-	h.title = "\u05de\u05e0\u05d4\u05dc \u05d4\u05d5\u05e8\u05d3\u05d5\u05ea";
+	h.title = "מנהל הורדות";
 	h.css_list = ["downloads"];
-	h.popupWrap();
+	h.popupWrap(true);
 	var e = document.querySelectorAll("#current span"), d = document.getElementById("queue"),
 		q = h.loadTemplate("dl_item");
 	n();

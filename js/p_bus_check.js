@@ -84,7 +84,7 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 	var f = new CommonPopup;
 	f.title = "\u05d0\u05d5\u05d8\u05d5\u05d1\u05d5\u05e1\u05d9\u05dd \u05e7\u05e8\u05d5\u05d1\u05d9\u05dd - \u05d6\u05de\u05df \u05d0\u05de\u05ea";
 	f.css_list = ["bus_check"];
-	f.popupWrap();
+	f.popupWrap(true);
 	var t = [{
 		name: "\u05d8\u05db\u05e0\u05d9\u05d5\u05df/\u05d1\u05e0\u05d9\u05d9\u05df \u05d4\u05e1\u05e4\u05d5\u05e8\u05d8",
 		val: 43015

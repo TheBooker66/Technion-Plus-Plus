@@ -3,61 +3,111 @@
 import {CommonPopup} from "./p_common.js";
 
 (function () {
-	function p(m) {
-		var e = document.getElementById("info");
-		e.className = "error_bar";
-		e.style.display = "block";
-		e.textContent = m
+	function oops(m) {
+		let element = document.getElementById("info");
+		element.className = "error_bar";
+		element.style.display = "block";
+		element.textContent = m
 	}
 
-	var k = new CommonPopup;
-	k.title = "מסעדות פתוחות בטכניון";
-	k.popupWrap();
-	chrome.storage.local.get({allow_timings: !1}, m => {
-		chrome.runtime.lastError ? (console.log("TE_food_err: " + chrome.runtime.lastError.message), p("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.")) :
-			m.allow_timings ? k.XHR("../json/food.json", "json").then(e => {
-				e = e.response;
-				var f = new Date;
-				f = {day: f.getDay(), hour: f.getHours(), minutes: f.getMinutes(), nt: 0};
-				f.nt = 100 * f.hour + f.minutes;
-				var q = document.getElementById("food_table"), n = 0, r = k.loadTemplate("list-item");
-				for (let h = 0; h < e.length - 1; h++) {
-					var c = e[h];
-					var a = f;
-					var d = 0;
-					a.nt = 5 > a.hour ? 2400 + 100 * a.hour + a.minutes : a.nt;
-					0 > a.day - 5 && c.ns <= a.nt && c.ne > a.nt && (d = 1);
-					c.hasOwnProperty("hamishi") && 4 == a.day && (d = c.hamishi < a.nt ? 0 : 1);
-					5 == a.day && 0 < c.wd && (c.shi_s <= a.nt && c.shi_e > a.nt &&
-					99 != c.shi_e && (d = 1), c.shi_s <= a.nt && 1900 > a.nt && 99 == c.shi_e && (d = 2));
-					if (6 == a.day && 2 == c.wd) {
-						if (c.sha_s <= a.nt && c.sha_e > a.nt && 99 != c.sha_s || c.shi_e > a.nt && 5 > a.hour) d = 1;
-						1630 < a.nt && 99 == c.sha_s && 5 < a.hour && (d = 3)
+	let popup = new CommonPopup;
+	popup.title = "מסעדות פתוחות בחיפה ובנשר";
+	popup.popupWrap(true);
+	chrome.storage.local.get({allow_timings: !1}, cookie => {
+		if (chrome.runtime.lastError) {
+			console.log("TE_food_err: " + chrome.runtime.lastError.message);
+			oops("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");
+			return;
+		}
+		if (!cookie.allow_timings)
+			return void oops('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.');
+
+		popup.XHR("../resources/food.csv", "csv").then(res => {
+			// Split the string into an array of strings
+			const [keys, ...rest] = res.response
+				.trim()
+				.split("\n")
+				.map((item) => item.split('\t'));
+
+			// Map the array of strings into an array of objects
+			let restaurants = rest.map((item) => {
+				const object = {};
+				keys.forEach((key, index) => (object[key] = item.at(index)));
+				return object;
+			});
+			console.log(restaurants);
+			restaurants.forEach(item => {
+				// Parse the working hours
+				delete Object.assign(item, {["working_hours"]: item["working_hours\r"]})["working_hours\r"];
+				item['working_hours'] = item['working_hours'].replace('"{', '{').replace('}"', '}');
+				console.log(item['working_hours']);
+				item['working_hours'] = JSON.parse(item['working_hours']);
+
+				// Parse the phone number (israeli format)
+				item['phone'] = item['phone'].replace('+972 ', '0').replace(/-/g, '');
+			});
+
+			// Get the current date and time
+			let date = new Date, counter = 0;
+			const days = ["יום ראשון", "יום שני", "יום שלישי", "יום רביעי", "יום חמישי", "יום שישי", "יום שבת"];
+			date = {day: date.getDay(), hour: date.getHours(), minutes: date.getMinutes(), nt: 0};
+			date.hour = date.hour < 10 ? "0" + date.hour : date.hour;
+			date.minutes = date.minutes < 10 ? "0" + date.minutes : date.minutes;
+			date.nt = date.hour + ":" + date.minutes;
+
+			// Get the template for the list of restaurants and the table to display the list
+			let food_table = document.getElementById("food_table"),
+				template = popup.loadTemplate("list-item"),
+				technion_loc = {latitude: 32.776763, longitude: 35.023121};
+
+			for (let i = 0; i < restaurants.length; i++) {
+				// Check which restaurants are open right now by the hour (if a restaurant isn't open, splice it)
+				console.log(restaurants[i]);
+				if (restaurants[i]['working_hours'][days[date.day]]) {
+					let [start, end] = restaurants[i]['working_hours'][days[date.day]].split("-");
+					if (date.nt > start && date.nt < end) {
+						// Calculate the distance of each restaurant from the Technion (add it to the object)
+						restaurants[i]['distance'] =
+							Math.sqrt(Math.pow(technion_loc.latitude - restaurants[i].latitude, 2)
+								+ Math.pow(technion_loc.longitude - restaurants[i].longitude, 2));
+					} else {
+						restaurants.splice(i, 1);
+						i--;
 					}
-					a = d;
-					if (0 != a) {
-						c = r.cloneNode(!0);
-						d = c.querySelectorAll(".list_item div");
-						d[0].getElementsByTagName("b")[0].textContent = e[h].name;
-						d[0].getElementsByTagName("span")[0].textContent += e[h].location;
-						3 == a && (d[1].textContent = "פתוח מחצי שעה לאחר צאת השבת");
-						a = d[2];
-						d = a.textContent;
-						var g = e[h], l = f, b = 0;
-						0 > l.day - 5 && (b = g.ne);
-						4 == l.day && g.hasOwnProperty("hamishi") && (b = g.hamishi);
-						5 == l.day && 0 < g.wd && (b = g.shi_e);
-						6 == l.day && 2 == g.wd && (b = g.sha_e);
-						2400 < b && (b -= 2400);
-						99 == b ? b = "שעה וחצי לפני שבת" : 0 == b ? b = " -- " : (b = b.toString(), b = 3 == b.length ? "0" + b : b, b = b[0] + b[1] + ":" + b[2] + b[3]);
-						a.textContent = d + b;
-						0 < n && (a = document.createElement("div"), a.className = "divider", q.appendChild(a));
-						q.appendChild(c);
-						n++
-					}
+				} else {
+					restaurants.splice(i, 1);
+					i--;
 				}
-				document.getElementById("info").textContent =
-					0 == n ? "כל המסעדות בטכניון סגורות." : "הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים."
-			}).catch(e => console.log("TE_Error_FOOD: " + e)) : p('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.')
+			}
+
+			// Sort the restaurants by their distance from the Technion
+			restaurants.sort((a, b) => a['distance'] - b['distance']);
+
+			restaurants.forEach(item => {
+				// Create the list of restaurants and display it
+				let node = template.cloneNode(true);
+				let text = node.querySelectorAll(".list_item div")[0];
+				text.getElementsByTagName("a")[0].textContent = item['name'];
+				text.getElementsByTagName("a")[0].href = item['site'];
+				text.getElementsByTagName("span")[0].textContent += `– ${item['full_address']} – ★${item['rating']}`;
+				let type_and_hours = node.querySelectorAll(".list_item div")[1];
+				type_and_hours.getElementsByTagName("span")[0].textContent =
+					`סוג אוכל: ${item['type']}; שעות פתיחה היום: ${item['working_hours'][days[date.day]]}; טלפון: ${item['phone']}`;
+				if (counter !== 0) {
+					let divider = document.createElement("div");
+					divider.className = "divider";
+					food_table.appendChild(divider);
+				}
+				food_table.appendChild(node);
+				counter++;
+			});
+
+			document.getElementById("info").textContent =
+				counter === 0 ? "כל המסעדות בחיפה ונשר סגורות." :
+					"הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. המסעדות מסודרות לפי מרחק מהטכניון. כל המידע באדיבות גוגל מפות."
+		}).catch(e => {
+			console.log("TE_Error_FOOD: " + e)
+			oops("שגיאה בעיבוד הנתונים, אנא נסה שנית.");
+		})
 	})
 })();

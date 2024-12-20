@@ -96,7 +96,7 @@ import {TE_updateInfo} from "../bg_main.js";
 		a.setAttribute("preload", "auto");
 		a.setAttribute("autobuffer", "true");
 		a.volume = document.getElementById("notification_volume").value;
-		a.src = chrome.runtime.getURL("audio/notification.mp3");
+		a.src = chrome.runtime.getURL("resources/notification.mp3");
 		a.play()
 	});
 	document.getElementById("notification_volume").addEventListener("change", () => {

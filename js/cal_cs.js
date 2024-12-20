@@ -1,7 +1,6 @@
 'use strict';
 import {CommonPopup} from './p_common.js';
 import {CommonCalendar} from './p_cal_common.js';
-import {OrganizerPopup} from './organizer.js';
 import {OrganizerCalendar} from './organizer.js';
 
 
@@ -24,18 +23,18 @@ import {OrganizerCalendar} from './organizer.js';
 		})
 	}
 
-	var r, v;
+	var r = new CommonPopup, v, popupEh;
 	if (document.title === "ארגונית++") {
-		r = new OrganizerPopup;
+		popupEh = false;
 		v = new OrganizerCalendar(r, "cs");
 	}
 	else {
-		r = new CommonPopup;
+		popupEh = true;
 		v = new CommonCalendar(r, "cs");
 	}
 	r.title = 'מטלות קרובות - מדמ"ח';
 	r.css_list = ["calendar"];
-	r.popupWrap();
+	r.popupWrap(popupEh);
 	v.progress(_ => new Promise((b, k) => {
 		chrome.storage.local.get({
 			cs_cal_finished: {},
@@ -52,8 +51,8 @@ import {OrganizerCalendar} from './organizer.js';
 				"" == w || "" == a.wcpass ? k({
 					msg: "לא הגדרת מספר זהות/סיסמת יומן; יש למלא פרטים אלו בהגדרות התוסף.",
 					is_error: !0
-				}) : (w = `https://grades.cs.technion.ac.il/cal/${w}/${encodeURIComponent(a.wcpass)}`, r.XHR(w,
-					"text").then(function (m) {
+				}) : (w = `https://grades.cs.technion.ac.il/cal/${w}/${encodeURIComponent(a.wcpass)}`,
+					r.XHR(w, "text").then(function (m) {
 					var f = m.response.split("BEGIN:VEVENT");
 					if (1 == f.length) b({new_list: [], finished_list: []}); else {
 						m = Date.now();

@@ -1,7 +1,6 @@
 'use strict';
 import {CommonPopup} from './p_common.js';
 import {CommonCalendar} from './p_cal_common.js';
-import {OrganizerPopup} from './organizer.js';
 import {OrganizerCalendar} from './organizer.js';
 import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 
@@ -58,18 +57,18 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 			chrome.runtime.lastError && console.log("TE_cal_ra: " + chrome.runtime.lastError.message)
 		})
 	}
-	var l, r;
+	var l = new CommonPopup, r, popupEh;
 	if (document.title === "ארגונית++") {
-		l = new OrganizerPopup;
+		popupEh = false;
 		r = new OrganizerCalendar(l, "moodle");
 	}
 	else {
-		l = new CommonPopup;
+		popupEh = true;
 		r = new CommonCalendar(l, "moodle");
 	}
 	l.title = "מטלות קרובות - מודל";
 	l.css_list = ["calendar"];
-	l.popupWrap();
+	l.popupWrap(popupEh);
 	chrome.storage.local.get({cal_killa: !0}, function (c) {
 		chrome.runtime.lastError ? (console.log("TE_cal: " + chrome.runtime.lastError.message), r.insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
 			!0)) : (document.getElementById("appeals_toggle").checked = c.cal_killa, document.getElementById("appeals_toggle").addEventListener("change", function () {

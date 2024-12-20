@@ -1,6 +1,5 @@
 'use strict';
 import {CommonCalendar} from "./p_cal_common.js";
-import {CommonPopup} from "./p_common.js";
 
 var $jscomp = $jscomp || {};
 $jscomp.scope = {};
@@ -292,52 +291,10 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 	return $jscomp.asyncExecutePromiseGenerator(new $jscomp.generator.Generator_(new $jscomp.generator.Engine_(a)))
 };
 
-// function XHR(a, b, c, d) {
-// 	c = void 0 === c ? "" : c;
-// 	d = void 0 === d ? !1 : d;
-// 	return new Promise((f, k) => {
-// 		var h = {
-// 			headers: {
-// 				accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-// 				"accept-language": "en-US,en;q=0.9",
-// 				"cache-control": "no-cache",
-// 				pragma: "no-cache",
-// 				"sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"'
-// 			}
-// 		};
-// 		h.method = d ? "head" : "get";
-// 		"" != c && (h.method = "post", h.body = c, h.headers["Content-type"] = "application/x-www-form-urlencoded");
-// 		fetch(a, h).then(e => $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
-// 			if (e.ok) {
-// 				var g = {response: "", responseURL: e.url};
-// 				"json" == b ? g.response = yield e.json() : (g.response = yield e.text(), "document" == b && (g.response = (new DOMParser).parseFromString(g.response, "text/html")));
-// 				f(g)
-// 			} else k(e.error())
-// 		})).catch(e => {
-// 			k(e)
-// 		})
-// 	})
-// }
-
 function loadTemplate(a, b) {
 	b = void 0 === b ? document : b;
 	a = b.querySelector("template#" + a).content;
 	return document.importNode(a, !0)
-}
-
-export class OrganizerPopup extends CommonPopup {
-	constructor(a) {
-		super(a);
-		this.title = "";
-		this.css_list = []
-	}
-
-	popupWrap() {
-	}
-
-	XHR(a, b, c) {
-		return super.XHR(a, b, void 0 === c ? "" : c)
-	}
 }
 
 export class OrganizerCalendar extends CommonCalendar {
@@ -498,12 +455,12 @@ function insertUserAssignment(a, b, c, d) {
 		h => toggle(b, a.toggleFunc, 0)))
 }
 
-const MAX_CALENDARS = 3;
+const CALENDARS = 3; // moodle, webwork, cs
 var assignments_promises = {};
 
 function addAssignmentsToList(a, b) {
 	assignments_promises[b] = a;
-	Object.keys(assignments_promises).length == MAX_CALENDARS && chrome.storage.local.get({
+	Object.keys(assignments_promises).length == CALENDARS && chrome.storage.local.get({
 		moodle_cal: !0,
 		cs_cal: !1,
 		wwcal_switch: !1,

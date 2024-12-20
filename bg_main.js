@@ -330,19 +330,25 @@ function TE_reBadge(a) {
 function XHR(a, b, c, d) {
 	c = void 0 === c ? "" : c;
 	d = void 0 === d ? !1 : d;
-	return new Promise((e, h) => {
-		var f = {headers: {}};
-		f.method = d ? "head" : "get";
-		"" != c && (f.method = "post", f.body = c, f.headers["Content-type"] = "application/x-www-form-urlencoded");
-		fetch(a, f).then(g => $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
-			if (g.ok) {
-				var k = {response: "", responseURL: g.url};
-				"json" == b ? k.response = yield g.json() : (k.response = yield g.text(), "document" == b && (k.response = (new DOMParser).parseFromString(k.response, "text/html")));
+	return new Promise((e, g) => {
+		var f = {
+			headers: {},
+			method: d ? "head" : "get"
+		};
+		if (c != "") {
+			f.method = "post";
+			f.body = c;
+			f.headers["Content-type"] = "application/x-www-form-urlencoded";
+		}
+		fetch(a, f).then(h => $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
+			if (h.ok) {
+				var k = {
+					response: (new DOMParser).parseFromString(yield h.text(), "text/html"),
+					responseURL: h.url
+				};
 				e(k)
-			} else h(g.error())
-		})).catch(g => {
-			h(g)
-		})
+			} else g(h.error())
+		})).catch(h => g(h))
 	})
 }
 
@@ -366,7 +372,7 @@ function TE_notification(a, b, c) {
 				g.setAttribute("preload", "auto");
 				g.setAttribute("autobuffer", "true");
 				g.volume = f.notif_vol;
-				g.src = chrome.runtime.getURL("audio/notification.mp3");
+				g.src = chrome.runtime.getURL("resources/notification.mp3");
 				g.play()
 			}
 		})
@@ -755,8 +761,9 @@ export function TE_loginToMoodle(a) {
 				var h = document.createElement("iframe"), m = () => {
 					h.getAttribute("login_over") || (h.setAttribute("timer_over", "1"), c("timer ended"))
 				}, l = () => {
-					h.getAttribute("timer_over") || (clearTimeout(m), h.setAttribute("login_over", "1"), h.removeEventListener("load", l), XHR("https://moodle24.technion.ac.il/auth/oidc/",
-						"document", "", a).then(q => {
+					h.getAttribute("timer_over") || (clearTimeout(m), h.setAttribute("login_over", "1"),
+						h.removeEventListener("load", l),
+						XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", a).then(q => {
 						q.responseURL.includes("microsoft") ? c("stuck on microsoft") : e(q)
 					}))
 				}, n = () => {
@@ -1210,41 +1217,46 @@ chrome.runtime.onInstalled.addListener(a => {
 	if ("update" == a.reason) {
 		a = a.previousVersion.split(".").map(c => parseInt(c));
 		chrome.runtime.getManifest().version.split(".").map(c => parseInt(c));
-		TE_comingFromLower(a, [2, 4, 15]) && TE_setStorage({
-			cal_seen: 0,
-			calendar_prop: "",
-			calendar_max: 0,
-			cal_killa: !0,
-			webwork_courses: {},
-			webwork_cal: {},
-			wwcal_update: 0
-		});
-		TE_comingFromLower(a, [2, 4, 0]) && TE_setStorage({webwork_courses: {}, webwork_cal: {}, wwcal_update: 0});
-		TE_comingFromLower(a, [2, 3, 3]) && chrome.storage.local.get({
-			user_agenda: {},
-			wwcal_switch: !1
-		}, c => {
-			if (c.wwcal_switch) {
-				c = c.user_agenda;
-				var d = Date.now();
-				c[d] = {
-					header: "מטלות WeBWorK שסומנו כהושלמו אופסו!",
-					description: "לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂",
-					timestamp: -1,
-					done: !1
-				};
-				TE_setStorage({user_agenda: c, webwork_cal: {}});
-				TE_notification("לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂",
-					!1)
-			}
-		});
-		if (TE_comingFromLower(a, [2, 1, 0])) {
+		if (TE_comingFromLower(a, [2, 4, 15]))
+			TE_setStorage({
+				cal_seen: 0,
+				calendar_prop: "",
+				calendar_max: 0,
+				cal_killa: !0,
+				webwork_courses: {},
+				webwork_cal: {},
+				wwcal_update: 0
+			})
+		else if (TE_comingFromLower(a, [2, 4, 0]))
+			TE_setStorage({webwork_courses: {}, webwork_cal: {}, wwcal_update: 0})
+		else if (TE_comingFromLower(a, [2, 3, 3]))
+			chrome.storage.local.get({
+				user_agenda: {},
+				wwcal_switch: !1
+			}, c => {
+				if (c.wwcal_switch) {
+					c = c.user_agenda;
+					var d = Date.now();
+					c[d] = {
+						header: "מטלות WeBWorK שסומנו כהושלמו אופסו!",
+						description: "לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂",
+						timestamp: -1,
+						done: !1
+					};
+					TE_setStorage({user_agenda: c, webwork_cal: {}});
+					TE_notification("לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂",
+						!1)
+				}
+			})
+		else if (TE_comingFromLower(a, [2, 1, 0])) {
 			chrome.storage.local.remove(["courses_names", "courses_links", "courses_update"]);
 			var b = parseInt(3 * Math.random()) + 1;
 			b = Date.now() + 864E5 * b;
 			TE_updateVideosInfo(b)
-		}
-		TE_comingFromLower(a, [1, 3, 0]) && (TE_setStorage({remoodle: !1}), TE_setStorage({cal_seen: 0}))
+		} else if (TE_comingFromLower(a, [1, 3, 0]))
+			TE_setStorage({remoodle: !1}), TE_setStorage({cal_seen: 0})
+
+		chrome.tabs.create({url: 'html/release_notes.html'}) && TE_startExtension();
 	}
 });
 
@@ -1258,4 +1270,3 @@ function TE_startExtension() {
 }
 
 chrome.runtime.onStartup.addListener(TE_startExtension);
-chrome.runtime.onInstalled.addListener(chrome.tabs.create({url: 'html/release_notes.html'}) && TE_startExtension);

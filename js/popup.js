@@ -320,7 +320,7 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 
 	var e = new CommonPopup;
 	e.css_list = ["main"];
-	e.popupWrap();
+	e.popupWrap(true);
 
 	function checkOS() {
 		if (navigator.userAgentData) {

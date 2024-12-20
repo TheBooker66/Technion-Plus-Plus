@@ -6,7 +6,7 @@ import {CommonPopup} from "./p_common.js";
 	var a = new CommonPopup;
 	a.title = "אודות";
 	a.css_list = ["about"];
-	a.popupWrap();
+	a.popupWrap(true);
 	chrome.storage.local.get({gmail: !0}, c => {
 		var d = {ad: "ethan.amiran@gmail.com", su: "יצירת קשר - Technion"},
 			b = c.gmail ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1" : "mailto:{1}?subject={2}";
