@@ -9,6 +9,7 @@
 
 <div id="header">
     <div class="wrapper">
+        <div id="date" hidden="hidden">2024-12-24</div>
         <span id="version"></span>
         <img src="../icons/blank.png" width="48px" height="48px"/>
         <div id="logo">
@@ -37,18 +38,11 @@
             <div class="info">
                 <b>חידושים וכו'</b>
                 <ul>
-                    <li>הדף הזה קופץ עכשיו כל פעם שתעדכנו (או תורידו) את התוסף.</li>
-                    <li>אם יש לכם רעיונות לשיפור, אתם מוזמנים לפנות אליי.</li>
+                    <li>הוספו תחנות אוטובוס חדשות והוסרו תחנות אוטובוס שלא קיימות יותר.</li>
+                    <li>התחברות אוטומטית ל־grades, אתר הציונים!</li>
+                    <li>קוד QR לתרומה (בנוסף לקישור), כי מן הראוי שאם אני מבקש תרומה אני אעשה לכם חיים קלים.</li>
                 </ul>
-                <b>ארגונית++</b>
-                <ul>
-                    <li>נוסף כפתור לסינון ערעורים וזומים גם לארגונית, במקום שיהיה רק בחלונית של המודל.</li>
-                </ul>
-                <b>אוכל</b>
-                <ul>
-                    <li>עודכנה ושופצה לגמרי רשימת המסעדות בטכניון ובסביבתו.</li>
-                    <li>היא כנראה תעבור עוד שיפוץ בעתיד, לא יודע בדיוק מתי.</li>
-                </ul>
+                <small>אם יש לכם רעיונות לשיפור, אתם מוזמנים לפנות אליי.</small>
             </div>
         </div>
     </div>
@@ -58,15 +52,12 @@
             <div class="info">
                 <b>ארגונית++</b>
                 <ul>
-                    <li>תוקנה הצגת מטלות מדמ"ח. תודה למי שדיווח על הבאג.</li>
+                    <li>תוקן הבאג של השורה העליונה בארגונית. כעת ניתן להפעיל ולכבות מצב לילה ללא חשש!</li>
+                    <li>תוקן באג קטן עם מעבר להגשות במודל</li>
                 </ul>
-                <b>מודל</b>
+                <b>מחשבון ממוצע אקדמי</b>
                 <ul>
-                    <li>מצב לילה בחלון העלאת קבצים.</li>
-                </ul>
-                <b>פנופטו</b>
-                <ul>
-                    <li>תוקן גודל החלונית הקטנה של טכניון++.</li>
+                    <li>כעת ניתן להכניס גם מספרי נק"ז לא שלמים (בקפיצות של חצי), אם מכניסים קורס נוסף ידנית.</li>
                 </ul>
             </div>
         </div>
@@ -77,8 +68,8 @@
                 <div class="info">
                     <b>מחיקות וכו'</b>
                     <ul>
+                        <li>הוסרו תחנות אוטובוס שלא קיימות יותר ונוספו תחנות חדשות.</li>
 <!--                        <li>לא היה מה להסיר :shrug:</li>-->
-                        <li>הוסרו קבצים לא נחוצים שרק הכבידו על התוסף.</li>
                     </ul>
                 </div>
             </div>
@@ -89,18 +80,23 @@
             <div class="info">
                 <b>באגים ידועים</b>
                 <ul>
-                    <li>לחיצה על השורה העליונה בארגונית מעלימה את המטלות עד ללחיצה על הלחצן של המטלות.
-                    אני לא יודע למה, אז אם למישהו/י יש רעיון אשמח לקבל דוא"ל בנושא.</li>
                     <li><b>מחשבון הממוצע האקדמי לפעמים עובד ולפעמים לא.</b>
                         זו אשמת הטכניון, ועד שהם מוסיפים גיליון ציונים דיגיטלי לסאפ, אין שום דבר שאני יכול לעשות בנושא.
                         אני מציע <b>לנסות שוב כמה שעות אחר כך</b> אם המחשבון לא נפתח לכם.</li>
                     <li>יש איזה הבהוב לבן כשמרחפים מעל ציון במודל. לא מאוד משמעותי או דחוף.</li>
                 </ul>
                 <!--
-                TODO: Update version, release date, and the list of changes.
-                - Check CATEGORIES code. Actually, I won't touch it unless someone else reports a bug.
-                - DOMParser is not defined in bg_main.js (manifest v3).
+                TODO: Update version in manifest.json and release date and the list of changes here.
+                - Fix autologin to SAP. Actually though.
+                - Add pinning to the Organizer.
+                - Split the filtering of the appeals and the zooms.
+                - DOMParser is not defined in bg_main.js (manifest v3). Maybe solve with:
+                https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension
                 - Remove all the "jscomp" stuff.
+                - Unify OrganizerCalendar and CommonCalendar.
+                - Touch up the food popup.
+                - Sort buses by time (this is too difficult to implement as of now).
+                - Check CATEGORIES code. Actually, I won't touch it unless someone else reports a bug.
                 -->
             </div>
         </div>

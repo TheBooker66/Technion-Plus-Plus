@@ -10,7 +10,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     font-size: 15px;
     margin: 0;
     background-image: linear-gradient(to bottom, #efefef, #f7f7f7);

@@ -19,7 +19,7 @@
 
 .maor_wrapper, .maor_norm_wrapper {
     font-size: 13px;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     color: #000;
 }
 
@@ -148,7 +148,7 @@
 
 .maor_norm_wrapper input {
     font-size: 15px;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     margin: 5px 2px;
     padding: 2px 5px;
 }
@@ -167,7 +167,7 @@
     border: 0;
     color: #fff;
     border-radius: 4px;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     box-sizing: border-box;
 }
 

@@ -1,5 +1,5 @@
 'use strict';
-import {CommonCalendar} from "./p_cal_common.js";
+import {CommonCalendar} from "./calendar.js";
 
 var $jscomp = $jscomp || {};
 $jscomp.scope = {};

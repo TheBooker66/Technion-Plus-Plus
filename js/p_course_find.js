@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from "./p_common.js";
+import {CommonPopup} from "./common.js";
 
 (function () {
 	function l() {
@@ -87,7 +87,7 @@ import {CommonPopup} from "./p_common.js";
 	var p = new CommonPopup(!window.location.href.includes("?"));
 	p.title = "חיפוש קורס לצפייה";
 	p.css_list = ["course_find"];
-	p.popupWrap(true);
+	p.popupWrap();
 	document.getElementById("theform").addEventListener("submit", function (a) {
 		0 == document.getElementsByName("course")[0].value.length &&
 		a.preventDefault()

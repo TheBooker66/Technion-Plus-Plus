@@ -290,7 +290,7 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 };
 
 class CommonPopup {
-	constructor(a) {
+	constructor() {
 		this.title = "";
 		this.css_list = [];
 		this.wrapper = document.getElementsByClassName("wrapper")[0];
@@ -310,19 +310,17 @@ class CommonPopup {
 		return document.importNode(a, !0)
 	}
 
-	popupWrap(popupEh) {
-		if (popupEh) {
-			this.useTemplatesFile("common", a => {
-				for (var b = 0; b < this.css_list.length; b++) {
-					var c = this.loadTemplate("head-stylesheets", a);
-					c.querySelector("link").setAttribute("href", "css/p_" + this.css_list[b] + ".css");
-					document.head.appendChild(c)
-				}
-				this.wrapper.insertBefore(this.loadTemplate("header-koteret", a), this.main_content);
-				"" != this.title && (a = this.loadTemplate("header-title", a), a.querySelector("div:not(#returnHome)").textContent = this.title, this.wrapper.insertBefore(a, this.main_content));
-				this.buttonsSetup()
-			})
-		}
+	popupWrap() {
+		this.useTemplatesFile("common", a => {
+			for (var b = 0; b < this.css_list.length; b++) {
+				var c = this.loadTemplate("head-stylesheets", a);
+				c.querySelector("link").setAttribute("href", "../css/p_" + this.css_list[b] + ".css");
+				document.head.appendChild(c)
+			}
+			this.wrapper.insertBefore(this.loadTemplate("header-koteret", a), this.main_content);
+			"" != this.title && (a = this.loadTemplate("header-title", a), a.querySelector("div:not(#returnHome)").textContent = this.title, this.wrapper.insertBefore(a, this.main_content));
+			this.buttonsSetup()
+		})
 	}
 
 	buttonsSetup() {
@@ -332,7 +330,7 @@ class CommonPopup {
 					chrome.runtime.lastError && console.log("TE_p: " + chrome.runtime.lastError.message)
 				})
 			});
-		document.getElementById("goToAbout").addEventListener("click", () => window.location.href = "../html/about.html");
+		document.getElementById("goToAbout").addEventListener("click", () => window.location.href = "../html/p_about.html");
 		"" != this.title && document.getElementById("returnHome").addEventListener("click", () => {
 			window.location.href = "../popup.html"
 		})

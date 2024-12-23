@@ -21,7 +21,7 @@ a.maor_download, label.maor_download {
     border-radius: 4px;
     text-decoration: none !important;
     letter-spacing: 0.03rem;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     margin: 2px;
     background-color: rgb(246, 198, 54);
     color: #0c0c0d !important;

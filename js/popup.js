@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from './p_common.js';
+import {CommonPopup} from './common.js';
 
 var $jscomp = $jscomp || {};
 $jscomp.scope = {};
@@ -320,7 +320,7 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 
 	var e = new CommonPopup;
 	e.css_list = ["main"];
-	e.popupWrap(true);
+	e.popupWrap();
 
 	function checkOS() {
 		if (navigator.userAgentData) {
@@ -368,7 +368,7 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
 	var t = document.getElementById("tools_content").getElementsByTagName("a");
 	for (let c = 0; c < t.length; c++)
 		[4, 5, 7].includes(c) || t[c].addEventListener("click", () => { // 4 - Organiser, 5 - grades sheet, 7 - printer
-			window.location.href = "html/" + t[c].id + ".html"
+			window.location.href = "html/p_" + t[c].id + ".html"
 		});
 	e = document.querySelectorAll("#more_links > div");
 	m(e[0].querySelectorAll(".tab"), Array.from(e).slice(1), _ => {

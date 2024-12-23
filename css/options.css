@@ -11,7 +11,7 @@ body {
     cursor: default;
     /*display: flex;
     flex-direction: column;*/
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     font-size: 13px;
     margin: 0;
     padding: 4px 4px 2px;
@@ -37,7 +37,7 @@ input[type="text"], input[type="password"], select {
     margin: 5px;
     padding: 5px;
     font-size: 15px;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     max-width: 50%;
     direction: ltr;
 }
@@ -66,7 +66,7 @@ input[type="range"], input[type="range"]:hover, input[type="range"]:focus {
 }
 
 #try_vol {
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     display: inline-block;
     text-decoration: none;
     color: #fff;
@@ -80,7 +80,7 @@ input[type="range"], input[type="range"]:hover, input[type="range"]:focus {
 }
 
 .submit {
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     display: inline-block;
     margin: 2px;
     text-decoration: none;

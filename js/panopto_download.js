@@ -160,8 +160,7 @@
 			for (var d of a) for (a = 0; a < d.addedNodes.length; a++) {
 				let b = d.addedNodes[a];
 				if ("function" === typeof b.querySelector && !document.getElementById("new_win") && b.classList.contains("player") && 2 == document.getElementsByClassName("video-js").length) {
-					d =
-						document.createElement("script");
+					d = document.createElement("script");
 					d.src = chrome.runtime.getURL("js/panopto_new.js");
 					document.body.appendChild(d);
 					c.disconnect();

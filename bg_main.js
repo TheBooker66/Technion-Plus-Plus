@@ -764,8 +764,8 @@ export function TE_loginToMoodle(a) {
 					h.getAttribute("timer_over") || (clearTimeout(m), h.setAttribute("login_over", "1"),
 						h.removeEventListener("load", l),
 						XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", a).then(q => {
-						q.responseURL.includes("microsoft") ? c("stuck on microsoft") : e(q)
-					}))
+							q.responseURL.includes("microsoft") ? c("stuck on microsoft") : e(q)
+						}))
 				}, n = () => {
 					h.addEventListener("load", l);
 					h.removeEventListener("load", n)
@@ -812,7 +812,7 @@ function TE_alertMoodleCalendar(a, b, d, c) {
 		e = e.response.split("BEGIN:VEVENT");
 		for (let k = 1; k < e.length; k++) {
 			var g = e[k].split("SUMMARY:")[1].split("\n")[0].trim();
-			"Attendance" === g || c || g.includes("ערעור") || g.includes("זום") || g.includes("Zoom")
+			"Attendance" === g || c || g.includes("ערעור") || g.includes("זום") || g.includes("Zoom") || g.includes("zoom")
 			|| g.includes("הרצאה") || g.includes("תרגול")
 			|| (g = g.split(" "), "opens" !== g[g.length - 1] && "opens)" !== g[g.length - 1]
 			&& (g = parseInt(e[k].split("UID:")[1].split("@moodle")[0]),

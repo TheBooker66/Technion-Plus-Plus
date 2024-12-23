@@ -70,7 +70,7 @@
     display: inline-block;
     margin: 0;
     padding: 0 0 0 14px;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     text-align: left;
     direction: ltr;
     background: url("../icons/arrowhead-down-black.svg") no-repeat 0 50%;

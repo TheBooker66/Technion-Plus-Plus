@@ -4,7 +4,7 @@
   "author": "Ethan \"67\" A.",
   "description": "Get the Technion's web-experience out of the stone age.",
   "homepage_url": "https://sites.google.com/view/technion-plus-plus/home",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "manifest_version": 3,
   "minimum_chrome_version": "88.0",
   "background": {
@@ -31,8 +31,7 @@
   "host_permissions": [
     "*://*.technion.ac.il/*",
     "*://panoptotech.cloud.panopto.eu/*",
-    "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*",
-    "https://mslworld.egged.co.il/"
+    "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*"
   ],
   "icons": {
     "16": "icons/technion_plus_plus/icon-16.png",
@@ -49,7 +48,6 @@
       ],
       "matches": [
         "https://panoptotech.cloud.panopto.eu/*",
-        "https://grades.technion.ac.il/login.aspx",
         "https://bookme.technion.ac.il/*",
         "https://techwww.technion.ac.il/tech_ident/",
         "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*",
@@ -73,21 +71,22 @@
         "https://moodle24.technion.ac.il/my/",
         "https://moodle24.technion.ac.il/*.php?*",
         "https://moodle24.technion.ac.il/login/index.php",
-        "https://sason-p.technion.ac.il/*",
+        "https://grades.technion.ac.il/*",
         "https://grades.cs.technion.ac.il/",
         "https://grades.cs.technion.ac.il/grades.cgi",
         "https://webcourse.cs.technion.ac.il/23*/*/grades.html",
         "https://webcourse.cs.technion.ac.il/23*/*/hw_esubmit_*.html",
         "https://webcourse.cs.technion.ac.il/23*/*/lock_*.html",
         "https://portalex.technion.ac.il/irj/portal/external*",
-        "https://techwww.technion.ac.il/tech_ident/"
+        "https://techwww.technion.ac.il/tech_ident/",
+        "https://sason-p.technion.ac.il/*"
       ],
       "run_at": "document_end"
     },
     {
       "css": [
         "css/maor_download.css",
-        "css/c_panopto.css"
+        "css/panopto.css"
       ],
       "js": [
         "js/panopto_download.js"
@@ -112,7 +111,7 @@
     },
     {
       "css": [
-        "css/c_ug.css"
+        "css/ug.css"
       ],
       "js": [
         "js/ug.js"
@@ -123,7 +122,7 @@
     },
     {
       "css": [
-        "css/c_ug.css"
+        "css/ug.css"
       ],
       "js": [
         "js/course_search.js"
@@ -169,8 +168,9 @@
     },
     {
       "css": [
-        "css/c_moodle.css",
-        "css/dark_moodle2223.css"
+        "css/moodle.css",
+        "css/moodle_dark_2223.css",
+        "css/moodle_dark_root.css"
       ],
       "js": [
         "js/remoodle.js"
@@ -182,8 +182,9 @@
     },
     {
       "css": [
-        "css/c_moodle.css",
-        "css/dark_moodle2324.css"
+        "css/moodle.css",
+        "css/moodle_dark_2224.css",
+        "css/moodle_dark_root.css"
       ],
       "js": [
         "js/remoodle.js"
@@ -195,8 +196,9 @@
     },
     {
       "css": [
-        "css/c_moodle.css",
-        "css/dark_moodle2425.css"
+        "css/moodle.css",
+        "css/moodle_dark_24.css",
+        "css/moodle_dark_root.css"
       ],
       "js": [
         "js/remoodle.js"
@@ -216,10 +218,10 @@
     },
     {
       "css": [
-        "css/c_grades_sheet.css"
+        "css/grades_sheet.css"
       ],
       "js": [
-        "js/grades_sheet_students.js"
+        "js/grades_sheet.js"
       ],
       "matches": [
         "https://students.technion.ac.il/local/tcurricular/grades*"
@@ -229,18 +231,44 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "icons/technion_plus_plus/icon-*.png",
-        "resources/notification.mp3",
+        "icons/technion_plus_plus/icon-*.png"
+      ],
+      "matches": [
+        "https://*.technion.ac.il/*",
+        "https://panoptotech.cloud.panopto.eu/*"
+      ]
+    },
+    {
+      "resources": [
         "js/panopto_new.js",
-        "icons/panopto_icons/*",
-        "html/templates/grades_sheet.html",
-        "cheesefork/share-histograms.js",
-        "css/dark_moodle.css",
-        "css/light_moodle.css",
+        "icons/panopto_icons/*"
+      ],
+      "matches": [
+        "https://panoptotech.cloud.panopto.eu/*"
+      ]
+    },
+    {
+      "resources": [
+        "html/templates/grades_sheet.html"
+      ],
+      "matches": [
+        "https://students.technion.ac.il/*"
+      ]
+    },
+    {
+      "resources": [
+        "cheesefork/share-histograms.js"
+      ],
+      "matches": [
+        "https://grades.technion.ac.il/*"
+      ]
+    },
+    {
+      "resources": [
         "css/sasonp.css"
       ],
       "matches": [
-        "*://*/*"
+        "https://sason-p.technion.ac.il/*"
       ]
     }
   ]

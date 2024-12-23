@@ -47,7 +47,6 @@
 
 #TP_infobox .TP_expand::before {
     content: "הרחב";
-    font-size: small;
     font-size: 0.6em;
     margin-left: 0.4em;
 }
@@ -68,7 +67,6 @@
 #TP_infobox label {
     float: right;
     margin-bottom: 0;
-    font-size: inherit;
     line-height: initial;
     display: flex;
     align-items: center;

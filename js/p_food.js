@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from "./p_common.js";
+import {CommonPopup} from "./common.js";
 
 (function () {
 	function oops(m) {
@@ -12,7 +12,7 @@ import {CommonPopup} from "./p_common.js";
 
 	let popup = new CommonPopup;
 	popup.title = "מסעדות פתוחות בחיפה ובנשר";
-	popup.popupWrap(true);
+	popup.popupWrap();
 	chrome.storage.local.get({allow_timings: !1}, cookie => {
 		if (chrome.runtime.lastError) {
 			console.log("TE_food_err: " + chrome.runtime.lastError.message);
@@ -35,12 +35,10 @@ import {CommonPopup} from "./p_common.js";
 				keys.forEach((key, index) => (object[key] = item.at(index)));
 				return object;
 			});
-			console.log(restaurants);
 			restaurants.forEach(item => {
 				// Parse the working hours
 				delete Object.assign(item, {["working_hours"]: item["working_hours\r"]})["working_hours\r"];
 				item['working_hours'] = item['working_hours'].replace('"{', '{').replace('}"', '}');
-				console.log(item['working_hours']);
 				item['working_hours'] = JSON.parse(item['working_hours']);
 
 				// Parse the phone number (israeli format)
@@ -62,7 +60,6 @@ import {CommonPopup} from "./p_common.js";
 
 			for (let i = 0; i < restaurants.length; i++) {
 				// Check which restaurants are open right now by the hour (if a restaurant isn't open, splice it)
-				console.log(restaurants[i]);
 				if (restaurants[i]['working_hours'][days[date.day]]) {
 					let [start, end] = restaurants[i]['working_hours'][days[date.day]].split("-");
 					if (date.nt > start && date.nt < end) {

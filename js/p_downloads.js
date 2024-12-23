@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from './p_common.js';
+import {CommonPopup} from './common.js';
 
 (function () {
 	function f(a, b) {
@@ -56,7 +56,7 @@ import {CommonPopup} from './p_common.js';
 	var h = new CommonPopup;
 	h.title = "מנהל הורדות";
 	h.css_list = ["downloads"];
-	h.popupWrap(true);
+	h.popupWrap();
 	var e = document.querySelectorAll("#current span"), d = document.getElementById("queue"),
 		q = h.loadTemplate("dl_item");
 	n();

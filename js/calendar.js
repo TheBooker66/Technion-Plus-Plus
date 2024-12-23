@@ -7,7 +7,6 @@ export class CommonCalendar {
 		this.name = b;
 		this.w_days = "ראשון שני שלישי רביעי חמישי שישי שבת".split(" ");
 		this.flags = {moodle: 1, cs: 2, mathnet: 4, webwork: 8};
-		this.calendarWrap()
 	}
 
 	calendarWrap() {

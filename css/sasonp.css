@@ -5,7 +5,7 @@ body {
 #box {
     color: #ededf0;
     font-size: 13px;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     background: linear-gradient(15deg, #16253D 50%, #043766 100%);
     border: 1px solid #fff;
     width: 250px;

@@ -25,7 +25,7 @@ body {
     background: #fff;
     color: #0c0c0d;
     cursor: default;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     font-size: 13px;
     margin: 0;
     user-select: none;
@@ -120,7 +120,7 @@ body {
     color: #0c0c0d;
     display: inline-block !important;
     font-size: 11px;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     margin: 1px;
     padding: 4px;
     width: 143px;
@@ -144,7 +144,7 @@ body {
     padding: 5px;
     background-color: var(--sec-norm);
     font-size: 11px;
-    font-family: 'Segoe UI', arial;
+    font-family: 'Segoe UI', arial, sans-serif;
     min-width: 70px;
     border-radius: 2px;
     border: 0;

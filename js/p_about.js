@@ -1,12 +1,12 @@
 'use strict';
 
-import {CommonPopup} from "./p_common.js";
+import {CommonPopup} from "./common.js";
 
 (function () {
 	var a = new CommonPopup;
 	a.title = "אודות";
 	a.css_list = ["about"];
-	a.popupWrap(true);
+	a.popupWrap();
 	chrome.storage.local.get({gmail: !0}, c => {
 		var d = {ad: "ethan.amiran@gmail.com", su: "יצירת קשר - Technion"},
 			b = c.gmail ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1" : "mailto:{1}?subject={2}";

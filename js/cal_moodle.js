@@ -1,6 +1,6 @@
 'use strict';
-import {CommonPopup} from './p_common.js';
-import {CommonCalendar} from './p_cal_common.js';
+import {CommonPopup} from './common.js';
+import {CommonCalendar} from './calendar.js';
 import {OrganizerCalendar} from './organizer.js';
 import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 
@@ -57,18 +57,18 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 			chrome.runtime.lastError && console.log("TE_cal_ra: " + chrome.runtime.lastError.message)
 		})
 	}
-	var l = new CommonPopup, r, popupEh;
-	if (document.title === "ארגונית++") {
-		popupEh = false;
-		r = new OrganizerCalendar(l, "moodle");
-	}
-	else {
-		popupEh = true;
-		r = new CommonCalendar(l, "moodle");
-	}
+
+	var l = new CommonPopup, r;
 	l.title = "מטלות קרובות - מודל";
 	l.css_list = ["calendar"];
-	l.popupWrap(popupEh);
+	if (document.title === "ארגונית++") {
+		r = new OrganizerCalendar(l, "moodle");
+	} else {
+		r = new CommonCalendar(l, "moodle");
+		l.popupWrap();
+		r.calendarWrap();
+	}
+
 	chrome.storage.local.get({cal_killa: !0}, function (c) {
 		chrome.runtime.lastError ? (console.log("TE_cal: " + chrome.runtime.lastError.message), r.insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
 			!0)) : (document.getElementById("appeals_toggle").checked = c.cal_killa, document.getElementById("appeals_toggle").addEventListener("change", function () {
@@ -111,8 +111,8 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 							t = n > t ? n : t;
 							if (a[f].includes("CATEGORIES")) {
 								var p = a[f].split("SUMMARY:")[1].split("\n")[0].trim();
-								if (!("Attendance" === p || b.cal_killa && (p.includes("ערעור")
-									|| p.includes("זום") || p.includes("Zoom") || p.includes("הרצא") || p.includes("תרגול")))) {
+								if (!("Attendance" === p || b.cal_killa && (p.includes("ערעור") || p.includes("זום")
+									|| p.includes("Zoom") || p.includes("zoom") || p.includes("הרצא") || p.includes("תרגול")))) {
 									var g =
 										p.split(" ");
 									if ("opens" !== g[g.length - 1] && "opens)" !== g[g.length - 1]) {

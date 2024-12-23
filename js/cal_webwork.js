@@ -1,6 +1,6 @@
 'use strict';
-import {CommonPopup} from './p_common.js';
-import {CommonCalendar} from './p_cal_common.js';
+import {CommonPopup} from './common.js';
+import {CommonCalendar} from './calendar.js';
 import {OrganizerCalendar} from './organizer.js';
 
 
@@ -15,18 +15,17 @@ import {OrganizerCalendar} from './organizer.js';
 		return e[1].ts === b[1].ts ? e[1].h.localeCompare(b[1].h) : 0 === e[1].ts ? 1 : 0 === b[1].ts || e[1].ts < b[1].ts ? -1 : e[1].ts > b[1].ts ? 1 : 0
 	}
 
-	var h = new CommonPopup, l, popupEh;
-	if (document.title === "ארגונית++") {
-		popupEh = false;
-		l = new OrganizerCalendar(h, "webwork");
-	}
-	else {
-		popupEh = true;
-		l = new CommonCalendar(h, "webwork");
-	}
+	var h = new CommonPopup, l;
 	h.title = "מטלות קרובות - WeBWorK";
 	h.css_list = ["calendar"];
-	h.popupWrap(popupEh);
+	if (document.title === "ארגונית++") {
+		l = new OrganizerCalendar(h, "webwork");
+	} else {
+		l = new CommonCalendar(h, "webwork");
+		h.popupWrap();
+		l.calendarWrap();
+	}
+
 	var u = (e, b) => chrome.storage.local.get({
 		webwork_cal: {},
 		cal_seen: 0,

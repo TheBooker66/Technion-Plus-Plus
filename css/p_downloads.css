@@ -46,7 +46,6 @@ small {
 
 #progress {
     border-radius: 4px;
-    font-size: 13px;
     background-image: linear-gradient(#000, #222, #000);
     font-size: 14px;
     position: relative;
