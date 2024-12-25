@@ -367,7 +367,8 @@ function TE_notification(a, b, c) {
 	"" != c && chrome.notifications.clear(c);
 	chrome.notifications.create(c, a, h => {
 		b || chrome.storage.local.get({notif_vol: 1, alerts_sound: !0}, f => {
-			if (chrome.runtime.lastError) console.log("TE_bg_notification_err: " + chrome.runtime.lastError.message); else if (f.alerts_sound) {
+			if (chrome.runtime.lastError) console.log("TE_bg_notification_err: " + chrome.runtime.lastError.message);
+			else if (f.alerts_sound) {
 				var g = document.createElement("audio");
 				g.setAttribute("preload", "auto");
 				g.setAttribute("autobuffer", "true");
@@ -1119,15 +1120,17 @@ function TE_busAlertNow(a) {
 function TE_checkBuses() {
 	console.log("TE_checkBuses");
 	chrome.storage.local.get({bus_station: 43015, bus_time: 10, buses_alerts: []}, a => {
-		chrome.runtime.lastError ? console.log("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message) : XHR("https://mslworld.egged.co.il/MslWebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/" + a.bus_station + "/he/false", "json").then(function (b) {
-			b = b.response;
-			var c = [];
-			for (let d = 0; d < b.length; d++) -1 !== a.buses_alerts.indexOf(b[d].Shilut) && b[d].MinutesToArrival <= a.bus_time && c.push(b[d]);
-			0 < c.length && TE_busAlertNow(c);
-			0 == b.length && TE_busAlertError()
-		}).catch(function () {
-			TE_busAlertError()
-		})
+		chrome.runtime.lastError ? console.log("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message) :
+			XHR("https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/" + a.bus_station + "/he/false", "json")
+				.then(function (b) {
+					b = b.response;
+					var c = [];
+					for (let d = 0; d < b.length; d++) -1 !== a.buses_alerts.indexOf(b[d].Shilut) && b[d].MinutesToArrival <= a.bus_time && c.push(b[d]);
+					0 < c.length && TE_busAlertNow(c);
+					0 == b.length && TE_busAlertError()
+				}).catch(function () {
+				TE_busAlertError()
+			})
 	})
 }
 

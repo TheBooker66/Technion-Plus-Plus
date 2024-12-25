@@ -9,7 +9,7 @@
 
 <div id="header">
     <div class="wrapper">
-        <div id="date" hidden="hidden">2024-12-24</div>
+        <div id="date" hidden="hidden">2024-12-25</div>
         <span id="version"></span>
         <img src="../icons/blank.png" width="48px" height="48px"/>
         <div id="logo">
@@ -38,9 +38,7 @@
             <div class="info">
                 <b>חידושים וכו'</b>
                 <ul>
-                    <li>הוספו תחנות אוטובוס חדשות והוסרו תחנות אוטובוס שלא קיימות יותר.</li>
-                    <li>התחברות אוטומטית ל־grades, אתר הציונים!</li>
-                    <li>קוד QR לתרומה (בנוסף לקישור), כי מן הראוי שאם אני מבקש תרומה אני אעשה לכם חיים קלים.</li>
+                    <li></li>
                 </ul>
                 <small>אם יש לכם רעיונות לשיפור, אתם מוזמנים לפנות אליי.</small>
             </div>
@@ -50,14 +48,10 @@
         <div class="tableRow">
             <div class="section"><img src="../icons/release_notes/refresh.svg"/> <span>שונה ותוקן</span></div>
             <div class="info">
-                <b>ארגונית++</b>
+                <b>שינויים ותיקונים</b>
                 <ul>
-                    <li>תוקן הבאג של השורה העליונה בארגונית. כעת ניתן להפעיל ולכבות מצב לילה ללא חשש!</li>
-                    <li>תוקן באג קטן עם מעבר להגשות במודל</li>
-                </ul>
-                <b>מחשבון ממוצע אקדמי</b>
-                <ul>
-                    <li>כעת ניתן להכניס גם מספרי נק"ז לא שלמים (בקפיצות של חצי), אם מכניסים קורס נוסף ידנית.</li>
+                    <li>תוקן באג מינורי באוטובוסים.</li>
+                    <li>תוקן באג מינורי בכפתור התרומה בארגונית.</li>
                 </ul>
             </div>
         </div>
@@ -68,8 +62,7 @@
                 <div class="info">
                     <b>מחיקות וכו'</b>
                     <ul>
-                        <li>הוסרו תחנות אוטובוס שלא קיימות יותר ונוספו תחנות חדשות.</li>
-<!--                        <li>לא היה מה להסיר :shrug:</li>-->
+                        <li>לא היה מה להסיר :shrug:</li>
                     </ul>
                 </div>
             </div>
@@ -87,13 +80,17 @@
                 </ul>
                 <!--
                 TODO: Update version in manifest.json and release date and the list of changes here.
-                - Fix autologin to SAP. Actually though.
-                - Add pinning to the Organizer.
-                - Split the filtering of the appeals and the zooms.
+                - Remove all the "jscomp" stuff.
                 - DOMParser is not defined in bg_main.js (manifest v3). Maybe solve with:
                 https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension
-                - Remove all the "jscomp" stuff.
                 - Unify OrganizerCalendar and CommonCalendar.
+                - Fix bus notifications with offscreen documents. See:
+                https://stackoverflow.com/questions/67437180/play-audio-from-background-script-in-chrome-extention-manifest-v3
+                - Fix autologin to SAP. Actually though.
+                - Remove the "go to course" button from the moodle (or ask if anyone knows how to link to a course),
+                and move the histogram from the moodle to SAP (hopefully).
+                - Add pinning to the Organizer.
+                - Split the filtering of the appeals and the zooms.
                 - Touch up the food popup.
                 - Sort buses by time (this is too difficult to implement as of now).
                 - Check CATEGORIES code. Actually, I won't touch it unless someone else reports a bug.
