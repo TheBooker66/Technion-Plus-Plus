@@ -1,6 +1,6 @@
 'use strict';
-import {CommonPopup} from './common.js';
-import {CommonCalendar} from './calendar.js';
+import {CommonPopup} from './common_popup.js';
+import {CommonCalendar} from './common_calendar.js';
 import {OrganizerCalendar} from './organizer.js';
 
 

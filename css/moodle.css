@@ -198,53 +198,6 @@ a.maor_download_light:hover {
     color: #eee;
 }
 
-/*
-@media (max-width:1299px) {
-	
-	.tplus_block .tp_float_button {
-		display: block;
-	}
-
-	.tplus_block .card-body, [tplus="dm"] .tplus_block .card-body {
-		display: none;
-		position: fixed;
-		left: 20px;
-		bottom: 80px;
-		z-index: 3;
-		background-color: #061123;
-		border: 1px solid #000 !important;
-		padding-bottom: calc(1.25rem + 45px);
-		color: #fff;
-		border-radius: 4px;
-		box-shadow: 0 16px 24px 2px rgba(0,0,0,0.14),0 6px 30px 5px rgba(0,0,0,0.12),0 8px 10px -7px rgba(0,0,0,0.2);
-		width: 300px;
-	}
-
-	[tplus="dm"] .tplus_block h5.card-title, .tplus_block h5.card-title {
-		position: absolute;
-		border: 0;
-		bottom: 0;
-		width: 298px;
-		height: 46px;
-		background-color: #043766;
-		margin: 0 -1.25rem !important;
-		display: flex !important;
-		align-items: center;
-		padding-left: 50px;
-		border-top: 1px solid #000;
-		border-radius: 4px;
-		cursor: default;
-	}
-
-	.tplus_block:hover .card-body {
-		display: block;
-	}
-
-	.tplus_block:hover .tp_float_button {
-		box-shadow: none;
-	}
-}*/
-
 .row.maor_mgrid {
     display: grid;
     grid-template-areas: "a b" "a c";

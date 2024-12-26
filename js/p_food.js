@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from "./common.js";
+import {CommonPopup} from "./common_popup.js";
 
 (function () {
 	function oops(m) {
@@ -24,6 +24,7 @@ import {CommonPopup} from "./common.js";
 
 		popup.XHR("../resources/food.csv", "csv").then(res => {
 			// Split the string into an array of strings
+
 			const [keys, ...rest] = res.response
 				.trim()
 				.split("\n")
@@ -48,11 +49,10 @@ import {CommonPopup} from "./common.js";
 			// Get the current date and time
 			let date = new Date, counter = 0;
 			const days = ["יום ראשון", "יום שני", "יום שלישי", "יום רביעי", "יום חמישי", "יום שישי", "יום שבת"];
-			date = {day: date.getDay(), hour: date.getHours(), minutes: date.getMinutes(), nt: 0};
+			date = {day: date.getDay(), hour: date.getHours(), minutes: date.getMinutes(), time: ""};
 			date.hour = date.hour < 10 ? "0" + date.hour : date.hour;
 			date.minutes = date.minutes < 10 ? "0" + date.minutes : date.minutes;
-			date.nt = date.hour + ":" + date.minutes;
-
+			date.time = date.hour + ":" + date.minutes;
 			// Get the template for the list of restaurants and the table to display the list
 			let food_table = document.getElementById("food_table"),
 				template = popup.loadTemplate("list-item"),
@@ -60,17 +60,29 @@ import {CommonPopup} from "./common.js";
 
 			for (let i = 0; i < restaurants.length; i++) {
 				// Check which restaurants are open right now by the hour (if a restaurant isn't open, splice it)
-				if (restaurants[i]['working_hours'][days[date.day]]) {
-					let [start, end] = restaurants[i]['working_hours'][days[date.day]].split("-");
-					if (date.nt > start && date.nt < end) {
-						// Calculate the distance of each restaurant from the Technion (add it to the object)
-						restaurants[i]['distance'] =
-							Math.sqrt(Math.pow(technion_loc.latitude - restaurants[i].latitude, 2)
-								+ Math.pow(technion_loc.longitude - restaurants[i].longitude, 2));
-					} else {
-						restaurants.splice(i, 1);
-						i--;
-					}
+				if (!restaurants[i]['working_hours'][days[date.day]]) {
+					restaurants.splice(i, 1);
+					i--;
+					continue;
+				}
+
+				let [start, end] = restaurants[i]['working_hours'][days[date.day]].split("-");
+				if (start === "סגור" || end === "סגור") {
+					restaurants.splice(i, 1);
+					i--;
+					continue;
+				} else if (start === "פתוח 24 שעות" || end === "פתוח 24 שעות") {
+					continue;
+				}
+
+				// Added leading zero to the hours (if needed)
+				start = start.split(":")[0].length === 1 ? "0" + start : start;
+				end = end.split(":")[0].length === 1 ? "0" + end : end;
+				if (end > date.time > start) {
+					// Calculate the distance of each restaurant from the Technion (add it to the object)
+					restaurants[i]['distance'] =
+						Math.sqrt(Math.pow(technion_loc.latitude - restaurants[i].latitude, 2)
+							+ Math.pow(technion_loc.longitude - restaurants[i].longitude, 2));
 				} else {
 					restaurants.splice(i, 1);
 					i--;
@@ -102,8 +114,8 @@ import {CommonPopup} from "./common.js";
 			document.getElementById("info").textContent =
 				counter === 0 ? "כל המסעדות בחיפה ונשר סגורות." :
 					"הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. המסעדות מסודרות לפי מרחק מהטכניון. כל המידע באדיבות גוגל מפות."
-		}).catch(e => {
-			console.log("TE_Error_FOOD: " + e)
+		}).catch(err => {
+			console.log("TE_Error_FOOD: " + err)
 			oops("שגיאה בעיבוד הנתונים, אנא נסה שנית.");
 		})
 	})

@@ -1,6 +1,6 @@
 'use strict';
 
-import {CommonPopup} from "./common.js";
+import {CommonPopup} from "./common_popup.js";
 
 (function () {
 	function l() {

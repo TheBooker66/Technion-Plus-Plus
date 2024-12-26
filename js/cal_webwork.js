@@ -1,6 +1,7 @@
 'use strict';
-import {CommonPopup} from './common.js';
-import {CommonCalendar} from './calendar.js';
+
+import {CommonPopup} from './common_popup.js';
+import {CommonCalendar} from './common_calendar.js';
 import {OrganizerCalendar} from './organizer.js';
 
 
@@ -46,7 +47,7 @@ import {OrganizerCalendar} from './organizer.js';
 			var g = function (a) {
 				return 9 < a ? a : "0" + a
 			};
-			document.getElementById("lastcheck").textContent += f.wwcal_update ? c.getDate() + "." + (c.getMonth() + 1) + "." + c.getFullYear() + ", \u05d1\u05e9\u05e2\u05d4 " + g(c.getHours()) + ":" + g(c.getMinutes()) : "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2";
+			document.getElementById("lastcheck").textContent += f.wwcal_update ? c.getDate() + "." + (c.getMonth() + 1) + "." + c.getFullYear() + ", בשעה " + g(c.getHours()) + ":" + g(c.getMinutes()) : "לא ידוע";
 			var d = [], k = f.webwork_cal;
 			Object.keys(k).forEach(a => {
 				d.push([a, k[a]])

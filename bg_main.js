@@ -1,298 +1,5 @@
 'use strict';
 
-
-// "bg_common.js"
-
-var $jscomp = $jscomp || {};
-$jscomp.scope = {};
-$jscomp.ASSUME_ES5 = !1;
-$jscomp.ASSUME_NO_NATIVE_MAP = !1;
-$jscomp.ASSUME_NO_NATIVE_SET = !1;
-$jscomp.SIMPLE_FROUND_POLYFILL = !1;
-$jscomp.ISOLATE_POLYFILLS = !1;
-$jscomp.defineProperty = $jscomp.ASSUME_ES5 || "function" == typeof Object.defineProperties ? Object.defineProperty : function (a, b, c) {
-	if (a == Array.prototype || a == Object.prototype) return a;
-	a[b] = c.value;
-	return a
-};
-$jscomp.getGlobal = function (a) {
-	a = ["object" == typeof globalThis && globalThis, a, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof global && global];
-	for (var b = 0; b < a.length; ++b) {
-		var c = a[b];
-		if (c && c.Math == Math) return c
-	}
-	throw Error("Cannot find global object");
-};
-$jscomp.global = $jscomp.getGlobal(this);
-$jscomp.IS_SYMBOL_NATIVE = "function" === typeof Symbol && "symbol" === typeof Symbol("x");
-$jscomp.TRUST_ES6_POLYFILLS = !$jscomp.ISOLATE_POLYFILLS || $jscomp.IS_SYMBOL_NATIVE;
-$jscomp.polyfills = {};
-$jscomp.propertyToPolyfillSymbol = {};
-$jscomp.POLYFILL_PREFIX = "$jscp$";
-var $jscomp$lookupPolyfilledValue = function (a, b) {
-	var c = $jscomp.propertyToPolyfillSymbol[b];
-	if (null == c) return a[b];
-	c = a[c];
-	return void 0 !== c ? c : a[b]
-};
-$jscomp.polyfill = function (a, b, c, d) {
-	b && ($jscomp.ISOLATE_POLYFILLS ? $jscomp.polyfillIsolated(a, b, c, d) : $jscomp.polyfillUnisolated(a, b, c, d))
-};
-$jscomp.polyfillUnisolated = function (a, b, c, d) {
-	c = $jscomp.global;
-	a = a.split(".");
-	for (d = 0; d < a.length - 1; d++) {
-		var e = a[d];
-		if (!(e in c)) return;
-		c = c[e]
-	}
-	a = a[a.length - 1];
-	d = c[a];
-	b = b(d);
-	b != d && null != b && $jscomp.defineProperty(c, a, {configurable: !0, writable: !0, value: b})
-};
-$jscomp.polyfillIsolated = function (a, b, c, d) {
-	var e = a.split(".");
-	a = 1 === e.length;
-	d = e[0];
-	d = !a && d in $jscomp.polyfills ? $jscomp.polyfills : $jscomp.global;
-	for (var h = 0; h < e.length - 1; h++) {
-		var f = e[h];
-		if (!(f in d)) return;
-		d = d[f]
-	}
-	e = e[e.length - 1];
-	c = $jscomp.IS_SYMBOL_NATIVE && "es6" === c ? d[e] : null;
-	b = b(c);
-	null != b && (a ? $jscomp.defineProperty($jscomp.polyfills, e, {
-		configurable: !0,
-		writable: !0,
-		value: b
-	}) : b !== c && ($jscomp.propertyToPolyfillSymbol[e] = $jscomp.IS_SYMBOL_NATIVE ? $jscomp.global.Symbol(e) : $jscomp.POLYFILL_PREFIX + e, e =
-		$jscomp.propertyToPolyfillSymbol[e], $jscomp.defineProperty(d, e, {configurable: !0, writable: !0, value: b})))
-};
-$jscomp.underscoreProtoCanBeSet = function () {
-	var a = {a: !0}, b = {};
-	try {
-		return b.__proto__ = a, b.a
-	} catch (c) {
-	}
-	return !1
-};
-$jscomp.setPrototypeOf = $jscomp.TRUST_ES6_POLYFILLS && "function" == typeof Object.setPrototypeOf ? Object.setPrototypeOf : $jscomp.underscoreProtoCanBeSet() ? function (a, b) {
-	a.__proto__ = b;
-	if (a.__proto__ !== b) throw new TypeError(a + " is not extensible");
-	return a
-} : null;
-$jscomp.arrayIteratorImpl = function (a) {
-	var b = 0;
-	return function () {
-		return b < a.length ? {done: !1, value: a[b++]} : {done: !0}
-	}
-};
-$jscomp.arrayIterator = function (a) {
-	return {next: $jscomp.arrayIteratorImpl(a)}
-};
-$jscomp.makeIterator = function (a) {
-	var b = "undefined" != typeof Symbol && Symbol.iterator && a[Symbol.iterator];
-	return b ? b.call(a) : $jscomp.arrayIterator(a)
-};
-$jscomp.generator = {};
-$jscomp.generator.ensureIteratorResultIsObject_ = function (a) {
-	if (!(a instanceof Object)) throw new TypeError("Iterator result " + a + " is not an object");
-};
-$jscomp.generator.Context = function () {
-	this.isRunning_ = !1;
-	this.yieldAllIterator_ = null;
-	this.yieldResult = void 0;
-	this.nextAddress = 1;
-	this.finallyAddress_ = this.catchAddress_ = 0;
-	this.finallyContexts_ = this.abruptCompletion_ = null
-};
-$jscomp.generator.Context.prototype.start_ = function () {
-	if (this.isRunning_) throw new TypeError("Generator is already running");
-	this.isRunning_ = !0
-};
-$jscomp.generator.Context.prototype.stop_ = function () {
-	this.isRunning_ = !1
-};
-$jscomp.generator.Context.prototype.jumpToErrorHandler_ = function () {
-	this.nextAddress = this.catchAddress_ || this.finallyAddress_
-};
-$jscomp.generator.Context.prototype.next_ = function (a) {
-	this.yieldResult = a
-};
-$jscomp.generator.Context.prototype.throw_ = function (a) {
-	this.abruptCompletion_ = {exception: a, isException: !0};
-	this.jumpToErrorHandler_()
-};
-$jscomp.generator.Context.prototype.return = function (a) {
-	this.abruptCompletion_ = {return: a};
-	this.nextAddress = this.finallyAddress_
-};
-$jscomp.generator.Context.prototype.jumpThroughFinallyBlocks = function (a) {
-	this.abruptCompletion_ = {jumpTo: a};
-	this.nextAddress = this.finallyAddress_
-};
-$jscomp.generator.Context.prototype.yield = function (a, b) {
-	this.nextAddress = b;
-	return {value: a}
-};
-$jscomp.generator.Context.prototype.yieldAll = function (a, b) {
-	a = $jscomp.makeIterator(a);
-	var c = a.next();
-	$jscomp.generator.ensureIteratorResultIsObject_(c);
-	if (c.done) this.yieldResult = c.value, this.nextAddress = b; else return this.yieldAllIterator_ = a, this.yield(c.value, b)
-};
-$jscomp.generator.Context.prototype.jumpTo = function (a) {
-	this.nextAddress = a
-};
-$jscomp.generator.Context.prototype.jumpToEnd = function () {
-	this.nextAddress = 0
-};
-$jscomp.generator.Context.prototype.setCatchFinallyBlocks = function (a, b) {
-	this.catchAddress_ = a;
-	void 0 != b && (this.finallyAddress_ = b)
-};
-$jscomp.generator.Context.prototype.setFinallyBlock = function (a) {
-	this.catchAddress_ = 0;
-	this.finallyAddress_ = a || 0
-};
-$jscomp.generator.Context.prototype.leaveTryBlock = function (a, b) {
-	this.nextAddress = a;
-	this.catchAddress_ = b || 0
-};
-$jscomp.generator.Context.prototype.enterCatchBlock = function (a) {
-	this.catchAddress_ = a || 0;
-	a = this.abruptCompletion_.exception;
-	this.abruptCompletion_ = null;
-	return a
-};
-$jscomp.generator.Context.prototype.enterFinallyBlock = function (a, b, c) {
-	c ? this.finallyContexts_[c] = this.abruptCompletion_ : this.finallyContexts_ = [this.abruptCompletion_];
-	this.catchAddress_ = a || 0;
-	this.finallyAddress_ = b || 0
-};
-$jscomp.generator.Context.prototype.leaveFinallyBlock = function (a, b) {
-	b = this.finallyContexts_.splice(b || 0)[0];
-	if (b = this.abruptCompletion_ = this.abruptCompletion_ || b) {
-		if (b.isException) return this.jumpToErrorHandler_();
-		void 0 != b.jumpTo && this.finallyAddress_ < b.jumpTo ? (this.nextAddress = b.jumpTo, this.abruptCompletion_ = null) : this.nextAddress = this.finallyAddress_
-	} else this.nextAddress = a
-};
-$jscomp.generator.Context.prototype.forIn = function (a) {
-	return new $jscomp.generator.Context.PropertyIterator(a)
-};
-$jscomp.generator.Context.PropertyIterator = function (a) {
-	this.object_ = a;
-	this.properties_ = [];
-	for (var b in a) this.properties_.push(b);
-	this.properties_.reverse()
-};
-$jscomp.generator.Context.PropertyIterator.prototype.getNext = function () {
-	for (; 0 < this.properties_.length;) {
-		var a = this.properties_.pop();
-		if (a in this.object_) return a
-	}
-	return null
-};
-$jscomp.generator.Engine_ = function (a) {
-	this.context_ = new $jscomp.generator.Context;
-	this.program_ = a
-};
-$jscomp.generator.Engine_.prototype.next_ = function (a) {
-	this.context_.start_();
-	if (this.context_.yieldAllIterator_) return this.yieldAllStep_(this.context_.yieldAllIterator_.next, a, this.context_.next_);
-	this.context_.next_(a);
-	return this.nextStep_()
-};
-$jscomp.generator.Engine_.prototype.return_ = function (a) {
-	this.context_.start_();
-	var b = this.context_.yieldAllIterator_;
-	if (b) return this.yieldAllStep_("return" in b ? b["return"] : function (c) {
-		return {value: c, done: !0}
-	}, a, this.context_.return);
-	this.context_.return(a);
-	return this.nextStep_()
-};
-$jscomp.generator.Engine_.prototype.throw_ = function (a) {
-	this.context_.start_();
-	if (this.context_.yieldAllIterator_) return this.yieldAllStep_(this.context_.yieldAllIterator_["throw"], a, this.context_.next_);
-	this.context_.throw_(a);
-	return this.nextStep_()
-};
-$jscomp.generator.Engine_.prototype.yieldAllStep_ = function (a, b, c) {
-	try {
-		var d = a.call(this.context_.yieldAllIterator_, b);
-		$jscomp.generator.ensureIteratorResultIsObject_(d);
-		if (!d.done) return this.context_.stop_(), d;
-		var e = d.value
-	} catch (h) {
-		return this.context_.yieldAllIterator_ = null, this.context_.throw_(h), this.nextStep_()
-	}
-	this.context_.yieldAllIterator_ = null;
-	c.call(this.context_, e);
-	return this.nextStep_()
-};
-$jscomp.generator.Engine_.prototype.nextStep_ = function () {
-	for (; this.context_.nextAddress;) try {
-		var a = this.program_(this.context_);
-		if (a) return this.context_.stop_(), {value: a.value, done: !1}
-	} catch (b) {
-		this.context_.yieldResult = void 0, this.context_.throw_(b)
-	}
-	this.context_.stop_();
-	if (this.context_.abruptCompletion_) {
-		a = this.context_.abruptCompletion_;
-		this.context_.abruptCompletion_ = null;
-		if (a.isException) throw a.exception;
-		return {value: a.return, done: !0}
-	}
-	return {value: void 0, done: !0}
-};
-$jscomp.generator.Generator_ = function (a) {
-	this.next = function (b) {
-		return a.next_(b)
-	};
-	this.throw = function (b) {
-		return a.throw_(b)
-	};
-	this.return = function (b) {
-		return a.return_(b)
-	};
-	this[Symbol.iterator] = function () {
-		return this
-	}
-};
-$jscomp.generator.createGenerator = function (a, b) {
-	b = new $jscomp.generator.Generator_(new $jscomp.generator.Engine_(b));
-	$jscomp.setPrototypeOf && a.prototype && $jscomp.setPrototypeOf(b, a.prototype);
-	return b
-};
-$jscomp.asyncExecutePromiseGenerator = function (a) {
-	function b(d) {
-		return a.next(d)
-	}
-
-	function c(d) {
-		return a.throw(d)
-	}
-
-	return new Promise(function (d, e) {
-		function h(f) {
-			f.done ? d(f.value) : Promise.resolve(f.value).then(b, c).then(h, e)
-		}
-
-		h(a.next())
-	})
-};
-$jscomp.asyncExecutePromiseGeneratorFunction = function (a) {
-	return $jscomp.asyncExecutePromiseGenerator(a())
-};
-$jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
-	return $jscomp.asyncExecutePromiseGenerator(new $jscomp.generator.Generator_(new $jscomp.generator.Engine_(a)))
-};
-
 function str_rev(a) {
 	var b = [], c = 0;
 	for (let d = a.length - 1; 0 <= d; d--) b[c++] = a[d];
@@ -340,15 +47,24 @@ function XHR(a, b, c, d) {
 			f.body = c;
 			f.headers["Content-type"] = "application/x-www-form-urlencoded";
 		}
-		fetch(a, f).then(h => $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
-			if (h.ok) {
-				var k = {
-					response: (new DOMParser).parseFromString(yield h.text(), "text/html"),
-					responseURL: h.url
+		(async () => {
+			try {
+				const response = await fetch(a, f);
+
+				if (!response.ok) {
+					throw new Error(response.statusText);
+				}
+
+				var data = {
+					response: (new DOMParser).parseFromString(await response.text(), "text/html"),
+					responseURL: response.url
 				};
-				e(k)
-			} else g(h.error())
-		})).catch(h => g(h))
+
+				e({ response: data, responseURL: response.url });
+			} catch (error) {
+				g(error);
+			}
+		})();
 	})
 }
 
@@ -379,299 +95,6 @@ function TE_notification(a, b, c) {
 		})
 	})
 }
-
-
-// "bg_calendar.js"
-
-var $jscomp = $jscomp || {};
-$jscomp.scope = {};
-$jscomp.ASSUME_ES5 = !1;
-$jscomp.ASSUME_NO_NATIVE_MAP = !1;
-$jscomp.ASSUME_NO_NATIVE_SET = !1;
-$jscomp.SIMPLE_FROUND_POLYFILL = !1;
-$jscomp.ISOLATE_POLYFILLS = !1;
-$jscomp.defineProperty = $jscomp.ASSUME_ES5 || "function" == typeof Object.defineProperties ? Object.defineProperty : function (a, b, d) {
-	if (a == Array.prototype || a == Object.prototype) return a;
-	a[b] = d.value;
-	return a
-};
-$jscomp.getGlobal = function (a) {
-	a = ["object" == typeof globalThis && globalThis, a, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof global && global];
-	for (var b = 0; b < a.length; ++b) {
-		var d = a[b];
-		if (d && d.Math == Math) return d
-	}
-	throw Error("Cannot find global object");
-};
-$jscomp.global = $jscomp.getGlobal(this);
-$jscomp.IS_SYMBOL_NATIVE = "function" === typeof Symbol && "symbol" === typeof Symbol("x");
-$jscomp.TRUST_ES6_POLYFILLS = !$jscomp.ISOLATE_POLYFILLS || $jscomp.IS_SYMBOL_NATIVE;
-$jscomp.polyfills = {};
-$jscomp.propertyToPolyfillSymbol = {};
-$jscomp.POLYFILL_PREFIX = "$jscp$";
-var $jscomp$lookupPolyfilledValue = function (a, b) {
-	var d = $jscomp.propertyToPolyfillSymbol[b];
-	if (null == d) return a[b];
-	d = a[d];
-	return void 0 !== d ? d : a[b]
-};
-$jscomp.polyfill = function (a, b, d, c) {
-	b && ($jscomp.ISOLATE_POLYFILLS ? $jscomp.polyfillIsolated(a, b, d, c) : $jscomp.polyfillUnisolated(a, b, d, c))
-};
-$jscomp.polyfillUnisolated = function (a, b, d, c) {
-	d = $jscomp.global;
-	a = a.split(".");
-	for (c = 0; c < a.length - 1; c++) {
-		var e = a[c];
-		if (!(e in d)) return;
-		d = d[e]
-	}
-	a = a[a.length - 1];
-	c = d[a];
-	b = b(c);
-	b != c && null != b && $jscomp.defineProperty(d, a, {configurable: !0, writable: !0, value: b})
-};
-$jscomp.polyfillIsolated = function (a, b, d, c) {
-	var e = a.split(".");
-	a = 1 === e.length;
-	c = e[0];
-	c = !a && c in $jscomp.polyfills ? $jscomp.polyfills : $jscomp.global;
-	for (var f = 0; f < e.length - 1; f++) {
-		var g = e[f];
-		if (!(g in c)) return;
-		c = c[g]
-	}
-	e = e[e.length - 1];
-	d = $jscomp.IS_SYMBOL_NATIVE && "es6" === d ? c[e] : null;
-	b = b(d);
-	null != b && (a ? $jscomp.defineProperty($jscomp.polyfills, e, {
-		configurable: !0,
-		writable: !0,
-		value: b
-	}) : b !== d && ($jscomp.propertyToPolyfillSymbol[e] = $jscomp.IS_SYMBOL_NATIVE ? $jscomp.global.Symbol(e) : $jscomp.POLYFILL_PREFIX + e, e =
-		$jscomp.propertyToPolyfillSymbol[e], $jscomp.defineProperty(c, e, {configurable: !0, writable: !0, value: b})))
-};
-$jscomp.underscoreProtoCanBeSet = function () {
-	var a = {a: !0}, b = {};
-	try {
-		return b.__proto__ = a, b.a
-	} catch (d) {
-	}
-	return !1
-};
-$jscomp.setPrototypeOf = $jscomp.TRUST_ES6_POLYFILLS && "function" == typeof Object.setPrototypeOf ? Object.setPrototypeOf : $jscomp.underscoreProtoCanBeSet() ? function (a, b) {
-	a.__proto__ = b;
-	if (a.__proto__ !== b) throw new TypeError(a + " is not extensible");
-	return a
-} : null;
-$jscomp.arrayIteratorImpl = function (a) {
-	var b = 0;
-	return function () {
-		return b < a.length ? {done: !1, value: a[b++]} : {done: !0}
-	}
-};
-$jscomp.arrayIterator = function (a) {
-	return {next: $jscomp.arrayIteratorImpl(a)}
-};
-$jscomp.makeIterator = function (a) {
-	var b = "undefined" != typeof Symbol && Symbol.iterator && a[Symbol.iterator];
-	return b ? b.call(a) : $jscomp.arrayIterator(a)
-};
-$jscomp.generator = {};
-$jscomp.generator.ensureIteratorResultIsObject_ = function (a) {
-	if (!(a instanceof Object)) throw new TypeError("Iterator result " + a + " is not an object");
-};
-$jscomp.generator.Context = function () {
-	this.isRunning_ = !1;
-	this.yieldAllIterator_ = null;
-	this.yieldResult = void 0;
-	this.nextAddress = 1;
-	this.finallyAddress_ = this.catchAddress_ = 0;
-	this.finallyContexts_ = this.abruptCompletion_ = null
-};
-$jscomp.generator.Context.prototype.start_ = function () {
-	if (this.isRunning_) throw new TypeError("Generator is already running");
-	this.isRunning_ = !0
-};
-$jscomp.generator.Context.prototype.stop_ = function () {
-	this.isRunning_ = !1
-};
-$jscomp.generator.Context.prototype.jumpToErrorHandler_ = function () {
-	this.nextAddress = this.catchAddress_ || this.finallyAddress_
-};
-$jscomp.generator.Context.prototype.next_ = function (a) {
-	this.yieldResult = a
-};
-$jscomp.generator.Context.prototype.throw_ = function (a) {
-	this.abruptCompletion_ = {exception: a, isException: !0};
-	this.jumpToErrorHandler_()
-};
-$jscomp.generator.Context.prototype.return = function (a) {
-	this.abruptCompletion_ = {return: a};
-	this.nextAddress = this.finallyAddress_
-};
-$jscomp.generator.Context.prototype.jumpThroughFinallyBlocks = function (a) {
-	this.abruptCompletion_ = {jumpTo: a};
-	this.nextAddress = this.finallyAddress_
-};
-$jscomp.generator.Context.prototype.yield = function (a, b) {
-	this.nextAddress = b;
-	return {value: a}
-};
-$jscomp.generator.Context.prototype.yieldAll = function (a, b) {
-	a = $jscomp.makeIterator(a);
-	var d = a.next();
-	$jscomp.generator.ensureIteratorResultIsObject_(d);
-	if (d.done) this.yieldResult = d.value, this.nextAddress = b; else return this.yieldAllIterator_ = a, this.yield(d.value, b)
-};
-$jscomp.generator.Context.prototype.jumpTo = function (a) {
-	this.nextAddress = a
-};
-$jscomp.generator.Context.prototype.jumpToEnd = function () {
-	this.nextAddress = 0
-};
-$jscomp.generator.Context.prototype.setCatchFinallyBlocks = function (a, b) {
-	this.catchAddress_ = a;
-	void 0 != b && (this.finallyAddress_ = b)
-};
-$jscomp.generator.Context.prototype.setFinallyBlock = function (a) {
-	this.catchAddress_ = 0;
-	this.finallyAddress_ = a || 0
-};
-$jscomp.generator.Context.prototype.leaveTryBlock = function (a, b) {
-	this.nextAddress = a;
-	this.catchAddress_ = b || 0
-};
-$jscomp.generator.Context.prototype.enterCatchBlock = function (a) {
-	this.catchAddress_ = a || 0;
-	a = this.abruptCompletion_.exception;
-	this.abruptCompletion_ = null;
-	return a
-};
-$jscomp.generator.Context.prototype.enterFinallyBlock = function (a, b, d) {
-	d ? this.finallyContexts_[d] = this.abruptCompletion_ : this.finallyContexts_ = [this.abruptCompletion_];
-	this.catchAddress_ = a || 0;
-	this.finallyAddress_ = b || 0
-};
-$jscomp.generator.Context.prototype.leaveFinallyBlock = function (a, b) {
-	b = this.finallyContexts_.splice(b || 0)[0];
-	if (b = this.abruptCompletion_ = this.abruptCompletion_ || b) {
-		if (b.isException) return this.jumpToErrorHandler_();
-		void 0 != b.jumpTo && this.finallyAddress_ < b.jumpTo ? (this.nextAddress = b.jumpTo, this.abruptCompletion_ = null) : this.nextAddress = this.finallyAddress_
-	} else this.nextAddress = a
-};
-$jscomp.generator.Context.prototype.forIn = function (a) {
-	return new $jscomp.generator.Context.PropertyIterator(a)
-};
-$jscomp.generator.Context.PropertyIterator = function (a) {
-	this.object_ = a;
-	this.properties_ = [];
-	for (var b in a) this.properties_.push(b);
-	this.properties_.reverse()
-};
-$jscomp.generator.Context.PropertyIterator.prototype.getNext = function () {
-	for (; 0 < this.properties_.length;) {
-		var a = this.properties_.pop();
-		if (a in this.object_) return a
-	}
-	return null
-};
-$jscomp.generator.Engine_ = function (a) {
-	this.context_ = new $jscomp.generator.Context;
-	this.program_ = a
-};
-$jscomp.generator.Engine_.prototype.next_ = function (a) {
-	this.context_.start_();
-	if (this.context_.yieldAllIterator_) return this.yieldAllStep_(this.context_.yieldAllIterator_.next, a, this.context_.next_);
-	this.context_.next_(a);
-	return this.nextStep_()
-};
-$jscomp.generator.Engine_.prototype.return_ = function (a) {
-	this.context_.start_();
-	var b = this.context_.yieldAllIterator_;
-	if (b) return this.yieldAllStep_("return" in b ? b["return"] : function (d) {
-		return {value: d, done: !0}
-	}, a, this.context_.return);
-	this.context_.return(a);
-	return this.nextStep_()
-};
-$jscomp.generator.Engine_.prototype.throw_ = function (a) {
-	this.context_.start_();
-	if (this.context_.yieldAllIterator_) return this.yieldAllStep_(this.context_.yieldAllIterator_["throw"], a, this.context_.next_);
-	this.context_.throw_(a);
-	return this.nextStep_()
-};
-$jscomp.generator.Engine_.prototype.yieldAllStep_ = function (a, b, d) {
-	try {
-		var c = a.call(this.context_.yieldAllIterator_, b);
-		$jscomp.generator.ensureIteratorResultIsObject_(c);
-		if (!c.done) return this.context_.stop_(), c;
-		var e = c.value
-	} catch (f) {
-		return this.context_.yieldAllIterator_ = null, this.context_.throw_(f), this.nextStep_()
-	}
-	this.context_.yieldAllIterator_ = null;
-	d.call(this.context_, e);
-	return this.nextStep_()
-};
-$jscomp.generator.Engine_.prototype.nextStep_ = function () {
-	for (; this.context_.nextAddress;) try {
-		var a = this.program_(this.context_);
-		if (a) return this.context_.stop_(), {value: a.value, done: !1}
-	} catch (b) {
-		this.context_.yieldResult = void 0, this.context_.throw_(b)
-	}
-	this.context_.stop_();
-	if (this.context_.abruptCompletion_) {
-		a = this.context_.abruptCompletion_;
-		this.context_.abruptCompletion_ = null;
-		if (a.isException) throw a.exception;
-		return {value: a.return, done: !0}
-	}
-	return {value: void 0, done: !0}
-};
-$jscomp.generator.Generator_ = function (a) {
-	this.next = function (b) {
-		return a.next_(b)
-	};
-	this.throw = function (b) {
-		return a.throw_(b)
-	};
-	this.return = function (b) {
-		return a.return_(b)
-	};
-	this[Symbol.iterator] = function () {
-		return this
-	}
-};
-$jscomp.generator.createGenerator = function (a, b) {
-	b = new $jscomp.generator.Generator_(new $jscomp.generator.Engine_(b));
-	$jscomp.setPrototypeOf && a.prototype && $jscomp.setPrototypeOf(b, a.prototype);
-	return b
-};
-$jscomp.asyncExecutePromiseGenerator = function (a) {
-	function b(c) {
-		return a.next(c)
-	}
-
-	function d(c) {
-		return a.throw(c)
-	}
-
-	return new Promise(function (c, e) {
-		function f(g) {
-			g.done ? c(g.value) : Promise.resolve(g.value).then(b, d).then(f, e)
-		}
-
-		f(a.next())
-	})
-};
-$jscomp.asyncExecutePromiseGeneratorFunction = function (a) {
-	return $jscomp.asyncExecutePromiseGenerator(a())
-};
-$jscomp.asyncExecutePromiseGeneratorProgram = function (a) {
-	return $jscomp.asyncExecutePromiseGenerator(new $jscomp.generator.Generator_(new $jscomp.generator.Engine_(a)))
-};
 
 export function TE_forcedAutoLogin(a) {
 	a = void 0 === a ? !1 : a;
@@ -861,7 +284,7 @@ function TE_csCalendarCheck(a, b, d) {
 }
 
 function TE_getWebwork(a, b) {
-	return $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
+	return (async () => {
 		var d = {}, c = /(?<cname>.+)\s*-\s*(?<cnum>[0-9]+)/,
 			e = / - (?:קיץ|חורף|אביב)/,
 			f = /webwork|וובוורק|ווב-וורק/i, // The Next line is HARDCODED COURSE NUMBERS
@@ -886,7 +309,7 @@ function TE_getWebwork(a, b) {
 							d[m] = b[m];
 							continue
 						}
-						let n = yield XHR(`https://moodle24.technion.ac.il/mod/lti/index.php?id=${m}`, "document").then(p);
+						let n = await XHR(`https://moodle24.technion.ac.il/mod/lti/index.php?id=${m}`, "document").then(p);
 						"" != n && (d[m] = {name: h.cname.trim(), lti: n})
 					}
 				}
@@ -894,14 +317,14 @@ function TE_getWebwork(a, b) {
 			TE_setStorage({webwork_courses: d}, "webworkCourses");
 			TE_webworkScan()
 		}
-	})
+	})();
 }
 
 function TE_webworkStep(a, b) {
 	b = void 0 === b ? "" : b;
-	return $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
+	return (async () => {
 		var d = /webwork/i;
-		return yield XHR(a, "document", b).then(c => {
+		return await XHR(a, "document", b).then(c => {
 			var e = c.response.querySelector("form");
 			if (!e) return !1;
 			c = e.getAttribute("action");
@@ -909,24 +332,24 @@ function TE_webworkStep(a, b) {
 			var f = e.get("redirect_uri") || e.get("target_link_uri") || c;
 			return d.test(f) ? [c, e] : !1
 		})
-	})
+	})();
 }
 
 function TE_webworkScan() {
 	chrome.storage.local.get({webwork_courses: {}, webwork_cal: {}}, function (a) {
-		return $jscomp.asyncExecutePromiseGeneratorFunction(function* () {
+		return (async () => {
 			var b = /(?<day>[0-9]{2}).(?<month>[0-9]{2}).(?<year>[0-9]{4}) @ (?<hour>[0-9]{2}):(?<minute>[0-9]{2})/,
 				d = /^\u05d9\u05d9\u05e4\u05ea\u05d7|^\u05e1\u05d2\u05d5\u05e8/, c = {}, e = !1;
 			for (let g of Object.values(a.webwork_courses)) {
-				var f = yield TE_webworkStep(`https://moodle24.technion.ac.il/mod/lti/launch.php?id=${g.lti}`);
+				var f = await TE_webworkStep(`https://moodle24.technion.ac.il/mod/lti/launch.php?id=${g.lti}`);
 				if (!f) continue;
-				f = yield TE_webworkStep(f[0],
+				f = await TE_webworkStep(f[0],
 					(new URLSearchParams(f[1])).toString());
 				if (!f) continue;
-				f = yield TE_webworkStep(f[0], (new URLSearchParams(f[1])).toString());
+				f = await TE_webworkStep(f[0], (new URLSearchParams(f[1])).toString());
 				if (!f) continue;
 				let k = (new URLSearchParams(f[1])).toString();
-				f = yield XHR(f[0], "document", k).then(p => {
+				f = await XHR(f[0], "document", k).then(p => {
 					let h = {};
 					p = p.response.querySelectorAll(".problem_set_table tr");
 					for (let l = 1; l < p.length; l++) {
@@ -951,7 +374,7 @@ function TE_webworkScan() {
 			}
 			TE_setStorage({webwork_cal: c, wwcal_update: Date.now()}, "wwcfail_1");
 			e && TE_alertNewHW(3)
-		})
+		})();
 	})
 }
 
@@ -1142,6 +565,15 @@ function TE_sendMessageToTabs(a) {
 	})
 }
 
+function TE_startExtension() {
+	chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
+	TE_setStorage({buses_alerts: []});
+	chrome.storage.local.get({dl_current: 0, dl_queue: []}, a => {
+		chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
+		TE_setStorage({dl_queue: [], dl_current: 0})
+	})
+}
+
 chrome.runtime.onMessage.addListener((a, b, c) => {
 	switch (a.mess_t) {
 		case "singledownload":
@@ -1198,78 +630,16 @@ chrome.runtime.onMessage.addListener((a, b, c) => {
 	}
 	return !0
 });
+
 chrome.alarms.onAlarm.addListener(function (a) {
 	"TE_update_info" === a.name && TE_updateInfo();
 	"TE_buses_start" === a.name && TE_checkBuses()
 });
 
-function TE_comingFromLower(a, b) {
-	for (var c = 0; c < b.length; c++) {
-		if (b[c] > a[c]) return !0;
-		if (b[c] != a[c]) break
-	}
-	return !1
-}
-
-function TE_updateType(a, b) {
-	for (var c = 0; c < b.length; c++) if (b[c] > a[c]) return b.length - c;
-	return 1
-}
-
 chrome.runtime.onInstalled.addListener(a => {
 	if ("update" == a.reason) {
-		a = a.previousVersion.split(".").map(c => parseInt(c));
-		chrome.runtime.getManifest().version.split(".").map(c => parseInt(c));
-		if (TE_comingFromLower(a, [2, 4, 15]))
-			TE_setStorage({
-				cal_seen: 0,
-				calendar_prop: "",
-				calendar_max: 0,
-				cal_killa: !0,
-				webwork_courses: {},
-				webwork_cal: {},
-				wwcal_update: 0
-			})
-		else if (TE_comingFromLower(a, [2, 4, 0]))
-			TE_setStorage({webwork_courses: {}, webwork_cal: {}, wwcal_update: 0})
-		else if (TE_comingFromLower(a, [2, 3, 3]))
-			chrome.storage.local.get({
-				user_agenda: {},
-				wwcal_switch: !1
-			}, c => {
-				if (c.wwcal_switch) {
-					c = c.user_agenda;
-					var d = Date.now();
-					c[d] = {
-						header: "מטלות WeBWorK שסומנו כהושלמו אופסו!",
-						description: "לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂",
-						timestamp: -1,
-						done: !1
-					};
-					TE_setStorage({user_agenda: c, webwork_cal: {}});
-					TE_notification("לצערי, עקב באג נאלצתי לאפס את מטלות הוובוורק שהושלמו. ניתן למחוק את ההודעה הזאת ולסמן אותן שוב לאחר שייטענו מחדש 🙂",
-						!1)
-				}
-			})
-		else if (TE_comingFromLower(a, [2, 1, 0])) {
-			chrome.storage.local.remove(["courses_names", "courses_links", "courses_update"]);
-			var b = parseInt(3 * Math.random()) + 1;
-			b = Date.now() + 864E5 * b;
-			TE_updateVideosInfo(b)
-		} else if (TE_comingFromLower(a, [1, 3, 0]))
-			TE_setStorage({remoodle: !1}), TE_setStorage({cal_seen: 0})
-
 		chrome.tabs.create({url: 'html/release_notes.html'}) && TE_startExtension();
 	}
 });
-
-function TE_startExtension() {
-	chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
-	TE_setStorage({buses_alerts: []});
-	chrome.storage.local.get({dl_current: 0, dl_queue: []}, a => {
-		chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
-		TE_setStorage({dl_queue: [], dl_current: 0})
-	})
-}
 
 chrome.runtime.onStartup.addListener(TE_startExtension);

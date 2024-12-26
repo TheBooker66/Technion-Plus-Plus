@@ -1,6 +1,6 @@
 'use strict';
-import {CommonPopup} from './common.js';
-import {CommonCalendar} from './calendar.js';
+import {CommonPopup} from './common_popup.js';
+import {CommonCalendar} from './common_calendar.js';
 import {OrganizerCalendar} from './organizer.js';
 import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 
@@ -32,7 +32,6 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 			}); else if ("" === d.calendar_prop) {
 				var e = () => c({
 					msg: "אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.",
-
 					is_error: !0
 				});
 				l.XHR("https://moodle24.technion.ac.il/calendar/export.php", "document").then(function (b) {
@@ -46,8 +45,8 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 								is_error: !0
 							})) : window.location.reload()
 						})
-					}).catch(e)
-				}).catch(e)
+					}).catch(err => console.log(err))
+				}).catch(err => console.log(err))
 			}
 		})
 	}
@@ -159,10 +158,13 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 						y(t, r.removeCalendarAlert(b.cal_seen));
 						d({new_list: A, finished_list: B})
 					}
-				}).catch(() => e({
-					msg: "אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.",
-					is_error: !0
-				}))
+				}).catch(err => {
+					console.log(err);
+					e({
+						msg: "אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.",
+						is_error: !0
+					})
+				})
 			})
 	}))
 })();

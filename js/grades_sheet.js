@@ -38,8 +38,7 @@
 
 	function I() {
 		var a = H(".selected"), b = document.querySelectorAll("#selected_tbl .maor_table_row div");
-		b[1].textContent = 1 != a.count ? `${a.count} \u05e7\u05d5\u05e8\u05e1\u05d9\u05dd` : "\u05e7\u05d5\u05e8\u05e1 \u05d0\u05d7\u05d3";
-		// קורסים : קורס אחד
+		b[1].textContent = 1 != a.count ? `${a.count} קורסים` : "קורס 1";
 		b[3].textContent = a.avg;
 		b[5].textContent = a.points;
 		b[7].textContent = a.points_passed
@@ -73,7 +72,7 @@
 		var c =
 			f.querySelector(".maor_table_row");
 		(55 > parseInt(a.grade) || "incomplete" == b) && c.classList.add("failed");
-		"\u05e2\u05d1\u05e8" == a.grade && c.classList.add("over_binary"); // עבר
+		"עבר" == a.grade && c.classList.add("over_binary");
 		a.perma && c.classList.add("ignored");
 		d && c.classList.add("animate");
 		d = c.querySelectorAll("div");
@@ -90,11 +89,11 @@
 						g[0];
 					var n = g[1];
 					if (e.disabled)
-						e.disabled = !1, n.textContent = "\u05d0\u05d9\u05e9\u05d5\u05e8", e.focus(); // אישור
+						e.disabled = !1, n.textContent = "אישור", e.focus();
 					else if (0 <= e.value && 100 >= e.value && !isNaN(parseInt(e.value))) {
 						e.value = parseInt(e.value);
 						e.disabled = !0;
-						n.textContent = "\u05e2\u05e8\u05d5\u05da"; // ערוך
+						n.textContent = "ערוך";
 						55 <= e.value ? c.classList.remove("failed") : c.classList.add("failed");
 						if (!c.className.includes("temporary")) {
 							if (e.value == a.grade) {
