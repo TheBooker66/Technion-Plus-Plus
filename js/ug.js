@@ -1,6 +1,6 @@
 'use strict';
 (function () {
-	var c = (new URL(window.location)).searchParams.get("MK"), b = window.location.pathname.split("rishum/course/")[1],
+	let c = (new URL(window.location)).searchParams.get("MK"), b = window.location.pathname.split("rishum/course/")[1],
 		d = (b = b ? b.split("/")[0] : b) ? b : c;
 	6 > d.length && (d = "0" + d);
 	if (d) {
@@ -8,13 +8,13 @@
 			"text/html").body.firstChild;
 		b = document.querySelector("#content .properties-wrapper");
 		b.insertBefore(c, b.querySelectorAll(".properties-section")[1]);
-		var e = c.getElementsByClassName("TP_expand"), g = c.getElementsByTagName("iframe");
+		const e = c.getElementsByClassName("TP_expand"), g = c.getElementsByTagName("iframe");
 		for (let a = 0; a < e.length; a++) e[a].addEventListener("click", () => {
-			var h = "false" == e[a].getAttribute("data-expanded") ? !0 : !1;
+			const h = "false" == e[a].getAttribute("data-expanded") ? !0 : !1;
 			g[a].style.height = h ? "600px" : "";
 			e[a].setAttribute("data-expanded", h ? "true" : "false")
 		});
-		var l = c.querySelector("#TP_infobox > div"), f = c.querySelector("input[type='checkbox']"),
+		const l = c.querySelector("#TP_infobox > div"), f = c.querySelector("input[type='checkbox']"),
 			k = a => {
 				f.checked = a;
 				l.style.display = a ? "block" : "none";

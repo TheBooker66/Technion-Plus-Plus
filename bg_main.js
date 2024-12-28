@@ -1,19 +1,9 @@
 'use strict';
 
-function str_rev(a) {
-	var b = [], c = 0;
-	for (let d = a.length - 1; 0 <= d; d--) b[c++] = a[d];
-	return b.join("")
-}
-
-function maor_p_e(a, b) {
-	var c = a.split("");
-	for (let d = 0; d < c.length; d++) c[d] = String.fromCharCode(a.charCodeAt(d) ^ b.charCodeAt(d));
-	return c
-}
+import {reverseString, xorStrings} from './js/utils.js';
 
 function maor_p_t(a, b, c) {
-	return str_rev(maor_p_e(a + b, c))
+	return reverseString(xorStrings(a + b, c))
 }
 
 function TE_getBrowser() {
@@ -26,10 +16,25 @@ function TE_setStorage(a, b) {
 	})
 }
 
+function checkOS() {
+	if (navigator.userAgentData) {
+		const hints = ["architecture", "model", "platform", "platformVersion", "uaFullVersion"];
+		navigator.userAgentData.getHighEntropyValues(hints).then(ua => console.log(ua));
+		return navigator.userAgentData;
+	} else {
+		console.log(navigator.userAgent);
+		return "navigator.userAgentData is not supported!";
+	}
+}
+
 function TE_reBadge(a) {
-	navigator.appVersion.includes("Android") || chrome.action.getBadgeBackgroundColor({}, b => {
+	if (checkOS().toString().includes("Android")) return;
+	chrome.action.getBadgeBackgroundColor({}, b => {
 		chrome.action.getBadgeText({}, c => {
-			if (215 != b[0] || 0 != b[1] || 34 != b[2] || "!" != c) chrome.action.setBadgeBackgroundColor({color: a ? [215, 0, 34, 185] : [164, 127, 0, 185]}), chrome.action.setBadgeText({text: "!"})
+			if (215 != b[0] || 0 != b[1] || 34 != b[2] || "!" != c) {
+				chrome.action.setBadgeBackgroundColor({color: a ? [215, 0, 34, 185] : [164, 127, 0, 185]});
+				chrome.action.setBadgeText({text: "!"});
+			}
 		})
 	})
 }
@@ -38,7 +43,7 @@ function XHR(a, b, c, d) {
 	c = void 0 === c ? "" : c;
 	d = void 0 === d ? !1 : d;
 	return new Promise((e, g) => {
-		var f = {
+		const f = {
 			headers: {},
 			method: d ? "head" : "get"
 		};
@@ -55,12 +60,12 @@ function XHR(a, b, c, d) {
 					throw new Error(response.statusText);
 				}
 
-				var data = {
+				const data = {
 					response: (new DOMParser).parseFromString(await response.text(), "text/html"),
 					responseURL: response.url
 				};
 
-				e({ response: data, responseURL: response.url });
+				e({response: data, responseURL: response.url});
 			} catch (error) {
 				g(error);
 			}
@@ -70,7 +75,8 @@ function XHR(a, b, c, d) {
 
 function TE_notification(a, b, c) {
 	c = void 0 === c ? "" : c;
-	var d = new Date, e = d.getHours();
+	let d = new Date;
+	const e = d.getHours();
 	d = d.getMinutes();
 	a += "התראה התקבלה בשעה: " + (10 > e ? "0" + e : e) + ":" + (10 > d ? "0" + d : d);
 	a = {
@@ -81,11 +87,11 @@ function TE_notification(a, b, c) {
 	};
 	"Chromium" == TE_getBrowser() && (a.silent = !0);
 	"" != c && chrome.notifications.clear(c);
-	chrome.notifications.create(c, a, h => {
+	chrome.notifications.create(c, a, _ => {
 		b || chrome.storage.local.get({notif_vol: 1, alerts_sound: !0}, f => {
 			if (chrome.runtime.lastError) console.log("TE_bg_notification_err: " + chrome.runtime.lastError.message);
 			else if (f.alerts_sound) {
-				var g = document.createElement("audio");
+				const g = document.createElement("audio");
 				g.setAttribute("preload", "auto");
 				g.setAttribute("autobuffer", "true");
 				g.volume = f.notif_vol;
@@ -99,7 +105,7 @@ function TE_notification(a, b, c) {
 export function TE_forcedAutoLogin(a) {
 	a = void 0 === a ? !1 : a;
 	return new Promise((b, d) => {
-		var c = f => {
+		const c = f => {
 			console.log("TE_back_M_login: could not connect to moodle. {reason: " + f + "}");
 			d()
 		}, e = f => {
@@ -113,7 +119,7 @@ export function TE_forcedAutoLogin(a) {
 }
 
 function TE_forcedAutoLoginNormalPromise(a, b, d) {
-	var c = (e, f) => {
+	const c = (e, f) => {
 		30 <= f ? (chrome.tabs.remove(e), b("Could not reach moodle, possibly wrong username/password.")) : chrome.tabs.get(e, g => {
 			"https://moodle24.technion.ac.il/" == g.url ? (console.log("close the tab"), chrome.tabs.remove(e), XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", d).then(k => a(k))) : setTimeout(() => c(e, f + 1), 500)
 		})
@@ -123,7 +129,7 @@ function TE_forcedAutoLoginNormalPromise(a, b, d) {
 			chrome.storage.local.get({username: "", server: !0, enable_login: !1}, f => {
 				if (chrome.runtime.lastError) return b("b_storage - " + chrome.runtime.lastError.message);
 				if (!f.enable_login) return b("No username/password");
-				var g = e.responseURL.split("?"), k = new URLSearchParams(g[1]);
+				const g = e.responseURL.split("?"), k = new URLSearchParams(g[1]);
 				k.delete("prompt");
 				k.append("login_hint", f.username + "@" + (f.server ? "campus." : "") + "technion.ac.il");
 				chrome.tabs.create({url: g[0] + "?" + k.toString(), active: !1}, p => c(p.id, 0))
@@ -132,8 +138,8 @@ function TE_forcedAutoLoginNormalPromise(a, b, d) {
 }
 
 function TE_forcedAutoLoginExternalPromise(a, b) {
-	var d = (c, e) => {
-		8 <= e ? (chrome.tabs.remove(c), b("Could not login to moodle, possibly wrong username/password.")) : chrome.tabs.get(c, f => {
+	const d = (c, e) => {
+		8 <= e ? (chrome.tabs.remove(c), b("Could not login to moodle, possibly wrong username/password.")) : chrome.tabs.get(c, _ => {
 			XHR("https://moodle24.technion.ac.il/", "document", "").then(g => {
 				g.response.querySelector(".usertext") ? (a(g), console.log("close the tab"), chrome.tabs.remove(c)) : setTimeout(() => d(c, e + 1), 1E3)
 			})
@@ -149,7 +155,7 @@ function TE_forcedAutoLoginExternalPromise(a, b) {
 }
 
 function TE_alertNewHW(a) {
-	var b = [{mess: "מודל", binary_flag: 1}, {
+	const b = [{mess: "מודל", binary_flag: 1}, {
 		mess: 'מדמ"ח',
 		binary_flag: 2
 	}, {mess: "לא אמור לקרות", binary_flag: 4}, {mess: "WeBWorK", binary_flag: 8}][a];
@@ -164,7 +170,7 @@ function TE_alertNewHW(a) {
 export function TE_loginToMoodle(a) {
 	a = void 0 === a ? !1 : a;
 	return new Promise((b, d) => {
-		var c = f => {
+		const c = f => {
 			console.log("TE_back_M_login: could not connect to moodle. {reason: " + f + "}");
 			d()
 		}, e = f => {
@@ -179,10 +185,10 @@ export function TE_loginToMoodle(a) {
 			}, g => {
 				if (chrome.runtime.lastError) return c("b_storage - " + chrome.runtime.lastError.message);
 				if (!g.enable_login) return c("No username/password");
-				var k = f.responseURL.split("?"), p = new URLSearchParams(k[1]);
+				const k = f.responseURL.split("?"), p = new URLSearchParams(k[1]);
 				p.delete("prompt");
 				p.append("login_hint", g.username + "@" + (g.server ? "campus." : "") + "technion.ac.il");
-				var h = document.createElement("iframe"), m = () => {
+				const h = document.createElement("iframe"), m = () => {
 					h.getAttribute("login_over") || (h.setAttribute("timer_over", "1"), c("timer ended"))
 				}, l = () => {
 					h.getAttribute("timer_over") || (clearTimeout(m), h.setAttribute("login_over", "1"),
@@ -204,14 +210,14 @@ export function TE_loginToMoodle(a) {
 }
 
 function TE_getCoursesMoodle(a) {
-	var b = {}, d = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/,
+	const b = {}, d = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/,
 		c = / - (?:קיץ|חורף|אביב)/;
 	a = a.response.getElementsByClassName("coursevisible");
 	if (0 == a.length)
 		console.log("TE_login: failed to fetch courses.");
 	else {
 		for (let f = 0; f < a.length; f++) {
-			var e = a[f].getElementsByTagName("h3")[0].textContent.replace(c, "").match(d);
+			let e = a[f].getElementsByTagName("h3")[0].textContent.replace(c, "").match(d);
 			e && (e = e.groups, b[e.cnum.trim()] = e.cname.trim())
 		}
 		0 < Object.keys(b).length && chrome.storage.local.set({u_courses: b}, () => {
@@ -222,7 +228,7 @@ function TE_getCoursesMoodle(a) {
 
 function TE_checkCalendarProp(a) {
 	"" === a && XHR("https://moodle24.technion.ac.il/calendar/export.php", "document").then(function (b) {
-		var d = b.response.getElementsByName("sesskey")[0].value;
+		const d = b.response.getElementsByName("sesskey")[0].value;
 		XHR(b.responseURL, "document", "sesskey=" + d + "&_qf__core_calendar_export_form=1&events[exportevents]=all&period[timeperiod]=recentupcoming&generateurl=\u05d4\u05e9\u05d2+\u05d0\u05ea+\u05db\u05ea\u05d5\u05d1\u05ea+\u05d4-URL+\u05e9\u05dc+\u05dc\u05d5\u05d7+\u05d4\u05e9\u05e0\u05d4").then(function (c) {
 			c = "userid=" + c.response.getElementById("calendarexporturl").value.split("userid=")[1].split("&preset_what=all")[0];
 			TE_setStorage({calendar_prop: c}, "cal2")
@@ -232,10 +238,10 @@ function TE_checkCalendarProp(a) {
 
 function TE_alertMoodleCalendar(a, b, d, c) {
 	a & 1 ? TE_reBadge(!1) : "" !== b && XHR("https://moodle24.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&" + b, "text").then(function (e) {
-		var f = d;
+		let f = d;
 		e = e.response.split("BEGIN:VEVENT");
 		for (let k = 1; k < e.length; k++) {
-			var g = e[k].split("SUMMARY:")[1].split("\n")[0].trim();
+			let g = e[k].split("SUMMARY:")[1].split("\n")[0].trim();
 			"Attendance" === g || c || g.includes("ערעור") || g.includes("זום") || g.includes("Zoom") || g.includes("zoom")
 			|| g.includes("הרצאה") || g.includes("תרגול")
 			|| (g = g.split(" "), "opens" !== g[g.length - 1] && "opens)" !== g[g.length - 1]
@@ -252,24 +258,24 @@ function TE_csCalendarCheck(a, b, d) {
 		console.log("Checking GR++...");
 		c = c.response.split("BEGIN:VEVENT");
 		if (1 != c.length) {
-			for (var e = Date.now(), f = new Set, g = {
+			let e = Date.now(), f = new Set,
+				g = {
 					banned: /Exam|moed| - Late|\u05d4\u05e8\u05e6\u05d0\u05d4|\u05ea\u05e8\u05d2\u05d5\u05dc/,
 					summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
 					uid: /UID:([0-9.a-zA-Z-]+)/,
 					time: /(?<Y>[0-9]{4})(?<M>[0-9]{2})(?<D>[0-9]{2})(T(?<TH>[0-9]{2})(?<TM>[0-9]{2}))?/
-				},
-				     k = 1; k < c.length; k++) {
-				var p = c[k].match(g.summary)[1];
+				};
+			for (let k = 1; k < c.length; k++) {
+				let p = c[k].match(g.summary)[1];
 				let m = p.split("(")[0].trim();
 				if (g.banned.test(m)) continue;
 				let l = c[k].match(g.uid)[1] || p;
-				var h = c[k].match(g.time).groups;
+				let h = c[k].match(g.time).groups;
 				h = new Date(`${h.Y}-${h.M}-${h.D}T${h.TH || 23}:${h.TM || 59}:00+03:00`);
 				if (!(h < e || h > e + 2592E6)) {
 					if ("icspasswordexpires" == l) {
 						f.clear();
-						TE_notification('\u05e1\u05d9\u05e1\u05de\u05ea \u05d4\u05d9\u05d5\u05de\u05df \u05e9\u05dc \u05d4\u05e6\u05d2\u05ea \u05d4\u05de\u05d8\u05dc\u05d5\u05ea \u05e9\u05dc \u05de\u05d3\u05de"\u05d7 \u05ea\u05e4\u05d5\u05d2 \u05d1\u05e7\u05e8\u05d5\u05d1, \u05d0\u05e0\u05d0 \u05db\u05e0\u05e1 \u05d1\u05d3\u05d7\u05d9\u05e4\u05d5\u05ea \u05dc\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05d4\u05ea\u05d5\u05e1\u05e3 \u05dc\u05d4\u05d5\u05e8\u05d0\u05d5\u05ea \u05d7\u05d9\u05d3\u05d5\u05e9 \u05d4\u05e1\u05d9\u05e1\u05de\u05d4!',
-							!1);
+						TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח תפוג בקרוב, אנא כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!', !1);
 						break
 					}
 					h = l.includes(".PHW");
@@ -285,24 +291,24 @@ function TE_csCalendarCheck(a, b, d) {
 
 function TE_getWebwork(a, b) {
 	return (async () => {
-		var d = {}, c = /(?<cname>.+)\s*-\s*(?<cnum>[0-9]+)/,
+		const d = {}, c = /(?<cname>.+)\s*-\s*(?<cnum>[0-9]+)/,
 			e = / - (?:קיץ|חורף|אביב)/,
 			f = /webwork|וובוורק|ווב-וורק/i, // The Next line is HARDCODED COURSE NUMBERS
 			// g = "104000 104003 104004 104012 104013 104016 104018 104019 104022 104031 104032 104033 104034 104035 104036 104038 104041 104042 104043 104044 104064 104065 104066 104131 104136 104166 104174 104192 104195 104215 104220 104221 104228 104281 104285 104295".split(" "),
 			g = "01040000 01040003 01040004 01040012 01040013 01040016 01040018 01040019 01040022 01040031 01040032 01040033 01040034 01040035 01040036 01040038 01040041 01040042 01040043 01040044 01040064 01040065 01040066 01040131 01040136 01040166 01040174 01040192 01040195 01040215 01040220 01040221 01040228 01040281 01040285 01040295".split(" "),
-			k = a.response.getElementsByClassName("coursevisible");
+			k = a.response.response.getElementsByClassName("coursevisible");
 		if (0 == k.length) console.log("TE_login: failed to fetch webwork courses."); else {
-			var p = l => {
+			const p = l => {
 				l = l.response.querySelectorAll(".mod_index .lastcol a");
-				var n = "";
+				let n = "";
 				for (let q = 0; q < l.length; q++) f.test(l[q].textContent) && (n = l[q]);
 				return n ? n.getAttribute("href").split("id=")[1] : ""
 			};
 			for (let l = 0; l < k.length; l++) {
-				var h = k[l].getElementsByTagName("h3")[0].textContent.replace(e, "").match(c);
+				let h = k[l].getElementsByTagName("h3")[0].textContent.replace(e, "").match(c);
 				if (h) {
 					h = h.groups;
-					var m = parseInt(h.cnum).toString();
+					let m = parseInt(h.cnum).toString();
 					if (g.includes(m)) {
 						m = k[l].getElementsByClassName("coursestyle2url")[0].getAttribute("href").split("id=")[1];
 						if (b.hasOwnProperty(m)) {
@@ -323,13 +329,13 @@ function TE_getWebwork(a, b) {
 function TE_webworkStep(a, b) {
 	b = void 0 === b ? "" : b;
 	return (async () => {
-		var d = /webwork/i;
+		const d = /webwork/i;
 		return await XHR(a, "document", b).then(c => {
-			var e = c.response.querySelector("form");
+			let e = c.response.querySelector("form");
 			if (!e) return !1;
 			c = e.getAttribute("action");
 			e = new FormData(e);
-			var f = e.get("redirect_uri") || e.get("target_link_uri") || c;
+			const f = e.get("redirect_uri") || e.get("target_link_uri") || c;
 			return d.test(f) ? [c, e] : !1
 		})
 	})();
@@ -338,10 +344,11 @@ function TE_webworkStep(a, b) {
 function TE_webworkScan() {
 	chrome.storage.local.get({webwork_courses: {}, webwork_cal: {}}, function (a) {
 		return (async () => {
-			var b = /(?<day>[0-9]{2}).(?<month>[0-9]{2}).(?<year>[0-9]{4}) @ (?<hour>[0-9]{2}):(?<minute>[0-9]{2})/,
-				d = /^\u05d9\u05d9\u05e4\u05ea\u05d7|^\u05e1\u05d2\u05d5\u05e8/, c = {}, e = !1;
+			const b = /(?<day>[0-9]{2}).(?<month>[0-9]{2}).(?<year>[0-9]{4}) @ (?<hour>[0-9]{2}):(?<minute>[0-9]{2})/,
+				d = /^\u05d9\u05d9\u05e4\u05ea\u05d7|^\u05e1\u05d2\u05d5\u05e8/, c = {};
+			let e = !1;
 			for (let g of Object.values(a.webwork_courses)) {
-				var f = await TE_webworkStep(`https://moodle24.technion.ac.il/mod/lti/launch.php?id=${g.lti}`);
+				let f = await TE_webworkStep(`https://moodle24.technion.ac.il/mod/lti/launch.php?id=${g.lti}`);
 				if (!f) continue;
 				f = await TE_webworkStep(f[0],
 					(new URLSearchParams(f[1])).toString());
@@ -353,7 +360,7 @@ function TE_webworkScan() {
 					let h = {};
 					p = p.response.querySelectorAll(".problem_set_table tr");
 					for (let l = 1; l < p.length; l++) {
-						var m = p[l].getElementsByTagName("td");
+						let m = p[l].getElementsByTagName("td");
 						if (d.test(m[1].textContent)) continue;
 						let n = b.exec(m[1].textContent).groups;
 						m = m[0].textContent;
@@ -380,7 +387,7 @@ function TE_webworkScan() {
 
 function TE_userCalendar() {
 	chrome.storage.local.get({user_agenda: {}}, a => {
-		var b = [], d = Date.now();
+		const b = [], d = Date.now();
 		Object.keys(a.user_agenda).forEach(c => {
 			let e = a.user_agenda[c].timestamp;
 			0 < e && 1728E5 < d - e && b.push(c)
@@ -399,7 +406,7 @@ function TE_doDownloads(a) {
 		chrome.storage.local.set({dl_queue: b.dl_queue}, () => {
 			if (chrome.runtime.lastError) {
 				console.log("TE_bg_download_fail: " + chrome.runtime.lastError.message);
-				var c = 1E6 < JSON.stringify(b.dl_queue).length ? "\u05d9\u05d9\u05ea\u05db\u05df \u05e9\u05d4\u05ea\u05d5\u05e1\u05e3 \u05de\u05e0\u05e1\u05d4 \u05dc\u05d4\u05d5\u05e8\u05d9\u05d3 \u05d9\u05d5\u05ea\u05e8 \u05de\u05d9\u05d3\u05d9 \u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05d5 \u05d6\u05de\u05e0\u05d9\u05ea." :
+				const c = 1E6 < JSON.stringify(b.dl_queue).length ? "\u05d9\u05d9\u05ea\u05db\u05df \u05e9\u05d4\u05ea\u05d5\u05e1\u05e3 \u05de\u05e0\u05e1\u05d4 \u05dc\u05d4\u05d5\u05e8\u05d9\u05d3 \u05d9\u05d5\u05ea\u05e8 \u05de\u05d9\u05d3\u05d9 \u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05d5 \u05d6\u05de\u05e0\u05d9\u05ea." :
 					"";
 				TE_notification(`\u05e9\u05dc\u05d9\u05d7\u05ea \u05d4\u05e7\u05d1\u05e6\u05d9\u05dd \u05dc\u05d4\u05d5\u05e8\u05d3\u05d4 \u05e0\u05db\u05e9\u05dc\u05d4. ${c}\n`, !0, "downloads")
 			} else TE_notification(a.chunk.list.length + ` \u05e4\u05e8\u05d9\u05d8\u05d9\u05dd \u05e0\u05e9\u05dc\u05d7\u05d5 \u05dc\u05d4\u05d5\u05e8\u05d3\u05d4. ${1 < b.dl_queue.length ? "\u05d4\u05ea\u05d5\u05e1\u05e3 \u05d9\u05d5\u05e8\u05d9\u05d3 \u05d0\u05d5\u05ea\u05dd \u05de\u05d9\u05d3 \u05dc\u05d0\u05d7\u05e8 \u05d4\u05e7\u05d1\u05e6\u05d9\u05dd \u05e9\u05db\u05d1\u05e8 \u05e0\u05de\u05e6\u05d0\u05d9\u05dd \u05d1\u05d4\u05d5\u05e8\u05d3\u05d4." :
@@ -409,10 +416,10 @@ function TE_doDownloads(a) {
 }
 
 function TE_nextDownload() {
-	var a = ["https://moodle24.technion.ac.il/blocks/material_download/download_materialien.php?courseid=", "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/", "https://grades.cs.technion.ac.il/grades.cgi?", "https://webcourse.cs.technion.ac.il/"];
+	const a = ["https://moodle24.technion.ac.il/blocks/material_download/download_materialien.php?courseid=", "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/", "https://grades.cs.technion.ac.il/grades.cgi?", "https://webcourse.cs.technion.ac.il/"];
 	chrome.storage.local.get({dl_current: 0, dl_queue: []}, b => {
 		if (0 == b.dl_current && 0 != b.dl_queue.length) {
-			var c = b.dl_queue[0], d = c.list.shift(), e = a[c.sys] + c.sub_pre + d.u;
+			const c = b.dl_queue[0], d = c.list.shift(), e = a[c.sys] + c.sub_pre + d.u;
 			b.dl_queue[0] = c;
 			chrome.downloads.download({
 				url: e, filename: d.n,
@@ -445,7 +452,7 @@ chrome.downloads.onChanged.addListener(a => {
 });
 
 function TE_updateVideosInfo(a, b = null) {
-	var c = new Headers;
+	const c = new Headers;
 	c.append("Authorization", "Basic Y291bHBsZWRseXNlcXVhbGxvbmVyd2FyOjZhODk1NTljMmQyYzFlNDViZTQyYzk3MDQ3N2E3MDRhMDkwNjg0ODg=");
 	c.append("Content-Type", "application/json");
 	fetch("https://12041543-fd22-49b6-bf91-5fa9cf6046b2-bluemix.cloudant.com/tpvideos/v_Data%3Abff4cb5a16c3d92e443287a965d1f385", {
@@ -453,7 +460,7 @@ function TE_updateVideosInfo(a, b = null) {
 		headers: c
 	}).then(d => d.json()).then(d => {
 		if (!d.data || !d._id) throw "video-update bad request.";
-		var e = [], f = {};
+		const e = [], f = {};
 		for (const g in d.data) d.data[g].a ?
 			e.push([g, d.data[g].n, d.data[g].a]) : e.push([g, d.data[g].n]), f[g] = d.data[g].v;
 		console.log(`TE_back: found ${e.length} courses for videos-db (${a})`);
@@ -487,16 +494,19 @@ export function TE_updateInfo() {
 		webwork_courses: {}
 	}, a => {
 		if (chrome.runtime.lastError) console.log("TE_bg_Alarm: " + chrome.runtime.lastError.message); else {
-			var b = Date.now();
+			const b = Date.now();
 			a.videos_update < b - 2592E5 && TE_updateVideosInfo(b);
-			var c = (a.enable_external || a.enable_login) && a.quick_login, d = c && a.moodle_cal,
+			const c = (a.enable_external || a.enable_login) && a.quick_login,
+				d = c && a.moodle_cal,
 				e = c && a.wwcal_switch && 288E5 < b - a.wwcal_update;
-			e || d && "" == a.calendar_prop ? TE_forcedAutoLogin().then(f => {
-				d && "" == a.calendar_prop && (TE_getCoursesMoodle(f), TE_checkCalendarProp(a.calendar_prop));
-				e && TE_getWebwork(f, a.webwork_courses)
-			}).catch(() => {
-			}) : d && "" != a.calendar_prop && (TE_loginToMoodle().then(TE_getCoursesMoodle).catch(() => {
-			}), TE_alertMoodleCalendar(a.cal_seen, a.calendar_prop, a.calendar_max, a.cal_killa));
+			e || d && "" == a.calendar_prop ?
+				TE_forcedAutoLogin().then(f => {
+					d && "" == a.calendar_prop && (TE_getCoursesMoodle(f), TE_checkCalendarProp(a.calendar_prop));
+					e && TE_getWebwork(f, a.webwork_courses);
+				}).catch(() => console.log("TE_back: forced_login_error")) :
+				d && "" != a.calendar_prop && (TE_loginToMoodle().then(TE_getCoursesMoodle)
+					.catch(() => console.log("TE_back: login_error")),
+					TE_alertMoodleCalendar(a.cal_seen, a.calendar_prop, a.calendar_max, a.cal_killa));
 			a.cs_cal && 288E5 < b - a.cscal_update &&
 			TE_csCalendarCheck(a.uidn_arr, a.wcpass, a.cs_cal_seen);
 			TE_userCalendar()
@@ -526,16 +536,18 @@ export function TE_shutBusesAlerts() {
 }
 
 function TE_busAlertError() {
-	TE_notification("\u05d4\u05ea\u05e8\u05d7\u05e9\u05d4 \u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05e0\u05d9\u05e1\u05d9\u05d5\u05df \u05d9\u05e6\u05d9\u05e8\u05ea \u05d4\u05ea\u05e8\u05d0\u05d4 \u05dc\u05d0\u05d5\u05d8\u05d5\u05d1\u05d5\u05e1, \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05e0\u05d9\u05ea.\n\u05e9\u05d9\u05dd \u05dc\u05d1: \u05d4\u05d4\u05ea\u05e8\u05d0\u05d5\u05ea \u05d4\u05e7\u05d9\u05d9\u05de\u05d5\u05ea, \u05d1\u05de\u05d9\u05d3\u05d4 \u05d5\u05d4\u05d9\u05d5, \u05e0\u05de\u05d7\u05e7\u05d5.", !1);
+	TE_notification("התרחשה שגיאה בניסיון יצירת התראה לאוטובוס, אנא נסה שנית.\n" +
+		"שים לב: ההתראות הקיימות, במידה והיו, נמחקו.", !1);
 	TE_reBadge(!0);
 	TE_shutBusesAlerts()
 }
 
 function TE_busAlertNow(a) {
-	for (var b = "", c = 0; c < a.length; c++) b += "\u05e7\u05d5 " + a[c].Shilut + " \u05d9\u05d2\u05d9\u05e2 \u05dc\u05ea\u05d7\u05e0\u05d4 \u05d1\u05e2\u05d5\u05d3 " + a[c].MinutesToArrival + " \u05d3\u05e7\u05d5\u05ea.\n";
+	let b = "";
+	for (let c = 0; c < a.length; c++) b += "קו " + a[c].Shilut + " יגיע לתחנה בעוד " + a[c].MinutesToArrival + " דקות.\n";
 	TE_notification(b, !1);
 	chrome.storage.local.get({buses_alerts: []}, d => {
-		for (var e = 0; e < a.length; e++) -1 !== d.buses_alerts.indexOf(a[e].Shilut) && d.buses_alerts.splice(d.buses_alerts.indexOf(a[e].Shilut), 1);
+		for (let e = 0; e < a.length; e++) -1 !== d.buses_alerts.indexOf(a[e].Shilut) && d.buses_alerts.splice(d.buses_alerts.indexOf(a[e].Shilut), 1);
 		0 === d.buses_alerts.length && TE_shutBusesAlerts()
 	})
 }
@@ -547,7 +559,7 @@ function TE_checkBuses() {
 			XHR("https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/" + a.bus_station + "/he/false", "json")
 				.then(function (b) {
 					b = b.response;
-					var c = [];
+					const c = [];
 					for (let d = 0; d < b.length; d++) -1 !== a.buses_alerts.indexOf(b[d].Shilut) && b[d].MinutesToArrival <= a.bus_time && c.push(b[d]);
 					0 < c.length && TE_busAlertNow(c);
 					0 == b.length && TE_busAlertError()
@@ -559,7 +571,7 @@ function TE_checkBuses() {
 
 function TE_sendMessageToTabs(a) {
 	chrome.tabs.query({}, b => {
-		for (var c = 0; c < b.length; ++c) chrome.tabs.sendMessage(b[c].id, a, {}, () => {
+		for (let c = 0; c < b.length; ++c) chrome.tabs.sendMessage(b[c].id, a, {}, () => {
 			chrome.runtime.lastError && console.log("TE_popup_remoodle: " + chrome.runtime.lastError.message)
 		})
 	})
@@ -568,7 +580,7 @@ function TE_sendMessageToTabs(a) {
 function TE_startExtension() {
 	chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
 	TE_setStorage({buses_alerts: []});
-	chrome.storage.local.get({dl_current: 0, dl_queue: []}, a => {
+	chrome.storage.local.get({dl_current: 0, dl_queue: []}, _ => {
 		chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
 		TE_setStorage({dl_queue: [], dl_current: 0})
 	})

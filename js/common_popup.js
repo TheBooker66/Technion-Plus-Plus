@@ -23,8 +23,8 @@ export class CommonPopup {
 
 	popupWrap() {
 		this.useTemplatesFile("common", a => {
-			for (var b = 0; b < this.css_list.length; b++) {
-				var c = this.loadTemplate("head-stylesheets", a);
+			for (let b = 0; b < this.css_list.length; b++) {
+				const c = this.loadTemplate("head-stylesheets", a);
 				c.querySelector("link").setAttribute("href", "../css/p_" + this.css_list[b] + ".css");
 				document.head.appendChild(c)
 			}
@@ -50,7 +50,7 @@ export class CommonPopup {
 	XHR(a, b, c) {
 		c = void 0 === c ? "" : c;
 		return new Promise((e, g) => {
-			var f = {
+			const f = {
 				headers: {
 					accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 					"accept-language": "en-US,en;q=0.9",

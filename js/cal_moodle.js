@@ -6,9 +6,10 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 
 
 (function () {
+
 	function C(c, d) {
 		return () => new Promise((e, b) => {
-			var a = function (k) {
+			const a = function (k) {
 					k = k.response.querySelectorAll(".event[data-event-id='" + c + "'] a");
 					k.length ? (chrome.tabs.create({url: k[k.length - 1].getAttribute("href")}), e()) : b(console.log("TE_cal_moodle: bad content"))
 				},
@@ -30,12 +31,12 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 				msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
 				is_error: !0
 			}); else if ("" === d.calendar_prop) {
-				var e = () => c({
+				c({
 					msg: "אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.",
 					is_error: !0
 				});
 				l.XHR("https://moodle24.technion.ac.il/calendar/export.php", "document").then(function (b) {
-					var a = b.response.getElementsByName("sesskey")[0].value;
+					const a = b.response.getElementsByName("sesskey")[0].value;
 					l.XHR(b.responseURL, "document", "sesskey=" + a + "&_qf__core_calendar_export_form=1&events[exportevents]=all&period[timeperiod]=recentupcoming&generateurl=\u05d4\u05e9\u05d2+\u05d0\u05ea+\u05db\u05ea\u05d5\u05d1\u05ea+\u05d4-URL+\u05e9\u05dc+\u05dc\u05d5\u05d7+\u05d4\u05e9\u05e0\u05d4").then(function (m) {
 						m = "userid=" + m.response.getElementById("calendarexporturl").value.split("userid=")[1].split("&preset_what=all")[0];
 						chrome.storage.local.set({calendar_prop: m}, function () {
@@ -57,7 +58,8 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 		})
 	}
 
-	var l = new CommonPopup, r;
+	const l = new CommonPopup
+	let r;
 	l.title = "מטלות קרובות - מודל";
 	l.css_list = ["calendar"];
 	if (document.title === "ארגונית++") {
@@ -100,7 +102,9 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 						new_list: [],
 						finished_list: []
 					}); else {
-						var m = new Date, k = 0, t = 0, z = {}, E = {
+						const m = new Date;
+						let k = 0, t = 0;
+						const z = {}, E = {
 							"200": "חורף",
 							"100": "אביב",
 							"300": "קיץ"
@@ -109,17 +113,17 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 							let n = parseInt(a[f].split("UID:")[1].split("@moodle")[0]);
 							t = n > t ? n : t;
 							if (a[f].includes("CATEGORIES")) {
-								var p = a[f].split("SUMMARY:")[1].split("\n")[0].trim();
+								let p = a[f].split("SUMMARY:")[1].split("\n")[0].trim();
 								if (!("Attendance" === p || b.cal_killa && (p.includes("ערעור") || p.includes("זום")
 									|| p.includes("Zoom") || p.includes("zoom") || p.includes("הרצא") || p.includes("תרגול")))) {
-									var g =
+									let g =
 										p.split(" ");
 									if ("opens" !== g[g.length - 1] && "opens)" !== g[g.length - 1]) {
 										g = a[f].split("DESCRIPTION:")[1].split("CLASS:")[0].replace(/\\n/g, "");
-										g = 95 < g.length ? g.substr(0, 90) + "..." : g;
-										var h = a[f].split("DTSTART")[1].split("\n")[0].replace(";VALUE=DATE:", "").replace(":", ""),
+										g = 95 < g.length ? g.slice(0, 90) + "..." : g;
+										let h = a[f].split("DTSTART")[1].split("\n")[0].replace(";VALUE=DATE:", "").replace(":", ""),
 											w = h.includes("T") ? h.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3") : "21:55:00Z";
-										h = h.substr(0, 8).replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + w.trim();
+										h = h.substring(0, 8).replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + w.trim();
 										h = new Date(h);
 										if (!(h.getTime() < m.getTime() - 864E5)) {
 											w =
@@ -129,7 +133,7 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../bg_main.js"
 													month: "2-digit",
 													year: "numeric"
 												});
-											var q = a[f].split("CATEGORIES:")[1].split("\n")[0].trim().split("."),
+											let q = a[f].split("CATEGORIES:")[1].split("\n")[0].trim().split("."),
 												u = q[0].replace(/[^0-9]/i, "").trim(),
 												v = q[1].replace(/[^0-9]/i, "").trim();
 											v = v ? ` - ${E[v]}` : "";

@@ -2,10 +2,10 @@
 (function () {
 	function v(a, c, d) {
 		if (!(0 < c.getElementsByClassName("maor_download").length)) {
-			var b = document.createElement("a");
+			let b = document.createElement("a");
 			b.setAttribute("class", "maor_download");
 			b.textContent = "הורדה";
-			var g = "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/" + a + ".mp4";
+			const g = "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/" + a + ".mp4";
 			b.addEventListener("click", function () {
 				chrome.runtime.sendMessage({mess_t: "singledownload", link: g, name: d})
 			});
@@ -17,7 +17,7 @@
 				b.setAttribute("class", "maor_download");
 				a = document.createElement("div");
 				a.textContent = "בחר";
-				var e = document.createElement("input");
+				const e = document.createElement("input");
 				e.setAttribute("type", "checkbox");
 				e.className = "maor_check";
 				a.appendChild(e);
@@ -28,14 +28,14 @@
 	}
 
 	async function w() {
-		var a = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0],
+		const a = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0],
 			c = document.getElementById("contentHeaderText").textContent.replace(/[0-9]{4,}[swi]: /, "")
 				.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "") + "/";
 		const response =
 			await fetch("https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=" + a + "&type=mp4");
 		if (4 === response.readyState)
 			if (200 === response.status) {
-				var b = response.response.getElementsByTagName("item"), g = {sys: 1, sub_pre: "", list: []};
+				const b = response.response.getElementsByTagName("item"), g = {sys: 1, sub_pre: "", list: []};
 				for (let e = 0; e < b.length; e++) {
 					let h = {};
 					h.u = b[e].getElementsByTagName("guid")[0].textContent.split("/Syndication/")[1];
@@ -51,7 +51,7 @@
 		a.setAttribute("class", "hidden-command-button");
 		c.setAttribute("class", "hidden-command-button");
 		if (!1 !== window.location.href.includes("folderID")) {
-			var d = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0];
+			const d = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0];
 			fetch(`https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=${d}&type=mp4`)
 				.then(b => b.text())
 				.then(b => (new DOMParser).parseFromString(b, "text/xml"))
@@ -62,17 +62,17 @@
 						a.setAttribute("style", "margin-right: 8px");
 						c.setAttribute("class", "maor_panopto_action css-fehuet");
 						c.setAttribute("style", "margin-right: 8px");
-						var g = setInterval(() => {
+						const g = setInterval(() => {
 							if ("none" == document.getElementById("loadingMessage").style.display && 0 < document.getElementsByClassName("thumbnail-link").length && "none" != document.getElementsByClassName("thumbnail-link")[0].style.display) {
 								clearInterval(g);
-								var e = document.getElementById("listViewContainer").getElementsByTagName("tr");
+								const e = document.getElementById("listViewContainer").getElementsByTagName("tr");
 								for (let f = 0; f < e.length - 1; f++) {
-									var h = e[f].getAttribute("id"), p = e[f].getElementsByClassName("item-title")[0],
+									const h = e[f].getAttribute("id"), p = e[f].getElementsByClassName("item-title")[0],
 										l = p.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
 									v(h, p, l)
 								}
 							}
-						}, 2E3)
+						}, 2E3);
 					}
 				}).catch(err => console.log(err))
 		}
@@ -87,7 +87,7 @@
 	}
 
 	function q(a) {
-		var c = {};
+		const c = {};
 		switch (a) {
 			case "showhide":
 				c.panopto_hide = "true" == document.getElementById("toggleThumbnailsButton").getAttribute("aria-expanded") ? !1 : !0;
@@ -119,29 +119,29 @@
 					c.panopto_save;
 				c.panopto_light && u(a);
 				document.getElementById("m_darkmode").checked = c.panopto_light;
-				var d = setInterval(() => {
+				const d = setInterval(() => {
 					if (document.getElementById("Faster")) {
 						clearInterval(d);
 						c.panopto_hide && "none" != document.getElementById("toggleThumbnailsButton").style.display
 						&& document.getElementById("toggleThumbnailsButton").click();
 						document.getElementById(c.panopto_speed).click();
-						var b = document.getElementsByClassName("play-speed");
+						const b = document.getElementsByClassName("play-speed");
 						for (let g of b) g.addEventListener("click", () => {
 							q("speed");
-							var e = document.querySelector(".maor_selected");
+							const e = document.querySelector(".maor_selected");
 							e && e.classList.remove("maor_selected")
 						});
 						document.getElementById("toggleThumbnailsButton").addEventListener("click", () => {
 							q("showhide")
 						})
 					}
-				}, 2E3)
+				}, 2E3);
 			}
 		})
 	}
 
 	function y() {
-		var a = document.querySelectorAll("#listViewContainer tr.list-view-row"),
+		const a = document.querySelectorAll("#listViewContainer tr.list-view-row"),
 			c = document.getElementById("contentHeaderText").textContent.replace(/[0-9]{4,}[swi]: /, "").replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "") + "/",
 			d = {sys: 1, sub_pre: "", list: []};
 		for (let b = 0; b < a.length; b++) {
@@ -157,7 +157,7 @@
 
 	function z() {
 		(new MutationObserver(function (a, c) {
-			for (var d of a) for (a = 0; a < d.addedNodes.length; a++) {
+			for (let d of a) for (a = 0; a < d.addedNodes.length; a++) {
 				let b = d.addedNodes[a];
 				if ("function" === typeof b.querySelector && !document.getElementById("new_win") && b.classList.contains("player") && 2 == document.getElementsByClassName("video-js").length) {
 					d = document.createElement("script");
@@ -171,7 +171,7 @@
 	}
 
 	function A() {
-		var a = document.getElementById("m_snapshot"), c = document.getElementById("m_vid_list"),
+		const a = document.getElementById("m_snapshot"), c = document.getElementById("m_vid_list"),
 			d = c.getElementsByTagName("canvas"), b = document.getElementsByClassName("video-js"), g = function (f) {
 				d[f].width = 28 / b[f].videoHeight * b[f].videoWidth;
 				d[f].height = 28;
@@ -182,7 +182,7 @@
 			c.className = "maor_hidden";
 			document.getElementById("maor_menu").classList.remove("start", "overlaid")
 		});
-		var e = document.createElement("canvas"), h = [document.createElement("a"), document.createElement("a")],
+		const e = document.createElement("canvas"), h = [document.createElement("a"), document.createElement("a")],
 			p = new MouseEvent("click", {bubbles: !0, cancelable: !0, view: window}), l = f => {
 				e.width = b[f].videoWidth;
 				e.height = b[f].videoHeight;
@@ -201,7 +201,7 @@
 	}
 
 	function B() {
-		var a = window.location.href.split("?")[1].split("id=")[1].split("&")[0],
+		const a = window.location.href.split("?")[1].split("id=")[1].split("&")[0],
 			c = document.title.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, ""),
 			d = document.getElementById("m_cant_download"),
 			b = {
@@ -227,7 +227,7 @@
 	}
 
 	function C() {
-		var a = (new DOMParser).parseFromString(
+		const a = (new DOMParser).parseFromString(
 			'\n\t<div id="maor_menu_container">' +
 			'\n\t\t<div id="maor_menu" class="start">\n\t\t\t<div id="maor_content">\n\t\t\t\t<div id="maor_overlay">' +
 			'</div>\n\t\t\t\t<div id="m_cant_download"><a><i>הורדת ההקלטה נחסמה על ידי צוות הקורס</i></a></div>\n' +
@@ -317,11 +317,11 @@
 
 	if (!0 === window.location.href.includes("List.aspx")) {
 		if (!0 !== window.location.href.includes("query=")) {
-			var k = document.querySelector("#actionHeader > div"), m = document.createElement("a");
+			let k = document.querySelector("#actionHeader > div"), m = document.createElement("a");
 			m.addEventListener("click", w);
 			m.textContent = "הורד את כל הקורס";
 			k.insertBefore(m, k.childNodes[0]);
-			var n = document.createElement("a");
+			const n = document.createElement("a");
 			n.addEventListener("click", y);
 			n.textContent = "הורד פריטים שנבחרו";
 			k.insertBefore(n, k.childNodes[1]);
@@ -333,7 +333,7 @@
 	} else {
 		C();
 		B();
-		var r = document.head.appendChild(document.createElement("style")).sheet;
+		const r = document.head.appendChild(document.createElement("style")).sheet;
 		r.insertRule(".player {background-color: #000 !important;}", 0);
 		document.getElementById("m_darkmode").addEventListener("change", function () {
 			u(r);
@@ -344,9 +344,10 @@
 		(document.getElementById("m_float").classList.remove("maor_hidden"), document.getElementById("m_float").addEventListener("click", () => {
 			document.pictureInPictureElement || document.querySelector(".video-js").requestPictureInPicture()
 		}));
-		k = document.querySelectorAll("#m_speed span");
+		let k = document.querySelectorAll("#m_speed span");
 		for (let a of k) a.addEventListener("click", () => {
-			for (var c of document.querySelectorAll(".video-js")) c.playbackRate = a.textContent;
+			let c;
+			for (c of document.querySelectorAll(".video-js")) c.playbackRate = a.textContent;
 			(c = document.querySelector(".maor_selected")) && c.classList.remove("maor_selected");
 			a.classList.add("maor_selected")
 		});

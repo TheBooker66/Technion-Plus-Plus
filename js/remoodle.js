@@ -5,18 +5,18 @@
 	}
 
 	if (!window.location.href.includes("pluginfile.php")) {
-		var e = [];
+		let e = [];
 		chrome.storage.local.get({
 			remoodle: !1,
 			remoodle_angle: 120
 		}, a => {
 			if (chrome.runtime.lastError) console.log("TE_remoodle_err: " + chrome.runtime.lastError.message); else {
-				var b = a.remoodle;
+				let b = a.remoodle;
 				e = f(a.remoodle_angle);
 				e.forEach(c => document.documentElement.style.setProperty(c[0], c[1]));
-				var d = function (c) {
+				const d = function (c) {
 					c ? document.querySelector("html").setAttribute("tplus", "dm") : document.querySelector("html").removeAttribute("tplus");
-					var g = document.getElementById("tp-darkmode");
+					const g = document.getElementById("tp-darkmode");
 					g && (g.checked = c)
 				};
 				d(b);
@@ -30,7 +30,7 @@
 				a = a.angle;
 				e = f(a);
 				e.forEach(d => document.documentElement.style.setProperty(d[0], d[1]));
-				var b = document.querySelector("#tp_colorswitcher input[type=range]");
+				const b = document.querySelector("#tp_colorswitcher input[type=range]");
 				b && (b.value = a)
 			}
 		})

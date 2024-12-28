@@ -1,5 +1,7 @@
 'use strict';
 (function () {
+	let l, n, e, h;
+
 	function f(a, b, c = {}, g = "", d = null, k = !1) {
 		a = document.createElement(a);
 		a.textContent = g;
@@ -14,11 +16,11 @@
 	}
 
 	function u(a) {
-		var b = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/,
+		const b = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/,
 			c = / - (?:חורף|אביב|קיץ)/,
 			g = {};
 		for (let k = 0; k < a.length; k++) {
-			var d = a[k].getElementsByTagName("h3")[0].textContent.replace(c, "").match(b);
+			let d = a[k].getElementsByTagName("h3")[0].textContent.replace(c, "").match(b);
 			d && (d = d.groups, g[d.cnum.trim()] = d.cname.trim())
 		}
 		0 < Object.keys(g).length && chrome.storage.local.set({u_courses: g}, () => {
@@ -27,19 +29,19 @@
 	}
 
 	function t(a) {
-		var b = f("section", "block block_material_download card mb-3 tplus_block", {}, "", document.getElementById("block-region-side-pre"), !0),
+		let b = f("section", "block block_material_download card mb-3 tplus_block", {}, "", document.getElementById("block-region-side-pre"), !0),
 			c = f("div", "card-body", {}, "", b),
 			g = f("h5", "card-title d-inline", {dir: "ltr"}, "Technion", c);
 		f("sup", "", {}, "++", g);
 		a = a ? f("div", "card-text mt-3", {style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(128,128,128,.3);"}, "", c) : null;
 		c = f("div", "card-text mt-3 tplus_main_actions", {}, "", c);
 		g = f("div", "custom-control custom-switch", {style: "text-align: right"}, "", c);
-		var d = f("input", "custom-control-input", {id: "tp-darkmode", type: "checkbox"}, "", g);
+		const d = f("input", "custom-control-input", {id: "tp-darkmode", type: "checkbox"}, "", g);
 		f("label", "custom-control-label",
 			{"for": "tp-darkmode"}, "מצב לילה", g);
 		c = f("div", "", {id: "tp_colorswitcher"}, "", c);
 		f("div", "", {style: "text-align: right; width: 8rem"}, "צבע משני", c);
-		var k = f("input", "", {type: "range", min: "0", max: "330", step: "30"}, "", c);
+		const k = f("input", "", {type: "range", min: "0", max: "330", step: "30"}, "", c);
 		f("div", "tp_float_button", {style: "background-image: url(" + chrome.runtime.getURL("../icons/technion_plus_plus/icon-16.png") + ");"}, "", b);
 		chrome.storage.local.get({remoodle: !1, remoodle_angle: 120}, m => {
 			d.checked = m.remoodle;
@@ -51,7 +53,7 @@
 			})
 		});
 		k.addEventListener("change", () => {
-			var m = parseInt(k.value);
+			const m = parseInt(k.value);
 			chrome.storage.local.set({remoodle_angle: m});
 			chrome.runtime.sendMessage({mess_t: "TE_remoodle_reangle", angle: m})
 		});
@@ -63,11 +65,11 @@
 
 	if (".ac.il/" === window.location.href.split("technion")[1]) {
 		if (!document.querySelector(".usermenu > .login")) {
-			var h = document.getElementsByClassName("coursevisible");
+			h = document.getElementsByClassName("coursevisible");
 			u(h);
-			var e = [[], [], []];
-			if (0 < h.length) for (var n = 0; n < h.length; n++) {
-				var l = document.createElement("div");
+			e = [[], [], []];
+			if (0 < h.length) for (n = 0; n < h.length; n++) {
+				l = document.createElement("div");
 				l.style.cssFloat = "left";
 				document.getElementsByClassName("tilecontainer")[n].appendChild(l);
 				let a = h[n].getElementsByTagName("h3")[0].textContent,
@@ -92,7 +94,8 @@
 		}
 	} else {
 		h = window.location.href.split("?id=")[1];
-		var p = (e = document.title.match(/(?<cname>.+)\s-\s(?<cnum>[0-9]+)/)) ? e.groups.cnum.trim() : "", q =
+		let p = (e = document.title.match(/(?<cname>.+)\s-\s(?<cnum>[0-9]+)/)) ? e.groups.cnum.trim() : "";
+		const q =
 			t(!0);
 		r(q, h, 0, "הורדת כל הקבצים בקורס");
 		"" != p && (p = p.replace(/^0+/, ""), f("a", "maor_download", {
@@ -102,10 +105,9 @@
 			videos_data: {},
 			videos_courses: []
 		}, a => {
-			var b = "";
-			for (var c = 0; c < a.videos_courses.length; c++) if (a.videos_courses[c].join(" ").includes(p)) {
-				b =
-					a.videos_courses[c][0];
+			let c = 0, b = "";
+			for (; c < a.videos_courses.length; c++) if (a.videos_courses[c].join(" ").includes(p)) {
+				b = a.videos_courses[c][0];
 				break
 			}
 			if ("" != b && a.videos_data[b]) for (a = a.videos_data[b], 0 < a.length && f("div", "", {style: "text-align: right; margin: 8px 0 0;"}, "\u05d4\u05e7\u05dc\u05d8\u05d5\u05ea \u05d5\u05d9\u05d3\u05d0\u05d5", q), b = 0; b < a.length; b++) {

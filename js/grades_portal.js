@@ -1,9 +1,9 @@
 'use strict';
 (function () {
-	var a = document.location.pathname.toLowerCase();
+	let a = document.location.pathname.toLowerCase();
 	if ("/index.aspx" == a || "/indexeng.aspx" == a) {
 		a = "/index.aspx" == a ? 0 : 1;
-		var b = {
+		let b = {
 			grad_dir: ["left", "right"],
 			padding: ["1em 0 1em 3em", "1em 3em 1em 0"],
 			title: ["לחץ להתחלת תהליך השיתוף", "Click to start sharing process"],
@@ -21,7 +21,7 @@
     </div>`, "text/html").body.firstChild;
 		b = document.getElementById("contents");
 		b.insertBefore(a, b.firstChild).querySelector("#cf_loader").addEventListener("click", () => {
-			var c = document.createElement("script");
+			const c = document.createElement("script");
 			c.setAttribute("charset", "utf-8");
 			c.src = chrome.runtime.getURL("cheesefork/share-histograms.js");
 			c.onload = function () {

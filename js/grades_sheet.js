@@ -1,5 +1,7 @@
 'use strict';
 (function () {
+	let l, m, t, h = {};
+
 	function O(a, b, f = {}, d = "", c = null, g = !1) {
 		a = document.createElement(a);
 		a.textContent = d;
@@ -10,7 +12,7 @@
 	}
 
 	function H(a = "#inlist") {
-		var b = 0, f = 0, d = 0, c = 0;
+		let b = 0, f = 0, d = 0, c = 0;
 		let g = document.querySelectorAll(`${a} .grade`);
 		a = document.querySelectorAll(`${a} .points`);
 		for (let k = 0; k < g.length; k++) {
@@ -29,15 +31,16 @@
 	}
 
 	function P() {
-		var a = document.querySelectorAll(":not(#ptors) > .maor_table_row:not(.failed) .points"),
-			b = document.querySelectorAll(":not(#ptors) > .maor_table_row .points"), f = 0, d = 0;
+		const a = document.querySelectorAll(":not(#ptors) > .maor_table_row:not(.failed) .points"),
+			b = document.querySelectorAll(":not(#ptors) > .maor_table_row .points");
+		let f = 0, d = 0;
 		a.forEach(c => f += parseFloat(c.value));
 		b.forEach(c => d += parseFloat(c.value));
 		return d ? parseFloat(100 * f / d).toFixed(2) : 0
 	}
 
 	function I() {
-		var a = H(".selected"), b = document.querySelectorAll("#selected_tbl .maor_table_row div");
+		const a = H(".selected"), b = document.querySelectorAll("#selected_tbl .maor_table_row div");
 		b[1].textContent = 1 != a.count ? `${a.count} קורסים` : "קורס 1";
 		b[3].textContent = a.avg;
 		b[5].textContent = a.points;
@@ -45,7 +48,7 @@
 	}
 
 	function y() {
-		var a = H();
+		const a = H();
 		document.getElementById("avg_grade").textContent = a.avg;
 		document.getElementById("curr_points").textContent = a.points_passed + h.ex_points;
 		document.getElementById("curr_success").textContent = P();
@@ -53,7 +56,7 @@
 	}
 
 	function Q(a, b, f, d) {
-		var c = "inlist" == f ? "outlist" : "inlist";
+		let c = "inlist" == f ? "outlist" : "inlist";
 		b.className.includes("temporary") ||
 		(c = z(a, c), "outlist" == f && a.perma && (a.perma = !1, c.classList.remove("ignored"), chrome.storage.local.get({calc_ignore: []}, g => {
 			chrome.storage.local.set({calc_ignore: g.calc_ignore.filter(k => k != a.num)})
@@ -66,10 +69,10 @@
 	}
 
 	function z(a, b, f = null) {
-		var d = !1;
+		let d = !1;
 		f || (f = document.querySelector(`#${b} template`).content, d = !0);
 		f = f.cloneNode(!0);
-		var c =
+		const c =
 			f.querySelector(".maor_table_row");
 		(55 > parseInt(a.grade) || "incomplete" == b) && c.classList.add("failed");
 		"עבר" == a.grade && c.classList.add("over_binary");
@@ -80,14 +83,14 @@
 		d[1].textContent = a.name;
 		d[2].querySelector(".points").value = a.points;
 		if ("incomplete" != b) {
-			var g = d[3].querySelectorAll("div > *");
+			const g = d[3].querySelectorAll("div > *");
 			g[0].value = a.grade;
 			d[4].textContent = a.sem;
 			"inlist" == b && g[1].addEventListener("click", () => {
+				let e;
 				a:{
-					var e =
-						g[0];
-					var n = g[1];
+					e = g[0];
+					const n = g[1];
 					if (e.disabled)
 						e.disabled = !1, n.textContent = "אישור", e.focus();
 					else if (0 <= e.value && 100 >= e.value && !isNaN(parseInt(e.value))) {
@@ -116,7 +119,7 @@
 			for (let e = 0; e < d.length; e++) d[e].addEventListener("click", () => Q(a, c, b, e))
 		} else d[3].textContent = a.sem;
 		if ("inlist" == b) {
-			var k = c.querySelector("input[type='checkbox']");
+			const k = c.querySelector("input[type='checkbox']");
 			a.selected && (c.classList.add("selected"), k.checked = !0);
 			k.addEventListener("change", () => {
 				k.checked ? c.classList.add("selected") : c.classList.remove("selected");
@@ -128,7 +131,7 @@
 	}
 
 	function D(a, b) {
-		var f = document.querySelector(`#${a} template`).content;
+		const f = document.querySelector(`#${a} template`).content;
 		for (let d of b.reverse()) z(d, a, f)
 	}
 
@@ -147,7 +150,7 @@
 	}
 
 	function S(a) {
-		var b = document.querySelector("#ptors template").content;
+		const b = document.querySelector("#ptors template").content;
 		for (let f of a.reverse()) {
 			a = b.cloneNode(!0);
 			let d =
@@ -165,31 +168,31 @@
 			fetch(chrome.runtime.getURL("html/templates/grades_sheet.html")).then(c => c.text()).then(c => {
 				for (c = (new DOMParser).parseFromString(c, "text/html"); document.documentElement.firstChild;) document.documentElement.lastChild.remove();
 				document.dir = "rtl";
-				for (var g of c.documentElement.childNodes) document.documentElement.appendChild(g);
-				g = {
+				for (let g of c.documentElement.childNodes) document.documentElement.appendChild(g);
+				let x = {
 					ex_points: h.ex_points,
 					system_avg: h.system_avg,
 					system_points: h.system_points,
 					success_rate: h.success_rate
 				};
-				for (let e of Object.keys(g)) document.getElementById(e).textContent = g[e];
+				for (let e of Object.keys(x)) document.getElementById(e).textContent = x[e];
 				D("inlist", a);
 				D("outlist", b);
 				0 < f.length ? D("incomplete", f) : document.getElementById("incomplete_wrapper").style.display = "none";
 				0 < d.length ? S(d) : document.getElementById("ptors_wrapper").style.display = "none";
 				y();
-				var k = document.getElementById("c_form");
+				const k = document.getElementById("c_form");
 				k.addEventListener("submit", e => R(e, k));
 				document.getElementById("to_csv").addEventListener("click",
 					() => {
-						var e = "מספר,קורס,נקודות,ציון,סמסטר";
+						let e = "מספר,קורס,נקודות,ציון,סמסטר";
 						document.querySelectorAll("#inlist div.maor_table_row").forEach(v => {
 							let A = [];
 							v.querySelectorAll("div").forEach(U => A.push(`"${U.textContent}"`));
 							v = v.querySelectorAll("input[type='number']");
 							e += `${A[0]},${A[1]},${v[0].value},${v[1].value},${A[4]}\n`
 						});
-						var n = document.createElement("a"), u = new Blob(["\ufeff", e], {type: "text/csv"});
+						const n = document.createElement("a"), u = new Blob(["\ufeff", e], {type: "text/csv"});
 						n.href = window.URL.createObjectURL(u);
 						n.download = "grades_" + Date.now() + ".csv";
 						n.click();
@@ -201,7 +204,7 @@
 		}
 	}
 
-	var q = (new URLSearchParams(window.location.search)).get("TP");
+	let q = (new URLSearchParams(window.location.search)).get("TP");
 	q = q ? q : (new URLSearchParams(document.referrer)).get("TP");
 	q = parseInt(q);
 	if (2 != q) O("a", "no-print", {
@@ -210,18 +213,22 @@
 			style: "border-radius: 4px; color: #000; background-color: var(--sec-light); padding: 4px 8px;"
 		}, "פתח מחשבון ממוצע אקדמי - Technion",
 		document.querySelector("#page-header div.card-body > .flex-wrap"), !1); else {
-		var p = [], E = [], J = [], K = [], h = {}, r = "";
+		let p = [], E = [], J = [], K = [], r = "";
 		h.total_points_tried = 0;
 		h.points_succeed = 0;
 		h.ex_points = 0;
-		for (var F = document.querySelectorAll("table.table-sm.table-striped > tbody"), V = document.querySelectorAll("table.table-sm > thead > tr:first-of-type > th"), w = F.length - 1; 0 <= w; w--) {
-			var B = F[w].querySelectorAll("tr"),
-				x = V[w].textContent.split("(")[0].replace("\n", "").replace("סמסטר", "").trim();
+		const F = document.querySelectorAll("table.table-sm.table-striped > tbody"),
+			V = document.querySelectorAll("table.table-sm > thead > tr:first-of-type > th");
+		let w = F.length - 1;
+		for (; 0 <= w; w--) {
+			const B = F[w].querySelectorAll("tr");
+			let x = V[w].textContent.split("(")[0].replace("\n", "").replace("סמסטר", "").trim();
 			if ("זיכויים" == x) {
 				h.ex_points = parseFloat(F[w].querySelectorAll("tr:last-child th")[1].textContent.trim());
 				h.ex_points = isNaN(h.ex_points) ? 0 : h.ex_points;
-				for (var t = B.length - 2; 0 <= t; t--) {
-					var l = B[t].querySelectorAll("td"), m = l[1].textContent;
+				for (t = B.length - 2; 0 <= t; t--) {
+					l = B[t].querySelectorAll("td");
+					m = l[1].textContent;
 					x = l[0].textContent.trim();
 					m = m.trim();
 					l = parseFloat(l[2].textContent);
@@ -230,7 +237,7 @@
 			} else for (t = B.length - 1; 0 <= t; t--) if (m = B[t].querySelectorAll("td"), l = m[3].textContent.replace("*", "").trim(),
 				!("-" == l || "עבר" != l && "לא השלים" != l && isNaN(parseInt(l)))) {
 				"" == r && (r = x);
-				var L = parseInt(l), G = parseFloat(m[2].textContent), W = m[1].textContent,
+				const L = parseInt(l), G = parseFloat(m[2].textContent), W = m[1].textContent,
 					M = m[0].textContent.trim(), C = W.trim();
 				h.total_points_tried += G;
 				h.points_succeed += 55 <= L || "עבר" == l ? G : 0;
@@ -239,7 +246,7 @@
 					m.grade = l, J.push(m);
 				else {
 					"עבר" == l && (m.grade = l);
-					var N = !0;
+					let N = !0;
 					C.includes("ספורט") || C.includes("חינוך גופני") ||
 					p.forEach(a => {
 						if (a.name == C || a.num == M) N = !1

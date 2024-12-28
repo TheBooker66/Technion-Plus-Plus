@@ -53,16 +53,17 @@ import {CommonPopup} from './common_popup.js';
 		})
 	}
 
-	var h = new CommonPopup;
+	const h = new CommonPopup;
 	h.title = "מנהל הורדות";
 	h.css_list = ["downloads"];
 	h.popupWrap();
-	var e = document.querySelectorAll("#current span"), d = document.getElementById("queue"),
+	const e = document.querySelectorAll("#current span"),
+		d = document.getElementById("queue"),
 		q = h.loadTemplate("dl_item");
 	n();
 	setInterval(n, 350);
 	l();
-	chrome.downloads.onCreated.addListener(() => setTimeout(l, 1E3));
+	chrome.downloads.onCreated.addListener(_ => setTimeout(l, 1E3));
 	chrome.downloads.onChanged.addListener(a => {
 		(a.state || a.paused) && l()
 	});

@@ -4,13 +4,17 @@ import {CommonPopup} from "./common_popup.js";
 import {TE_shutBusesAlerts} from "../bg_main.js";
 
 (function () {
+	const f = new CommonPopup;
+
 	function m(a = ["", "", ""], c) {
-		for (var e = f.loadTemplate("busline"), d = e.querySelectorAll(".drow div"), b = 0; 3 > b; b++) d[b].textContent = a[b];
+		let e = f.loadTemplate("busline");
+		let d = e.querySelectorAll(".drow div");
+		for (let b = 0; 3 > b; b++) d[b].textContent = a[b];
 		return c.appendChild(e.querySelector(".drow"))
 	}
 
 	function q(a, c, e, d) {
-		var b = m([a.Shilut, a.DestinationQuarterName, a.MinutesToArrivalList[c]], e);
+		const b = m([a.Shilut, a.DestinationQuarterName, a.MinutesToArrivalList[c]], e);
 		-1 !== d.indexOf(a.Shilut) && 0 == c && b.classList.add("chosen");
 		b.addEventListener("click", () => {
 			a.MinutesToArrivalList[c] <= parseInt(document.getElementById("min_select").value) ? (b.classList.add("blat"), setTimeout(() =>
@@ -27,7 +31,7 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 	}
 
 	function k(a) { // Old url: https://mslworld.egged.co.il/MslWebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/
-		var c = "https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/"
+		let c = "https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/"
 			+ document.getElementById("station_select").value + "/he/false";
 		c = encodeURI(c);
 		chrome.storage.local.get({buses_alerts: []}, e => {
@@ -36,11 +40,11 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 					g("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית."),
 					clearInterval(a)) :
 				chrome.runtime.sendMessage({mess_t: "buses", url: c}, d => {
-					var b = document.getElementById("bus_table");
+					const b = document.getElementById("bus_table");
 					0 == d.length && m(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""], b);
-					for (var h = 0; h < d.length; h++) {
+					for (let h = 0; h < d.length; h++) {
 						console.log(d[h])
-						for (var l = 0; l < d[h].MinutesToArrivalList.length; l++)
+						for (let l = 0; l < d[h].MinutesToArrivalList.length; l++)
 							q(d[h], l, b, e.buses_alerts);
 					}
 
@@ -56,7 +60,7 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 	}
 
 	function n() {
-		var a;
+		let a;
 		switch (document.getElementById("min_select").value) {
 			case "10":
 				a = 10;
@@ -67,14 +71,16 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 			default:
 				a = 5
 		}
-		var c = parseInt(document.getElementById("station_select").value);
+		const c = parseInt(document.getElementById("station_select").value);
 		chrome.storage.local.set({bus_time: a, bus_station: c}, () => {
 			chrome.runtime.lastError && console.log("TE_bus_err: " + chrome.runtime.lastError.message)
 		})
 	}
 
 	function p() {
-		for (var a = document.getElementById("bus_table"), c = a.childNodes.length - 1; 3 <= c; c--)
+		const a = document.getElementById("bus_table");
+		let c = a.childNodes.length - 1;
+		for (; 3 <= c; c--)
 			a.removeChild(a.childNodes[c])
 	}
 
@@ -85,11 +91,10 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 		k(0)
 	}
 
-	var f = new CommonPopup;
 	f.title = "אוטובוסים קרובים - זמן אמת";
 	f.css_list = ["buses"];
 	f.popupWrap();
-	var bus_stops = [{
+	const bus_stops = [{
 		name: 'מל"ל/הצפירה',
 		val: 43016
 	}, {
@@ -133,16 +138,16 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 		} else if (a.allow_timings) {
 			document.getElementById("min_select").getElementsByTagName("option")[a.bus_time / 5 - 1].selected = !0;
 			document.getElementById("min_select").addEventListener("change", n);
-			var c = document.getElementById("station_select");
+			const c = document.getElementById("station_select");
 			bus_stops.forEach(d => {
-				var b = document.createElement("option");
+				const b = document.createElement("option");
 				b.value = d.val;
 				b.textContent = d.name;
 				d.val === a.bus_station && (b.selected = !0);
 				c.appendChild(b)
 			});
 			c.addEventListener("change", r);
-			var e = setInterval(() => {
+			const e = setInterval(() => {
 				p();
 				k(e)
 			}, 3E4);

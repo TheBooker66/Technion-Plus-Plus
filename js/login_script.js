@@ -1,16 +1,7 @@
 'use strict';
-(function () {
-	function k(a) {
-		var d = [], b = 0;
-		for (let c = a.length - 1; 0 <= c; c--) d[b++] = a[c];
-		return d.join("")
-	}
 
-	function l(a, d) {
-		var b = a.split("");
-		for (let c = 0; c < b.length; c++) b[c] = String.fromCharCode(a.charCodeAt(c) ^ d.charCodeAt(c));
-		return b
-	}
+(async function () {
+	const { reverseString, xorStrings } = await import(chrome.runtime.getURL("../js/utils.js"));
 
 	function m(a, MSorSAP, location) {
 		location = location == "" ? window.location.href : location;
@@ -38,9 +29,20 @@
 		form.submit()
 	}
 
+	function login_moodle_url(a) {
+		chrome.runtime.sendMessage({mess_t: "login_moodle_url", h: window.location.hostname}, d => {
+			d = d.split("?");
+			const b = new URLSearchParams(d[1]);
+			b.delete("prompt");
+			b.delete("login_hint");
+			b.append("login_hint", a.username + "@" + (a.server ? "campus." : "") + "technion.ac.il");
+			location.href = d[0] + "?" + b.toString()
+		})
+	}
+
 	function microsoft(a) {
-		var d = () => {
-			var b = document.forms.f1, c = document.getElementById("idSIButton9");
+		const d = () => {
+			let b = document.forms.f1, c = document.getElementById("idSIButton9");
 			b && !document.getElementById("passwordError") && (location.pathname.includes("/oauth2/authorize") ||
 				location.pathname.includes("/saml2")) ? b.passwd || !document.getElementById("tilesHolder") ||
 				location.href.includes("select_account") || location.href.includes("login_hint") ?
@@ -53,38 +55,32 @@
 				== location.href && c.click()
 		};
 		document.querySelector(".banner-logo") ?
-			d() : (new MutationObserver((b, c) => {
+			d() : (new MutationObserver(_ => {
 				d()
 			})).observe(document.forms[0] || document.body, {childList: !0, attributes: !1, subtree: !0})
 	}
 
 	function techwww(a) {
-		if (a.enable_external) {
-			var d = document.createElement("form"),
-				b = (c, e) => {
-					let g = d.appendChild(document.createElement("input"));
-					g.name = c;
-					g.value = e;
-					g.type = "hidden"
-				};
-			b("username", a.d);
-			b("password", a.password);
-			b("Current_language", "HEBREW");
-			d.action = "https://moodle.technion.ac.il/login/index.php";
-			d.target = "_self";
-			d.method = "post";
-			document.body.appendChild(d);
-			d.submit()
+		if (!a.enable_external) {
+			login_moodle_url(a);
 			return;
 		}
-		chrome.runtime.sendMessage({mess_t: "login_moodle_url", h: window.location.hostname}, d => {
-			d = d.split("?");
-			var b = new URLSearchParams(d[1]);
-			b.delete("prompt");
-			b.delete("login_hint");
-			b.append("login_hint", a.username + "@" + (a.server ? "campus." : "") + "technion.ac.il");
-			location.href = d[0] + "?" + b.toString()
-		})
+
+		let d = document.createElement("form"),
+			b = (c, e) => {
+				let g = d.appendChild(document.createElement("input"));
+				g.name = c;
+				g.value = e;
+				g.type = "hidden"
+			};
+		b("username", a.d);
+		b("password", a.password);
+		b("Current_language", "HEBREW");
+		d.action = "https://moodle.technion.ac.il/login/index.php";
+		d.target = "_self";
+		d.method = "post";
+		document.body.appendChild(d);
+		d.submit()
 	}
 
 	function moodle(a) {
@@ -110,17 +106,8 @@
 	}
 
 	function students(a) {
-		a.enable_external || chrome.runtime.sendMessage({
-			mess_t: "login_moodle_url",
-			h: window.location.hostname
-		}, d => {
-			d = d.split("?");
-			var b = new URLSearchParams(d[1]);
-			b.delete("prompt");
-			b.delete("login_hint");
-			b.append("login_hint", a.username + "@" + (a.server ? "campus." : "") + "technion.ac.il");
-			location.href = d[0] + "?" + b.toString()
-		})
+		if (!a.enable_external)
+			login_moodle_url(a);
 	}
 
 	function sason_p(a, b) {
@@ -130,12 +117,13 @@
 			b.setAttribute("rel", "stylesheet");
 			b.setAttribute("href", chrome.runtime.getURL("css/sasonp.css"));
 			document.head.appendChild(b);
+			// noinspection JSDeprecatedSymbols
 			b = document.createElement("center");
 			b.id = "box";
-			var c = document.createElement("div");
+			let c = document.createElement("div");
 			c.id = "koteret";
 			c.textContent = "Technion";
-			var e = document.createElement("sup");
+			const e = document.createElement("sup");
 			e.textContent = "++";
 			c.appendChild(e);
 			b.appendChild(c);
@@ -157,7 +145,7 @@
 
 	function sap(a) {
 		if ((document.getElementById("certLogonForm") == null || document.referrer.includes("portalex"))
-		&& !document.getElementById("divChangeContent"))
+			&& !document.getElementById("divChangeContent"))
 			m(a, !1, "");
 	}
 
@@ -186,11 +174,11 @@
 		if (chrome.runtime.lastError)
 			console.log("TE_login: " + chrome.runtime.lastError.message);
 		else {
-			var d = k(l(a.uidn_arr[0] + "", a.uidn_arr[1]));
+			const d = reverseString(xorStrings(a.uidn_arr[0] + "", a.uidn_arr[1]));
 			a.enable_external && (a.d = d);
 			if (a.enable_login && a.quick_login) {
-				a.password = k(l(a.term + a.phrase, a.maor_p));
-				var website = window.location.hostname;
+				a.password = reverseString(xorStrings(a.term + a.phrase, a.maor_p));
+				const website = window.location.hostname;
 				if (/moodle[0-9]+.technion.ac.il/.test(website))
 					moodle(a);
 				else switch (website) {

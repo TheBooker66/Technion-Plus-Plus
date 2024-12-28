@@ -1,37 +1,45 @@
 'use strict';
 import {TE_updateInfo} from "../bg_main.js";
+import {reverseString, xorStrings} from './utils.js';
 
 (function () {
-	function f(a) {
-		var c = [], d = 0;
-		for (let b = a.length - 1; 0 <= b; b--) c[d++] = a[b];
-		return c.join("")
-	}
-
-	function h(a, c) {
-		var d = a.split("");
-		for (let b = 0; b < d.length; b++) d[b] = String.fromCharCode(a.charCodeAt(b) ^ c.charCodeAt(b));
-		return d
-	}
-
 	function l(a) {
-		var c = a.split(""), d = [];
-		for (let b = 0; b < c.length; b++) for (; d[b] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=,.".charAt(Math.floor(78 * Math.random())), c[b] = String.fromCharCode(a.charCodeAt(b) ^ d[b].charCodeAt(0)), !0 !== /^[\040-\176]*$/.test(c[b]);) ;
+		const c = a.split(""), d = [];
+		for (let b = 0; b < c.length; b++) {
+			while (true) {
+				d[b] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=,.".charAt(Math.floor(78 * Math.random()));
+				c[b] = String.fromCharCode(a.charCodeAt(b) ^ d[b].charCodeAt(0));
+				if (/^[\040-\176]*$/.test(c[b])) {
+					break;
+				}
+			}
+		}
 		return [c.join(""), d.join("")]
 	}
 
 	function m() {
-		for (var a = document.getElementById("username").value, c = document.getElementById("password").value, d, b, k;
-		     d = l(f(c)), b = d[0].toString(), d = d[1], k = b.substring(Math.floor(b.length / 2), b.length),
-			     b = b.substring(0, Math.floor(b.length / 2)), f(h(b + k, d)).toString() !== c.toString();) ;
-		var g = document.getElementById("idn").value, t = l(f(g)), u = document.getElementById("campus").selected,
+		const a = document.getElementById("username").value;
+		let c = document.getElementById("password").value;
+		let d,b,k;
+		while (true) {
+			d = l(reverseString(c));
+			b = d[0].toString();
+			k = b.substring(Math.floor(b.length / 2), b.length);
+			b = b.substring(0, Math.floor(b.length / 2));
+			d = d[1];
+			if (reverseString(xorStrings(b + k, d)).toString() === c.toString()) {
+				break;
+			}
+		}
+		let g = document.getElementById("idn").value;
+		const t = l(reverseString(g)), u = document.getElementById("campus").selected,
 			n = document.getElementById("quick_login").checked, p = document.getElementById("moodle_cal").checked,
 			v = document.getElementById("gmail_select").checked, q = document.getElementById("external_user").checked,
 			dark_mode = document.getElementById("dark_mode").checked,
 			r = "" != a && "" != c ? !0 : !1;
 		c = q && "" != c && "" != g ? !0 : !1;
 		g = document.getElementById("allow_timings").checked;
-		var w = document.getElementById("panopto_save").checked,
+		const w = document.getElementById("panopto_save").checked,
 			x = document.getElementById("notification_volume").value, y = document.getElementById("WCPass").value,
 			z = document.getElementById("cs_cal").checked, A = document.getElementById("wwcal_switch").checked,
 			B = document.getElementById("allow_hw_alerts").checked;
@@ -59,7 +67,7 @@ import {TE_updateInfo} from "../bg_main.js";
 			hw_alerts: B,
 			dark_mode: dark_mode,
 		}, function () {
-			var e = document.getElementById("status");
+			const e = document.getElementById("status");
 			e.textContent = "השינויים נשמרו.";
 			chrome.runtime.lastError ? (console.log("TE_opt: " + chrome.runtime.lastError.message),
 					e.textContent = "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05e9\u05de\u05d9\u05e8\u05ea \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd, \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05e0\u05d9\u05ea!") :
@@ -79,20 +87,20 @@ import {TE_updateInfo} from "../bg_main.js";
 	}
 
 	document.getElementById("bug_report").addEventListener("click", () => {
-		var a = {
-				ad: "ethan.amiran@gmail.com",
-				su: "דיווח תקלה בתוסף Technion++",
-				body: encodeURIComponent("מלאו כאן את פרטי התקלה - מומלץ בתוספת תמונות להמחשה.") +
-					"%0D%0A" + encodeURIComponent("תזכורת: התוסף פותח בהתנדבות ולא מטעם הטכניון!")
-			},
-			c = document.getElementById("gmail_select").checked ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1&body={3}" : "mailto:{1}?subject={2}&body={3}";
+		const a = {
+			ad: "ethan.amiran@gmail.com",
+			su: "דיווח תקלה בתוסף Technion++",
+			body: encodeURIComponent("מלאו כאן את פרטי התקלה - מומלץ בתוספת תמונות להמחשה.") +
+				"%0D%0A" + encodeURIComponent("תזכורת: התוסף פותח בהתנדבות ולא מטעם הטכניון!")
+		};
+		let c = document.getElementById("gmail_select").checked ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1&body={3}" : "mailto:{1}?subject={2}&body={3}";
 		c = c.replace("{1}", a.ad).replace("{2}", a.su).replace("{3}", a.body);
 		document.getElementById("gmail_select").checked ?
 			window.open(c) : document.getElementById("hiddenframe").src = c
 	});
 	document.getElementById("save").addEventListener("click", m);
 	document.getElementById("try_vol").addEventListener("click", () => {
-		var a = document.createElement("audio");
+		const a = document.createElement("audio");
 		a.setAttribute("preload", "auto");
 		a.setAttribute("autobuffer", "true");
 		a.volume = document.getElementById("notification_volume").value;
@@ -130,8 +138,8 @@ import {TE_updateInfo} from "../bg_main.js";
 			dark_mode: !1,
 		}, function (a) {
 			if (chrome.runtime.lastError) console.log("TE_opt: " + chrome.runtime.lastError.message), document.getElementById("myform").textContent = "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05d0\u05d7\u05d6\u05d5\u05e8 \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd, \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05e0\u05d9\u05ea."; else {
-				var c = f(h(a.term + a.phrase,
-					a.maor_p)), d = f(h(a.uidn_arr[0] + "", a.uidn_arr[1]));
+				let c = reverseString(xorStrings(a.term + a.phrase,
+					a.maor_p)), d = reverseString(xorStrings(a.uidn_arr[0] + "", a.uidn_arr[1]));
 				document.getElementById("username").value = a.username;
 				document.getElementById("campus").selected = a.server;
 				document.getElementById("technion").selected = !a.server;
@@ -162,7 +170,7 @@ import {TE_updateInfo} from "../bg_main.js";
 					c = document.getElementById("ww_current");
 					c.style.display = "block";
 					d = [];
-					for (var b of Object.values(a.webwork_courses)) d.push(b.name);
+					for (let b of Object.values(a.webwork_courses)) d.push(b.name);
 					0 < d.length && (c.getElementsByTagName("span")[0].textContent = d.join(", "))
 				}
 			}
