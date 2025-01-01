@@ -67,13 +67,10 @@
 }
 
 [tplus=dm] h5.card-title {
-    display: block !important;
     margin: -1.25rem -1.25rem .75rem;
-    padding: 1rem;
-    /*background-color: rgba(0, 0, 0, 0.15);*/
     border-bottom: 1px solid;
-    text-align: center;
-    border-image: linear-gradient(to left, transparent 5%, #6B6E70, transparent 95%) 1;
+    border-radius: 8px !important;
+    border-image: linear-gradient(to left, transparent 5%, #acb3b8, transparent 95%) 1;
 }
 
 [tplus=dm] .card-body, [tplus=dm] .userprofile .profile_tree section {
@@ -139,7 +136,8 @@
 [tplus=dm] .path-grade-report-user .user-grade .baggt,
 [tplus=dm] .path-grade-report-user .user-grade .baggb,
 [tplus=dm] .grade-report-user .user-grade .baggt,
-[tplus=dm] .grade-report-user .user-grade .baggb {
+[tplus=dm] .grade-report-user .user-grade .baggb,
+[tplus=dm] .path-mod-assign td.submissionnotgraded {
     color: #eee;
     background-color: rgba(255, 255, 255, 0.05) !important;
 }
@@ -175,13 +173,6 @@
     font-weight: 600;
 }
 
-/*a.navbar-brand::after {
-    content: "";
-    width: 1px;
-    border-left: 1px solid rgba(255,255,255,.1);
-    margin-right: 20px;
-}*/
-
 [tplus=dm] .coursecontrols .editcogbutton:first-child {
     border-left: 1px solid rgba(255, 255, 255, .1);
     margin-left: 20px;
@@ -200,16 +191,9 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     background-color: var(--navbar_bg) !important;
 }
 
-/*[tplus=dm] nav.navbar .logo img {
-	opacity: 0.5;
-	border-radius: 6px;
-	display: none;
-}*/
-
 [tplus=dm] .navbar .nav-item {
     line-height: 1 !important;
 }
-
 
 [tplus=dm] .course-content .section {
     background-color: unset !important;
@@ -221,20 +205,6 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     padding: 0.8em;
 }
 
-/*[tplus=dm] .course-content ul.topics li.section:not(.hidden) .content:after, [tplus=dm] .course-content ul.topics li.section:not(.hidden) .sectionname.accesshide + .section_availability:before {
-    content: '';
-    display: block;
-    height: 8px;
-    background-color: var(--navbar_bg);
-    margin: 4px 4px -4px 4px;
-    border-radius: 3px;
-    border: 1px solid #000;
-}
-
-[tplus=dm] .course-content ul.topics li.section:not(.hidden) .content:after {
-	filter: saturate(.75);
-}*/
-
 [tplus=dm] .course-content ul.topics li.section .content, [tplus=dm] .course-content ul.weeks li.section .content {
     /*background-color: #181818 !important;*/
     padding-bottom: 8px !important;
@@ -244,28 +214,15 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     background-color: #777 !important;
 }
 
-/*[tplus=dm] h3.sectionname {
-    background-color: var(--navbar_bg) !important;
-	border-bottom: 1px solid #000;
-    border-radius: 4px 4px 0 0;
-	box-shadow: var(--shadow_2);
-}
-
-[tplus=dm] h3.sectionname a:not(.maor_download_light) {
-	color: #fff !important;
-}
-
-[tplus=dm] li.section.hidden h3.sectionname {
-	background-color: #444 !important;
-	filter: grayscale(100%);
-}*/
-
 [tplus=dm] .path-mod .activity-header:not(:empty) {
     background-color: unset;
 }
 
 [tplus=dm] .section li.activity:not(.modtype_label):hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: var(--calendar_today) !important;
+}
+
+[tplus=dm] .path-grade-report-user .user-grade tbody tr:hover, .grade-report-user .user-grade tbody tr:hover {
     background-color: var(--calendar_today) !important;
 }
 
@@ -394,7 +351,6 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     color: #eee !important;
 }
 
-
 [tplus=dm] div.qtext img[width],
 [tplus=dm] #equationview, [tplus=dm] .mathExpression, [tplus=dm] .MathJax_Preview img, [tplus=dm] img.CToWUd {
     background-color: #e6e6e6 !important;
@@ -404,12 +360,6 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 [tplus=dm] .mathExpression *, [tplus=dm] .mathExpression {
     color: #0c0c0c !important;
 }
-
-/* side course list*/
-/*[tplus=dm] nav .list-group-item:not(.active) {*/
-/*    background-color: #e6e6e6 !important;*/
-/*    color: #0c0c0c;*/
-/*}*/
 
 [tplus=dm] nav .list-group-item:hover:not(.active) {
     background-color: #444 !important;
@@ -429,7 +379,6 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     background-color: rgba(0, 0, 0, .3);
 }
 
-
 [tplus=dm] #nav-drawer {
     background-color: var(--dark_bg) !important;
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
@@ -448,6 +397,7 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 
 [tplus=dm] .secondary-navigation .navigation {
     border-color: #fff;
+    background-color: var(--dark_bg) !important;
 }
 
 [tplus=dm] a.left.carousel-control .fa-chevron-left, [tplus=dm] a.right.carousel-control .fa-chevron-right {
@@ -556,18 +506,15 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     padding: 1px;
 }
 
-
 [tplus=dm] ::-webkit-scrollbar {
     width: 14px;
 }
 
-/* Track */
 [tplus=dm] ::-webkit-scrollbar-track {
     /*background: #222;*/
     background: var(--dark_bg) !important;
 }
 
-/* Handle */
 [tplus=dm] ::-webkit-scrollbar-thumb {
     background: var(--navbar_bottom) linear-gradient(#fff6, #fff6) !important;
     /*border: solid #222;*/
@@ -576,7 +523,6 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     border-radius: 5px;
 }
 
-/* Handle on hover */
 [tplus=dm] ::-webkit-scrollbar-thumb:hover {
     background: #909090cc;
     background: var(--navbar_bottom) linear-gradient(#fff8, #fffa) !important;
@@ -586,7 +532,6 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     background: #b0b0b0cc;
     background: var(--navbar_bottom) linear-gradient(#fffc, #fffe) !important;
 }
-
 
 [tplus=dm] .content-item-container .content-item-footer .timestamp {
     color: #aaa;

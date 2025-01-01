@@ -1,28 +1,29 @@
 'use strict';
+
 (function () {
-	function v(a, c, d) {
+	function v(b, c, d) {
 		if (!(0 < c.getElementsByClassName("maor_download").length)) {
-			let b = document.createElement("a");
-			b.setAttribute("class", "maor_download");
-			b.textContent = "הורדה";
-			const g = "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/" + a + ".mp4";
-			b.addEventListener("click", function () {
-				chrome.runtime.sendMessage({mess_t: "singledownload", link: g, name: d})
+			const a = document.createElement("a");
+			a.setAttribute("class", "maor_download");
+			a.textContent = "הורדה";
+			const g = "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/" + b + ".mp4";
+			a.addEventListener("click", () => {
+				chrome.runtime.sendMessage({mess_t: "singledownload", link: g, name: d});
 			});
-			a = document.createElement("br");
-			c.appendChild(a);
+			b = document.createElement("br");
 			c.appendChild(b);
+			c.appendChild(a);
 			if (window.location.href.includes("folderID")) {
-				b = document.createElement("label");
-				b.setAttribute("class", "maor_download");
-				a = document.createElement("div");
-				a.textContent = "בחר";
+				const l = document.createElement("label");
+				l.setAttribute("class", "maor_download");
+				b = document.createElement("div");
+				b.textContent = "בחר";
 				const e = document.createElement("input");
 				e.setAttribute("type", "checkbox");
 				e.className = "maor_check";
-				a.appendChild(e);
-				b.appendChild(a);
-				c.appendChild(b)
+				b.appendChild(e);
+				l.appendChild(b);
+				c.appendChild(l);
 			}
 		}
 	}
@@ -39,58 +40,58 @@
 				for (let e = 0; e < b.length; e++) {
 					let h = {};
 					h.u = b[e].getElementsByTagName("guid")[0].textContent.split("/Syndication/")[1];
-					h.n = c + b[e].getElementsByTagName("title")[0].textContent.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g,
-						"").replace(/\s\s+/g, " ") + ".mp4";
-					g.list.push(h)
+					h.n = c + b[e].getElementsByTagName("title")[0].textContent
+						.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
+					g.list.push(h);
 				}
-				0 < g.list.length && chrome.runtime.sendMessage({mess_t: "multidownload", chunk: g})
-			} else window.alert("שגיאה בניסיון הורדת הקורס, אנא נסה שנית מאוחר יותר.")
+				0 < g.list.length && chrome.runtime.sendMessage({mess_t: "multidownload", chunk: g});
+			} else window.alert("שגיאה בניסיון הורדת הקורס, אנא נסה שנית מאוחר יותר.");
 	}
 
 	function t(a, c) {
 		a.setAttribute("class", "hidden-command-button");
 		c.setAttribute("class", "hidden-command-button");
-		if (!1 !== window.location.href.includes("folderID")) {
+		if (false !== window.location.href.includes("folderID")) {
 			const d = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0];
 			fetch(`https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=${d}&type=mp4`)
 				.then(b => b.text())
 				.then(b => (new DOMParser).parseFromString(b, "text/xml"))
 				.then(b => {
 					if (0 != b.getElementsByTagName("item").length) {
-						a.setAttribute("class",
-							"maor_panopto_action css-fehuet");
+						a.setAttribute("class", "maor_panopto_action css-fehuet");
 						a.setAttribute("style", "margin-right: 8px");
 						c.setAttribute("class", "maor_panopto_action css-fehuet");
 						c.setAttribute("style", "margin-right: 8px");
 						const g = setInterval(() => {
-							if ("none" == document.getElementById("loadingMessage").style.display && 0 < document.getElementsByClassName("thumbnail-link").length && "none" != document.getElementsByClassName("thumbnail-link")[0].style.display) {
+							if ("none" == document.getElementById("loadingMessage").style.display &&
+								0 < document.getElementsByClassName("thumbnail-link").length &&
+								"none" != document.getElementsByClassName("thumbnail-link")[0].style.display) {
 								clearInterval(g);
 								const e = document.getElementById("listViewContainer").getElementsByTagName("tr");
 								for (let f = 0; f < e.length - 1; f++) {
 									const h = e[f].getAttribute("id"), p = e[f].getElementsByClassName("item-title")[0],
 										l = p.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
-									v(h, p, l)
+									v(h, p, l);
 								}
 							}
 						}, 2E3);
 					}
-				}).catch(err => console.log(err))
+				}).catch(err => console.error(err));
 		}
 	}
 
 	function u(a) {
 		if (1 == a.cssRules.length) ["#viewer {background-color: #000 !important;}", "#viewerHeader, .transport-button, #timeElapsed, #timeRemaining, #positionControl, .viewer .transport-button .clicked, #volumeFlyout, #playSpeedExpander, #qualityButton, #qualityExpander, #inlineMessageLetterbox, .next-delivery-thumb, #thumbnailList, #thumbnailList img, .thumbnail-timestamp {filter:invert(1);}",
 			"#leftPane aside {background-color: #eee; filter: invert(1);}", "#leftPane {background-color: #111;}", "#playControlsWrapper {background-color: #000;}", "#playControls {background-color: #000; border-top: 1px solid #555; opacity: 0.8;}", "#playControls:hover, #playControls:focus {opacity: 1;}", "#thumbnailList {background-color: #eee;}", "#leftPane #eventTabs #eventTabControl .event-tab-header{filter:invert(0.05);}", "#leftPane #searchRegion input {background-color: transparent}", "#transportControls {background-color: transparent !important; border-left-color: #0c0c0d !important;}",
-			"#playSpeedExpander > div, #qualityExpander > div {filter: none !important;}", "#thumbnailList img {opacity: 0.5;}", "#thumbnailList img:hover{opacity:1}"].forEach(function (c) {
-			a.insertRule(c, 0)
-		}); else for (; 1 < a.cssRules.length;) a.deleteRule(0)
+			"#playSpeedExpander > div, #qualityExpander > div {filter: none !important;}", "#thumbnailList img {opacity: 0.5;}", "#thumbnailList img:hover{opacity:1}"]
+			.forEach(s => a.insertRule(s, 0)); else for (; 1 < a.cssRules.length;) a.deleteRule(0);
 	}
 
 	function q(a) {
 		const c = {};
 		switch (a) {
 			case "showhide":
-				c.panopto_hide = "true" == document.getElementById("toggleThumbnailsButton").getAttribute("aria-expanded") ? !1 : !0;
+				c.panopto_hide = "true" !== document.getElementById("toggleThumbnailsButton").getAttribute("aria-expanded");
 				break;
 			case "darkmode":
 				c.panopto_light = document.getElementById("m_darkmode").checked;
@@ -99,24 +100,23 @@
 				c.panopto_speed = document.querySelector(".play-speed.selected").id;
 				break;
 			case "settings":
-				c.panopto_save = document.getElementById("m_save").checked
+				c.panopto_save = document.getElementById("m_save").checked;
 		}
 		chrome.storage.local.set(c, () => {
-			chrome.runtime.lastError && console.log("TE_panopto_3: " + chrome.runtime.lastError.message)
-		})
+			chrome.runtime.lastError && console.error("TE_panopto_3: " + chrome.runtime.lastError.message);
+		});
 	}
 
 	function x(a) {
 		chrome.storage.local.get({
 			panopto_speed: "Normal",
-			panopto_light: !1,
-			panopto_hide: !1,
-			panopto_save: !0
+			panopto_light: false,
+			panopto_hide: false,
+			panopto_save: true
 		}, c => {
-			chrome.runtime.lastError && console.log("TE_panopto_2: " + chrome.runtime.lastError.message);
+			chrome.runtime.lastError && console.error("TE_panopto_2: " + chrome.runtime.lastError.message);
 			if (c.panopto_save) {
-				document.getElementById("m_save").checked =
-					c.panopto_save;
+				document.getElementById("m_save").checked = c.panopto_save;
 				c.panopto_light && u(a);
 				document.getElementById("m_darkmode").checked = c.panopto_light;
 				const d = setInterval(() => {
@@ -167,7 +167,7 @@
 					return
 				}
 			}
-		})).observe(document.getElementById("viewerContent"), {childList: !0, subtree: !0})
+		})).observe(document.getElementById("viewerContent"), {childList: true, subtree: true})
 	}
 
 	function A() {
@@ -183,21 +183,24 @@
 			document.getElementById("maor_menu").classList.remove("start", "overlaid")
 		});
 		const e = document.createElement("canvas"), h = [document.createElement("a"), document.createElement("a")],
-			p = new MouseEvent("click", {bubbles: !0, cancelable: !0, view: window}), l = f => {
+			p = new MouseEvent("click", {bubbles: true, cancelable: true, view: window}), l = f => {
 				e.width = b[f].videoWidth;
 				e.height = b[f].videoHeight;
 				e.getContext("2d").drawImage(b[f], 0, 0);
-				h[f].href =
-					e.toDataURL("image/png");
+				h[f].href = e.toDataURL("image/png");
 				h[f].download = "snapshot_" + Date.now() + ".png";
-				h[f].dispatchEvent(p)
+				h[f].dispatchEvent(p);
 			};
 		d[0].addEventListener("click", () => l(0));
 		d[1].addEventListener("click", () => l(1));
 		a.addEventListener("click", () => {
 			g(0);
-			2 == b.length ? (document.getElementById("maor_menu").classList.add("start", "overlaid"), c.className = "maor_persist", g(1)) : l(0)
-		})
+			if (b.length === 2) {
+				document.getElementById("maor_menu").classList.add("start", "overlaid");
+				c.className = "maor_persist";
+				g(1);
+			} else l(0);
+		});
 	}
 
 	function B() {
@@ -213,17 +216,21 @@
 					n: c + ".mp4"
 				}
 			};
-		Object.keys(b).forEach(g => {
-			let e = document.getElementById(`m_download_mp${g}`);
-			fetch(b[g].u, {method: "head", mode: "no-cors"}).then(h => {
-				0 == h.status && (d.classList.add("maor_hidden"), e.classList.remove("maor_hidden"), e.addEventListener("click", function () {
-					chrome.runtime.sendMessage({
-						mess_t: "singledownload",
-						link: b[g].u, name: b[g].n
-					})
-				}))
-			})
-		})
+		Object.keys(b).forEach(s => {
+			fetch(b[s].u, {method: "head", mode: "no-cors"}).then(h => {
+				if (h.status == 0) {
+					d.classList.add("maor_hidden");
+					let e = document.getElementById(`m_download_mp${s}`);
+					e.classList.remove("maor_hidden");
+					e.addEventListener("click", () => {
+						chrome.runtime.sendMessage({
+							mess_t: "singledownload",
+							link: b[s].u, name: b[s].n
+						});
+					});
+				}
+			});
+		});
 	}
 
 	function C() {
@@ -312,40 +319,42 @@
 		document.getElementById("transportControls").appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
 		document.getElementById("transportControls").appendChild(a);
 		document.getElementById("maor_koteret").style.backgroundImage =
-			"url(" + chrome.runtime.getURL("icons/technion_plus_plus/icon-16.png").toString() + ")"
+			"url(" + chrome.runtime.getURL("icons/technion_plus_plus/icon-16.png").toString() + ")";
 	}
 
-	if (!0 === window.location.href.includes("List.aspx")) {
-		if (!0 !== window.location.href.includes("query=")) {
-			let k = document.querySelector("#actionHeader > div"), m = document.createElement("a");
+	if (true === window.location.href.includes("List.aspx")) {
+		if (true !== window.location.href.includes("query=")) {
+			const m = document.createElement("a"),
+				n = document.createElement("a"),
+				k = document.querySelector("#actionHeader > div");
 			m.addEventListener("click", w);
 			m.textContent = "הורד את כל הקורס";
-			k.insertBefore(m, k.childNodes[0]);
-			const n = document.createElement("a");
 			n.addEventListener("click", y);
 			n.textContent = "הורד פריטים שנבחרו";
+			k.insertBefore(m, k.childNodes[0]);
 			k.insertBefore(n, k.childNodes[1]);
 			t(m, n);
 			window.addEventListener("hashchange", () => {
-				t(m, n)
-			})
+				t(m, n);
+			});
 		}
 	} else {
 		C();
 		B();
 		const r = document.head.appendChild(document.createElement("style")).sheet;
 		r.insertRule(".player {background-color: #000 !important;}", 0);
-		document.getElementById("m_darkmode").addEventListener("change", function () {
+		document.getElementById("m_darkmode").addEventListener("change", () => {
 			u(r);
-			q("darkmode")
+			q("darkmode");
 		});
 		document.getElementById("m_save").addEventListener("change", () => q("settings"));
-		document.pictureInPictureEnabled && !document.querySelector(".video-js").disablePictureInPicture &&
-		(document.getElementById("m_float").classList.remove("maor_hidden"), document.getElementById("m_float").addEventListener("click", () => {
-			document.pictureInPictureElement || document.querySelector(".video-js").requestPictureInPicture()
-		}));
-		let k = document.querySelectorAll("#m_speed span");
-		for (let a of k) a.addEventListener("click", () => {
+		if (document.pictureInPictureEnabled && !document.querySelector(".video-js").disablePictureInPicture) {
+			document.getElementById("m_float").classList.remove("maor_hidden");
+			document.getElementById("m_float").addEventListener("click", () => {
+				document.pictureInPictureElement || document.querySelector(".video-js").requestPictureInPicture();
+			});
+		}
+		for (let a of document.querySelectorAll("#m_speed span")) a.addEventListener("click", () => {
 			let c;
 			for (c of document.querySelectorAll(".video-js")) c.playbackRate = a.textContent;
 			(c = document.querySelector(".maor_selected")) && c.classList.remove("maor_selected");
@@ -355,6 +364,6 @@
 		z();
 		A();
 		document.getElementById("m_sound").style.display = "none";
-		setTimeout(() => document.getElementById("maor_menu").classList.remove("start"), 1500)
+		setTimeout(() => document.getElementById("maor_menu").classList.remove("start"), 1500);
 	}
 })();

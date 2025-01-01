@@ -232,7 +232,6 @@ a.maor_panopto_action:hover {
     margin-right: auto;
 }
 
-
 /*
 ===================================
 sounds control panel
@@ -303,7 +302,6 @@ sounds control panel
 #maor_sound > div.m_grid > div:nth-of-type(2n) {
     text-align: left;
 }
-
 
 #maor_sound select {
     width: 60px

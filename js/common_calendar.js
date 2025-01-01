@@ -61,7 +61,7 @@ export class CommonCalendar {
 			d.style.display = "block";
 			d.parentNode.classList.remove("small_spinner")
 		};
-		b().then(c).catch(() => {
+		b().then(c).catch(_ => {
 			a.setAttribute("style", "background-color: rgba(215, 0, 34, 0.8) !important; border-radius: 3px;");
 			setTimeout(() => a.setAttribute("style", ""), 1E3);
 			c()
@@ -86,14 +86,14 @@ export class CommonCalendar {
 		};
 		this.common.useTemplatesFile(this.template_file, c => {
 			const e = this.common.loadTemplate("assignment", c);
-			a.forEach(f => d(f, e.cloneNode(!0), "new_assignments"));
-			b.forEach(f => d(f, e.cloneNode(!0), "finished_assignments"));
-			0 == a.length + b.length && this.insertMessage("לא נמצאו אירועים קרובים לתצוגה.", !1);
+			a.forEach(f => d(f, e.cloneNode(true), "new_assignments"));
+			b.forEach(f => d(f, e.cloneNode(true), "finished_assignments"));
+			0 == a.length + b.length && this.insertMessage("לא נמצאו אירועים קרובים לתצוגה.", false);
 			this.stopSpinning()
 		})
 	}
 
 	progress(a) {
-		a().then(b => this.insertAssignments(b.new_list, b.finished_list)).catch(b => this.insertMessage(b.msg, b.is_error))
+		a().then(b => this.insertAssignments(b.new_list, b.finished_list)).catch(err => this.insertMessage(err.msg, err.is_error))
 	}
 }

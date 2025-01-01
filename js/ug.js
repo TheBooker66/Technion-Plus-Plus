@@ -1,4 +1,5 @@
 'use strict';
+
 (function () {
 	let c = (new URL(window.location)).searchParams.get("MK"), b = window.location.pathname.split("rishum/course/")[1],
 		d = (b = b ? b.split("/")[0] : b) ? b : c;
@@ -10,7 +11,7 @@
 		b.insertBefore(c, b.querySelectorAll(".properties-section")[1]);
 		const e = c.getElementsByClassName("TP_expand"), g = c.getElementsByTagName("iframe");
 		for (let a = 0; a < e.length; a++) e[a].addEventListener("click", () => {
-			const h = "false" == e[a].getAttribute("data-expanded") ? !0 : !1;
+			const h = "false" == e[a].getAttribute("data-expanded") ? true : false;
 			g[a].style.height = h ? "600px" : "";
 			e[a].setAttribute("data-expanded", h ? "true" : "false")
 		});
@@ -25,7 +26,7 @@
 			k(f.checked);
 			chrome.storage.local.set({ug_hist: f.checked})
 		});
-		chrome.storage.local.get({ug_hist: !1}, a => {
+		chrome.storage.local.get({ug_hist: false}, a => {
 			k(a.ug_hist)
 		})
 	}

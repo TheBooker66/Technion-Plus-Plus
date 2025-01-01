@@ -1,32 +1,30 @@
 'use strict';
-
 import {CommonPopup} from "./common_popup.js";
-import {TE_shutBusesAlerts} from "../bg_main.js";
+import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 
 (function () {
-	const f = new CommonPopup;
-
 	function m(a = ["", "", ""], c) {
-		let e = f.loadTemplate("busline");
+		let e = popup.loadTemplate("busline");
 		let d = e.querySelectorAll(".drow div");
 		for (let b = 0; 3 > b; b++) d[b].textContent = a[b];
-		return c.appendChild(e.querySelector(".drow"))
+		return c.appendChild(e.querySelector(".drow"));
 	}
 
 	function q(a, c, e, d) {
 		const b = m([a.Shilut, a.DestinationQuarterName, a.MinutesToArrivalList[c]], e);
 		-1 !== d.indexOf(a.Shilut) && 0 == c && b.classList.add("chosen");
 		b.addEventListener("click", () => {
-			a.MinutesToArrivalList[c] <= parseInt(document.getElementById("min_select").value) ? (b.classList.add("blat"), setTimeout(() =>
-				b.classList.remove("blat"), 1E3)) : 0 < c ? (chrome.runtime.sendMessage({
-				mess_t: "silent_notification",
-				message: "ניתן ליצור התראה רק לאוטובוס הראשון המופיע ברשימה עבור קו ספציפי.\n"
-			}), b.classList.add("blat"), setTimeout(() => b.classList.remove("blat"),
-				1E3)) : (chrome.runtime.sendMessage({
-				mess_t: "bus_alert",
-				bus_kav: a.Shilut,
-				bus_before: c
-			}), b.classList.contains("chosen") ? b.className = "drow" : b.classList.add("chosen"))
+			a.MinutesToArrivalList[c] <= parseInt(document.getElementById("min_select").value) ?
+				(b.classList.add("blat"), setTimeout(() => b.classList.remove("blat"), 1E3)) : 0 < c ?
+					(chrome.runtime.sendMessage({
+						mess_t: "silent_notification",
+						message: "ניתן ליצור התראה רק לאוטובוס הראשון המופיע ברשימה עבור קו ספציפי.\n"
+					}), b.classList.add("blat"), setTimeout(() => b.classList.remove("blat"), 1E3)) :
+					(TE_toggleBusAlert({
+						mess_t: "bus_alert",
+						bus_kav: a.Shilut,
+						bus_before: c
+					}), b.classList.contains("chosen") ? b.className = "drow" : b.classList.add("chosen"))
 		})
 	}
 
@@ -36,18 +34,24 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 		c = encodeURI(c);
 		chrome.storage.local.get({buses_alerts: []}, e => {
 			chrome.runtime.lastError ?
-				(console.log("TE_bus_err: " + chrome.runtime.lastError.message),
+				(console.error("TE_bus_err: " + chrome.runtime.lastError.message),
 					g("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית."),
-					clearInterval(a)) :
-				chrome.runtime.sendMessage({mess_t: "buses", url: c}, d => {
+					clearInterval(a)) : chrome.runtime.sendMessage({mess_t: "buses", url: c}, d => {
 					const b = document.getElementById("bus_table");
-					0 == d.length && m(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""], b);
+					if (d.length === 0)
+						m(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""], b);
+					let count = 0;
 					for (let h = 0; h < d.length; h++) {
-						console.log(d[h])
-						for (let l = 0; l < d[h].MinutesToArrivalList.length; l++)
+						if (d[h].MinutesToArrivalList === null) {
+							continue;
+						}
+						for (let l = 0; l < d[h].MinutesToArrivalList.length; l++) {
 							q(d[h], l, b, e.buses_alerts);
+							count++;
+						}
 					}
-
+					if (count === 0)
+						m(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""], b);
 					document.getElementById("spinner").style.display = "none"
 				})
 		})
@@ -73,7 +77,7 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 		}
 		const c = parseInt(document.getElementById("station_select").value);
 		chrome.storage.local.set({bus_time: a, bus_station: c}, () => {
-			chrome.runtime.lastError && console.log("TE_bus_err: " + chrome.runtime.lastError.message)
+			chrome.runtime.lastError && console.error("TE_bus_err: " + chrome.runtime.lastError.message)
 		})
 	}
 
@@ -91,9 +95,10 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 		k(0)
 	}
 
-	f.title = "אוטובוסים קרובים - זמן אמת";
-	f.css_list = ["buses"];
-	f.popupWrap();
+	const popup = new CommonPopup;
+	popup.title = "אוטובוסים קרובים - זמן אמת";
+	popup.css_list = ["buses"];
+	popup.popupWrap();
 	const bus_stops = [{
 		name: 'מל"ל/הצפירה',
 		val: 43016
@@ -131,19 +136,19 @@ import {TE_shutBusesAlerts} from "../bg_main.js";
 		name: "טכניון/מעונות העמים",
 		val: 41200
 	}];
-	chrome.storage.local.get({bus_station: 41205, bus_time: 10, allow_timings: !1}, a => {
+	chrome.storage.local.get({bus_station: 41205, bus_time: 10, allow_timings: false}, a => {
 		if (chrome.runtime.lastError) {
-			console.log("TE_bus_err: " + chrome.runtime.lastError.message);
+			console.error("TE_bus_err: " + chrome.runtime.lastError.message);
 			g("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");
 		} else if (a.allow_timings) {
-			document.getElementById("min_select").getElementsByTagName("option")[a.bus_time / 5 - 1].selected = !0;
+			document.getElementById("min_select").getElementsByTagName("option")[a.bus_time / 5 - 1].selected = true;
 			document.getElementById("min_select").addEventListener("change", n);
 			const c = document.getElementById("station_select");
 			bus_stops.forEach(d => {
 				const b = document.createElement("option");
 				b.value = d.val;
 				b.textContent = d.name;
-				d.val === a.bus_station && (b.selected = !0);
+				d.val === a.bus_station && (b.selected = true);
 				c.appendChild(b)
 			});
 			c.addEventListener("change", r);

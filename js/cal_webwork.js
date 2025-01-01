@@ -1,14 +1,12 @@
 'use strict';
-
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
 import {OrganizerCalendar} from './organizer.js';
 
-
 (function () {
 	function q(e) {
 		chrome.storage.local.get({webwork_cal: {}}, function (b) {
-			chrome.runtime.lastError ? console.log("TE_ww_cal7: " + chrome.runtime.lastError.message) : (b.webwork_cal[e].done = 1 - b.webwork_cal[e].done, chrome.storage.local.set({webwork_cal: b.webwork_cal}))
+			chrome.runtime.lastError ? console.error("TE_ww_cal7: " + chrome.runtime.lastError.message) : (b.webwork_cal[e].done = 1 - b.webwork_cal[e].done, chrome.storage.local.set({webwork_cal: b.webwork_cal}))
 		})
 	}
 
@@ -16,15 +14,15 @@ import {OrganizerCalendar} from './organizer.js';
 		return e[1].ts === b[1].ts ? e[1].h.localeCompare(b[1].h) : 0 === e[1].ts ? 1 : 0 === b[1].ts || e[1].ts < b[1].ts ? -1 : e[1].ts > b[1].ts ? 1 : 0
 	}
 
-	const h = new CommonPopup;
+	const popup = new CommonPopup;
 	let l;
-	h.title = "מטלות קרובות - WeBWorK";
-	h.css_list = ["calendar"];
+	popup.title = "מטלות קרובות - WeBWorK";
+	popup.css_list = ["calendar"];
 	if (document.title === "ארגונית++") {
-		l = new OrganizerCalendar(h, "webwork");
+		l = new OrganizerCalendar(popup, "webwork");
 	} else {
-		l = new CommonCalendar(h, "webwork");
-		h.popupWrap();
+		l = new CommonCalendar(popup, "webwork");
+		popup.popupWrap();
 		l.calendarWrap();
 	}
 
@@ -37,25 +35,22 @@ import {OrganizerCalendar} from './organizer.js';
 		const m = {};
 		for (let c of Object.values(f.webwork_courses)) m[c.lti] = c.name;
 		if (chrome.runtime.lastError) {
+			console.error("TE_ww_cal: " + chrome.runtime.lastError.message);
 			b({
 				msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
-				is_error: !0
+				is_error: true
 			})
-			console.log("TE_ww_cal: " + chrome.runtime.lastError.message);
 		} else {
 			document.getElementById("lastcheck").style.display = "block";
-			let c = new Date(f.wwcal_update);
-			let g = function (a) {
-				return 9 < a ? a : "0" + a
-			};
-			document.getElementById("lastcheck").textContent += f.wwcal_update ? c.getDate() + "." + (c.getMonth() + 1) + "." + c.getFullYear() + ", בשעה " + g(c.getHours()) + ":" + g(c.getMinutes()) : "לא ידוע";
+			let date = new Date(f.wwcal_update);
+			let fix_date = a => 9 < a ? a : "0" + a;
+			document.getElementById("lastcheck").textContent += f.wwcal_update ? date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ", בשעה " + fix_date(date.getHours()) + ":" + fix_date(date.getMinutes()) : "לא ידוע";
 			const d = [], k = f.webwork_cal;
 			Object.keys(k).forEach(a => {
 				d.push([a, k[a]])
 			});
 			d.sort(r);
-			c = [];
-			g = [];
+			let c = [], g = [];
 			for (let a = 0; a < d.length; a++) {
 				let n = d[a][0].split("_")[0];
 				let p = {

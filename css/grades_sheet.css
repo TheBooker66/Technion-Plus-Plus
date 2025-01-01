@@ -52,7 +52,6 @@
     border-radius: 4px 0 0 4px !important;
 }
 
-
 .maor_table_header div.op {
     text-align: center;
     padding: 1px;
@@ -255,7 +254,6 @@
         background-color: var(--color);
     }
 }
-
 
 /* over binary */
 .binary_text {

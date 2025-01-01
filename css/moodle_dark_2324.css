@@ -191,7 +191,6 @@
 }
 
 [tplus=dm] .section li.activity:not(.modtype_label):hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
     background-color: var(--calendar_today) !important;
 }
 
@@ -507,17 +506,6 @@
     background: #b0b0b0cc;
     background: var(--navbar_bottom) linear-gradient(#fffc, #fffe) !important;
 }
-
-/*[tplus=dm] ::-webkit-scrollbar-button:single-button:decrement {
-	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAJElEQVQI12NgoAr4////f2Q+IzYJRkZGRrgkug6YAkZsEkQBAM6zD/wBxW/hAAAAAElFTkSuQmCC");
-}
-[tplus=dm] ::-webkit-scrollbar-button:single-button:increment {
-	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAKUlEQVQI12NgwAMY/////x+nJAMDAwM2BYyMjIyMMA6yAmRxBmwKKAMAnpcP/GLG/WkAAAAASUVORK5CYII=");
-}
-[tplus=dm] ::-webkit-scrollbar-button {
-  background: no-repeat scroll #0005 center !important;
-  height: 14px;
-}*/
 
 [tplus=dm] .content-item-container .content-item-footer .timestamp {
     color: #aaa;

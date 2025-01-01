@@ -1,7 +1,18 @@
 'use strict';
 
 (async function () {
-	const { reverseString, xorStrings } = await import(chrome.runtime.getURL("../js/utils.js"));
+	// Duplicate of util.js due to the fact that the login script is executed in a different context
+	function reverseString(str) {
+		return str.split('').reverse().join('');
+	}
+
+	function xorStrings(str1, str2) {
+		return str1.split('').map((char, i) =>
+			String.fromCharCode(str1.charCodeAt(i) ^ str2.charCodeAt(i))
+		).join('');
+	}
+
+	// End of duplicate
 
 	function m(a, MSorSAP, location) {
 		location = location == "" ? window.location.href : location;
@@ -30,7 +41,7 @@
 	}
 
 	function login_moodle_url(a) {
-		chrome.runtime.sendMessage({mess_t: "login_moodle_url", h: window.location.hostname}, d => {
+		chrome.runtime.sendMessage({mess_t: "login_moodle_url", url: window.location.hostname}, d => {
 			d = d.split("?");
 			const b = new URLSearchParams(d[1]);
 			b.delete("prompt");
@@ -54,10 +65,8 @@
 				document.forms[0] && c && "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/login"
 				== location.href && c.click()
 		};
-		document.querySelector(".banner-logo") ?
-			d() : (new MutationObserver(_ => {
-				d()
-			})).observe(document.forms[0] || document.body, {childList: !0, attributes: !1, subtree: !0})
+		document.querySelector(".banner-logo") ? d() : (new MutationObserver(_ => d()))
+			.observe(document.forms[0] || document.body, {childList: true, attributes: false, subtree: true});
 	}
 
 	function techwww(a) {
@@ -140,13 +149,13 @@
 			return;
 		if ("X" == document.getElementById("Error_message").textContent)
 			return;
-		m(a, !0, "");
+		m(a, true, "");
 	}
 
 	function sap(a) {
 		if ((document.getElementById("certLogonForm") == null || document.referrer.includes("portalex"))
 			&& !document.getElementById("divChangeContent"))
-			m(a, !1, "");
+			m(a, false, "");
 	}
 
 	function panopto() {
@@ -168,11 +177,11 @@
 	}
 
 	chrome.extension.inIncognitoContext || "https:" != window.location.protocol || chrome.storage.local.get({
-		username: "", server: !0, phrase: "", term: "", maor_p: "maor", quick_login: !0, enable_login: !1,
-		uidn_arr: ["", ""], mn_pass: "", enable_external: !1
+		username: "", server: true, phrase: "", term: "", maor_p: "maor", quick_login: true, enable_login: false,
+		uidn_arr: ["", ""], mn_pass: "", enable_external: false
 	}, function (a) {
 		if (chrome.runtime.lastError)
-			console.log("TE_login: " + chrome.runtime.lastError.message);
+			console.error("TE_login: " + chrome.runtime.lastError.message);
 		else {
 			const d = reverseString(xorStrings(a.uidn_arr[0] + "", a.uidn_arr[1]));
 			a.enable_external && (a.d = d);

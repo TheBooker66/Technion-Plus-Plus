@@ -9,11 +9,11 @@
 
 <div id="header">
     <div class="wrapper">
-        <span id="date" hidden="hidden">2024-12-26</span>
+        <span id="date" hidden="hidden">2024-12-31</span>
         <span id="version"></span>
         <span id="logo">
             <span class="tpclass">Technion<sup>++</sup></span>
-            <img src="../icons/technion_plus_plus/icon-48.png"/>
+            <img src="../icons/technion_plus_plus/icon-48.png" alt="לוגו טכניון++"/>
         </span>
     </div>
 </div>
@@ -33,53 +33,66 @@
 
     <div class="divTable">
         <div class="tableRow">
-            <div class="section"><img src="../icons/release_notes/added.svg"/> <span>חדש</span></div>
+            <div class="section"><img src="../icons/release_notes/added.svg" alt="חדש"/> <span>חדש</span></div>
             <div class="info">
-                <b>חידושים וכו'</b>
+                <b>חידושים וכו'</b> <br/><br/>
                 <small>אם יש לכם רעיונות לשיפור, אתם מוזמנים לפנות אליי.</small>
             </div>
         </div>
     </div>
     <div class="divTable">
         <div class="tableRow">
-            <div class="section"><img src="../icons/release_notes/refresh.svg"/> <span>שונה ותוקן</span></div>
+            <div class="section"><img src="../icons/release_notes/refresh.svg" alt="שונה ותוקן"/>
+                <span>שונה ותוקן</span></div>
             <div class="info">
-                <b>שינויים ותיקונים</b>
+                <b>כללי</b>
                 <ul>
+                    <li>הריעו! התוסף מסוגל לסרוק מטלות ברקע שוב!
+                        בטח לא שמתם לב לזה, אבל הוא לא היה מסוגל לעבוד ברקע כמו שצריך עד עכשיו.</li>
+                    <li>צלילי התראות (עבור מטלות חדשות, אוטובוסים ודברים אחרים) עובדים שוב.</li>
                     <li>המבנה של הקוד שופר, ובתקווה הפך אותו למעט מהיר יותר והקטין את המשקל שלו.</li>
+                </ul>
+                <b>מודל</b>
+                <ul>
+                    <li>תוקן טקסט שחור אחד במצב לילה; כעת הוא לבן.</li>
+                    <li>ההבהובים מעל הציונים במצב לילה עכשיו בצבע הנכון.</li>
                 </ul>
             </div>
         </div>
     </div>
-        <div class="divTable">
-            <div class="tableRow">
-                <div class="section"><img src="../icons/release_notes/removed.svg"/> <span>בוטל</span></div>
-                <div class="info">
-                    <b>מחיקות וכו'</b>
-                    <ul>
-                        <li>לא היה מה להסיר :shrug:</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
     <div class="divTable">
         <div class="tableRow">
-            <div class="section"><img src="../icons/release_notes/bug.svg"/> <span>באגים</span></div>
+            <div class="section"><img src="../icons/release_notes/removed.svg" alt="בוטל"/> <span>בוטל</span></div>
+            <div class="info">
+                <b>מחיקות וכו'</b>
+                <ul>
+                    <li>לא היה מה להסיר :shrug:</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="divTable">
+        <div class="tableRow">
+            <div class="section"><img src="../icons/release_notes/bug.svg" alt="באגים ידועים"/>
+                <span>באגים ידועים</span></div>
             <div class="info">
                 <b>באגים ידועים</b>
                 <ul>
-                    <li><b>מחשבון הממוצע האקדמי לפעמים עובד ולפעמים לא.</b>
+                    <li>
+                        <b>מחשבון הממוצע האקדמי לפעמים עובד ולפעמים לא.</b>
                         זו אשמת הטכניון, ועד שהם מוסיפים גיליון ציונים דיגיטלי לסאפ, אין שום דבר שאני יכול לעשות בנושא.
-                        אני מציע <b>לנסות שוב כמה שעות אחר כך</b> אם המחשבון לא נפתח לכם.</li>
-                    <li>יש איזה הבהוב לבן כשמרחפים מעל ציון במודל. לא מאוד משמעותי או דחוף.</li>
+                        אני מציע <b>לנסות שוב כמה שעות אחר כך</b> אם המחשבון לא נפתח לכם.
+                    </li>
+                    <li>
+                        זה לא בדיוק באג אבל אני כותב את זה כאן בכל מקרה כדי שלא ידווחו לי על זה:
+                        המסעדות ממש ממש לא מעודכנות ולא מסודרות.
+                        אעבוד על זה כשאוכל, אבל כרגע זה בעדיפות נמוכה מאוד.
+                    </li>
                 </ul>
                 <!--
                 TODO: Update version in manifest.json and release date and the list of changes here.
-                - DOMParser is not defined in bg_main.js (manifest v3). Maybe solve with:
-                https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension
-                - Unify OrganizerCalendar and CommonCalendar.
-                - Fix bus notifications with offscreen documents. See:
-                https://stackoverflow.com/questions/67437180/play-audio-from-background-script-in-chrome-extention-manifest-v3
+                - Unify OrganizerCalendar and CommonCalendar (add "type" key to common).
+                - Remove Sason-p, ug.js and course_search.js.
                 - Remove the "go to course" button from the moodle (or ask if anyone knows how to link to a course),
                 and move the histogram from the moodle to SAP (hopefully).
 
@@ -88,6 +101,7 @@
 
                 - Fix? the food popup.
                 - Sort buses by time (this is too difficult to implement as of now).
+
                 - Fix autologin to SAP. Actually though. It seems to have fixed itself??
                 - Check CATEGORIES code. Actually, I won't touch it unless someone else reports a bug.
                 -->

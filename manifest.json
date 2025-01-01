@@ -6,9 +6,9 @@
   "homepage_url": "https://sites.google.com/view/technion-plus-plus/home",
   "version": "3.3.2",
   "manifest_version": 3,
-  "minimum_chrome_version": "88.0",
+  "minimum_chrome_version": "109.0",
   "background": {
-    "service_worker": "./bg_main.js",
+    "service_worker": "service_worker.js",
     "type": "module"
   },
   "options_ui": {
@@ -22,11 +22,12 @@
     "default_title": "Technion Plus Plus"
   },
   "permissions": [
-    "downloads",
     "storage",
-    "alarms",
+    "offscreen",
+    "tabs",
     "notifications",
-    "tabs"
+    "downloads",
+    "alarms"
   ],
   "host_permissions": [
     "*://*.technion.ac.il/*",
@@ -49,7 +50,6 @@
       "matches": [
         "https://panoptotech.cloud.panopto.eu/*",
         "https://bookme.technion.ac.il/*",
-        "https://techwww.technion.ac.il/tech_ident/",
         "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*",
         "https://students.technion.ac.il/login/index.php"
       ]
@@ -183,7 +183,7 @@
     {
       "css": [
         "css/moodle.css",
-        "css/moodle_dark_2224.css",
+        "css/moodle_dark_2324.css",
         "css/moodle_dark_root.css"
       ],
       "js": [
@@ -229,27 +229,6 @@
     }
   ],
   "web_accessible_resources": [
-    {
-      "resources": [
-        "js/utils.js"
-      ],
-      "matches": [
-        "https://login.microsoftonline.com/*",
-        "https://portalex.technion.ac.il/*",
-        "https://students.technion.ac.il/*",
-        "https://grades.technion.ac.il/*",
-        "https://moodle2223.technion.ac.il/*",
-        "https://moodle2324.technion.ac.il/*",
-        "https://moodle24.technion.ac.il/*",
-        "https://grades.cs.technion.ac.il/*",
-        "https://panoptotech.cloud.panopto.eu/*",
-        "https://webcourse.cs.technion.ac.il/*",
-        "https://bookme.technion.ac.il/*",
-        "https://techwww.technion.ac.il/*",
-        "https://ug3.technion.ac.il/*",
-        "https://sason-p.technion.ac.il/*"
-      ]
-    },
     {
       "resources": [
         "icons/technion_plus_plus/icon-*.png"

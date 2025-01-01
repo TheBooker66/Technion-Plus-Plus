@@ -1,5 +1,4 @@
 'use strict';
-
 import {CommonPopup} from "./common_popup.js";
 
 (function () {
@@ -7,20 +6,20 @@ import {CommonPopup} from "./common_popup.js";
 		let element = document.getElementById("info");
 		element.className = "error_bar";
 		element.style.display = "block";
-		element.textContent = m
+		element.textContent = m;
 	}
 
 	let popup = new CommonPopup;
 	popup.title = "מסעדות פתוחות בחיפה ובנשר";
 	popup.popupWrap();
-	chrome.storage.local.get({allow_timings: !1}, cookie => {
+	chrome.storage.local.get({allow_timings: false}, cookie => {
 		if (chrome.runtime.lastError) {
-			console.log("TE_food_err: " + chrome.runtime.lastError.message);
+			console.error("TE_food_err: " + chrome.runtime.lastError.message);
 			oops("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");
 			return;
 		}
 		if (!cookie.allow_timings)
-			return void oops('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.');
+			return oops('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.');
 
 		popup.XHR("../resources/food.csv", "csv").then(res => {
 			// Split the string into an array of strings
@@ -115,7 +114,7 @@ import {CommonPopup} from "./common_popup.js";
 				counter === 0 ? "כל המסעדות בחיפה ונשר סגורות." :
 					"הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. המסעדות מסודרות לפי מרחק מהטכניון. כל המידע באדיבות גוגל מפות."
 		}).catch(err => {
-			console.log("TE_Error_FOOD: " + err)
+			console.error("TE_Error_FOOD: " + err)
 			oops("שגיאה בעיבוד הנתונים, אנא נסה שנית.");
 		})
 	})

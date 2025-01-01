@@ -8,47 +8,45 @@ export class CommonPopup {
 		this.main_content = this.wrapper.getElementsByClassName("main-content")[0];
 	}
 
-	useTemplatesFile(a, b) {
+	useTemplatesFile = (a, b) => {
 		fetch("../html/templates/" + a + ".html").then(c => c.text()).then(c => {
 			c = (new DOMParser).parseFromString(c, "text/html");
-			b(c)
-		})
-	}
+			b(c);
+		});
+	};
 
-	loadTemplate(a, b) {
-		b = void 0 === b ? document : b;
-		a = b.querySelector("template#" + a).content;
-		return document.importNode(a, !0)
-	}
+	loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
 
 	popupWrap() {
 		this.useTemplatesFile("common", a => {
 			for (let b = 0; b < this.css_list.length; b++) {
 				const c = this.loadTemplate("head-stylesheets", a);
 				c.querySelector("link").setAttribute("href", "../css/p_" + this.css_list[b] + ".css");
-				document.head.appendChild(c)
+				document.head.appendChild(c);
 			}
 			this.wrapper.insertBefore(this.loadTemplate("header-koteret", a), this.main_content);
-			"" != this.title && (a = this.loadTemplate("header-title", a), a.querySelector("div:not(#returnHome)").textContent = this.title, this.wrapper.insertBefore(a, this.main_content));
-			this.buttonsSetup()
-		})
+			if (this.title !== "") {
+				a = this.loadTemplate("header-title", a);
+				a.querySelector("div:not(#returnHome)").textContent = this.title;
+				this.wrapper.insertBefore(a, this.main_content);
+			}
+			this.buttonsSetup();
+		});
 	}
 
 	buttonsSetup() {
-		document.getElementById("goToSettings").addEventListener("click",
-			function () {
-				chrome.runtime.openOptionsPage(function () {
-					chrome.runtime.lastError && console.log("TE_p: " + chrome.runtime.lastError.message)
-				})
+		document.getElementById("goToSettings").addEventListener("click", () => {
+			chrome.runtime.openOptionsPage(() => {
+				chrome.runtime.lastError && console.error("TE_p: " + chrome.runtime.lastError.message);
 			});
-		document.getElementById("goToAbout").addEventListener("click", () => window.location.href = "../html/p_about.html");
-		"" != this.title && document.getElementById("returnHome").addEventListener("click", () => {
-			window.location.href = "../popup.html"
-		})
+		});
+		document.getElementById("goToAbout")
+			.addEventListener("click", () => window.location.href = "../html/p_about.html");
+		if (this.title !== "") document.getElementById("returnHome")
+			.addEventListener("click", () => window.location.href = "../popup.html");
 	}
 
-	XHR(a, b, c) {
-		c = void 0 === c ? "" : c;
+	XHR(a, b, c = "") {
 		return new Promise((e, g) => {
 			const f = {
 				headers: {
@@ -88,11 +86,11 @@ export class CommonPopup {
 							data = await response.text();
 					}
 
-					e({ response: data, responseURL: response.url });
-				} catch (error) {
-					g(error);
+					e({response: data, responseURL: response.url});
+				} catch (err) {
+					g(err);
 				}
 			})();
-		})
+		});
 	}
 }

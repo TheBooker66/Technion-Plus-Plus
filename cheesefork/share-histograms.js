@@ -617,7 +617,7 @@ let cheeseforkShareHistograms = function () {
 							for (h = (a = E + A) >>> 2; v.length <= h;) v.push(0);
 							v[h] |= u[f] << 8 * (c + e * (a % 4)), E += 1
 						} else for (c = -1 === e ? 2 : 0, w = "UTF16LE" === r && 1 !== e || "UTF16LE" !== r && 1 === e, s = 0; s < t.length; s += 1) {
-							for (o = t.charCodeAt(s), !0 === w && (o = (f = 255 & o) << 8 | o >>> 8), h = (a = E + A) >>> 2; v.length <= h;) v.push(0);
+							for (o = t.charCodeAt(s), true === w && (o = (f = 255 & o) << 8 | o >>> 8), h = (a = E + A) >>> 2; v.length <= h;) v.push(0);
 							v[h] |= o << 8 * (c + e * (a % 4)), E += 2
 						}
 						return {value: v, binLen: 8 * E + i}
@@ -731,8 +731,8 @@ let cheeseforkShareHistograms = function () {
 	}
 
 	function o(t) {
-		var r = {outputUpper: !1, b64Pad: "=", outputLen: -1}, n = t || {}, i = "Output length must be a multiple of 8";
-		if (r.outputUpper = n.outputUpper || !1, n.b64Pad && (r.b64Pad = n.b64Pad), n.outputLen) {
+		var r = {outputUpper: false, b64Pad: "=", outputLen: -1}, n = t || {}, i = "Output length must be a multiple of 8";
+		if (r.outputUpper = n.outputUpper || false, n.b64Pad && (r.b64Pad = n.b64Pad), n.outputLen) {
 			if (n.outputLen % 8 != 0) throw new Error(i);
 			r.outputLen = n.outputLen
 		} else if (n.shakeLen) {
@@ -787,9 +787,9 @@ let cheeseforkShareHistograms = function () {
 			var o = this;
 			if ("SHA-1" !== t) throw new Error("Chosen SHA variant is not supported");
 			var u = e || {};
-			return (o = r.call(this, t, n, e) || this).t = !0, o.i = o.o, o.u = -1, o.s = i(o.h, o.v, o.u), o.A = w, o.p = function (t) {
+			return (o = r.call(this, t, n, e) || this).t = true, o.i = o.o, o.u = -1, o.s = i(o.h, o.v, o.u), o.A = w, o.p = function (t) {
 				return t.slice()
-			}, o.l = c, o.R = E, o.U = [1732584193, 4023233417, 2562383102, 271733878, 3285377520], o.T = 512, o.m = 160, o.F = !1, u.hmacKey && o.B(function (t, r, n, e) {
+			}, o.l = c, o.R = E, o.U = [1732584193, 4023233417, 2562383102, 271733878, 3285377520], o.T = 512, o.m = 160, o.F = false, u.hmacKey && o.B(function (t, r, n, e) {
 				var o = t + " must include a value and format";
 				if (!r) {
 					if (!e) throw new Error(o);
@@ -811,13 +811,13 @@ let cheeseforkShareHistograms = function () {
 		function t(t, r, n) {
 			var i = n || {};
 			if (this.h = r, this.v = i.encoding || "UTF8", this.numRounds = i.numRounds || 1, isNaN(this.numRounds) || this.numRounds !== parseInt(this.numRounds, 10) || 1 > this.numRounds) throw new Error("numRounds must a integer >= 1");
-			this.g = t, this.Y = [], this.I = 0, this.C = !1, this.H = 0, this.L = !1, this.N = [], this.S = []
+			this.g = t, this.Y = [], this.I = 0, this.C = false, this.H = 0, this.L = false, this.N = [], this.S = []
 		}
 
 		return t.prototype.update = function (t) {
 			var r, n = 0, i = this.T >>> 5, e = this.s(t, this.Y, this.I), o = e.binLen, u = e.value, s = o >>> 5;
 			for (r = 0; r < s; r += i) n + this.T <= o && (this.U = this.A(u.slice(r, r + i), this.U), n += this.T);
-			this.H += n, this.Y = u.slice(n >>> 5), this.I = o % this.T, this.C = !0
+			this.H += n, this.Y = u.slice(n >>> 5), this.I = o % this.T, this.C = true
 		}, t.prototype.getHash = function (t, r) {
 			var n, i, u = this.m, s = o(r);
 			if (this.F) {
@@ -839,7 +839,7 @@ let cheeseforkShareHistograms = function () {
 			if (this.L) throw new Error("MAC key already set");
 			for (n < t.binLen / 8 && (t.value = this.R(t.value, t.binLen, 0, this.l(this.g), this.m)); t.value.length <= i;) t.value.push(0);
 			for (r = 0; r <= i; r += 1) this.N[r] = 909522486 ^ t.value[r], this.S[r] = 1549556828 ^ t.value[r];
-			this.U = this.A(this.N, this.U), this.H = this.T, this.L = !0
+			this.U = this.A(this.N, this.U), this.H = this.T, this.L = true
 		}, t.prototype.getHMAC = function (t, r) {
 			var n = o(r);
 			return e(t, this.m, this.u, n)(this.o())

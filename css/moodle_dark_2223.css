@@ -157,7 +157,6 @@
 }*/
 
 [tplus=dm] .section li.activity:not(.modtype_label):hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
     background-color: var(--calendar_today) !important;
 }
 

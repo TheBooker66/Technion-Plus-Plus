@@ -1,38 +1,40 @@
 'use strict';
+
 (function () {
-	function f(a) {
-		return [["--a_color", "hsl(" + (80 + a) + ", 90%, 80%)"], ["--a_hover_color", "hsl(" + (80 + a) + ", 90%, 45%)"], ["--a_navlink", "hsl(" + (90 + a) + ", 80%, 85%)"], ["--a_navlink_hover", "hsl(" + (90 + a) + ", 100%, 80%)"], ["--navbar_bottom", "hsl(" + (82 + a) + ", 100%, 41%)"], ["--navbar_bg", "hsl(" + (82 + a) + ", 100%, 25%)"], ["--dark_bg", "hsl(" + (90 + a) + ", 100%, 10%)"], ["--calendar_today", "hsla(" + (70 + a) + ", 100%, 20%, 0.5)"]]
-	}
+	const f = a => [["--a_color", "hsl(" + (80 + a) + ", 90%, 80%)"], ["--a_hover_color", "hsl(" + (80 + a) + ", 90%, 45%)"], ["--a_navlink", "hsl(" + (90 + a) + ", 80%, 85%)"], ["--a_navlink_hover", "hsl(" + (90 + a) + ", 100%, 80%)"], ["--navbar_bottom", "hsl(" + (82 + a) + ", 100%, 41%)"], ["--navbar_bg", "hsl(" + (82 + a) + ", 100%, 25%)"], ["--dark_bg", "hsl(" + (90 + a) + ", 100%, 10%)"], ["--calendar_today", "hsla(" + (70 + a) + ", 100%, 20%, 0.5)"]];
 
 	if (!window.location.href.includes("pluginfile.php")) {
-		let e = [];
 		chrome.storage.local.get({
-			remoodle: !1,
+			remoodle: false,
 			remoodle_angle: 120
 		}, a => {
-			if (chrome.runtime.lastError) console.log("TE_remoodle_err: " + chrome.runtime.lastError.message); else {
-				let b = a.remoodle;
-				e = f(a.remoodle_angle);
-				e.forEach(c => document.documentElement.style.setProperty(c[0], c[1]));
-				const d = function (c) {
-					c ? document.querySelector("html").setAttribute("tplus", "dm") : document.querySelector("html").removeAttribute("tplus");
-					const g = document.getElementById("tp-darkmode");
-					g && (g.checked = c)
+			if (chrome.runtime.lastError) console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
+			else {
+				let checkboxStatus = a.remoodle, e = f(a.remoodle_angle);
+				const checkBox = function (bool) {
+					bool ? document.querySelector("html").setAttribute("tplus", "dm") :
+						document.querySelector("html").removeAttribute("tplus");
+					const checkbox = document.getElementById("tp-darkmode");
+					if (checkbox) checkbox.checked = bool;
 				};
-				d(b);
-				chrome.runtime.onMessage.addListener(c => {
-					"TE_remoodle" === c.mess_t && (b = !b, d(b))
-				})
+				e.forEach(c => document.documentElement.style.setProperty(c[0], c[1]));
+				checkBox(checkboxStatus);
+				chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+					if (message.mess_t === "TE_remoodle") {
+						checkBox(!checkboxStatus);
+						checkboxStatus = !checkboxStatus;
+					}
+					sendResponse();
+				});
 			}
 		});
-		chrome.runtime.onMessage.addListener(a => {
-			if ("TE_remoodle_reangle" === a.mess_t) {
-				a = a.angle;
-				e = f(a);
-				e.forEach(d => document.documentElement.style.setProperty(d[0], d[1]));
+		chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+			if (message.mess_t === "TE_remoodle_reangle") {
+				f(message.angle).forEach(d => document.documentElement.style.setProperty(d[0], d[1]));
 				const b = document.querySelector("#tp_colorswitcher input[type=range]");
-				b && (b.value = a)
+				if (b) b.value = message.angle;
 			}
-		})
+			sendResponse();
+		});
 	}
 })();

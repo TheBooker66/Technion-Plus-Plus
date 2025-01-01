@@ -1,4 +1,5 @@
 'use strict';
+
 (function () {
 	function e() {
 		const a = document.querySelectorAll("center > table + table > tbody > tr");
@@ -8,8 +9,7 @@
 				"text/html").querySelector("td");
 			a[a.length - 1].children[0].setAttribute("colspan", "4");
 			for (let b = 1; b < a.length - 1; b++) {
-				let d = c.cloneNode(!0);
-				console.log(d);
+				let d = c.cloneNode(true);
 				d.querySelector("input").addEventListener("click", f => {
 					f.preventDefault();
 					document.forms.SubSub.RecreatePath.value = `5-${b - 1}`;
@@ -32,8 +32,10 @@
 			b.addEventListener("click", () => {
 				navigator.clipboard.writeText(c).then(() => {
 					b.textContent = "הסיסמה הועתקה בהצלחה!"
-				}).catch(_ =>
-					b.textContent = "שגיאה בהעתקה"
+				}).catch(err => {
+						b.textContent = "שגיאה בהעתקה";
+						console.error(err);
+					}
 				)
 			})
 		}

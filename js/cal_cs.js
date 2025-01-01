@@ -4,23 +4,22 @@ import {CommonCalendar} from './common_calendar.js';
 import {OrganizerCalendar} from './organizer.js';
 import {reverseString, xorStrings} from './utils.js';
 
-
 (function () {
 	function F(e) {
 		chrome.storage.local.get({cs_cal_finished: {}}, function (b) {
-			chrome.runtime.lastError ? console.log("TE_cs_cal7: " + chrome.runtime.lastError.message) : (b.cs_cal_finished.hasOwnProperty(e) ? delete b.cs_cal_finished[e] : b.cs_cal_finished[e] = 0, chrome.storage.local.set({cs_cal_finished: b.cs_cal_finished}))
+			chrome.runtime.lastError ? console.error("TE_cs_cal7: " + chrome.runtime.lastError.message) : (b.cs_cal_finished.hasOwnProperty(e) ? delete b.cs_cal_finished[e] : b.cs_cal_finished[e] = 0, chrome.storage.local.set({cs_cal_finished: b.cs_cal_finished}))
 		})
 	}
 
-	const r = new CommonPopup;
+	const popup = new CommonPopup;
 	let v;
-	r.title = 'מטלות קרובות - מדמ"ח';
-	r.css_list = ["calendar"];
+	popup.title = 'מטלות קרובות - מדמ"ח';
+	popup.css_list = ["calendar"];
 	if (document.title === "ארגונית++") {
-		v = new OrganizerCalendar(r, "cs");
+		v = new OrganizerCalendar(popup, "cs");
 	} else {
-		v = new CommonCalendar(r, "cs");
-		r.popupWrap();
+		v = new CommonCalendar(popup, "cs");
+		popup.popupWrap();
 		v.calendarWrap();
 	}
 
@@ -32,16 +31,16 @@ import {reverseString, xorStrings} from './utils.js';
 			wcpass: "",
 			cal_seen: 0
 		}, function (a) {
-			if (chrome.runtime.lastError) console.log("TE_cs_cal: " + chrome.runtime.lastError.message), k({
+			if (chrome.runtime.lastError) console.error("TE_cs_cal: " + chrome.runtime.lastError.message), k({
 				msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
-				is_error: !0
+				is_error: true
 			}); else {
 				let w = reverseString(xorStrings(a.uidn_arr[0] + "", a.uidn_arr[1]));
 				"" == w || "" == a.wcpass ? k({
 					msg: "לא הגדרת מספר זהות/סיסמת יומן; יש למלא פרטים אלו בהגדרות התוסף.",
-					is_error: !0
+					is_error: true
 				}) : (w = `https://grades.cs.technion.ac.il/cal/${w}/${encodeURIComponent(a.wcpass)}`,
-					r.XHR(w, "text").then(function (m) {
+					popup.XHR(w, "text").then(function (m) {
 						let d;
 						const f = m.response.split("BEGIN:VEVENT");
 						if (1 == f.length) b({new_list: [], finished_list: []}); else {
@@ -65,7 +64,7 @@ import {reverseString, xorStrings} from './utils.js';
 								if (h.includes(".PHW")) {
 									if (u > m) {
 										let y = h.replace(".PHW", ".HW");
-										g = g.replace("\u05e4\u05e8\u05e1\u05d5\u05dd \u05e9\u05dc ", "");
+										g = g.replace("פרסום של ", "");
 										n.hasOwnProperty(d) && (n[d] = n[d].replace("[[" + g + "]]", ""));
 										t = t.filter(z => z.uid != y);
 										x = x.filter(z => z.uid != y)
@@ -74,10 +73,10 @@ import {reverseString, xorStrings} from './utils.js';
 								}
 								if (u < m || u > m + 2592E6) continue;
 								let A = "icspasswordexpires" == h, B = "icspasswordexpires1" == h;
-								A && !B && v.insertMessage('תוקף סיסמת הגישה ליומן המטלות של מדמ"ח יפוג בשבוע הקרוב, הוראות לחידושה נמצאות בהגדרות התוסף.',
-									!1);
+								A && !B &&
+								v.insertMessage('תוקף סיסמת הגישה ליומן המטלות של מדמ"ח יפוג בשבוע הקרוב, הוראות לחידושה נמצאות בהגדרות התוסף.', false);
 								if (A || B) continue;
-								A = "\u05d9\u05d5\u05dd " + v.w_days[u.getDay()] + ", " + c.D + "." + c.M + "." + c.Y;
+								A = "יום " + v.w_days[u.getDay()] + ", " + c.D + "." + c.M + "." + c.Y;
 								B = f[l].match(p.description)[1];
 								let G = f[l].match(p.url)[1];
 								c = 0;
@@ -85,8 +84,8 @@ import {reverseString, xorStrings} from './utils.js';
 								d = q.split("(")[1].split(")")[0];
 								n.hasOwnProperty(d) || (n[d] = "");
 								n[d] += "[[" + g + "]]";
-								q = !0;
-								a.cs_cal_seen.hasOwnProperty(d) && a.cs_cal_seen[d].includes("[[" + g + "]]") && (q = !1);
+								q = true;
+								a.cs_cal_seen.hasOwnProperty(d) && a.cs_cal_seen[d].includes("[[" + g + "]]") && (q = false);
 								g = {
 									header: g,
 									description: B,
@@ -113,10 +112,9 @@ import {reverseString, xorStrings} from './utils.js';
 					}).catch(function (m) {
 						const f = ['אירעה שגיאה בניסיון לגשת אל שרת הפקולטה למדמ"ח, אנא נסה שנית מאוחר יותר.',
 							'השרת של הפקולטה למדמ"ח מסרב לקבל את סיסמת היומן שלך. הוראות לחידוש סיסמת יומן ה-GR++ נמצאות בהגדרות התוסף.'];
-						k({msg: 401 == m ? f[1] : f[0], is_error: !0})
+						k({msg: 401 == m ? f[1] : f[0], is_error: true})
 					}))
 			}
 		})
-		console.log("cs")
 	}))
 })();

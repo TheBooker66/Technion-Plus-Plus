@@ -1,5 +1,4 @@
 'use strict';
-
 import {CommonPopup} from './common_popup.js';
 
 (function () {
@@ -21,7 +20,7 @@ import {CommonPopup} from './common_popup.js';
 					f(e[1], c);
 					0 < b[0].totalBytes ? (c += " - " + (b[0].bytesReceived / 1048576).toFixed(1) + "/" + (b[0].totalBytes / 1048576).toFixed(1) + "MB", f(e[1], c), b = (100 * b[0].bytesReceived / b[0].totalBytes).toFixed(1), k(e[2], b)) : k(e[2], 0)
 				}
-			}) : ("none" != document.getElementById("myform").style.display && (document.getElementById("myform").style.display = "none"), f(e[0], "\u05d0\u05d9\u05df \u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05d4\u05d5\u05e8\u05d3\u05d4 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d4\u05ea\u05d5\u05e1\u05e3."),
+			}) : ("none" != document.getElementById("myform").style.display && (document.getElementById("myform").style.display = "none"), f(e[0], "אין קבצים בהורדה על ידי התוסף."),
 				f(e[1], ""), k(e[2], 0))
 		})
 	}
@@ -32,7 +31,7 @@ import {CommonPopup} from './common_popup.js';
 			let b = 0;
 			a.dl_queue.forEach(c => {
 				for (let m = 0; m < c.list.length; m++) {
-					let p = c.list[m], g = q.cloneNode(!0).querySelector(".list_item");
+					let p = c.list[m], g = q.cloneNode(true).querySelector(".list_item");
 					g.querySelector(".dl_name").textContent = p.n;
 					g.querySelector(".dl_from").src = "../icons/" + ["moodle.svg", "panopto.ico", "grpp.ico", "grpp.ico"][c.sys];
 					g.querySelector(".remove").addEventListener("click", () => {
@@ -53,13 +52,13 @@ import {CommonPopup} from './common_popup.js';
 		})
 	}
 
-	const h = new CommonPopup;
-	h.title = "מנהל הורדות";
-	h.css_list = ["downloads"];
-	h.popupWrap();
+	const popup = new CommonPopup;
+	popup.title = "מנהל הורדות";
+	popup.css_list = ["downloads"];
+	popup.popupWrap();
 	const e = document.querySelectorAll("#current span"),
 		d = document.getElementById("queue"),
-		q = h.loadTemplate("dl_item");
+		q = popup.loadTemplate("dl_item");
 	n();
 	setInterval(n, 350);
 	l();

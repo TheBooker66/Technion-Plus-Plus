@@ -17,11 +17,7 @@ export class OrganizerCalendar extends CommonCalendar {
 	}
 }
 
-function loadTemplate(a, b) {
-	b = void 0 === b ? document : b;
-	a = b.querySelector("template#" + a).content;
-	return document.importNode(a, !0)
-}
+const loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
 
 function insertMessage(a, b) {
 	const c = document.getElementById("error").appendChild(document.createElement("div"));
@@ -55,7 +51,7 @@ function openAssignment(a, b) {
 		c.classList.remove("small_spinner");
 		c.textContent = d
 	};
-	b().then(f).catch(() => {
+	b().then(f).catch(_ => {
 		a.setAttribute("style", "background-color: rgba(215, 0, 34, 0.8) !important;");
 		setTimeout(() => a.setAttribute("style", ""), 1E3);
 		f()
@@ -80,10 +76,6 @@ function insertAssignments(a, b) {
 				m: ["moodle.svg", "מודל"],
 				cs: ["grpp.ico", 'מדמ"ח']
 			};
-			// e.course = e.course.replace(/[0-9]+ - | - (\u05d7\u05d5\u05e8\u05e3|\u05e7\u05d9\u05e5|\u05d0\u05d1\u05d9\u05d1)/,
-			// 	""); // חורף, קיץ, אביב
-			// e.course = e.course.replace(/[^a-zA-Z0-9\u05d0-\u05ea ]/, ""); // א-ת
-			// WHY WOULD YOU DO THIS?!
 			c.add(e.course);
 			g.querySelector(".system").src = "../icons/" + m[e.sys][0];
 			g.querySelector(".system").title = "מטלת" + m[e.sys][1];
@@ -102,9 +94,9 @@ function insertAssignments(a, b) {
 	}, f = loadTemplate("assignment"), k = loadTemplate("userAgenda");
 	a.sort(hw_sort);
 	b.sort(hw_sort);
-	a.forEach(e => d(e, "ua" == e.sys ? k.cloneNode(!0) : f.cloneNode(!0), "new_assignments"));
+	a.forEach(e => d(e, "ua" == e.sys ? k.cloneNode(true) : f.cloneNode(true), "new_assignments"));
 	b.forEach(e =>
-		d(e, "ua" == e.sys ? k.cloneNode(!0) : f.cloneNode(!0), "finished_assignments"));
+		d(e, "ua" == e.sys ? k.cloneNode(true) : f.cloneNode(true), "finished_assignments"));
 	const h = document.getElementById("course_filter");
 	Array.from(c).forEach(e => {
 		let g = h.appendChild(document.createElement("option"));
@@ -116,16 +108,20 @@ function insertAssignments(a, b) {
 
 function removeUA(a) {
 	chrome.storage.local.get({user_agenda: {}}, b => {
-		b.user_agenda.hasOwnProperty(a) && (console.log("h1"), window.confirm(`המטלה "${b.user_agenda[a].header}" תימחק!`) && (console.log("h2"), delete b.user_agenda[a], chrome.storage.local.set({user_agenda: b.user_agenda}, () => {
-			document.getElementById(`U_${a}`).remove();
-			checkForEmpty()
-		})))
-	})
+		if (b.user_agenda.hasOwnProperty(a))
+			if (window.confirm(`המטלה "${b.user_agenda[a].header}" תימחק!`)) {
+				delete b.user_agenda[a];
+				chrome.storage.local.set({user_agenda: b.user_agenda}, () => {
+					document.getElementById(`U_${a}`).remove();
+					checkForEmpty();
+				});
+			}
+	});
 }
 
 function toggleFinishedUA(a) {
 	chrome.storage.local.get({user_agenda: {}}, function (b) {
-		chrome.runtime.lastError ? console.log("TE_organize7: " + chrome.runtime.lastError.message) : (b.user_agenda[a].done = 1 - b.user_agenda[a].done, chrome.storage.local.set({user_agenda: b.user_agenda}))
+		chrome.runtime.lastError ? console.error("TE_organize7: " + chrome.runtime.lastError.message) : (b.user_agenda[a].done = 1 - b.user_agenda[a].done, chrome.storage.local.set({user_agenda: b.user_agenda}))
 	})
 }
 
@@ -134,22 +130,20 @@ function editUA(a) {
 		form.subject.value = b.user_agenda[a].header;
 		form.notes.value = b.user_agenda[a].description;
 		form.edit.value = a;
-		0 < b.user_agenda[a].timestamp ? (form.no_end.checked = !1, form.end_time.valueAsNumber = b.user_agenda[a].timestamp) : (form.no_end.checked = !0, form.end_time.value = "");
+		0 < b.user_agenda[a].timestamp ? (form.no_end.checked = false, form.end_time.valueAsNumber = b.user_agenda[a].timestamp) : (form.no_end.checked = true, form.end_time.value = "");
 		form_manual_events();
 		po_list.forEach(c => c.style.display = "none");
 		po_list[2].style.display = "block"
 	})
 }
 
-function insertUserAssignment(a, b, c, d) {
-	c = void 0 === c ? null : c;
-	d = void 0 === d ? !1 : d;
+function insertUserAssignment(a, b, c = null, d = false) {
 	"div" != b.nodeName.toLowerCase() && (b = b.querySelector(".list_item"));
 	b.id = `U_${a.id}`;
 	b.querySelector(".assignment_header").textContent = a.header;
 	b.dataset.course = "#user-course";
-	let f = 20 * (a.description.split("\n").length + 1);
-	let k = b.querySelector(".assignment_descripion textarea");
+	let f = 20 * (a.description.split("\n").length + 1),
+		k = b.querySelector(".assignment_descripion textarea");
 	k.textContent = a.description;
 	k.style.height = f + "px";
 	f = b.querySelector(".end_time > span");
@@ -161,13 +155,15 @@ function insertUserAssignment(a, b, c, d) {
 			year: "numeric"
 		})) : f.parentNode.style.visibility = "hidden";
 	-1 == a.timestamp && b.classList.add("system_message");
-	c && (c = document.getElementById(c),
-		b = d ? c.insertBefore(b, c.children[0]) : c.appendChild(b),
-		c = b.querySelectorAll("a.button"),
-		c[0].addEventListener("click", () => editUA(a.id)),
-		c[1].addEventListener("click", () => removeUA(a.id)),
-		c[2].addEventListener("click", () => toggle(b, a.toggleFunc, 1)),
-		c[3].addEventListener("click", () => toggle(b, a.toggleFunc, 0)))
+	if (c) {
+		c = document.getElementById(c)
+		b = d ? c.insertBefore(b, c.children[0]) : c.appendChild(b);
+		c = b.querySelectorAll("a.button");
+		c[0].addEventListener("click", () => editUA(a.id));
+		c[1].addEventListener("click", () => removeUA(a.id));
+		c[2].addEventListener("click", () => toggle(b, a.toggleFunc, 1));
+		c[3].addEventListener("click", () => toggle(b, a.toggleFunc, 0));
+	}
 }
 
 const CALENDARS = 3; // moodle, webwork, cs
@@ -176,11 +172,11 @@ const assignments_promises = {};
 function addAssignmentsToList(a, b) {
 	assignments_promises[b] = a;
 	Object.keys(assignments_promises).length == CALENDARS && chrome.storage.local.get({
-		moodle_cal: !0,
-		cs_cal: !1,
-		wwcal_switch: !1,
-		quick_login: !0,
-		enable_login: !0,
+		moodle_cal: true,
+		cs_cal: false,
+		wwcal_switch: false,
+		quick_login: true,
+		enable_login: true,
 		user_agenda: {}
 	}, c => {
 		const d = {};
@@ -200,14 +196,14 @@ function addAssignmentsToList(a, b) {
 			h = h.concat(m.new_list);
 			e = e.concat(m.finished_list);
 			++k == f.length && insertAssignments(h, e)
-		}).catch(m => {
-			insertMessage(m.msg, m.is_error);
+		}).catch(err => {
+			insertMessage(err.msg, err.is_error);
 			++k == f.length && insertAssignments(h, e)
 		});
 		0 == f.length && (insertAssignments(h, e), insertMessage(
 			'משיכת מטלות הבית עבור מודל, וובוורק ומדמ"ח כבויה. ' +
 			'יש להגדיר הצגת מטלות בית עבור המערכות הרצויות בהגדרות התוסף',
-			!1))
+			false))
 	})
 }
 
@@ -228,12 +224,12 @@ function form_submit() {
 		chrome.storage.local.get({user_agenda: {}}, a => {
 			let b = a.user_agenda;
 			a = parseInt(form.edit.value);
-			let c = 0 < a ? b.hasOwnProperty(a) : !1, d = c ? a : Date.now();
+			let c = 0 < a ? b.hasOwnProperty(a) : false, d = c ? a : Date.now();
 			b[d] = {
 				header: form.subject.value.slice(0, 50),
 				description: form.notes.value.slice(0, 280),
 				timestamp: !form.no_end.checked && 0 < parseInt(form.end_time.valueAsNumber) ? parseInt(form.end_time.valueAsNumber) : 0,
-				done: c ? b[d].done : !1
+				done: c ? b[d].done : false
 			};
 			50 < Object.keys(b).length ? alert("לא ניתן ליצור יותר מ־50 מטלות משתמש.") :
 				chrome.storage.local.set({user_agenda: b}, () => {
@@ -243,7 +239,7 @@ function form_submit() {
 						f = document.querySelector(`#U_${d}`);
 						insertUserAssignment(b[d], f);
 						document.querySelector(".tab.current").click()
-					} else f = loadTemplate("userAgenda"), b[d].toggleFunc = () => toggleFinishedUA(d), insertUserAssignment(b[d], f, "new_assignments", !0), checkForEmpty(), po_tabs[0].click();
+					} else f = loadTemplate("userAgenda"), b[d].toggleFunc = () => toggleFinishedUA(d), insertUserAssignment(b[d], f, "new_assignments", true), checkForEmpty(), po_tabs[0].click();
 					form_reset_all()
 				})
 		}) : alert('חובה לבחור תאריך סיום או לסמן את "ללא תאריך סיום"')
@@ -297,7 +293,7 @@ if (document.title === "ארגונית++") {
 	form.notes.addEventListener("input", () => input_counters[1].textContent = form.notes.value.length);
 	form.no_end.addEventListener("input", () => form.end_time.disabled = form.no_end.checked);
 
-	chrome.storage.local.get({gmail: !0}, a => {
+	chrome.storage.local.get({gmail: true}, a => {
 		const b = {
 			ad: "ethan.amiran@gmail.com",
 			su: "יצירת קשר - Technion++"
@@ -307,15 +303,15 @@ if (document.title === "ארגונית++") {
 		document.getElementById("mailtome").setAttribute("href", c);
 		a.gmail && document.getElementById("mailtome").setAttribute("target", "_blank")
 	});
-	chrome.storage.local.get({organizer_fullscreen: !1, organizer_darkmode: !1}, a => {
+	chrome.storage.local.get({organizer_fullscreen: false, organizer_darkmode: false}, a => {
 		let b = document.getElementById("fullscreen");
-		a.organizer_fullscreen && (b.checked = !0, chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"}));
+		a.organizer_fullscreen && (b.checked = true, chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"}));
 		b.addEventListener("change", _ => {
 			chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: b.checked ? "maximized" : "normal"});
 			chrome.storage.local.set({organizer_fullscreen: b.checked})
 		});
 		let c = document.getElementById("darkmode");
-		a.organizer_darkmode && (c.checked = !0,
+		a.organizer_darkmode && (c.checked = true,
 			document.querySelector("html").setAttribute("tplus", "dm"));
 		c.addEventListener("change", _ => {
 			c.checked ? document.querySelector("html").setAttribute("tplus", "dm") : document.querySelector("html").removeAttribute("tplus");
