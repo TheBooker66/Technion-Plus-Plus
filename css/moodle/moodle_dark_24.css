@@ -1,4 +1,4 @@
-@import "moodle_dark_root.css";
+@import "css/moodle/moodle_dark_root.css";
 
 [tplus=dm] body {
     color: #eee !important;
@@ -14,6 +14,15 @@
 
 [tplus=dm] .iconset {
     background-color: #0002;
+}
+
+[tplus=dm] .fpstartwrap .iconset {
+    background-color: #0002;
+}
+
+[tplus=dm] .fpstartwrap .iconset div {
+    background-color: #0002;
+    border: #0002;
 }
 
 [tplus=dm] .iconset a.iconbtn {
@@ -58,13 +67,10 @@
 }
 
 [tplus=dm] h5.card-title {
-    display: block !important;
     margin: -1.25rem -1.25rem .75rem;
-    padding: 1rem;
-    /*background-color: rgba(0, 0, 0, 0.15);*/
     border-bottom: 1px solid;
-    text-align: center;
-    border-image: linear-gradient(to left, transparent 5%, #6B6E70, transparent 95%) 1;
+    border-radius: 8px !important;
+    border-image: linear-gradient(to left, transparent 5%, #acb3b8, transparent 95%) 1;
 }
 
 [tplus=dm] .card-body, [tplus=dm] .userprofile .profile_tree section {
@@ -72,7 +78,8 @@
     border-radius: 4px;
 }
 
-[tplus=dm] .card, [tplus=dm] #page-enrol-users #filterform, [tplus=dm] .que .history, [tplus=dm] .userprofile .profile_tree section, [tplus=dm] .groupinfobox, [tplus=dm] .well {
+[tplus=dm] .card, [tplus=dm] #page-enrol-users #filterform, [tplus=dm] .que .history,
+[tplus=dm] .userprofile .profile_tree section, [tplus=dm] .groupinfobox, [tplus=dm] .well {
     background-color: rgba(255, 255, 255, 0.05) !important;
     /*border-radius: 4px !important;
     box-shadow: var(--shadow_2);*/
@@ -82,14 +89,71 @@
     border: 0 !important;
 }
 
-/*.card-body a, .navbar a:not(.dropdown-item), a.nav-link, .m-t-2.m-b-1 a {*/
 [tplus=dm] .card-body a, [tplus=dm] section#region-main a, [tplus=dm] .activity-navigation a, [tplus=dm] .breadcrumb a {
     color: var(--a_color);
 }
 
-/*.card-body a:hover, .navbar a:hover:not(.dropdown-item), .m-t-2.m-b-1 a:hover {*/
 [tplus=dm] .card-body a:hover, [tplus=dm] section#region-main a:hover, [tplus=dm] .activity-navigation a:hover {
     color: var(--a_hover_color);
+}
+
+[tplus=dm] div#topofscroll.main-inner, [tplus=dm] #page .main-inner-wrapper .main-inner, [tplus=dm] #page.drawers .main-inner,
+[tplus=dm] #region-main, [tplus=dm] .page-header-headings, [tplus=dm] .activity-item, [tplus=dm] .navigation,
+[tplus=dm] .filter-group, [tplus=dm] .bg-white, [tplus=dm] .activity-availability {
+    color: #eee;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[tplus=dm] .moodle-dialogue-base .moodle-dialogue-wrap, [tplus=dm] .fp-content .fp-upload-form,
+[tplus=dm] .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd.yui3-widget-hd,
+[tplus=dm] .file-picker .fp-content {
+    color: #eee !important;
+    background-color: rgba(30, 30, 30, 1) !important;
+}
+
+[tplus=dm] .categoryname {
+    color: #ccc !important;
+}
+
+[tplus=dm] .path-grade-report-user .user-report-container, [tplus=dm] .grade-report-user .user-report-container,
+[tplus=dm] .path-grade-report-user .user-grade, [tplus=dm] .grade-report-user .user-grade,
+[tplus=dm] .path-grade-report-user .user-grade th.category, [tplus=dm] .grade-report-user .user-grade th.category,
+[tplus=dm] .path-grade-report-user .user-grade td.item, [tplus=dm] .grade-report-user .user-grade td.item,
+[tplus=dm] .path-grade-report-user .user-grade th.column-itemname:not(.header,.category,.baggt,.baggb),
+[tplus=dm] .grade-report-user .user-grade th.column-itemname:not(.header,.category,.baggt,.baggb),
+[tplus=dm] .path-grade-report-user .user-grade .column-itemname.baggt,
+[tplus=dm] .path-grade-report-user .user-grade .column-itemname.baggb,
+[tplus=dm] .grade-report-user .user-grade .column-itemname.baggt,
+[tplus=dm] .grade-report-user .user-grade .column-itemname.baggb,
+[tplus=dm] .path-grade-report-user .user-grade thead th,
+[tplus=dm] .grade-report-user .user-grade thead th,
+[tplus=dm] .path-grade-report-user .user-grade .column-contributiontocoursetotal,
+[tplus=dm] .path-grade-report-user .user-grade .column-range,
+[tplus=dm] .path-grade-report-user .user-grade .column-percentage,
+[tplus=dm] .path-grade-report-user .user-grade .column-weight,
+[tplus=dm] .path-grade-report-user .user-grade .b1l,
+[tplus=dm] .grade-report-user .user-grade .b1l,
+[tplus=dm] .path-grade-report-user .user-grade .baggt,
+[tplus=dm] .path-grade-report-user .user-grade .baggb,
+[tplus=dm] .grade-report-user .user-grade .baggt,
+[tplus=dm] .grade-report-user .user-grade .baggb,
+[tplus=dm] .path-mod-assign td.submissionnotgraded {
+    color: #eee;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[tplus=dm] .section-item {
+    border: 0 !important;
+}
+
+[tplus=dm] .activity-item.indented {
+    margin: 0 !important;
+    border: 16px rgba(255, 255, 255, 0.05) !important;
+
+}
+
+[tplus=dm] .navigation {
+    border: 0 !important;
 }
 
 [tplus=dm] .nav-link, [tplus=dm] .navbar a:not(.dropdown-item), [tplus=dm] a.nav-link, [tplus=dm] .navbar a .usertext {
@@ -109,13 +173,6 @@
     font-weight: 600;
 }
 
-/*a.navbar-brand::after {
-    content: "";
-    width: 1px;
-    border-left: 1px solid rgba(255,255,255,.1);
-    margin-right: 20px;
-}*/
-
 [tplus=dm] .coursecontrols .editcogbutton:first-child {
     border-left: 1px solid rgba(255, 255, 255, .1);
     margin-left: 20px;
@@ -127,16 +184,16 @@
     background-color: var(--navbar_bg) !important;
 }
 
-/*[tplus=dm] nav.navbar .logo img {
-	opacity: 0.5;
-	border-radius: 6px;
-	display: none;
-}*/
+nav.navbar, nav.navbar.fixed-top.custom-color,
+nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
+    border-bottom: 0 solid var(--navbar_bottom);
+    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.5) !important;
+    background-color: var(--navbar_bg) !important;
+}
 
 [tplus=dm] .navbar .nav-item {
     line-height: 1 !important;
 }
-
 
 [tplus=dm] .course-content .section {
     background-color: unset !important;
@@ -145,21 +202,8 @@
 
 [tplus=dm] .course-section-header {
     background-color: var(--navbar_bg);
+    padding: 0.8em;
 }
-
-/*[tplus=dm] .course-content ul.topics li.section:not(.hidden) .content:after, [tplus=dm] .course-content ul.topics li.section:not(.hidden) .sectionname.accesshide + .section_availability:before {
-    content: '';
-    display: block;
-    height: 8px;
-    background-color: var(--navbar_bg);
-    margin: 4px 4px -4px 4px;
-    border-radius: 3px;
-    border: 1px solid #000;
-}
-
-[tplus=dm] .course-content ul.topics li.section:not(.hidden) .content:after {
-	filter: saturate(.75);
-}*/
 
 [tplus=dm] .course-content ul.topics li.section .content, [tplus=dm] .course-content ul.weeks li.section .content {
     /*background-color: #181818 !important;*/
@@ -170,22 +214,6 @@
     background-color: #777 !important;
 }
 
-/*[tplus=dm] h3.sectionname {
-    background-color: var(--navbar_bg) !important;
-	border-bottom: 1px solid #000;
-    border-radius: 4px 4px 0 0;
-	box-shadow: var(--shadow_2);
-}
-
-[tplus=dm] h3.sectionname a:not(.maor_download_light) {
-	color: #fff !important;
-}
-
-[tplus=dm] li.section.hidden h3.sectionname {
-	background-color: #444 !important;
-	filter: grayscale(100%);
-}*/
-
 [tplus=dm] .path-mod .activity-header:not(:empty) {
     background-color: unset;
 }
@@ -194,12 +222,21 @@
     background-color: var(--calendar_today) !important;
 }
 
+[tplus=dm] .path-grade-report-user .user-grade tbody tr:hover, .grade-report-user .user-grade tbody tr:hover {
+    background-color: var(--calendar_today) !important;
+}
+
 [tplus=dm] .section li.activity, [tplus=dm] .activity-item:not(.activityinline) {
     border-color: #fff1 !important;
     /*border: 0 !important;*/
 }
 
-[tplus=dm] .section li.activity:not(.modtype_label):nth-of-type(odd) {
+[tplus=dm] .section li.activity:not(.modtype_label):nth-of-type(odd),
+[tplus=dm] .generaltable tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+[tplus=dm] .generaltable tbody tr:nth-of-type(even) {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
@@ -310,6 +347,10 @@
     opacity: 1;
 }
 
+[tplus=dm] .fa-cogs {
+    color: #eee !important;
+}
+
 [tplus=dm] div.qtext img[width],
 [tplus=dm] #equationview, [tplus=dm] .mathExpression, [tplus=dm] .MathJax_Preview img, [tplus=dm] img.CToWUd {
     background-color: #e6e6e6 !important;
@@ -320,15 +361,8 @@
     color: #0c0c0c !important;
 }
 
-/* side course list*/
-[tplus=dm] nav .list-group-item:not(.active) {
-    background-color: #e6e6e6 !important;
-    color: #0c0c0c;
-}
-
 [tplus=dm] nav .list-group-item:hover:not(.active) {
-    background-color: #ddd !important;
-    color: #000 !important;
+    background-color: #444 !important;
 }
 
 [tplus=dm] nav .list-group-item.active {
@@ -344,7 +378,6 @@
 [tplus=dm] .list-group-item {
     background-color: rgba(0, 0, 0, .3);
 }
-
 
 [tplus=dm] #nav-drawer {
     background-color: var(--dark_bg) !important;
@@ -364,6 +397,7 @@
 
 [tplus=dm] .secondary-navigation .navigation {
     border-color: #fff;
+    background-color: var(--dark_bg) !important;
 }
 
 [tplus=dm] a.left.carousel-control .fa-chevron-left, [tplus=dm] a.right.carousel-control .fa-chevron-right {
@@ -408,10 +442,6 @@
 
 [tplus=dm] #page-header a:not(:hover) h1 {
     color: #eee;
-}
-
-[tplus=dm] .moodle-dialogue-base .moodle-dialogue-wrap {
-    color: #0c0c0c;
 }
 
 [tplus=dm] .fp-iconview .fp-thumbnail {
@@ -476,18 +506,15 @@
     padding: 1px;
 }
 
-
 [tplus=dm] ::-webkit-scrollbar {
     width: 14px;
 }
 
-/* Track */
 [tplus=dm] ::-webkit-scrollbar-track {
     /*background: #222;*/
     background: var(--dark_bg) !important;
 }
 
-/* Handle */
 [tplus=dm] ::-webkit-scrollbar-thumb {
     background: var(--navbar_bottom) linear-gradient(#fff6, #fff6) !important;
     /*border: solid #222;*/
@@ -496,7 +523,6 @@
     border-radius: 5px;
 }
 
-/* Handle on hover */
 [tplus=dm] ::-webkit-scrollbar-thumb:hover {
     background: #909090cc;
     background: var(--navbar_bottom) linear-gradient(#fff8, #fffa) !important;

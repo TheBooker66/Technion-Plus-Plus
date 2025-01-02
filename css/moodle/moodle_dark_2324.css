@@ -1,11 +1,41 @@
-@import "moodle_dark_root.css";
+@import "css/moodle/moodle_dark_root.css";
 
 [tplus=dm] body {
     color: #eee !important;
-    background-size: 400px 400px;
-    background-color: var(--dark_bg) !important;
-    background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7)) !important;
-    /*background-color: #070707 !important;*/
+    /*background-size: 400px 400px;
+    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.7), rgba(0,0,0,0.9), rgba(0,0,0,0.7), rgba(0,0,0,0.9), rgba(0,0,0,0.7)) !important;
+    */
+    background-color: #070707 !important;
+}
+
+[tplus=dm] .btn {
+    color: #eee
+}
+
+[tplus=dm] .iconset {
+    background-color: #0002;
+}
+
+[tplus=dm] .iconset a.iconbtn {
+    color: var(--a_navlink)
+}
+
+[tplus=dm] .iconset a.iconbtn:hover {
+    color: var(--a_navlink_hover)
+}
+
+[tplus=dm] .drawer {
+    background-color: var(--dark_bg);
+}
+
+[tplus=dm] .drawerheader {
+    background-color: #fff1;
+}
+
+[tplus=dm] div#learnrpage {
+    background-color: rgba(255, 255, 255, 0.05); /*var(--dark_bg);*/
+    border: 0;
+    border-radius: 4px;
 }
 
 [tplus=dm] .headerbkg > .customimage {
@@ -42,12 +72,10 @@
     border-radius: 4px;
 }
 
-[tplus=dm] section#region-main, [tplus=dm] .card, [tplus=dm] #page-enrol-users #filterform, [tplus=dm] .que .history, [tplus=dm] .userprofile .profile_tree section, [tplus=dm] .groupinfobox, [tplus=dm] .well {
+[tplus=dm] .card, [tplus=dm] #page-enrol-users #filterform, [tplus=dm] .que .history, [tplus=dm] .userprofile .profile_tree section, [tplus=dm] .groupinfobox, [tplus=dm] .well {
     background-color: rgba(255, 255, 255, 0.05) !important;
-    /*background-color: rgba(255,255,255,0.05) !important;*/
-    /*border-color: rgba(255, 255, 255, 0.15) !important;*/
-    border-radius: 4px !important;
-    box-shadow: var(--shadow_2);
+    /*border-radius: 4px !important;
+    box-shadow: var(--shadow_2);*/
 }
 
 [tplus=dm] section#region-main {
@@ -55,7 +83,7 @@
 }
 
 /*.card-body a, .navbar a:not(.dropdown-item), a.nav-link, .m-t-2.m-b-1 a {*/
-[tplus=dm] .card-body a, [tplus=dm] section#region-main a, [tplus=dm] .activity-navigation a {
+[tplus=dm] .card-body a, [tplus=dm] section#region-main a, [tplus=dm] .activity-navigation a, [tplus=dm] .breadcrumb a {
     color: var(--a_color);
 }
 
@@ -67,6 +95,10 @@
 [tplus=dm] .nav-link, [tplus=dm] .navbar a:not(.dropdown-item), [tplus=dm] a.nav-link, [tplus=dm] .navbar a .usertext {
     /*color: var(--a_navlink) !important;*/
     color: #fff !important;
+}
+
+[tplus=dm] a.nav-link.active {
+    border-bottom-color: var(--navbar_bottom);
 }
 
 [tplus=dm] .nav-link:hover, [tplus=dm] .navbar a:hover:not(.dropdown-item), [tplus=dm] a.nav-link:hover, [tplus=dm] .navbar a:hover .usertext {
@@ -106,9 +138,13 @@
 }
 
 
-[tplus=dm] .course-content ul.section {
-    background-color: #181818 !important;
+[tplus=dm] .course-content .section {
+    background-color: unset !important;
     border-radius: 0 0 4px 4px;
+}
+
+[tplus=dm] .course-section-header {
+    background-color: var(--navbar_bg);
 }
 
 /*[tplus=dm] .course-content ul.topics li.section:not(.hidden) .content:after, [tplus=dm] .course-content ul.topics li.section:not(.hidden) .sectionname.accesshide + .section_availability:before {
@@ -126,14 +162,8 @@
 }*/
 
 [tplus=dm] .course-content ul.topics li.section .content, [tplus=dm] .course-content ul.weeks li.section .content {
-    /*background-color: #222629 !important;*/
-    /*border: 1px solid #6B6E70 !important;*/
-    background-color: #181818 !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    border-color: #000 !important;
-    border-radius: 4px;
+    /*background-color: #181818 !important;*/
     padding-bottom: 8px !important;
-    box-shadow: var(--shadow_1);
 }
 
 [tplus=dm] .course-content ul li.section.hidden .content {
@@ -156,12 +186,16 @@
 	filter: grayscale(100%);
 }*/
 
+[tplus=dm] .path-mod .activity-header:not(:empty) {
+    background-color: unset;
+}
+
 [tplus=dm] .section li.activity:not(.modtype_label):hover {
     background-color: var(--calendar_today) !important;
 }
 
-[tplus=dm] .section li.activity {
-    border-color: rgba(143, 74, 74, 0.1) !important;
+[tplus=dm] .section li.activity, [tplus=dm] .activity-item:not(.activityinline) {
+    border-color: #fff1 !important;
     /*border: 0 !important;*/
 }
 
@@ -222,6 +256,7 @@
 
 [tplus=dm] .table th, [tplus=dm] table.collection th, [tplus=dm] table.flexible th, [tplus=dm] .generaltable th, [tplus=dm] .table td, [tplus=dm] table.collection td, [tplus=dm] table.flexible td, [tplus=dm] .generaltable td {
     border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #eee;
 }
 
 [tplus=dm] table.quizreviewsummary td.cell {
@@ -265,6 +300,10 @@
     border-color: transparent !important;
     opacity: 0.8;
     padding: .4rem .8rem !important;
+}
+
+[tplus=dm] :not(.navbar) .btn-secondary {
+    color: var(--dark_bg) !important;
 }
 
 [tplus=dm] .navbar .btn-secondary:hover {
@@ -320,6 +359,11 @@
 
 [tplus=dm] .nav-tabs, [tplus=dm] .nav-tabs .nav-link:hover {
     border-color: var(--navbar_bottom) !important;
+    background-color: var(--dark_bg) !important;
+}
+
+[tplus=dm] .secondary-navigation .navigation {
+    border-color: #fff;
 }
 
 [tplus=dm] a.left.carousel-control .fa-chevron-left, [tplus=dm] a.right.carousel-control .fa-chevron-right {
@@ -384,11 +428,6 @@
     padding-left: 0 !important;
 }
 
-[tplus=dm] .breadcrumb {
-    background-color: #222 !important;
-    padding: 0.3rem 0.7rem !important;
-}
-
 [tplus=dm] div#blockslider {
     background-color: #000 !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
@@ -421,6 +460,9 @@
     display: flex !important;
 }
 
+[tplus=dm] #coursecontentcollapse1 .tplus_main_actions > div {
+    background-color: #0004;
+}
 
 [tplus=dm] .hsuforum-thread {
     background-color: #121212;
@@ -440,43 +482,29 @@
 }
 
 /* Track */
-::-webkit-scrollbar-track {
+[tplus=dm] ::-webkit-scrollbar-track {
     /*background: #222;*/
-    background: var(--dark_bg);
+    background: var(--dark_bg) !important;
 }
 
 /* Handle */
-::-webkit-scrollbar-thumb {
-    background-color: #707070cc;
-    background: var(--navbar_bottom) linear-gradient(#fff6, #fff6);
+[tplus=dm] ::-webkit-scrollbar-thumb {
+    background: var(--navbar_bottom) linear-gradient(#fff6, #fff6) !important;
     /*border: solid #222;*/
-    border: solid var(--dark_bg);
+    border: solid var(--dark_bg) !important;
     border-width: 3px;
     border-radius: 5px;
 }
 
 /* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
+[tplus=dm] ::-webkit-scrollbar-thumb:hover {
     background: #909090cc;
-    background: var(--navbar_bottom) linear-gradient(#fff8, #fffa);
+    background: var(--navbar_bottom) linear-gradient(#fff8, #fffa) !important;
 }
 
-::-webkit-scrollbar-thumb:active {
+[tplus=dm] ::-webkit-scrollbar-thumb:active {
     background: #b0b0b0cc;
-    background: var(--navbar_bottom) linear-gradient(#fffc, #fffe);
-}
-
-::-webkit-scrollbar-button:single-button:decrement {
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAJElEQVQI12NgoAr4////f2Q+IzYJRkZGRrgkug6YAkZsEkQBAM6zD/wBxW/hAAAAAElFTkSuQmCC");
-}
-
-::-webkit-scrollbar-button:single-button:increment {
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAKUlEQVQI12NgwAMY/////x+nJAMDAwM2BYyMjIyMMA6yAmRxBmwKKAMAnpcP/GLG/WkAAAAASUVORK5CYII=");
-}
-
-::-webkit-scrollbar-button {
-    background: no-repeat scroll #0005 center;
-    height: 14px;
+    background: var(--navbar_bottom) linear-gradient(#fffc, #fffe) !important;
 }
 
 [tplus=dm] .content-item-container .content-item-footer .timestamp {

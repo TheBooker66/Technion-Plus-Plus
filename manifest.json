@@ -168,9 +168,9 @@
     },
     {
       "css": [
-        "css/moodle.css",
-        "css/moodle_dark_2223.css",
-        "css/moodle_dark_root.css"
+        "css/moodle/moodle.css",
+        "css/moodle/moodle_dark_2223.css",
+        "css/moodle/moodle_dark_root.css"
       ],
       "js": [
         "js/remoodle.js"
@@ -182,9 +182,9 @@
     },
     {
       "css": [
-        "css/moodle.css",
-        "css/moodle_dark_2324.css",
-        "css/moodle_dark_root.css"
+        "css/moodle/moodle.css",
+        "css/moodle/moodle_dark_2324.css",
+        "css/moodle/moodle_dark_root.css"
       ],
       "js": [
         "js/remoodle.js"
@@ -196,9 +196,9 @@
     },
     {
       "css": [
-        "css/moodle.css",
-        "css/moodle_dark_24.css",
-        "css/moodle_dark_root.css"
+        "css/moodle/moodle.css",
+        "css/moodle/moodle_dark_24.css",
+        "css/moodle/moodle_dark_root.css"
       ],
       "js": [
         "js/remoodle.js"
