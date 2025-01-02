@@ -89,7 +89,7 @@
         "css/panopto.css"
       ],
       "js": [
-        "js/panopto_download.js"
+        "js/panopto.js"
       ],
       "matches": [
         "https://panoptotech.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?*",
@@ -240,7 +240,6 @@
     },
     {
       "resources": [
-        "js/panopto_new.js",
         "icons/panopto_icons/*"
       ],
       "matches": [

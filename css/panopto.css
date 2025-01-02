@@ -1,7 +1,7 @@
 /* Configure main menu width */
 :root {
-    --menu-width: 125px;
-    --speed-width: 105px; /* speed and snapshot menu width, 20 px less than menu width */
+    --menu-width: 130px;
+    --speed-width: 110px; /* speed and snapshot menu width, 20 px less than menu width */
 }
 
 /* mark videos that the user already watched */
@@ -53,7 +53,7 @@ a.maor_panopto_action:hover {
 #maor_koteret {
     text-align: center;
     direction: ltr;
-    padding: 4px 4px 4px 34px;
+    padding: 4px 4px 4px 30px;
     display: block;
     border-radius: 4px;
     background-color: #16253D;
