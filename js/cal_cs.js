@@ -1,29 +1,17 @@
 'use strict';
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
-import {OrganizerCalendar} from './organizer.js';
 import {reverseString, xorStrings} from './utils.js';
 
 (function () {
-	function F(e) {
-		chrome.storage.local.get({cs_cal_finished: {}}, function (b) {
-			chrome.runtime.lastError ? console.error("TE_cs_cal7: " + chrome.runtime.lastError.message) : (b.cs_cal_finished.hasOwnProperty(e) ? delete b.cs_cal_finished[e] : b.cs_cal_finished[e] = 0, chrome.storage.local.set({cs_cal_finished: b.cs_cal_finished}))
-		})
-	}
-
-	const popup = new CommonPopup;
-	let v;
-	popup.title = 'מטלות קרובות - מדמ"ח';
+	const popup = new CommonPopup(document.title);
+	popup.title = "מטלות קרובות - מודל";
 	popup.css_list = ["calendar"];
-	if (document.title === "ארגונית++") {
-		v = new OrganizerCalendar(popup, "cs");
-	} else {
-		v = new CommonCalendar(popup, "cs");
-		popup.popupWrap();
-		v.calendarWrap();
-	}
+	const calendar = new CommonCalendar(popup, "cs", document.title);
+	popup.popupWrap();
+	calendar.calendarWrap();
 
-	v.progress(_ => new Promise((b, k) => {
+	calendar.progress(_ => new Promise((b, k) => {
 		chrome.storage.local.get({
 			cs_cal_finished: {},
 			cs_cal_seen: {},
@@ -74,9 +62,9 @@ import {reverseString, xorStrings} from './utils.js';
 								if (u < m || u > m + 2592E6) continue;
 								let A = "icspasswordexpires" == h, B = "icspasswordexpires1" == h;
 								A && !B &&
-								v.insertMessage('תוקף סיסמת הגישה ליומן המטלות של מדמ"ח יפוג בשבוע הקרוב, הוראות לחידושה נמצאות בהגדרות התוסף.', false);
+								calendar.insertMessage('תוקף סיסמת הגישה ליומן המטלות של מדמ"ח יפוג בשבוע הקרוב, הוראות לחידושה נמצאות בהגדרות התוסף.', false);
 								if (A || B) continue;
-								A = "יום " + v.w_days[u.getDay()] + ", " + c.D + "." + c.M + "." + c.Y;
+								A = "יום " + calendar.w_days[u.getDay()] + ", " + c.D + "." + c.M + "." + c.Y;
 								B = f[l].match(p.description)[1];
 								let G = f[l].match(p.url)[1];
 								c = 0;
@@ -92,14 +80,14 @@ import {reverseString, xorStrings} from './utils.js';
 									final_date: A,
 									is_new: q,
 									goToFunc: () => new Promise(y => y(chrome.tabs.create({url: G}))),
-									toggleFunc: () => F(h),
+									event: h,
 									timestamp: u,
 									sys: "cs",
 									uid: h
 								};
 								1 == c ? x.push(g) : t.push(g)
 							}
-							d = v.removeCalendarAlert(a.cal_seen);
+							d = calendar.removeCalendarAlert(a.cal_seen);
 							chrome.storage.local.set({
 								cs_cal_finished: C,
 								cs_cal_seen: n,

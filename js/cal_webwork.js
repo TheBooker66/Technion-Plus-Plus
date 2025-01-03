@@ -1,32 +1,16 @@
 'use strict';
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
-import {OrganizerCalendar} from './organizer.js';
 
 (function () {
-	function q(e) {
-		chrome.storage.local.get({webwork_cal: {}}, function (b) {
-			chrome.runtime.lastError ? console.error("TE_ww_cal7: " + chrome.runtime.lastError.message) : (b.webwork_cal[e].done = 1 - b.webwork_cal[e].done, chrome.storage.local.set({webwork_cal: b.webwork_cal}))
-		})
-	}
-
-	function r(e, b) {
-		return e[1].ts === b[1].ts ? e[1].h.localeCompare(b[1].h) : 0 === e[1].ts ? 1 : 0 === b[1].ts || e[1].ts < b[1].ts ? -1 : e[1].ts > b[1].ts ? 1 : 0
-	}
-
-	const popup = new CommonPopup;
-	let l;
-	popup.title = "מטלות קרובות - WeBWorK";
+	const popup = new CommonPopup(document.title);
+	popup.title = "מטלות קרובות - מודל";
 	popup.css_list = ["calendar"];
-	if (document.title === "ארגונית++") {
-		l = new OrganizerCalendar(popup, "webwork");
-	} else {
-		l = new CommonCalendar(popup, "webwork");
-		popup.popupWrap();
-		l.calendarWrap();
-	}
+	const calendar = new CommonCalendar(popup, "webwork", document.title);
+	popup.popupWrap();
+	calendar.calendarWrap();
 
-	const u = (e, b) => chrome.storage.local.get({
+	calendar.progress(() => new Promise((e, b) => chrome.storage.local.get({
 		webwork_cal: {},
 		cal_seen: 0,
 		wwcal_update: 0,
@@ -49,7 +33,9 @@ import {OrganizerCalendar} from './organizer.js';
 			Object.keys(k).forEach(a => {
 				d.push([a, k[a]])
 			});
-			d.sort(r);
+			d.sort((a, b) => {
+				return a[1].ts === b[1].ts ? a[1].h.localeCompare(b[1].h) : 0 === a[1].ts ? 1 : 0 === b[1].ts || a[1].ts < b[1].ts ? -1 : a[1].ts > b[1].ts ? 1 : 0;
+			});
 			let c = [], g = [];
 			for (let a = 0; a < d.length; a++) {
 				let n = d[a][0].split("_")[0];
@@ -60,17 +46,16 @@ import {OrganizerCalendar} from './organizer.js';
 					final_date: d[a][1].due,
 					is_new: !d[a][1].seen,
 					goToFunc: () => new Promise((t, _) => t(chrome.tabs.create({url: `https://moodle24.technion.ac.il/mod/lti/launch.php?id=${n}`}))),
-					toggleFunc: () => q(d[a][0]),
+					event: d[a][0],
 					timestamp: d[a][1].ts,
-					sys: "ww"
+					sys: "webwork",
 				};
 				1 == d[a][1].done ? g.push(p) : c.push(p);
 				d[a][1].seen = 1
 			}
-			f = l.removeCalendarAlert(f.cal_seen);
+			f = calendar.removeCalendarAlert(f.cal_seen);
 			chrome.storage.local.set({cal_seen: f, webwork_cal: k});
 			e({new_list: c, finished_list: g})
 		}
-	});
-	l.progress(() => new Promise(u))
+	})));
 })();

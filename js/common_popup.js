@@ -1,11 +1,12 @@
 'use strict';
 
 export class CommonPopup {
-	constructor() {
+	constructor(type) {
 		this.title = "";
 		this.css_list = [];
 		this.wrapper = document.getElementsByClassName("wrapper")[0];
 		this.main_content = this.wrapper.getElementsByClassName("main-content")[0];
+		this.type = type;
 	}
 
 	useTemplatesFile = (a, b) => {
@@ -18,6 +19,7 @@ export class CommonPopup {
 	loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
 
 	popupWrap() {
+		if (this.type === "ארגונית++") return;
 		this.useTemplatesFile("popup", a => {
 			for (let b = 0; b < this.css_list.length; b++) {
 				const c = this.loadTemplate("head-stylesheets", a);
