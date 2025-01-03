@@ -78,8 +78,7 @@
         "https://webcourse.cs.technion.ac.il/23*/*/hw_esubmit_*.html",
         "https://webcourse.cs.technion.ac.il/23*/*/lock_*.html",
         "https://portalex.technion.ac.il/irj/portal/external*",
-        "https://techwww.technion.ac.il/tech_ident/",
-        "https://sason-p.technion.ac.il/*"
+        "https://techwww.technion.ac.il/tech_ident/"
       ],
       "run_at": "document_end"
     },
@@ -102,33 +101,11 @@
       ],
       "js": [
         "js/webcourse.js",
-        "js/gradescs.js"
+        "js/cs.js"
       ],
       "matches": [
         "https://webcourse.cs.technion.ac.il/*",
         "https://grades.cs.technion.ac.il/grades.cgi?*.html"
-      ]
-    },
-    {
-      "css": [
-        "css/ug.css"
-      ],
-      "js": [
-        "js/ug.js"
-      ],
-      "matches": [
-        "https://ug3.technion.ac.il/rishum/*"
-      ]
-    },
-    {
-      "css": [
-        "css/ug.css"
-      ],
-      "js": [
-        "js/course_search.js"
-      ],
-      "matches": [
-        "https://students.technion.ac.il/local/technionsearch/course/*"
       ]
     },
     {
@@ -147,7 +124,7 @@
         "css/maor_download.css"
       ],
       "js": [
-        "js/gradescs.js"
+        "js/cs.js"
       ],
       "matches": [
         "https://grades.cs.technion.ac.il/grades.cgi"
@@ -226,6 +203,18 @@
       "matches": [
         "https://students.technion.ac.il/local/tcurricular/grades*"
       ]
+    },
+    {
+      "css": [
+        "css/sap.css"
+      ],
+      "js": [
+        "js/sap.js"
+      ],
+      "matches": [
+        "https://portalex.technion.ac.il/irj/portal/external*",
+        "https://portalex.technion.ac.il/ovv*"
+      ]
     }
   ],
   "web_accessible_resources": [
@@ -260,14 +249,6 @@
       ],
       "matches": [
         "https://grades.technion.ac.il/*"
-      ]
-    },
-    {
-      "resources": [
-        "css/sasonp.css"
-      ],
-      "matches": [
-        "https://sason-p.technion.ac.il/*"
       ]
     }
   ]

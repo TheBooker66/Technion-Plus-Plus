@@ -18,7 +18,7 @@ export class CommonPopup {
 	loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
 
 	popupWrap() {
-		this.useTemplatesFile("common", a => {
+		this.useTemplatesFile("popup", a => {
 			for (let b = 0; b < this.css_list.length; b++) {
 				const c = this.loadTemplate("head-stylesheets", a);
 				c.querySelector("link").setAttribute("href", "../css/p_" + this.css_list[b] + ".css");

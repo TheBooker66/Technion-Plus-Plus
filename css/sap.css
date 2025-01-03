@@ -1,15 +1,30 @@
 :root {
-
     --prim-dark: hsl(208, 80%, 15%);
     --prim-cool: hsl(208, 90%, 23%);
     --prim-kot: hsl(208, 100%, 5%);
+}
+
+#TP_bigbox {
+    padding: 1rem 2.5rem 1rem;
+    border-bottom: 0.125rem solid #f2f2f2;
+    margin-bottom: 1rem;
+}
+
+#TP_bigbox #card-title {
+    height: 2rem;
+    line-height: 2rem;
+    white-space: normal;
+    float: right;
+    color: #333333;
+    font-size: 1.125rem;
+    font-weight: normal;
+    font-family: "72", "72full", Arial, Helvetica, sans-serif;
 }
 
 #TP_infobox {
     border: solid var(--prim-dark);
     border-width: 0 5px;
     clear: both;
-    margin: 0;
     border-radius: 4px;
 }
 

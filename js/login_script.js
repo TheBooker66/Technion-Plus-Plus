@@ -119,39 +119,6 @@
 			login_moodle_url(a);
 	}
 
-	function sason_p(a, b) {
-		if (window.location.href.includes("sason-p.technion.ac.il/idp/profile/SAML2/Redirect") &&
-			"" == document.title) {
-			b = document.createElement("link");
-			b.setAttribute("rel", "stylesheet");
-			b.setAttribute("href", chrome.runtime.getURL("css/sasonp.css"));
-			document.head.appendChild(b);
-			// noinspection JSDeprecatedSymbols
-			b = document.createElement("center");
-			b.id = "box";
-			let c = document.createElement("div");
-			c.id = "koteret";
-			c.textContent = "Technion";
-			const e = document.createElement("sup");
-			e.textContent = "++";
-			c.appendChild(e);
-			b.appendChild(c);
-			c = document.createElement("div");
-			c.textContent = "אתה מחובר ומועבר כעת, אנא המתן...";
-			b.appendChild(c);
-			document.body.appendChild(b)
-		}
-		if (!document.getElementById("Main_forM"))
-			return;
-		if (!document.getElementById("err_msg"))
-			return;
-		if ("X" == document.getElementById("err_msg").textContent || !document.getElementById("Error_message"))
-			return;
-		if ("X" == document.getElementById("Error_message").textContent)
-			return;
-		m(a, true, "");
-	}
-
 	function sap(a) {
 		if ((document.getElementById("certLogonForm") == null || document.referrer.includes("portalex"))
 			&& !document.getElementById("divChangeContent"))
@@ -196,9 +163,6 @@
 						break;
 					case "panoptotech.cloud.panopto.eu":
 						panopto();
-						break;
-					case "sason-p.technion.ac.il":
-						sason_p(a, website);
 						break;
 					case "portalex.technion.ac.il":
 						sap(a);

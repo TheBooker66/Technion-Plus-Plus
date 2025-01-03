@@ -1,6 +1,6 @@
 'use strict';
-import {CommonPopup} from './common_popup.js';
-import {reverseString, xorStrings} from './utils.js';
+import {CommonPopup} from './js/common_popup.js';
+import {reverseString, xorStrings} from './js/utils.js';
 
 (function () {
 	function m(tabs, popup, k) {

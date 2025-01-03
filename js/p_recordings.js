@@ -94,7 +94,7 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 
 	const popup = new CommonPopup(!window.location.href.includes("?"));
 	popup.title = "חיפוש קורס לצפייה";
-	popup.css_list = ["course_find"];
+	popup.css_list = ["recordings"];
 	popup.popupWrap();
 	document.getElementById("theform").addEventListener("submit", a => {
 		if (document.getElementsByName("course")[0].value.length === 0)

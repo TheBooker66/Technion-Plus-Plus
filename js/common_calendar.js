@@ -2,7 +2,6 @@
 
 export class CommonCalendar {
 	constructor(a, b) {
-		this.template_file = "calendar";
 		this.common = a;
 		this.name = b;
 		this.w_days = "ראשון שני שלישי רביעי חמישי שישי שבת".split(" ");
@@ -84,7 +83,7 @@ export class CommonCalendar {
 			e.querySelector(".assignment_header").addEventListener("click", _ => this.openAssignment(e, c.goToFunc));
 			document.getElementById(f).appendChild(e)
 		};
-		this.common.useTemplatesFile(this.template_file, c => {
+		this.common.useTemplatesFile("calendar", c => {
 			const e = this.common.loadTemplate("assignment", c);
 			a.forEach(f => d(f, e.cloneNode(true), "new_assignments"));
 			b.forEach(f => d(f, e.cloneNode(true), "finished_assignments"));
