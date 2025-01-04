@@ -11,9 +11,11 @@ function XHR(url, resType, body = "", reqType = false) {
 	return new Promise((e, g) => {
 		const headers = {
 			headers: {},
-			method: reqType ? "head" : "get"
+			method: reqType ? "head" : "get",
+			mode: "no-cors", // TODO
 		};
 		if (body !== "") {
+			delete headers.mode;
 			headers.method = "post";
 			headers.body = body;
 			headers.headers["Content-type"] = "application/x-www-form-urlencoded";
@@ -69,52 +71,58 @@ export function TE_loginToMoodle(a = false) {
 
 export function TE_forcedAutoLogin(a = false) {
 	return new Promise((b, d) => {
-		const c = err => {
-			console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err}} at${Date.now()} [s]`);
+		const failure = err => {
+			console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err}} at ${Date.now()} [s]`);
 			d();
-		}, e = f => {
+		}, success = f => {
 			console.log(`TE_auto_login: connection was made! At ${Date.now()} [s]`);
 			b(f);
 		};
 		chrome.storage.local.get({enable_external: false}, f => {
-			f.enable_external ? TE_forcedAutoLoginExternalPromise(e, c) : TE_forcedAutoLoginNormalPromise(e, c, a);
+			f.enable_external ? TE_forcedAutoLoginExternalPromise(success, failure) : TE_forcedAutoLoginNormalPromise(success, failure, a);
 		});
 	});
 }
 
 function TE_forcedAutoLoginNormalPromise(a, b, d) {
-	const c = (e, f) => {
-		30 <= f ? (chrome.tabs.remove(e), b("Could not reach moodle, possibly wrong username/password.")) :
-			chrome.tabs.get(e, g => {
-				if (g.url == "https://moodle24.technion.ac.il/") {
-					console.log("close the tab");
-					chrome.tabs.remove(e);
-					XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", d).then(k => a(k));
-				} else
-					setTimeout(() => c(e, f + 1), 500);
-			});
+	const c = async (e, f) => {
+		if (30 <= f) {
+			await chrome.tabs.remove(e);
+			b("Could not reach moodle, possibly wrong username/password.");
+			return;
+		}
+		chrome.tabs.get(e, async tab => {
+			if (tab.url === "https://moodle24.technion.ac.il/") {
+				console.log("close the tab");
+				await chrome.tabs.remove(e);
+				XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", d).then(k => a(k));
+			} else setTimeout(() => c(e, f + 1), 500);
+		});
 	};
 	XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", d).then(e => {
-		!e.responseURL.includes("microsoft") ? a(e) :
-			chrome.storage.local.get({
-				username: "",
-				server: true,
-				enable_login: false
-			}, f => {
-				if (chrome.runtime.lastError) return b("b_storage - " + chrome.runtime.lastError.message);
-				if (!f.enable_login) return b("No username/password");
-				const g = e.responseURL.split("?"), k = new URLSearchParams(g[1]);
-				k.delete("prompt");
-				k.append("login_hint", f.username + "@" + (f.server ? "campus." : "") + "technion.ac.il");
-				chrome.tabs.create({url: g[0] + "?" + k.toString(), active: false}, p => c(p.id, 0));
-			});
+		if (!e.responseURL.includes("microsoft")) {
+			a(e);
+			return;
+		}
+		chrome.storage.local.get({
+			username: "",
+			server: true,
+			enable_login: false
+		}, f => {
+			if (chrome.runtime.lastError) return b("b_storage - " + chrome.runtime.lastError.message);
+			if (!f.enable_login) return b("No username/password");
+			const g = e.responseURL.split("?"), k = new URLSearchParams(g[1]);
+			k.delete("prompt");
+			k.append("login_hint", f.username + "@" + (f.server ? "campus." : "") + "technion.ac.il");
+			chrome.tabs.create({url: g[0] + "?" + k.toString(), active: false}, p => c(p.id, 0));
+		});
 	}).catch(b);
 }
 
 function TE_forcedAutoLoginExternalPromise(a, b) {
 	const d = (c, e) => {
 		8 <= e ? (chrome.tabs.remove(c), b("Could not login to moodle, possibly wrong username/password.")) : chrome.tabs.get(c, _ => {
-			XHR("https://moodle24.technion.ac.il/", "document", "").then(g => {
+			XHR("https://moodle24.technion.ac.il/", "document").then(g => {
 				if (g.response[".usertext"]) {
 					a(g);
 					console.log("close the tab");
@@ -123,7 +131,7 @@ function TE_forcedAutoLoginExternalPromise(a, b) {
 			});
 		});
 	}
-	XHR("https://moodle24.technion.ac.il/", "document", "").then(c => {
+	XHR("https://moodle24.technion.ac.il/", "document").then(c => {
 		if (c.response[".usertext"]) return a(c);
 		chrome.tabs.create({
 			url: "https://moodle24.technion.ac.il/",

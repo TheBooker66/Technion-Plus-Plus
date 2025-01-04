@@ -4,13 +4,13 @@
 	function t(a, c) {
 		a.setAttribute("class", "hidden-command-button");
 		c.setAttribute("class", "hidden-command-button");
-		if (false !== window.location.href.includes("folderID")) {
+		if (window.location.href.includes("folderID")) {
 			const d = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0];
 			fetch(`https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=${d}&type=mp4`)
 				.then(res => res.text())
 				.then(text => (new DOMParser).parseFromString(text, "text/xml"))
 				.then(html => {
-					if (0 != html.getElementsByTagName("item").length) {
+					if (html.getElementsByTagName("item").length !== 0) {
 						a.setAttribute("class", "maor_panopto_action css-fehuet");
 						a.setAttribute("style", "margin-right: 8px");
 						c.setAttribute("class", "maor_panopto_action css-fehuet");
@@ -22,26 +22,28 @@
 								clearInterval(g);
 								const e = document.getElementById("listViewContainer").getElementsByTagName("tr");
 								for (let f = 0; f < e.length - 1; f++) {
-									const h = e[f].getAttribute("id"), p = e[f].getElementsByClassName("item-title")[0],
-										l = p.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
-									if (!(0 < p.getElementsByClassName("maor_download").length)) {
+									const p = e[f].getElementsByClassName("item-title")[0];
+									if (p.getElementsByClassName("maor_download").length === 0) {
 										const a = document.createElement("a");
 										a.setAttribute("class", "maor_download");
 										a.textContent = "הורדה";
-										const g = "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/" + h + ".mp4";
 										a.addEventListener("click", () => {
-											chrome.runtime.sendMessage({mess_t: "singledownload", link: g, name: l});
+											chrome.runtime.sendMessage({
+												mess_t: "singledownload",
+												link: "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/" + e[f].getAttribute("id") + ".mp4",
+												name: p.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4"
+											});
 										});
 										const h = document.createElement("br");
 										p.appendChild(h);
 										p.appendChild(a);
 										if (window.location.href.includes("folderID")) {
-											const l = document.createElement("label");
+											const l = document.createElement("label"),
+												h = document.createElement("div"),
+												e = document.createElement("input");
 											l.setAttribute("class", "maor_download");
-											const h = document.createElement("div");
-											h.textContent = "בחר";
-											const e = document.createElement("input");
 											e.setAttribute("type", "checkbox");
+											h.textContent = "בחר";
 											e.className = "maor_check";
 											h.appendChild(e);
 											l.appendChild(h);
