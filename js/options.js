@@ -14,7 +14,7 @@ import {TE_updateInfo} from '../service_worker.js';
 				}
 			}
 		}
-		return [c.join(""), d.join("")]
+		return [c.join(""), d.join("")];
 	}
 
 	async function m() {
@@ -87,17 +87,6 @@ import {TE_updateInfo} from '../service_worker.js';
 		dark_mode ? document.body.classList.add("dark-mode") : document.body.classList.remove("dark-mode");
 	}
 
-	document.getElementById("bug_report").addEventListener("click", () => {
-		const a = {
-			ad: "ethan.amiran@gmail.com",
-			su: "דיווח תקלה בתוסף Technion++",
-			body: encodeURIComponent("מלאו כאן את פרטי התקלה - מומלץ בתוספת תמונות להמחשה.") +
-				"%0D%0A" + encodeURIComponent("תזכורת: התוסף פותח בהתנדבות ולא מטעם הטכניון!")
-		};
-		let c = document.getElementById("gmail_select").checked ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1&body={3}" : "mailto:{1}?subject={2}&body={3}";
-		c = c.replace("{1}", a.ad).replace("{2}", a.su).replace("{3}", a.body);
-		document.getElementById("gmail_select").checked ? window.open(c) : document.getElementById("hiddenframe").src = c;
-	});
 	document.getElementById("save").addEventListener("click", await m);
 	document.getElementById("try_vol").addEventListener("click", () => {
 		const a = document.createElement("audio");
@@ -109,7 +98,7 @@ import {TE_updateInfo} from '../service_worker.js';
 	});
 	document.getElementById("notification_volume").addEventListener("change", () => {
 		document.getElementById("try_vol").textContent =
-			"נסה (" + 100 * document.getElementById("notification_volume").value + "%)"
+			"נסה (" + 100 * document.getElementById("notification_volume").value + "%)";
 	});
 	document.getElementById("cs_cal").addEventListener("change", () => {
 		document.getElementById("cscal_div").style =
@@ -174,16 +163,17 @@ import {TE_updateInfo} from '../service_worker.js';
 				}
 			}
 		});
-		"function" === typeof chrome.storage.local.getBytesInUse ?
+		if ("function" === typeof chrome.storage.local.getBytesInUse)
 			chrome.storage.local.getBytesInUse(null, bytes => {
 				if (chrome.runtime.lastError) document.getElementById("storage").textContent = "";
 				bytes /= 1024;
 				document.getElementById("storage").textContent += bytes.toFixed(3) + "Kb";
-			}) : document.getElementById("storage").textContent = "";
+			});
+		else document.getElementById("storage").textContent = "";
+		document.querySelector("#ext_version > span").textContent = chrome.runtime.getManifest().version;
 
-		document.addEventListener("keypress", async (a) => {
+		document.addEventListener("keypress", async a => {
 			if (a.key === "Enter") await m();
 		});
 	});
-	document.querySelector("#ext_version > span").textContent = chrome.runtime.getManifest().version;
 })();

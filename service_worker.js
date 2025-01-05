@@ -12,10 +12,8 @@ function XHR(url, resType, body = "", reqType = false) {
 		const headers = {
 			headers: {},
 			method: reqType ? "head" : "get",
-			mode: "no-cors", // TODO
 		};
 		if (body !== "") {
-			delete headers.mode;
 			headers.method = "post";
 			headers.body = body;
 			headers.headers["Content-type"] = "application/x-www-form-urlencoded";
@@ -47,35 +45,38 @@ function XHR(url, resType, body = "", reqType = false) {
 	});
 }
 
-export function TE_loginToMoodle(a = false) {
+export function TE_loginToMoodle(x = false, a = {}) {
 	return new Promise((b, d) => {
 		const failure = err => {
-			console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err}} at${Date.now()} [s]`);
+			console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err}} at ${Date.now()}`);
 			d();
 		}, success = f => {
-			console.log(`TE_auto_login: connection was made! At ${Date.now()} [s]`);
+			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
 			b(f);
 		};
-		XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", a).then(res => {
+		XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", x).then(res => {
 			!res.responseURL.includes("microsoft") ? success(res) : chrome.storage.local.get({
-				username: "",
-				server: true,
-				enable_login: false
+				username: "", server: true, enable_login: false
 			}, id => chrome.runtime.sendMessage({
-				mess_t: "iframe", a: a, fail: failure,
-				succeed: success, id: id, response: res, XHR: XHR
+				mess_t: "iframe", a: a, fail: failure, succeed: success, id: id, response: res, XHR: XHR
 			}));
-		}).catch(failure);
+		}).catch(async err => {
+			if (err === "TypeError: Failed to fetch") {
+				console.error(`${err}, ${Date.now}, OOF.`);
+				await TE_loginToMoodle(x, a);
+			}
+			failure(err);
+		});
 	});
 }
 
 export function TE_forcedAutoLogin(a = false) {
 	return new Promise((b, d) => {
 		const failure = err => {
-			console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err}} at ${Date.now()} [s]`);
+			console.error(`TE_back_M_forced_login: could not connect to moodle. {reason: ${err}} at ${Date.now()}`);
 			d();
 		}, success = f => {
-			console.log(`TE_auto_login: connection was made! At ${Date.now()} [s]`);
+			console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
 			b(f);
 		};
 		chrome.storage.local.get({enable_external: false}, f => {
@@ -446,28 +447,29 @@ export function TE_updateInfo() {
 		wwcal_switch: false,
 		wwcal_update: 0,
 		webwork_courses: {}
-	}, a => {
+	}, async a => {
 		if (chrome.runtime.lastError) console.error("TE_bg_Alarm: " + chrome.runtime.lastError.message);
 		else {
-			const b = Date.now();
-			a.videos_update < b - 2592E5 && TE_updateVideosInfo(b);
-			const c = (a.enable_external || a.enable_login) && a.quick_login,
-				d = c && a.moodle_cal, e = c && a.wwcal_switch && 288E5 < b - a.wwcal_update;
-			if (e || d && a.calendar_prop === "") {
-				TE_forcedAutoLogin().then(f => {
-					if (d && a.calendar_prop === "") {
+			const now = Date.now();
+			if (a.videos_update < now - 2592E5) TE_updateVideosInfo(now);
+			const loginEh = (a.enable_external || a.enable_login) && a.quick_login,
+				moodleEh = loginEh && a.moodle_cal,
+				webworkEh = loginEh && a.wwcal_switch && 288E5 < now - a.wwcal_update;
+			if (webworkEh || moodleEh && a.calendar_prop === "") {
+				TE_forcedAutoLogin().then(async f => {
+					if (moodleEh && a.calendar_prop === "") {
 						TE_getCoursesMoodle(f);
 						TE_checkCalendarProp(a.calendar_prop);
 					}
-					if (e) TE_getWebwork(f, a.webwork_courses);
+					if (webworkEh) await TE_getWebwork(f, a.webwork_courses);
 				}).catch(err => console.error("TE_back: forced_login_error -- " + err))
-			} else if (d && a.calendar_prop !== "") {
-				TE_loginToMoodle(a)
+			} else if (moodleEh && a.calendar_prop !== "") {
+				await TE_loginToMoodle(false, a)
 					.then(TE_getCoursesMoodle)
 					.catch(err => console.error("TE_back: login_error -- " + err));
 				TE_alertMoodleCalendar(a.cal_seen, a.calendar_prop, a.calendar_max, a.cal_killa);
 			}
-			if (a.cs_cal && 288E5 < b - a.cscal_update) TE_csCalendarCheck(a.uidn_arr, a.wcpass, a.cs_cal_seen);
+			if (a.cs_cal && 288E5 < now - a.cscal_update) TE_csCalendarCheck(a.uidn_arr, a.wcpass, a.cs_cal_seen);
 			chrome.storage.local.get({user_agenda: {}}, a => {
 				const b = [], d = Date.now();
 				Object.keys(a.user_agenda).forEach(c => {

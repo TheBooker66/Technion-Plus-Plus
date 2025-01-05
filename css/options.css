@@ -1,4 +1,3 @@
-
 html {
     margin: 0;
     padding: 0;
@@ -9,8 +8,6 @@ html {
 body {
     color: #0c0c0d;
     cursor: default;
-    /*display: flex;
-    flex-direction: column;*/
     font-family: 'Segoe UI', arial, sans-serif;
     font-size: 13px;
     margin: 0;
@@ -132,15 +129,6 @@ small, .description {
     padding: 0 25px;
     margin: 0;
 }
-
-/*.container {
-	margin-bottom: 20px !important;
-	padding: 4px;
-	border: 1px solid #b1b1b1;
-	border-radius: 4px;
-	box-shadow: 0 0 4px 1px #d7d7d7;
-	background: #fff;
-}*/
 
 .container {
     margin-bottom: 25px !important;
