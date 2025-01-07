@@ -230,39 +230,41 @@
 			V = document.querySelectorAll("table.table-sm > thead > tr:first-of-type > th");
 		for (let w = F.length - 1; 0 <= w; w--) {
 			const B = F[w].querySelectorAll("tr");
-			let x = V[w].textContent.split("(")[0].replace("\n", "").replace("סמסטר", "").trim(), l, m;
+			let x = V[w].textContent.split("(")[0].replace("\n", "").replace("סמסטר", "").trim();
 			if ("זיכויים" == x) {
 				h.ex_points = parseFloat(F[w].querySelectorAll("tr:last-child th")[1].textContent.trim());
 				h.ex_points = isNaN(h.ex_points) ? 0 : h.ex_points;
 				for (let t = B.length - 2; 0 <= t; t--) {
-					l = B[t].querySelectorAll("td");
-					m = l[1].textContent;
-					x = l[0].textContent.trim();
+					let l = B[t].querySelectorAll("td");
+					let m = l[1].textContent;
+					let x = l[0].textContent.trim();
 					m = m.trim();
 					l = parseFloat(l[2].textContent);
 					K.push({name: m, num: x, points: 0 < l ? l : 0});
 				}
-			} else for (let t = B.length - 1; 0 <= t; t--) if (m = B[t].querySelectorAll("td"), l = m[3].textContent.replace("*", "").trim(),
-				!("-" == l || "עבר" != l && "לא השלים" != l && isNaN(parseInt(l)))) {
-				"" == r && (r = x);
-				const L = parseInt(l), G = parseFloat(m[2].textContent), W = m[1].textContent,
-					M = m[0].textContent.trim(), C = W.trim();
-				h.total_points_tried += G;
-				h.points_succeed += 55 <= L || "עבר" == l ? G : 0;
-				m = {name: C, num: M, points: G, grade: L, sem: x};
-				if ("לא השלים" == l)
-					m.grade = l, J.push(m);
-				else {
-					"עבר" == l && (m.grade = l);
-					let N = true;
-					C.includes("ספורט") || C.includes("חינוך גופני") ||
-					p.forEach(a => {
-						if (a.name == C || a.num == M) N = false;
-					});
-					N ? (m.selected = m.sem == r, p.push(m)) : E.push(m);
+			} else for (let t = B.length - 1; 0 <= t; t--) {
+				let m = B[t].querySelectorAll("td"), l = m[3].textContent.replace("*", "").trim();
+				if (!("-" == l || "עבר" != l && "לא השלים" != l && isNaN(parseInt(l)))) {
+					if ("" == r) (r = x);
+					const L = parseInt(l), G = parseFloat(m[2].textContent), W = m[1].textContent,
+						M = m[0].textContent.trim(), C = W.trim();
+					h.total_points_tried += G;
+					h.points_succeed += 55 <= L || "עבר" == l ? G : 0;
+					m = {name: C, num: M, points: G, grade: L, sem: x};
+					if ("לא השלים" == l)
+						m.grade = l, J.push(m);
+					else {
+						"עבר" == l && (m.grade = l);
+						let N = true;
+						C.includes("ספורט") || C.includes("חינוך גופני") ||
+						p.forEach(a => {
+							if (a.name == C || a.num == M) N = false;
+						});
+						N ? (m.selected = m.sem == r, p.push(m)) : E.push(m);
+					}
 				}
-			}
-		}
+
+			}		}
 		r = document.querySelectorAll("table.table-sm")[0].querySelectorAll("tr")[2].querySelectorAll("td");
 		h.system_points = parseFloat(r[2].textContent.trim());
 		h.success_rate = 100 * parseFloat(r[1].textContent.trim());

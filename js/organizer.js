@@ -256,9 +256,9 @@ if (document.title === "ארגונית++") {
 	const filters_div = document.getElementById("filtering"), filter = document.getElementById("course_filter"),
 		filters_toggle = document.getElementById("filters_toggle");
 	filter.addEventListener("change", () => {
-		document.querySelectorAll(`.list_item[data-course^='#${filter.value.replace('"', '\\"').replace("'", "\\'")}']`)
+		document.querySelectorAll(`.list_item[data-course^='#${filter.value.replace(/"/g, '\\"').replace(/'/g, "\\'")}']`)
 			.forEach(a => a.classList.remove("hidden"));
-		document.querySelectorAll(`.list_item:not([data-course^='#${filter.value.replace('"', '\\"').replace("'", "\\'")}'])`)
+		document.querySelectorAll(`.list_item:not([data-course^='#${filter.value.replace(/"/g, '\\"').replace(/'/g, "\\'")}'])`)
 			.forEach(a => a.classList.add("hidden"));
 		checkForEmpty();
 	});
