@@ -1,6 +1,10 @@
 # IDE files
 /.idea/
 
+# Minified files
+/minified/
+minified.zip
+
 # My testing
 example.ics
 urls.txt
