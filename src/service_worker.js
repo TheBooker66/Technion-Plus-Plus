@@ -141,23 +141,23 @@ function TE_forcedAutoLoginExternalPromise(a, b) {
 	}).catch(b);
 }
 
-function TE_notification(a, b, c = "") {
-	let date = new Date;
+function TE_notification(msg, silent, c = "") {
+	const date = new Date;
 	const hour = date.getHours(), minutes = date.getMinutes();
-	a += "התראה התקבלה בשעה: " + (10 > hour ? "0" + hour : hour) + ":" + (10 > minutes ? "0" + minutes : minutes);
-	a = {
+	msg += "התראה התקבלה בשעה: " + (10 > hour ? "0" + hour : hour) + ":" + (10 > minutes ? "0" + minutes : minutes);
+	msg = {
 		type: "basic",
 		iconUrl: chrome.runtime.getURL("../icons/technion_plus_plus/icon-48.png"),
-		title: "Technion",
-		message: a
+		title: "Technion++",
+		message: msg,
 	};
-	"Chromium" === ("undefined" !== typeof browser ? "Firefox" : "Chromium") && (a.silent = true);
+	"Chromium" === ("undefined" !== typeof browser ? "Firefox" : "Chromium") && (msg.silent = true);
 	if (c !== "") chrome.notifications.clear(c);
-	chrome.notifications.create(c, a, _ => {
-		b || chrome.storage.local.get({notif_vol: 1, alerts_sound: true}, f => {
+	chrome.notifications.create(c, msg, _ => {
+		if (silent) return;
+		chrome.storage.local.get({notif_vol: 1, alerts_sound: true}, f => {
 			if (chrome.runtime.lastError) console.error("TE_bg_notification_err: " + chrome.runtime.lastError.message);
-			else if (f.alerts_sound)
-				chrome.runtime.sendMessage({mess_t: "audio notification", volume: f.notif_vol});
+			else if (f.alerts_sound) chrome.runtime.sendMessage({mess_t: "audio notification", volume: f.notif_vol});
 		});
 	});
 }

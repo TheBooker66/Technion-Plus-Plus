@@ -34,22 +34,26 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 			p.append("login_hint", message.id.username + "@" + (message.id.server ? "campus." : "") + "technion.ac.il");
 			const h = document.createElement("iframe"),
 				m = () => {
-					h.getAttribute("login_over") || (h.setAttribute("timer_over", "1"), message.fail("timer ended"))
+					if (h.getAttribute("login_over")) return;
+					h.setAttribute("timer_over", "1");
+					message.fail("timer ended");
 				}, l = () => {
-					h.getAttribute("timer_over") || (clearTimeout(m), h.setAttribute("login_over", "1"),
-						h.removeEventListener("load", l),
-						message.XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", message.a).then(q => {
-							q.responseURL.includes("microsoft") ? message.fail("stuck on microsoft") : message.succeed(q)
-						}))
+					if (h.getAttribute("timer_over")) return;
+					clearTimeout(m);
+					h.setAttribute("login_over", "1");
+					h.removeEventListener("load", l);
+					message.XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", message.a).then(q => {
+						q.responseURL.includes("microsoft") ? message.fail("stuck on microsoft") : message.succeed(q);
+					});
 				}, n = () => {
 					h.addEventListener("load", l);
-					h.removeEventListener("load", n)
+					h.removeEventListener("load", n);
 				};
 			document.body.appendChild(h);
 			h.addEventListener("load", n);
 			h.src = k[0] + "?" + p.toString();
 			console.warn(`iframe activated! at ${Date.now()} [s]`);
-			setTimeout(m, 4E3)
+			setTimeout(m, 4E3);
 			break;
 	}
 	return true;

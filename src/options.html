@@ -14,15 +14,16 @@
         <div>
             שם משתמש טכניוני<br/>
             <span dir="ltr"><input type="text" id="username" placeholder="הכנס שם משתמש" maxlength="35"/> @
-		<select id="server">
-			<option id="campus">campus.technion.ac.il</option>
-			<option id="technion">technion.ac.il</option>
-		</select></span>
+		    <select id="server">
+			    <option id="campus">campus.technion.ac.il</option>
+			    <option id="technion">technion.ac.il</option>
+		    </select>
+            </span>
         </div>
         <div>סיסמת משתמש טכניוני<br/><input type="password" id="password" placeholder="הכנס סיסמה" maxlength="256"/>
         </div>
         <div>מספר זהות *<br/>
-            <input type="text" placeholder="הכנס מספר זהות" maxlength="9" id="idn"/><br/>
+            <input type="number" placeholder="הכנס מספר זהות" maxlength="9" id="idn"/><br/>
             <small> * נמצא בשימוש על ידי שליחת קבצים להדפסה וייבוא מטלות בית ממדמ"ח.</small>
         </div>
         <div>
@@ -41,20 +42,31 @@
             <label><input type="checkbox" id="panopto_save"/> שמירת העדפות בפנופטו</label>
             <span class="description">תאפשר שמירה של מהירות ההפעלה ומצב התאורה בפנופטו.</span>
         </div>
+        <div>
+            קישור מותאם אישית <small>(מוצג בראש ה־popup של התוסף)</small><br/>
+            <input type="text" id="custom_name" placeholder="הכנס שם אתר" maxlength="22"/>
+            <input type="url" id="custom_link" placeholder="הכנס כתובת אתר"/>
+            <br/><small>
+                כאן ניתן להכניס כתובת לאתר אישי (למשל לדרייב הפקולטי).
+                הכתובת ושמה יוצגו בראש ה־popup של התוסף, ליד הקישורים למודל וסאפ.<br/>
+                השאירו תיבות טקסט אלו ריקות כדי לחזור לברירת המחדל (פנופטו).
+            </small>
+        </div>
         <div>אופן שימוש במייל <small style="margin: 0;">(בשימוש של שליחת קבצים להדפסה)</small><br/>
             <label><input type="radio" name="mailclient" id="gmail_select"/> GMail (בדפדפן)</label><br/>
             <label><input type="radio" name="mailclient" id="outlook_select"/> תוכנה חיצונית (ברירת המחדל של הדפדפן,
                 למשל אאוטלוק)</label></div>
-        <div><label><input type="checkbox" id="allow_timings"/> הפעל את "מסעדות פתוחות בטכניון" ו"אוטובוסים קרובים"</label>
+        <div><label><input type="checkbox" id="allow_timings"/> הפעל את "מסעדות פתוחות בטכניון" ו"אוטובוסים
+            קרובים"</label>
             <span class="description">
 			כל בעיה שעלולה להתרחש מהשימוש בכלים הנ"ל, לרבות עקב תזמון שגוי של אוטובוס או עקב זמני פתיחה שגויים של מסעדה, אינה באחריות מפתח התוסף.<br/>
 			ובקיצור, האחריות על הפעלת ושימוש הכלים הנ"ל היא על המשתמש בלבד.
-		</span>
+		    </span>
         </div>
         <div>
             עוצמת התראות
-            <div>0% <input type="range" min="0" max="1" step="0.1" value="1" id="notification_volume"/> 100% <a
-                    id="try_vol">נסה</a></div>
+            <div>0% <input type="range" min="0" max="1" step="0.1" value="1" id="notification_volume"/> 100%
+                <a id="try_vol">נסה</a></div>
             <small>בשימוש על ידי התראות של מטלות חדשות ואוטובוסים.</small>
         </div>
     </div>
@@ -111,7 +123,7 @@
     <div id="ext_version">
         גרסה מותקנת: <span>0</span>
     </div>
-    <div id="storage">זיכרון בשימוש: </div>
+    <div id="storage">זיכרון בשימוש:</div>
 </div>
 
 <div id="fixed_footer">

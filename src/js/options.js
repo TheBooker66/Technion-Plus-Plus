@@ -42,7 +42,9 @@ import {TE_updateInfo} from '../service_worker.js';
 			WCPass = document.getElementById("WCPass").value,
 			cs = document.getElementById("cs_cal").checked,
 			webwork = document.getElementById("wwcal_switch").checked,
-			hw_alerts = document.getElementById("allow_hw_alerts").checked;
+			hw_alerts = document.getElementById("allow_hw_alerts").checked,
+			custom_name = document.getElementById("custom_name").value,
+			custom_link = document.getElementById("custom_link").value;
 		const loginEh = "" != username && "" != password, externalEh = external && "" != password && "" != idn;
 		chrome.storage.local.set({
 			username: username,
@@ -67,15 +69,15 @@ import {TE_updateInfo} from '../service_worker.js';
 			enable_external: externalEh,
 			hw_alerts: hw_alerts,
 			dark_mode: dark_mode,
+			custom_name: custom_name,
+			custom_link: custom_link,
 		}, () => {
-			const e = document.getElementById("status");
-			e.textContent = "השינויים נשמרו.";
+			const status_bar = document.getElementById("status");
+			status_bar.textContent = "השינויים נשמרו.";
 			if (chrome.runtime.lastError) {
 				console.error("TE_opt: " + chrome.runtime.lastError.message);
-				e.textContent = "שגיאה בשמירת הנתונים, אנא נסה שנית!";
-			} else setTimeout(() => {
-				e.textContent = "";
-			}, 2E3);
+				status_bar.textContent = "שגיאה בשמירת הנתונים, אנא נסה שנית!";
+			} else setTimeout(() => status_bar.textContent = "", 2E3);
 		});
 		if (moodle && loginEh && login) TE_updateInfo();
 		else chrome.action.getBadgeBackgroundColor({}, colors => {
@@ -126,6 +128,8 @@ import {TE_updateInfo} from '../service_worker.js';
 			external_u: false,
 			hw_alerts: true,
 			dark_mode: false,
+			custom_name: "",
+			custom_link: "",
 		}, function (a) {
 			if (chrome.runtime.lastError) {
 				console.error("TE_opt: " + chrome.runtime.lastError.message);
@@ -153,6 +157,8 @@ import {TE_updateInfo} from '../service_worker.js';
 				document.getElementById("external_user").checked = a.external_u;
 				document.getElementById("allow_hw_alerts").checked = a.hw_alerts;
 				document.getElementById("dark_mode").checked = a.dark_mode;
+				document.getElementById("custom_name").value = a.custom_name;
+				document.getElementById("custom_link").value = a.custom_link;
 				a.dark_mode ? document.body.classList.add("dark-mode") : document.body.classList.remove("dark-mode");
 				if (a.wwcal_switch) {
 					c = document.getElementById("ww_current");

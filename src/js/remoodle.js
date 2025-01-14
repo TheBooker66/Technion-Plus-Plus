@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-	const f = a => [["--a_color", "hsl(" + (80 + a) + ", 90%, 80%)"], ["--a_hover_color", "hsl(" + (80 + a) + ", 90%, 45%)"], ["--a_navlink", "hsl(" + (90 + a) + ", 80%, 85%)"], ["--a_navlink_hover", "hsl(" + (90 + a) + ", 100%, 80%)"], ["--navbar_bottom", "hsl(" + (82 + a) + ", 100%, 41%)"], ["--navbar_bg", "hsl(" + (82 + a) + ", 100%, 25%)"], ["--dark_bg", "hsl(" + (90 + a) + ", 100%, 10%)"], ["--calendar_today", "hsla(" + (70 + a) + ", 100%, 20%, 0.5)"]];
+	const f = a => [["--a_color", "hsl(" + (80 + a) + ", 90%, 80%)"], ["--a_hover_color", "hsl(" + (80 + a) + ", 90%, 45%)"], ["--a_navlink", "hsl(" + (90 + a) + ", 80%, 85%)"], ["--a_hover_navlink", "hsl(" + (90 + a) + ", 100%, 80%)"], ["--navbar_bottom", "hsl(" + (82 + a) + ", 100%, 41%)"], ["--navbar_bg", "hsl(" + (82 + a) + ", 100%, 25%)"], ["--dark_bg", "hsl(" + (90 + a) + ", 100%, 10%)"], ["--calendar_today", "hsla(" + (70 + a) + ", 100%, 20%, 0.5)"]];
 
 	if (!window.location.href.includes("pluginfile.php")) {
 		chrome.storage.local.get({

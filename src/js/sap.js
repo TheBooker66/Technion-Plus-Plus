@@ -37,8 +37,7 @@
 
 	setTimeout(() => {
 		if (!/SM\/([0-9]+)/g.test(window.location.hash)) return;
-		const url = /SM\/([0-9]+)/g.exec(window.location.hash);
-		let course = url ? url[1] : false; ///([0-9]+)/.exec(document.getElementsByClassName("sapMObjectNumberUnit")?.[1].innerText)[0]
+		const course = /SM\/([0-9]+)/g.exec(window.location.hash)?.[1] ?? null; ///([0-9]+)/.exec(document.getElementsByClassName("sapMObjectNumberUnit")?.[1].innerText)[0]
 		const src = (new DOMParser).parseFromString(`
 <div id="TP_bigbox">
 <h3 class="card-title">היסטוגרמות וחוות דעת</h3>

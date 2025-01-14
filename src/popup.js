@@ -16,9 +16,9 @@ import {reverseString, xorStrings} from './js/utils.js';
 		}
 	}
 
-	let e = new CommonPopup;
-	e.css_list = ["main"];
-	e.popupWrap();
+	const popup = new CommonPopup;
+	popup.css_list = ["main"];
+	popup.popupWrap();
 
 	const OS = navigator.userAgentData ? navigator.userAgentData : "navigator.userAgentData is not supported!";
 	OS.toString().includes("Android") || chrome.action.getBadgeBackgroundColor({}, c => {
@@ -29,19 +29,17 @@ import {reverseString, xorStrings} from './js/utils.js';
 			}
 		});
 	});
-	const f = document.getElementById("microsoft_open");
-	f.addEventListener("click", () => f.className = "collapsed");
+	const microsoft = document.getElementById("microsoft_open"), links = document.getElementById("more_links"),
+		l = document.getElementById("print"), n = document.getElementById("apps_links");
+	microsoft.addEventListener("click", () => microsoft.className = "collapsed");
 	document.getElementById("microsoft_link")
 		.addEventListener("click", () => window.open("https://techwww.technion.ac.il/cgi-bin/newuser/newuser.pl"));
-	e = document.getElementById("more_links");
-	let l = document.getElementById("print"),
-		n = document.getElementById("apps_links");
-	[{b: "gotoPrint", from: e, to: l}, {b: "gotoApps", from: e, to: n},
-		{b: "returnFromPrint", from: l, to: e}, {b: "returnFromApps", from: n, to: e}].forEach(c => {
+	[{b: "gotoPrint", from: links, to: l}, {b: "gotoApps", from: links, to: n},
+		{b: "returnFromPrint", from: l, to: links}, {b: "returnFromApps", from: n, to: links}].forEach(c => {
 		document.getElementById(c.b).addEventListener("click", () => {
 			c.to.style.display = "block";
 			c.from.style.display = "none";
-			f.className = "collapse";
+			microsoft.className = "collapse";
 		});
 	});
 	const r = {
@@ -49,11 +47,10 @@ import {reverseString, xorStrings} from './js/utils.js';
 		focused: true,
 		state: "normal",
 		url: "html/organizer.html",
-		height: Math.min(window.screen.height -
-			40, 720),
+		height: Math.min(window.screen.height - 40, 720),
 		width: Math.min(window.screen.width - 20, 1200),
 		top: 0,
-		left: 0
+		left: 0,
 	};
 	r.top = parseInt((window.screen.height - r.height) / 2);
 	r.top = parseInt((window.screen.height - r.height) / 2);
@@ -61,18 +58,15 @@ import {reverseString, xorStrings} from './js/utils.js';
 	document.getElementById("organizer").addEventListener("click", () => chrome.windows.create(r));
 	document.getElementById("release_notes").addEventListener("click", () => chrome.tabs.create({url: "html/release_notes.html"}));
 	const t = document.getElementById("tools_content").getElementsByTagName("a");
-	for (let c = 0; c < t.length; c++)
-		[4, 5, 7].includes(c) || t[c].addEventListener("click", () => { // 4 - Organiser, 5 - grades sheet, 7 - printer
-			window.location.href = "html/p_" + t[c].id + ".html"
-		});
-	e = document.querySelectorAll("#more_links > div");
-	m(e[0].querySelectorAll(".tab"), Array.from(e).slice(1), _ => {
-		f.className = "collapse";
-	});
-	e = document.getElementById("secondary_tabs").getElementsByTagName("div");
-	l = [document.getElementById("single_page"), document.getElementById("double_page"),
-		document.getElementById("quadruple_page")];
-	m(e, l, null);
+	for (let c = 0; c < t.length; c++) {
+		if ([4, 5, 7].includes(c)) continue; // 4 - Organiser, 5 - grades sheet, 7 - printer
+		t[c].addEventListener("click", () => window.location.href = "html/p_" + t[c].id + ".html");
+	}
+	const linksDiv = document.querySelectorAll("#more_links > div"),
+		tabsDiv = document.getElementById("secondary_tabs").getElementsByTagName("div"),
+		pages = [document.getElementById("single_page"), document.getElementById("double_page"), document.getElementById("quadruple_page")];
+	m(linksDiv[0].querySelectorAll(".tab"), Array.from(linksDiv).slice(1), _ => microsoft.className = "collapse");
+	m(tabsDiv, pages, null);
 	document.getElementById("cantlogin").getElementsByTagName("u")[0].addEventListener("click", () => {
 		chrome.runtime.openOptionsPage(() => {
 			chrome.runtime.lastError && console.error("TE_p: " + chrome.runtime.lastError.message);
@@ -102,7 +96,9 @@ import {reverseString, xorStrings} from './js/utils.js';
 		wwcal_switch: false,
 		dl_current: 0,
 		username: "",
-		server: true
+		server: true,
+		custom_name: "",
+		custom_link: "",
 	}, function (c) {
 		document.getElementById("quick_login").checked = c.quick_login;
 		document.getElementById("mutealerts_toggle").checked = c.alerts_sound;
@@ -114,13 +110,14 @@ import {reverseString, xorStrings} from './js/utils.js';
 		for (k = 0; k < h.length; k++)
 			c.cal_seen & Math.pow(2, k) && (document.getElementById(h[k]).className = "major hw");
 		0 != c.dl_current && document.getElementById("downloads").classList.add("active");
-		h = reverseString(xorStrings(c.uidn_arr[0] + "", c.uidn_arr[1]));
-		h = "" == h ? "הקלד מספר זהות כאן" : h;
+		let id = reverseString(xorStrings(c.uidn_arr[0] + "", c.uidn_arr[1]));
+		id = "" === id ? "הקלד מספר זהות כאן" : id;
 		k = c.gmail && !chrome.runtime.lastError;
 		const g = document.getElementById("print").getElementsByTagName("a");
-		for (let p = 0; p < g.length; p++)
-			g[p].setAttribute("href", k ? "https://mail.google.com/mail/u/0/?view=cm&to=print." + g[p].id + "@campus.technion.ac.il&su=" + h + "&fs=1&tf=1" : "mailto:print." + g[p].id + "@campus.technion.ac.il?subject=" +
-				h), "הקלד מספר זהות כאן" === h && g[p].addEventListener("click", () => {
+		for (let p = 0; p < g.length; p++) {
+			g[p].setAttribute("href", k ? "https://mail.google.com/mail/u/0/?view=cm&to=print." + g[p].id + "@campus.technion.ac.il&su=" + id + "&fs=1&tf=1" : "mailto:print." + g[p].id + "@campus.technion.ac.il?subject=" + id);
+			if (id !== "הקלד מספר זהות כאן" && id !== "") continue;
+			g[p].addEventListener("click", () => {
 				chrome.runtime.sendMessage({
 					mess_t: "silent_notification",
 					message: 'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.'
@@ -128,7 +125,8 @@ import {reverseString, xorStrings} from './js/utils.js';
 					chrome.runtime.lastError && console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
 				});
 			});
-		const m = document.getElementById("UGS_Link");
+		}
+		const m = document.getElementById("UGS_Link"), custom_link = document.getElementById("custom_link");
 		m.addEventListener("click", async () => {
 			let p = setInterval(() => {
 				m.textContent = 7 > m.textContent.length ? m.textContent + "." : "טוען";
@@ -148,5 +146,15 @@ import {reverseString, xorStrings} from './js/utils.js';
 				m.textContent = "Students";
 			});
 		});
+
+		if (c.custom_name && c.custom_link) {
+			custom_link.textContent = c.custom_name;
+			custom_link.title = "קישור אישי שלכם! מעניין מה הוספתם...";
+			custom_link.setAttribute("href", c.custom_link);
+		} else {
+			custom_link.textContent = "פנופטו";
+			custom_link.title = "מאגר קורסים מצולמים";
+			custom_link.setAttribute("href", "https://panoptotech.cloud.panopto.eu");
+		}
 	})
 })();
