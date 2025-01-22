@@ -18,13 +18,13 @@
         </div>
 
         <div id="toggles">
-			<span id="changeoptions">
+			<span id="change_options">
 				<input type="checkbox" id="quick_login"/>
 				<label for="quick_login">חיבור אוטומטי</label>
 			</span>
-            <span id="mutealerts">
-				<input type="checkbox" id="mutealerts_toggle"/>
-				<label for="mutealerts_toggle">צליל התראות</label>
+            <span id="mute_alerts">
+				<input type="checkbox" id="mute_alerts_toggle"/>
+				<label for="mute_alerts_toggle">צליל התראות</label>
 			</span>
         </div>
 
@@ -37,7 +37,7 @@
                 <div id="bus_error" style="display: none; border-bottom: 1px solid #d7d7db;">
                     <div class="error_bar">התרחשה שגיאה בניסיון יצירת התראה לאוטובוס. התראות קיימות נמחקו.</div>
                 </div>
-                <div id="cantlogin" style="display: none; border-bottom: 1px solid #d7d7db;">
+                <div id="cant_login" style="display: none; border-bottom: 1px solid #d7d7db;">
                     <div class="attention">עדיין לא הוגדרו שם משתמש וסיסמה!<br/>לחץ <u style='cursor:pointer'>כאן</u>
                         להגדרת פרטי ההתחברות.<br/> תזכורת: התוסף אינו מעלה את הפרטים שלכם לאף שרת והם נשארים כאן, על
                         המחשב שלכם.
@@ -123,20 +123,18 @@
         <div id="apps_links" class="more_links" style="display: none">
             <h2>
                 <span id="returnFromApps" class="returner"></span>
-                <div>תוכנות ברישיון טכניוני</div>
+                <span>תוכנות ברישיון טכניוני</span>
             </h2>
-            <a href="https://portal.office.com/OLS/MySoftware.aspx" target="_blank"><span class="img_container"><img
-                    src="icons/office.svg" alt="Office"/></span> אופיס 365</a>
-            <a id="microsoft_open" class="collapse"><span class="img_container">
-                <img src="icons/microsoft.svg" alt="Microsoft"/></span>
-                חנות Microsoft (כלל טכניוני)
-                <div style="font-size: 11px; padding: 2px 25px 0 6px; display: none;" id="microsoft_link">לחץ <u
-                        style="color: #0060df; cursor: pointer">כאן</u> והתחבר לניהול המשתמש הטכניוני שלך, בחר באפשרות
-                    <b>"מיקרוסופט - רשיונות תוכנה"</b> ואז יופיע הקישור לחנות.
+            <a id="apps_menu" class="collapse"><span class="img_container">
+                <img src="icons/applications.svg" alt="Applications"/></span>
+                חנויות תוכנות מטעם הטכניון (רובן בחינם)
+                <div style="font-size: 11px; padding: 2px 25px 0 6px; display: none;" id="apps_link">
+                    ניתן לגשת לחנות רק מתוך רשת הטכניון. אם אתם מחוברים לרשת הטכניון,
+                    לחצו <u style="color: #0060df; cursor: pointer">כאן</u> ותועברו לחנות.
                 </div>
             </a>
-            <a href="https://elms.cs.technion.ac.il/?action=signin" target="_blank"><span class="img_container"><img
-                    src="icons/microsoft.svg" alt="Microsoft"/></span> חנויות Microsoft & VMWare (מדמ"ח)</a>
+            <a href="https://portal.office.com/OLS/MySoftware.aspx" target="_blank"><span class="img_container"><img
+                    src="icons/office.svg" alt="Office"/></span> אופיס 365</a>
             <a href="https://matlab.technion.ac.il/" target="_blank"><span class="img_container"><img
                     src="icons/chart.svg" alt="Matlab"/></span> מטלב</a>
         </div>
@@ -144,7 +142,7 @@
         <div id="print" class="more_links" style="display: none">
             <h2>
                 <span id="returnFromPrint" class="returner"></span>
-                <div>שליחה להדפסה בטכניון</div>
+                <span>שליחה להדפסה בטכניון</span>
             </h2>
             <div id="single_page">
                 <a id="bws" target="_blank"><span class="img_container"><img src="icons/page.svg" alt="דף"/></span> שחור

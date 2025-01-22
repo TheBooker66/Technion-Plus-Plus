@@ -267,19 +267,19 @@
     opacity: .7;
 }
 
-#changeoptions [type="checkbox"]:not(:checked) + label:after {
+#change_options [type="checkbox"]:not(:checked) + label:after {
     content: url("../icons/link_broken.svg");
 }
 
-#changeoptions [type="checkbox"]:checked + label:after {
+#change_options [type="checkbox"]:checked + label:after {
     content: url("../icons/link.svg");
 }
 
-#mutealerts [type="checkbox"]:not(:checked) + label:after {
+#mute_alerts [type="checkbox"]:not(:checked) + label:after {
     content: url("../icons/volume_off.svg");
 }
 
-#mutealerts [type="checkbox"]:checked + label:after {
+#mute_alerts [type="checkbox"]:checked + label:after {
     content: url("../icons/volume_on.svg");
 }
 

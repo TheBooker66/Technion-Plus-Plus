@@ -3,7 +3,7 @@ import {CommonPopup} from './js/common_popup.js';
 import {reverseString, xorStrings} from './js/utils.js';
 
 (function () {
-	function m(tabs, popup, k) {
+	function make_tabs_clicky(tabs, popup, func = null) {
 		for (let g = 0; g < tabs.length; g++) {
 			tabs[g].addEventListener("click", () => {
 				if (tabs[g].classList.contains("current")) return;
@@ -11,7 +11,7 @@ import {reverseString, xorStrings} from './js/utils.js';
 					tabs[m].className = m === g ? "tab current" : "tab";
 					popup[m].style.display = m === g ? "block" : "none";
 				}
-				k && k(g);
+				func && func(g);
 			});
 		}
 	}
@@ -29,20 +29,20 @@ import {reverseString, xorStrings} from './js/utils.js';
 			}
 		});
 	});
-	const microsoft = document.getElementById("microsoft_open"), links = document.getElementById("more_links"),
+	const apps = document.getElementById("apps_menu"), links = document.getElementById("more_links"),
 		l = document.getElementById("print"), n = document.getElementById("apps_links");
-	microsoft.addEventListener("click", () => microsoft.className = "collapsed");
-	document.getElementById("microsoft_link")
-		.addEventListener("click", () => window.open("https://techwww.technion.ac.il/cgi-bin/newuser/newuser.pl"));
+	apps.addEventListener("click", () => apps.className = "collapsed");
+	document.getElementById("apps_link")
+		.addEventListener("click", () => window.open("https://cis-shop.technion.ac.il/product-category/software/"));
 	[{b: "gotoPrint", from: links, to: l}, {b: "gotoApps", from: links, to: n},
 		{b: "returnFromPrint", from: l, to: links}, {b: "returnFromApps", from: n, to: links}].forEach(c => {
 		document.getElementById(c.b).addEventListener("click", () => {
 			c.to.style.display = "block";
 			c.from.style.display = "none";
-			microsoft.className = "collapse";
+			apps.className = "collapse";
 		});
 	});
-	const r = {
+	const popup_window = {
 		type: "popup",
 		focused: true,
 		state: "normal",
@@ -52,10 +52,10 @@ import {reverseString, xorStrings} from './js/utils.js';
 		top: 0,
 		left: 0,
 	};
-	r.top = parseInt((window.screen.height - r.height) / 2);
-	r.top = parseInt((window.screen.height - r.height) / 2);
-	r.left = parseInt((window.screen.width - r.width) / 2);
-	document.getElementById("organizer").addEventListener("click", () => chrome.windows.create(r));
+	popup_window.top = parseInt((window.screen.height - popup_window.height) / 2);
+	popup_window.top = parseInt((window.screen.height - popup_window.height) / 2);
+	popup_window.left = parseInt((window.screen.width - popup_window.width) / 2);
+	document.getElementById("organizer").addEventListener("click", () => chrome.windows.create(popup_window));
 	document.getElementById("release_notes").addEventListener("click", () => chrome.tabs.create({url: "html/release_notes.html"}));
 	const t = document.getElementById("tools_content").getElementsByTagName("a");
 	for (let c = 0; c < t.length; c++) {
@@ -65,9 +65,9 @@ import {reverseString, xorStrings} from './js/utils.js';
 	const linksDiv = document.querySelectorAll("#more_links > div"),
 		tabsDiv = document.getElementById("secondary_tabs").getElementsByTagName("div"),
 		pages = [document.getElementById("single_page"), document.getElementById("double_page"), document.getElementById("quadruple_page")];
-	m(linksDiv[0].querySelectorAll(".tab"), Array.from(linksDiv).slice(1), _ => microsoft.className = "collapse");
-	m(tabsDiv, pages, null);
-	document.getElementById("cantlogin").getElementsByTagName("u")[0].addEventListener("click", () => {
+	make_tabs_clicky(linksDiv[0].querySelectorAll(".tab"), Array.from(linksDiv).slice(1), _ => apps.className = "collapse");
+	make_tabs_clicky(tabsDiv, pages);
+	document.getElementById("cant_login").getElementsByTagName("u")[0].addEventListener("click", () => {
 		chrome.runtime.openOptionsPage(() => {
 			chrome.runtime.lastError && console.error("TE_p: " + chrome.runtime.lastError.message);
 		});
@@ -77,9 +77,9 @@ import {reverseString, xorStrings} from './js/utils.js';
 			chrome.runtime.lastError && console.error("TE_popup_login: " + chrome.runtime.lastError.message);
 		});
 	});
-	document.getElementById("mutealerts_toggle").addEventListener("change", () => {
-		chrome.storage.local.set({alerts_sound: document.getElementById("mutealerts_toggle").checked}, () => {
-			chrome.runtime.lastError && console.error("TE_popup_mutealerts: " + chrome.runtime.lastError.message);
+	document.getElementById("mute_alerts_toggle").addEventListener("change", () => {
+		chrome.storage.local.set({alerts_sound: document.getElementById("mute_alerts_toggle").checked}, () => {
+			chrome.runtime.lastError && console.error("TE_popup_mute_alerts: " + chrome.runtime.lastError.message);
 		});
 	});
 	chrome.storage.local.get({
@@ -101,8 +101,8 @@ import {reverseString, xorStrings} from './js/utils.js';
 		custom_link: "",
 	}, function (c) {
 		document.getElementById("quick_login").checked = c.quick_login;
-		document.getElementById("mutealerts_toggle").checked = c.alerts_sound;
-		document.getElementById("cantlogin").style.display = c.enable_login ? "none" : "block";
+		document.getElementById("mute_alerts_toggle").checked = c.alerts_sound;
+		document.getElementById("cant_login").style.display = c.enable_login ? "none" : "block";
 		document.getElementById("cal_moodle").style.display = c.enable_login && c.moodle_cal && c.quick_login ? "block" : "none";
 		document.getElementById("cal_cs").style.display = c.cs_cal ? "block" : "none";
 		document.getElementById("cal_webwork").style.display = c.enable_login && c.quick_login && c.wwcal_switch ? "block" : "none";
