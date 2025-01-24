@@ -648,12 +648,12 @@ chrome.alarms.onAlarm.addListener(alarm => {
 
 chrome.runtime.onInstalled.addListener(async details => {
 	if ("install" === details.reason)
-		console.log("Technion++: Welcome!"); // Do something in the future
+		console.log("Technion++: Welcome!"); // TODO: Do something in the future
 	else if ("update" === details.reason)
 		await chrome.tabs.create({url: 'html/release_notes.html'});
 	TE_startExtension();
 	await chrome.offscreen.createDocument({
-		url: 'offscreen.html',
+		url: 'html/offscreen.html',
 		reasons: ["DOM_PARSER", "LOCAL_STORAGE", "AUDIO_PLAYBACK"],
 		justification: `עמוד הרקע נחוץ על מנת לשלוח בקשות כמו שצריך למודל, לוובוורק ולשרת של מדמ"ח,
 		ולשלוח התראות כאשר יש מטלות חדשות.`,
@@ -663,7 +663,7 @@ chrome.runtime.onInstalled.addListener(async details => {
 chrome.runtime.onStartup.addListener(async () => {
 	TE_startExtension();
 	await chrome.offscreen.createDocument({
-		url: 'offscreen.html',
+		url: 'html/offscreen.html',
 		reasons: ["DOM_PARSER", "LOCAL_STORAGE", "AUDIO_PLAYBACK"],
 		justification: `עמוד הרקע נחוץ על מנת לשלוח בקשות כמו שצריך למודל, לוובוורק ולשרת של מדמ"ח,
 		ולשלוח התראות כאשר יש מטלות חדשות.`,

@@ -1,6 +1,6 @@
 'use strict';
-import {CommonPopup} from './js/common_popup.js';
-import {reverseString, xorStrings} from './js/utils.js';
+import {CommonPopup} from './common_popup.js';
+import {reverseString, xorStrings} from './utils.js';
 
 (function () {
 	function make_tabs_clicky(tabs, popup, func = null) {
@@ -52,7 +52,6 @@ import {reverseString, xorStrings} from './js/utils.js';
 		top: 0,
 		left: 0,
 	};
-	popup_window.top = parseInt((window.screen.height - popup_window.height) / 2);
 	popup_window.top = parseInt((window.screen.height - popup_window.height) / 2);
 	popup_window.left = parseInt((window.screen.width - popup_window.width) / 2);
 	document.getElementById("organizer").addEventListener("click", () => chrome.windows.create(popup_window));

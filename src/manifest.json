@@ -11,15 +11,15 @@
     "service_worker": "service_worker.js",
     "type": "module"
   },
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": true
-  },
   "action": {
     "browser_style": false,
     "default_icon": "icons/technion_plus_plus/icon-16.png",
     "default_popup": "popup.html",
     "default_title": "Technion Plus Plus"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
   },
   "permissions": [
     "storage",
