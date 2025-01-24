@@ -49,7 +49,7 @@
 }
 
 .more_links a.major, .more_links a.collapse {
-    background-image: url("../icons/arrowhead-left.svg");
+    background-image: url("../icons/main_popup_icons/arrowhead-left.svg");
     background-repeat: no-repeat;
     background-position: 8px center;
     background-size: 10px 10px;
@@ -268,19 +268,19 @@
 }
 
 #change_options [type="checkbox"]:not(:checked) + label:after {
-    content: url("../icons/link_broken.svg");
+    content: url("../icons/main_popup_icons/link_broken.svg");
 }
 
 #change_options [type="checkbox"]:checked + label:after {
-    content: url("../icons/link.svg");
+    content: url("../icons/main_popup_icons/link.svg");
 }
 
 #mute_alerts [type="checkbox"]:not(:checked) + label:after {
-    content: url("../icons/volume_off.svg");
+    content: url("../icons/main_popup_icons/volume_off.svg");
 }
 
 #mute_alerts [type="checkbox"]:checked + label:after {
-    content: url("../icons/volume_on.svg");
+    content: url("../icons/main_popup_icons/volume_on.svg");
 }
 
 /*
