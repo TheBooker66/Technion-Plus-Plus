@@ -131,26 +131,22 @@
       ]
     },
     {
+      "css": [
+        "css/moodle/moodle.css",
+        "css/moodle/moodle_dark_root.css"
+      ],
       "js": [
         "js/moodle.js"
       ],
       "matches": [
-        "https://moodle2223.technion.ac.il/course/view.php?*",
-        "https://moodle2223.technion.ac.il/",
-        "https://moodle2324.technion.ac.il/course/view.php?*",
-        "https://moodle2324.technion.ac.il/",
-        "https://moodle24.technion.ac.il/course/view.php?*",
-        "https://moodle24.technion.ac.il/"
+        "https://moodle2223.technion.ac.il/*",
+        "https://moodle2324.technion.ac.il/*",
+        "https://moodle24.technion.ac.il/*"
       ]
     },
     {
       "css": [
-        "css/moodle/moodle.css",
-        "css/moodle/moodle_dark_2223.css",
-        "css/moodle/moodle_dark_root.css"
-      ],
-      "js": [
-        "js/remoodle.js"
+        "css/moodle/moodle_dark_2223.css"
       ],
       "matches": [
         "https://moodle2223.technion.ac.il/*"
@@ -159,12 +155,7 @@
     },
     {
       "css": [
-        "css/moodle/moodle.css",
-        "css/moodle/moodle_dark_2324.css",
-        "css/moodle/moodle_dark_root.css"
-      ],
-      "js": [
-        "js/remoodle.js"
+        "css/moodle/moodle_dark_2324.css"
       ],
       "matches": [
         "https://moodle2324.technion.ac.il/*"
@@ -173,12 +164,7 @@
     },
     {
       "css": [
-        "css/moodle/moodle.css",
-        "css/moodle/moodle_dark_24.css",
-        "css/moodle/moodle_dark_root.css"
-      ],
-      "js": [
-        "js/remoodle.js"
+        "css/moodle/moodle_dark_24.css"
       ],
       "matches": [
         "https://moodle24.technion.ac.il/*"

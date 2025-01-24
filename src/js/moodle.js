@@ -51,7 +51,10 @@
 			});
 		});
 		b = "";
-		for (c = 0; 12 > c; c++) b += `hsl(${82 + 30 * c}, 100%, 25%) ${100 * c / 12}% ${100 * (c + 1) / 12}%`, 11 > c && (b += ", ");
+		for (c = 0; 12 > c; c++) {
+			b += `hsl(${82 + 30 * c}, 100%, 25%) ${100 * c / 12}% ${100 * (c + 1) / 12}%`;
+			if (11 > c) b += ", ";
+		}
 		k.setAttribute("style", "background-image: linear-gradient(to left, " + b + ") !important");
 		return a;
 	}
@@ -62,7 +65,9 @@
 				b = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/, c = / - (?:חורף|אביב|קיץ)/, g = {};
 			for (let k = 0; k < elements.length; k++) {
 				let d = elements[k].getElementsByTagName("h3")[0].textContent.replace(c, "").match(b);
-				d && (d = d.groups, g[d.cnum.trim()] = d.cname.trim());
+				if (!d) continue;
+				d = d.groups;
+				g[d.cnum.trim()] = d.cname.trim();
 			}
 			0 < Object.keys(g).length && chrome.storage.local.set({u_courses: g}, () => {
 				chrome.runtime.lastError && console.error("TE_moodle_001_" + mess + ": " + chrome.runtime.lastError.message);
@@ -100,10 +105,10 @@
 				"אביב": "100",
 				"קיץ": "300",
 			}, q = create_tp_buttons();
-		const semester = course ? semesters[course.groups.csemester] : "",
-			course_num = course ? course.groups.cnum.trim() : "";
+		const course_num = course?.groups.cnum.trim();
 		create_download(q, moodle_num, 0, "הורדת כל הקבצים בקורס");
-		if (course_num != "") {
+		if (course_num) {
+			const semester = semesters[course.groups.csemester];
 			create_element("a", "maor_download", {
 				href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2024/${semester}/SM/${course_num}`,
 				target: "_blank"
@@ -122,15 +127,67 @@
 						d = 1 < a.length ? "וידאו #" + (b + 1) : "וידאו";
 					d = 0 < a[b].t ? ["הרצאה", "תרגול"][a[b].t - 1] : d;
 					d += c ? "(פנופטו)" : "(שרת הוידאו הטכניוני)";
-					create_element("a", "maor_download", {href: g, target: "_blank", title: a[b].vn ? a[b].vn : course_num}, d, q);
+					create_element("a", "maor_download", {
+						href: g,
+						target: "_blank",
+						title: a[b].vn ? a[b].vn : course_num
+					}, d, q);
 				}
 			});
 		}
 		for (const element of document.getElementsByClassName("section main clearfix")) {
-			if (element.classList.contains("accesshide") || element.classList.contains("hidden"))
-				continue;
-			create_download(element.getElementsByClassName("course-section-header")[0], moodle_num, element.getAttribute("id")
-				.split("section-")[1], "הורדת כל הקבצים בנושא").style.marginRight = "auto";
+			if (element.classList.contains("accesshide") || element.classList.contains("hidden")) continue;
+			create_download(
+				element.getElementsByClassName("course-section-header")[0],
+				moodle_num,
+				element.getAttribute("id").split("section-")[1], "הורדת כל הקבצים בנושא"
+			).style.marginRight = "auto";
 		}
 	}
+
+	if (!window.location.href.includes("pluginfile.php")) {
+		const css_properties = hue_change => [
+			["--a_color", "hsl(" + (80 + hue_change) + ", 90%, 80%)"],
+			["--a_hover_color", "hsl(" + (80 + hue_change) + ", 90%, 45%)"],
+			["--a_navlink", "hsl(" + (90 + hue_change) + ", 80%, 85%)"],
+			["--a_hover_navlink", "hsl(" + (90 + hue_change) + ", 100%, 80%)"],
+			["--navbar_bottom", "hsl(" + (82 + hue_change) + ", 100%, 41%)"],
+			["--navbar_bg", "hsl(" + (82 + hue_change) + ", 100%, 25%)"],
+			["--dark_bg", "hsl(" + (90 + hue_change) + ", 100%, 10%)"],
+			["--calendar_today", "hsla(" + (70 + hue_change) + ", 100%, 20%, 0.5)"]
+		];
+		chrome.storage.local.get({
+			remoodle: false,
+			remoodle_angle: 120
+		}, a => {
+			if (chrome.runtime.lastError) console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
+			else {
+				let checkboxStatus = a.remoodle;
+				const checkBox = bool => {
+					bool ? document.querySelector("html").setAttribute("tplus", "dm") :
+						document.querySelector("html").removeAttribute("tplus");
+					const checkbox = document.getElementById("tp-darkmode");
+					if (checkbox) checkbox.checked = bool;
+				};
+				css_properties(a.remoodle_angle).forEach(c => document.documentElement.style.setProperty(c[0], c[1]));
+				checkBox(checkboxStatus);
+				chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+					if (message.mess_t === "TE_remoodle") {
+						checkBox(!checkboxStatus);
+						checkboxStatus = !checkboxStatus;
+					}
+					sendResponse();
+				});
+			}
+		});
+		chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+			if (message.mess_t === "TE_remoodle_reangle") {
+				css_properties(message.angle).forEach(d => document.documentElement.style.setProperty(d[0], d[1]));
+				const b = document.querySelector("#tp_colorswitcher input[type=range]");
+				if (b) b.value = message.angle;
+			}
+			sendResponse();
+		});
+	}
+
 })();
