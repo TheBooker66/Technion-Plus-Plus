@@ -69,7 +69,7 @@ function checkForEmpty() {
 	});
 }
 
-export function stopSpinning() {
+function stopSpinning() {
 	document.getElementById("spinner").style.display = "none";
 	checkForEmpty();
 }

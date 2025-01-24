@@ -1,5 +1,5 @@
 'use strict';
-import {stopSpinning, toggle} from "./common_calendar.js";
+import {toggle} from "./common_calendar.js";
 
 const loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
 

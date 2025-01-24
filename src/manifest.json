@@ -113,7 +113,7 @@
         "css/maor_download.css"
       ],
       "js": [
-        "js/grades_portal.js"
+        "js/grades.js"
       ],
       "matches": [
         "https://grades.technion.ac.il/*"
