@@ -1,5 +1,5 @@
-# IDE files
-/.idea/
+# Current workspace
+/.idea/workspace.xml
 
 # Minified files
 /minified/

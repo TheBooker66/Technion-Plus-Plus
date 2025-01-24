@@ -29,7 +29,7 @@ export class CommonPopup {
 			this.wrapper.insertBefore(this.loadTemplate("header-koteret", a), this.main_content);
 			if (this.title !== "") {
 				a = this.loadTemplate("header-title", a);
-				a.querySelector("div:not(#returnHome)").textContent = this.title;
+				a.querySelector("span:not(#returnHome)").textContent = this.title;
 				this.wrapper.insertBefore(a, this.main_content);
 			}
 			this.buttonsSetup();

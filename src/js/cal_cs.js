@@ -29,7 +29,6 @@ import {reverseString, xorStrings} from './utils.js';
 					is_error: true
 				}) : (w = `https://grades.cs.technion.ac.il/cal/${w}/${encodeURIComponent(a.wcpass)}`,
 					popup.XHR(w, "text").then(function (m) {
-						let d;
 						const f = m.response.split("BEGIN:VEVENT");
 						if (1 == f.length) b({new_list: [], finished_list: []}); else {
 							m = Date.now();
@@ -41,14 +40,12 @@ import {reverseString, xorStrings} from './utils.js';
 								url: /URL:(.+)/,
 								time: /(?<Y>[0-9]{4})(?<M>[0-9]{2})(?<D>[0-9]{2})(T(?<TH>[0-9]{2})(?<TM>[0-9]{2}))?/
 							};
-							let t = [], x = [];
+							let t = [], x = [], d;
 							for (let l = 1; l < f.length; l++) {
-								let q = f[l].match(p.summary)[1],
-									g = q.split("(")[0].trim();
+								let q = f[l].match(p.summary)[1], g = q.split("(")[0].trim();
 								if (p.banned.test(g)) continue;
-								let h = f[l].match(p.uid)[1] || q;
-								let c = f[l].match(p.time).groups;
-								let u = new Date(`${c.Y}-${c.M}-${c.D}T${c.TH || 23}:${c.TM || 59}:00+03:00`);
+								let h = f[l].match(p.uid)[1] || q, c = f[l].match(p.time).groups,
+									u = new Date(`${c.Y}-${c.M}-${c.D}T${c.TH || 23}:${c.TM || 59}:00+03:00`);
 								if (h.includes(".PHW")) {
 									if (u > m) {
 										let y = h.replace(".PHW", ".HW");
@@ -57,7 +54,7 @@ import {reverseString, xorStrings} from './utils.js';
 										t = t.filter(z => z.uid != y);
 										x = x.filter(z => z.uid != y)
 									}
-									continue
+									continue;
 								}
 								if (u < m || u > m + 2592E6) continue;
 								let A = "icspasswordexpires" == h, B = "icspasswordexpires1" == h;
@@ -87,11 +84,10 @@ import {reverseString, xorStrings} from './utils.js';
 								};
 								1 == c ? x.push(g) : t.push(g)
 							}
-							d = calendar.removeCalendarAlert(a.cal_seen);
 							chrome.storage.local.set({
 								cs_cal_finished: C,
 								cs_cal_seen: n,
-								cal_seen: d,
+								cal_seen: calendar.removeCalendarAlert(a.cal_seen),
 								cscal_update: m
 							});
 							t.sort((l, h) => l.timestamp - h.timestamp);

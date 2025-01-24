@@ -13,9 +13,15 @@
   },
   "action": {
     "browser_style": false,
-    "default_icon": "icons/technion_plus_plus/icon-16.png",
+    "default_icon": {
+      "16": "icons/technion_plus_plus/icon-16.png",
+      "32": "icons/technion_plus_plus/icon-32.png",
+      "48": "icons/technion_plus_plus/icon-48.png",
+      "96": "icons/technion_plus_plus/icon-96.png",
+      "128": "icons/technion_plus_plus/icon-128.png"
+    },
     "default_popup": "popup.html",
-    "default_title": "Technion Plus Plus"
+    "default_title": "Technion++"
   },
   "options_ui": {
     "page": "options.html",
@@ -36,7 +42,6 @@
   ],
   "icons": {
     "16": "icons/technion_plus_plus/icon-16.png",
-    "19": "icons/technion_plus_plus/icon-19.png",
     "32": "icons/technion_plus_plus/icon-32.png",
     "48": "icons/technion_plus_plus/icon-48.png",
     "96": "icons/technion_plus_plus/icon-96.png",

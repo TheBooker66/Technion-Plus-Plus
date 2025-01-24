@@ -78,6 +78,7 @@ body {
 /*
 * info bars
 */
+
 .attention, .error_bar {
     display: block;
     border-radius: 4px;
@@ -99,6 +100,7 @@ body {
 /*
 * tabs
 */
+
 #tabs {
     padding: 8px;
     z-index: 1;
@@ -172,6 +174,15 @@ body {
     }
 }
 
+ul {
+    padding: 0;
+    margin: 0;
+}
+
+#links {
+    margin-right: -20px;
+}
+
 .list_item.starred, .list_item.system_message {
     border-right-color: var(--sec-light);
     border-radius: 0 0 16px 0;
@@ -231,11 +242,6 @@ img.system {
 b.assignment_header {
     cursor: pointer;
 }
-
-/*.starred b.assignment_header::after {
-    content: " // מטלה חדשה";
-    color: var(--sec-norm);
-}*/
 
 .starred b.assignment_header::after, .system_message b.assignment_header::after {
     content: "חדש";

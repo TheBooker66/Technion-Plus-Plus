@@ -172,7 +172,6 @@
 }
 
 [tplus=dm] .nav-link, [tplus=dm] .navbar a:not(.dropdown-item), [tplus=dm] a.nav-link, [tplus=dm] .navbar a .usertext {
-    color: var(--a_navlink) !important;
     color: #fff !important;
 }
 

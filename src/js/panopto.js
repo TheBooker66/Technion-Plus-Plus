@@ -103,7 +103,7 @@
 							.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
 						g.list.push(h);
 					}
-					0 < g.list.length && chrome.runtime.sendMessage({mess_t: "multidownload", chunk: g});
+					if (0 < g.list.length) await chrome.runtime.sendMessage({mess_t: "multidownload", chunk: g});
 				} else window.alert("שגיאה בניסיון הורדת הקורס, אנא נסה שנית מאוחר יותר.");
 			});
 			m.textContent = "הורד את כל הקורס";
