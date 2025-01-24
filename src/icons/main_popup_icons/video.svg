@@ -1,5 +1,6 @@
-<?xml version="1.0"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 100 100" xml:space="preserve"><path fill="#fff" stroke="#000000" stroke-width="6.857" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M10 20.583h80v58.835H10z"/>
-    <path fill="#000000" stroke="#000000" stroke-width="5.983" stroke-linecap="round" stroke-linejoin="round"
-          stroke-miterlimit="10" d="M33.747 35.65v28.7L68.714 50z"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <path d="M 0.94725643,3.8311398 H 23.050368 V 20.086597 H 0.94725643 Z" fill="#ffffff" stroke="#000000"
+          stroke-width="1.89451" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/>
+    <path d="M 7.5082889,7.9939847 V 15.923475 L 17.169283,11.95873 Z" fill="#000000" stroke="#000000"
+          stroke-width="1.65304" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/>
 </svg>

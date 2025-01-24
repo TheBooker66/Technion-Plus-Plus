@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg width="800px" height="800px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-    <path fill="var(--ci-primary-color, #000000)"
-          d="M440,424V88H352V13.005L88,58.522V424H16v32h86.9L352,490.358V120h56V456h88V424ZM320,453.642,120,426.056V85.478L320,51Z"
-          class="ci-primary"/>
-    <rect width="32" height="64" x="256" y="232" fill="var(--ci-primary-color, #000000)" class="ci-primary"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <path d="M 21.200682,20.550412 V 3.7498707 H 16.800541 V 0 L 3.6001158,2.2759232 V 20.550412 H 0 v 1.600051 h 4.34514 l 12.455401,1.717955 V 5.3499221 h 2.80009 V 22.150463 h 4.400142 V 20.550412 Z M 15.20049,22.03256 5.2001672,20.653215 V 3.6237667 L 15.20049,1.8998111 Z"/>
+    <rect width="1.6000515" height="3.200103" x="12.000386" y="10.950102"/>
 </svg>
