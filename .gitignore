@@ -1,10 +1,11 @@
 # Current workspace
 /.idea/workspace.xml
 
-# Minified files
+# Minifier & Minified files
+/node_modules/
+package-lock.json
 /minified/
 minified.zip
 
 # My testing
-example.ics
 urls.txt
