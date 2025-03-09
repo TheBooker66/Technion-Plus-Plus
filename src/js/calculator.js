@@ -241,7 +241,8 @@
 	});
 
 	// Handle regular vs binary grades (and form resets)
-	document.getElementById("binaryEh").addEventListener("change", () => {
+	const binary_checkbox = document.getElementById("binaryEh");
+	binary_checkbox.addEventListener("change", () => {
 		const gradeInput = document.getElementById("grade"),
 			gradeLabel = document.getElementById("grade_label"),
 			binaryGradeInput = document.getElementById("binary_grade"),
@@ -253,7 +254,8 @@
 	});
 
 	// Handle new grades
-	document.getElementById("add_grade_form").addEventListener("submit", event => {
+	const addGradeForm = document.getElementById("add_grade_form");
+	addGradeForm.addEventListener("submit", event => {
 		event.preventDefault();
 		const formData = new FormData(addGradeForm);
 		const newCourse = {
@@ -294,12 +296,13 @@
 
 	// Set up CSV export
 	document.getElementById("to_csv").addEventListener("click", () => {
-		let csvContent = "מספר,קורס,נקודות,ציון,סמסטר,שנה\n";
+		let csvContent = `מספר קורס,שם קורס,נק"ז,ציון,סמסטר,שנה\n`;
 		document.querySelectorAll("#grades_list div.maor_table_row").forEach(row => {
-			const cellValues = Array.from(row.querySelectorAll("div")).map(cell => `"${cell.textContent}"`),
-				inputFields = row.querySelectorAll("input[type='number']");
-			csvContent += `${cellValues[0]},${cellValues[1]},${inputFields[0].value},${inputFields[1].value},${cellValues[4]},${cellValues[5]}\n`;
-			console.log(csvContent)
+			const cells = Array.from(row.querySelectorAll("div"));
+			console.log(cells);
+			csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].querySelector("input").value},`
+				+ `${cells[3].querySelector("input")?.value || cells[3].querySelector("span").textContent},`
+				+ `${cells[4].textContent},${cells[5].textContent}\n`;
 		});
 
 		const downloadLink = document.createElement("a");
