@@ -4,7 +4,7 @@
   "author": "Ethan \"67\" A.",
   "description": "Get the Technion's web-experience out of the stone age.",
   "homepage_url": "https://sites.google.com/view/technion-plus-plus/home",
-  "version": "3.5.3",
+  "version": "3.4.0",
   "manifest_version": 3,
   "minimum_chrome_version": "109.0",
   "background": {
@@ -187,17 +187,6 @@
     },
     {
       "css": [
-        "css/grades_sheet.css"
-      ],
-      "js": [
-        "js/grades_sheet.js"
-      ],
-      "matches": [
-        "https://students.technion.ac.il/local/tcurricular/grades*"
-      ]
-    },
-    {
-      "css": [
         "css/sap.css"
       ],
       "js": [
@@ -225,14 +214,6 @@
       ],
       "matches": [
         "https://panoptotech.cloud.panopto.eu/*"
-      ]
-    },
-    {
-      "resources": [
-        "html/templates/grades_sheet.html"
-      ],
-      "matches": [
-        "https://students.technion.ac.il/*"
       ]
     },
     {

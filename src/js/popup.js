@@ -56,6 +56,7 @@ import {reverseString, xorStrings} from './utils.js';
 	popup_window.left = parseInt((window.screen.width - popup_window.width) / 2);
 	document.getElementById("organizer").addEventListener("click", () => chrome.windows.create(popup_window));
 	document.getElementById("release_notes").addEventListener("click", () => chrome.tabs.create({url: "html/release_notes.html"}));
+	document.getElementById("calculator").addEventListener("click", () => chrome.tabs.create({url: "html/calculator.html"}));
 	const t = document.getElementById("tools_content").getElementsByTagName("a");
 	for (let c = 0; c < t.length; c++) {
 		if ([4, 5, 7].includes(c)) continue; // 4 - Organiser, 5 - grades sheet, 7 - printer

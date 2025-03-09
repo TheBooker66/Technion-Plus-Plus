@@ -1,0 +1,386 @@
+:root {
+    --sec-light: hsl(45, 92%, 59%);
+    --prim-dark: hsl(208, 80%, 15%);
+    --prim-cool: hsl(208, 90%, 23%);
+    --prim-kot: hsl(208, 100%, 5%);
+    --sec-darker: hsl(35, 100%, 25%);
+}
+
+@media print {
+    .no-print {
+        display: none;
+    }
+}
+
+.maor_wrapper, .norm_wrapper {
+    font-size: 13px;
+    font-family: 'Segoe UI', arial, sans-serif;
+    color: #000;
+}
+
+.maor_wrapper {
+    text-align: center;
+}
+
+.norm_wrapper {
+    min-width: 1280px;
+}
+
+.maor_table {
+    margin: 5px auto 5ch;
+    display: table;
+    width: 100%;
+}
+
+.maor_table_header {
+    font-weight: 600;
+    background-color: #eee;
+    line-height: 200%;
+}
+
+.norm_wrapper .maor_table .maor_table_header label:first-of-type {
+    border-radius: 0 4px 4px 0 !important;
+    width: 6ch;
+}
+
+.norm_wrapper .maor_table .maor_table_header label:last-of-type {
+    border-radius: 4px 0 0 4px !important;
+}
+
+.maor_table_header label.operator {
+    text-align: center;
+    padding: 1px;
+}
+
+.maor_table_row, .maor_table_header {
+    display: table-row;
+}
+
+.maor_table_row div, .maor_table_header label {
+    display: table-cell;
+    padding: 1px 5px;
+    text-align: right;
+    width: auto;
+}
+
+.norm_wrapper .maor_table_row div:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, .02);
+}
+
+.maor_table_header label {
+    padding: 1px 5px 1px 20px;
+}
+
+.norm_wrapper .maor_table_row:not(:last-of-type) div {
+    border-bottom: 1px dotted #0002;
+}
+
+.maor_table_row:nth-of-type(odd) {
+    background-color: #fcfcfc;
+}
+
+.maor_table_row div.grade {
+    min-width: 16.5ch;
+}
+
+.maor_table_row div.center {
+    text-align: center;
+    font-size: 0;
+}
+
+.maor_table_row.ignored > div.course_name::after {
+    content: "התעלמות קבועה";
+    display: inline-block;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: var(--sec-darker);
+    margin-right: 1ch;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background-color: hsla(45, 92%, 59%, .3);
+}
+
+.maor_attention {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.maor_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    margin-top: 10px;
+}
+
+.norm_wrapper h1, .norm_wrapper h2, .norm_wrapper h3, .norm_wrapper h4 {
+    border-radius: 4px;
+    margin: 0;
+    padding: 6px;
+}
+
+.norm_wrapper h1 {
+    background-color: var(--prim-cool);
+    color: #fff;
+    padding: 8px;
+}
+
+.norm_wrapper h2 {
+    background-color: var(--prim-dark);
+    color: #fff;
+}
+
+.norm_wrapper h3 {
+    background-color: var(--sec-light);
+}
+
+.norm_wrapper h4 {
+    background-color: #ddd;
+    font-weight: 400;
+}
+
+.norm_wrapper input {
+    font-size: 15px;
+    font-family: 'Segoe UI', arial, sans-serif;
+    margin: 5px 2px;
+    padding: 2px 5px;
+}
+
+.maor_table button {
+    padding: 2px 6px;
+    font-size: 12px;
+    margin: 4px 2px;
+    background-color: #0060df;
+    min-width: 7ch;
+    text-align: center;
+    border: 0;
+    color: #fff;
+    border-radius: 4px;
+    font-family: 'Segoe UI', arial, sans-serif;
+    box-sizing: border-box;
+}
+
+.maor_table button:hover {
+    background-color: #003eaa;
+}
+
+.danger button {
+    background-color: #d70022;
+}
+
+.danger button:hover {
+    background-color: #a4000f;
+}
+
+.maor_table input[type="number"]:disabled {
+    color: #000;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    background-color: transparent;
+}
+
+.maor_table input[type="number"] {
+    margin: 0;
+    font-size: inherit;
+    background-color: #eee;
+    border: 0;
+    border-bottom: 1px solid;
+    color: #0060df;
+    width: 6ch;
+    -webkit-appearance: textfield;
+    border-radius: 2px;
+}
+
+.maor_table .failed input[type="number"]:disabled {
+    color: #ff0039;
+}
+
+.norm_wrapper .failed, .norm_wrapper form.failed * {
+    color: #ff0039;
+    border-color: #ff0039;
+    transition: color 0.5s linear;
+}
+
+#footer {
+    margin-top: 50px;
+    text-align: center;
+    font-weight: 600;
+    position: absolute;
+    border-radius: 0 !important;
+    background-color: #eee;
+    width: 100%;
+    right: 0;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.temporary_remove, .temporary .center button:not(.temporary_remove) {
+    display: none;
+}
+
+.temporary .temporary_remove {
+    display: inline-block;
+}
+
+.norm_wrapper .maor_table_row.animate div {
+    animation: rowinsert 1.2s linear 0s;
+}
+
+#grades_list {
+    --color: #30e60b;
+}
+
+#ignore_list {
+    --color: #ff0039;
+}
+
+#grades_list .grade:disabled {
+    border-bottom-color: #ccc;
+}
+
+@keyframes rowinsert {
+    from {
+        color: transparent;
+        background-color: var(--color);
+    }
+}
+
+#add_grade_form input, #add_grade_form select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+#add_grade_form .inputs, #add_grade_form .labels {
+    display: grid;
+    grid-template-columns: 15% 1fr 10% 10% 10% 10% 10%;
+    gap: 10px;
+    align-items: center;
+}
+
+#add_grade_form .submit-button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+}
+
+#add_grade_form label {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.dark-mode {
+    background-color: #16253D;
+    color: #e0e0e0;
+}
+
+.dark-mode p, .dark-mode div, .dark-mode span, .dark-mode label {
+    color: #e0e0e0;
+}
+
+.dark-mode .norm_wrapper h1 {
+    background-color: darkslateblue;
+    color: white;
+}
+
+.dark-mode .norm_wrapper h2 {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.dark-mode .norm_wrapper h3 {
+    background-color: #34495e;
+    color: #e0e0e0;
+}
+
+.dark-mode .norm_wrapper h4 {
+    background-color: #4a6572;
+    color: #bdbdbd;
+}
+
+.dark-mode .maor_table_header {
+    background-color: #2c3e50;
+    color: #e0e0e0;
+}
+
+.dark-mode .maor_table_row div, .dark-mode .maor_table_header label {
+    border-bottom: 1px solid #34495e;
+}
+
+.dark-mode .norm_wrapper .maor_table_row div:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .maor_table_row:nth-of-type(odd) {
+    background-color: #1a2c45;
+}
+
+.dark-mode .maor_table input[type="number"] {
+    background-color: #34495e;
+    color: #e0e0e0;
+    border-bottom: 1px solid #4a6572;
+}
+
+.dark-mode .maor_table input[type="number"]:disabled {
+    color: #bdbdbd;
+}
+
+.dark-mode .maor_table button {
+    background-color: #2980b9;
+    color: white;
+}
+
+.dark-mode .maor_table button:hover {
+    background-color: #1f618d;
+}
+
+.dark-mode .danger button {
+    background-color: #c0392b;
+}
+
+.dark-mode .danger button:hover {
+    background-color: #922b21;
+}
+
+.dark-mode #footer {
+    background-color: #2c3e50;
+    color: #e0e0e0;
+}
+
+.dark-mode #add_grade_form input, .dark-mode #add_grade_form select {
+    background-color: #34495e;
+    color: #e0e0e0;
+    border: 1px solid #4a6572;
+}
+
+.dark-mode #add_grade_form .submit-button {
+    background-color: #27ae60;
+    color: white;
+}
+
+.dark-mode #add_grade_form .submit-button:hover {
+    background-color: #219653;
+}
+
+.dark-mode .maor_table_row.ignored > div.course_name::after {
+    background-color: hsl(59, 100%, 50%);
+    color: hsl(0, 100%, 50%);
+}
+
+.dark-mode .norm_wrapper .failed p, .dark-mode .norm_wrapper .failed div,
+.dark-mode .norm_wrapper .failed span, .dark-mode .norm_wrapper .failed label,
+.dark-mode .norm_wrapper form.failed * {
+    color: #ff0039;
+    transition: color 0.5s linear;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("../icons/arrowhead-down-white.svg");
+    background-repeat: no-repeat;
+    background-position: left 8px center;
+
+}
