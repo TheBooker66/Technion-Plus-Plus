@@ -2,7 +2,6 @@
 
 (function () {
 	function show_histograms(src, course) {
-		if (course.length === 8) course = course.slice(1, 4) + course.slice(5, 8);
 		const expand = src.getElementsByClassName("TP_expand"),
 			iframe = src.getElementsByTagName("iframe");
 		for (let i = 0; i < expand.length; i++)
