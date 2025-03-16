@@ -4,7 +4,7 @@
   "author": "Ethan \"67\" A.",
   "description": "Get the Technion's web-experience out of the stone age.",
   "homepage_url": "https://sites.google.com/view/technion-plus-plus/home",
-  "version": "3.6.1",
+  "version": "3.6.2",
   "manifest_version": 3,
   "minimum_chrome_version": "109.0",
   "background": {
@@ -137,42 +137,16 @@
     },
     {
       "css": [
-        "css/moodle/moodle.css",
-        "css/moodle/moodle_dark_root.css"
+        "css/moodle.css",
+        "css/moodle_dark.css"
       ],
       "js": [
         "js/moodle.js"
       ],
       "matches": [
+        "https://moodle2222.technion.ac.il/*",
         "https://moodle2223.technion.ac.il/*",
         "https://moodle2324.technion.ac.il/*",
-        "https://moodle24.technion.ac.il/*"
-      ],
-      "run_at": "document_start"
-    },
-    {
-      "css": [
-        "css/moodle/moodle_dark_2223.css"
-      ],
-      "matches": [
-        "https://moodle2223.technion.ac.il/*"
-      ],
-      "run_at": "document_start"
-    },
-    {
-      "css": [
-        "css/moodle/moodle_dark_2324.css"
-      ],
-      "matches": [
-        "https://moodle2324.technion.ac.il/*"
-      ],
-      "run_at": "document_start"
-    },
-    {
-      "css": [
-        "css/moodle/moodle_dark_24.css"
-      ],
-      "matches": [
         "https://moodle24.technion.ac.il/*"
       ],
       "run_at": "document_start"
