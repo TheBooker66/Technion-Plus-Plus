@@ -4,6 +4,7 @@
 	function show_histograms(src, course) {
 		const expand = src.getElementsByClassName("TP_expand"),
 			iframe = src.getElementsByTagName("iframe");
+		src.setAttribute("data-course", course);
 		for (let i = 0; i < expand.length; i++)
 			expand[i].addEventListener("click", () => {
 				if ("false" === expand[i].getAttribute("data-expanded")) {
@@ -34,11 +35,28 @@
 		chrome.storage.local.get({sap_hist: false}, a => toggleHists(a.sap_hist));
 	}
 
-	setTimeout(() => {
-		if (!/SM\/([0-9]+)/g.test(window.location.hash)) return;
-		const course = /SM\/([0-9]+)/g.exec(window.location.hash)?.[1] ?? null; ///([0-9]+)/.exec(document.getElementsByClassName("sapMObjectNumberUnit")?.[1].innerText)[0]
-		const src = (new DOMParser).parseFromString(`
-<div id="TP_bigbox">
+	function handlePageChange() {
+		// Check if the current page matches the general format
+		const father = document.querySelector(".sapUxAPObjectPageSectionContainer");
+		if (!father) return;
+		// Check if the current page is a course page and if the main tab is focused
+		const tab =
+			(document.querySelector("#__xmlview1--objectPageLayout-anchBar-__xmlview1--objectPageLayout-0-anchor-internalSplitBtn")
+				?? document.querySelector("#__xmlview1--objectPageLayout-anchBar-__xmlview1--objectPageLayout-0-anchor"))
+				?.getAttribute("aria-checked") === "true";
+		const course =
+			/([0-9]+)/.exec(
+				(document.querySelectorAll(".sapMObjectNumberUnit")?.[1] ??
+					document.querySelector("#__layout0-0header-content-0-0"))?.textContent)?.[0];
+		if (!tab || !course) return;
+
+		// Check if the element already exists and if the course is the same
+		const existingElement = father.querySelector("#TP_bigbox");
+		if (existingElement && existingElement.getAttribute("data-course") === course) return;
+
+		// If all checks pass, insert the new element into the DOM
+		const src = (new DOMParser()).parseFromString(`
+<div id="TP_bigbox" data-course="">
 <h3 class="card-title">היסטוגרמות וחוות דעת</h3>
 <div id="TP_histograms" class="card-body collapse show">
 <div id="TP_infobox">
@@ -61,8 +79,10 @@
 </div>
 </div>
 </div>`, "text/html").body.firstChild;
-		const father = document.getElementsByClassName("sapUxAPObjectPageSectionContainer")[0];
 		father.insertBefore(src, father.querySelector("#__xmlview1--objectPageLayout-0-1"));
 		show_histograms(src, course);
-	}, 5000);
+	}
+
+	const observer = new MutationObserver(handlePageChange);
+	observer.observe(document, {childList: true, subtree: true});
 })();
