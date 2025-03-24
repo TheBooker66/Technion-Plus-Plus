@@ -4,7 +4,7 @@
   "author": "Ethan \"67\" A.",
   "description": "Get the Technion's web-experience out of the stone age.",
   "homepage_url": "https://sites.google.com/view/technion-plus-plus/home",
-  "version": "3.6.3",
+  "version": "3.6.4",
   "manifest_version": 3,
   "minimum_chrome_version": "109.0",
   "background": {
@@ -64,6 +64,10 @@
         "js/login_script.js"
       ],
       "matches": [
+        "https://moodle2222.technion.ac.il/",
+        "https://moodle2222.technion.ac.il/my/",
+        "https://moodle2222.technion.ac.il/*.php?*",
+        "https://moodle2222.technion.ac.il/login/index.php",
         "https://moodle2223.technion.ac.il/",
         "https://moodle2223.technion.ac.il/my/",
         "https://moodle2223.technion.ac.il/*.php?*",
