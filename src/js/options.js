@@ -51,11 +51,11 @@ import {TE_updateInfo} from '../service_worker.js';
 			externalEh = external && "" !== password && "" !== idn;
 		chrome.storage.local.set({
 			username: username, server: campus, phrase: encryptedSubstring, term: encryptedString,
-			maor_p: encryptionResult, uidn_arr: encryptDecrypt(reverseString(idn)),
-			gmail: email, enable_login: loginEh, quick_login: login, allow_timings: timings, panopto_save: panopto,
-			external_u: external, enable_external: externalEh, hw_alerts: hw_alerts, notif_vol: notif_vol,
-			moodle_cal: moodle, cs_cal: cs, wcpass: WCPass, mncal_update: 0, wwcal_switch: webwork, wwcal_update: 0,
-			dark_mode: dark_mode, custom_name: custom_name, custom_link: custom_link,
+			maor_p: encryptionResult, uidn_arr: encryptDecrypt(reverseString(idn)), gmail: email,
+			enable_login: loginEh, quick_login: login, allow_timings: timings, panopto_save: panopto,
+			external_u: external, enable_external: externalEh, hw_alerts: hw_alerts,
+			moodle_cal: moodle, cs_cal: cs, wcpass: WCPass, wwcal_switch: webwork, wwcal_update: 0,
+			notif_vol: notif_vol, dark_mode: dark_mode, custom_name: custom_name, custom_link: custom_link,
 		}, () => {
 			const status_bar = document.getElementById("status");
 			if (chrome.runtime.lastError) {
@@ -71,7 +71,7 @@ import {TE_updateInfo} from '../service_worker.js';
 		else chrome.action.getBadgeBackgroundColor({}, colors => {
 			chrome.action.getBadgeText({}, badgeText => {
 				if (164 === colors[0] && 127 === colors[1] && 0 === colors[2] && "!" === badgeText)
-					chrome.action.setBadgeText({text: ""});
+					chrome.action.setBadgeText({text: ""}, () => {});
 			});
 		});
 	}
@@ -83,6 +83,7 @@ import {TE_updateInfo} from '../service_worker.js';
 		elem.setAttribute("autobuffer", "true");
 		elem.volume = document.getElementById("notification_volume").value;
 		elem.src = chrome.runtime.getURL("resources/notification.mp3");
+		// noinspection JSIgnoredPromiseFromCall
 		elem.play();
 	});
 	document.getElementById("notification_volume").addEventListener("change", () => {
@@ -95,12 +96,10 @@ import {TE_updateInfo} from '../service_worker.js';
 	});
 	document.addEventListener("DOMContentLoaded", () => {
 		chrome.storage.local.get({
-			username: "", server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
-			gmail: true, quick_login: true, allow_timings: false, panopto_save: true,
-			external_u: false, hw_alerts: true, notif_vol: 1,
-			moodle_cal: true, cs_cal: false, wcpass: "", mncal_update: 0, mn_pass: "",
-			wwcal_switch: false, wwcal_update: 0, webwork_courses: {},
-			dark_mode: false, custom_name: "", custom_link: "",
+			username: "", server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""], gmail: true,
+			quick_login: true, allow_timings: false, panopto_save: true, external_u: false, hw_alerts: true,
+			moodle_cal: true, cs_cal: false, wcpass: "", wwcal_switch: false, wwcal_update: 0, webwork_courses: {},
+			notif_vol: 1, dark_mode: false, custom_name: "", custom_link: "",
 		}, function (storage) {
 			if (chrome.runtime.lastError) {
 				console.error("TE_opt: " + chrome.runtime.lastError.message);

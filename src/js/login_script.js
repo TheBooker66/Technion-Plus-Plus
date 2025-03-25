@@ -7,9 +7,8 @@
 	}
 
 	function xorStrings(str1, str2) {
-		return str1.split('').map((char, i) =>
-			String.fromCharCode(str1.charCodeAt(i) ^ str2.charCodeAt(i))
-		).join('');
+		return str1.split('')
+			.map((char, i) => String.fromCharCode(str1.charCodeAt(i) ^ str2.charCodeAt(i))).join('');
 	} // End of duplicate
 
 	function appendInfo(form, name, value) {
@@ -111,7 +110,7 @@
 
 	function panopto() {
 		if (document.getElementById("loginButton") != null && window.location.href.includes("Pages/Home.aspx") === true)
-			window.location.href = (-1 === window.location.href.indexOf("?") ? "?" : "&") + "instance=TechnionAuthentication"
+			window.location.href = (-1 === window.location.href.indexOf("?") ? "?" : "&") + "instance=TechnionAuthentication";
 		if (document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton") != null
 			&& (document.getElementById("providerDropdown").value = "TechnionAuthentication"))
 			document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton").click();
@@ -129,8 +128,8 @@
 	if (chrome.extension.inIncognitoContext) return;
 	if (window.location.protocol !== "https:") return;
 	chrome.storage.local.get({
-		username: "", server: true, phrase: "", term: "", maor_p: "maor", quick_login: true, enable_login: false,
-		uidn_arr: ["", ""], mn_pass: "", enable_external: false
+		username: "", server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
+		quick_login: true, enable_login: false, enable_external: false,
 	}, function (storage) {
 		if (chrome.runtime.lastError) {
 			console.error("TE_login: " + chrome.runtime.lastError.message);

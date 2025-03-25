@@ -28,9 +28,9 @@ function XHR(url, resType, body = "", reqType = false) {
 					response: {} = resType === "json" ? JSON.parse(await response.text()) :
 						await chrome.runtime.sendMessage({
 							mess_t: "DOMParser",
-							data: await response.text()
+							data: await response.text(),
 						}),
-					responseURL: response.url
+					responseURL: response.url,
 				};
 				setInterval(() => {
 				}, 1e4);
@@ -56,9 +56,9 @@ export function TE_loginToMoodle(x = false, a = {}) {
 		};
 		XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", x).then(res => {
 			!res.responseURL.includes("microsoft") ? success(res) : chrome.storage.local.get({
-				username: "", server: true, enable_login: false
+				username: "", server: true, enable_login: false,
 			}, id => chrome.runtime.sendMessage({
-				mess_t: "iframe", a: a, fail: failure, succeed: success, id: id, response: res, XHR: XHR
+				mess_t: "iframe", a: a, fail: failure, succeed: success, id: id, response: res, XHR: XHR,
 			}));
 		}).catch(async err => {
 			if (err === "TypeError: Failed to fetch") {
@@ -108,7 +108,7 @@ function TE_forcedAutoLoginNormalPromise(a, b, d) {
 		chrome.storage.local.get({
 			username: "",
 			server: true,
-			enable_login: false
+			enable_login: false,
 		}, f => {
 			if (chrome.runtime.lastError) return b("b_storage - " + chrome.runtime.lastError.message);
 			if (!f.enable_login) return b("No username/password");
@@ -131,12 +131,12 @@ function TE_forcedAutoLoginExternalPromise(a, b) {
 				} else setTimeout(() => d(c, e + 1), 1E3);
 			});
 		});
-	}
+	};
 	XHR("https://moodle24.technion.ac.il/", "document").then(c => {
 		if (c.response[".usertext"]) return a(c);
 		chrome.tabs.create({
 			url: "https://moodle24.technion.ac.il/",
-			active: false
+			active: false,
 		}, tab => d(tab.id, 0));
 	}).catch(b);
 }
@@ -180,7 +180,7 @@ function TE_alertNewHW(a) {
 		{mess: "מודל", binary_flag: 1},
 		{mess: 'מדמ"ח', binary_flag: 2},
 		{mess: "לא אמור לקרות", binary_flag: 4},
-		{mess: "WeBWorK", binary_flag: 8}
+		{mess: "WeBWorK", binary_flag: 8},
 	][a];
 	TE_reBadge(false);
 	chrome.storage.local.get({cal_seen: 0, hw_alerts: true}, d => {
@@ -250,7 +250,7 @@ function TE_csCalendarCheck(a, b, d) {
 				banned: /Exam|moed| - Late|\u05d4\u05e8\u05e6\u05d0\u05d4|\u05ea\u05e8\u05d2\u05d5\u05dc/,
 				summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
 				uid: /UID:([0-9.a-zA-Z-]+)/,
-				time: /(?<Y>[0-9]{4})(?<M>[0-9]{2})(?<D>[0-9]{2})(T(?<TH>[0-9]{2})(?<TM>[0-9]{2}))?/
+				time: /(?<Y>[0-9]{4})(?<M>[0-9]{2})(?<D>[0-9]{2})(T(?<TH>[0-9]{2})(?<TM>[0-9]{2}))?/,
 			};
 			for (let k = 1; k < c.length; k++) {
 				let p = c[k].match(g.summary)[1];
@@ -354,8 +354,8 @@ function TE_webworkScan() {
 						ts: (new Date(n.year, parseInt(n.month) - 1, n.day, n.hour, n.minute)).getTime(),
 						due: `${n.day}.${n.month}.${n.year} - ${n.hour}:${n.minute}`,
 						seen: r,
-						done: t
-					}
+						done: t,
+					};
 				}
 				return h;
 			});
@@ -390,8 +390,7 @@ function TE_nextDownload() {
 			const c = b.dl_queue[0], d = c.list.shift(), e = a[c.sys] + c.sub_pre + d.u;
 			b.dl_queue[0] = c;
 			chrome.downloads.download({
-				url: e, filename: d.n,
-				saveAs: false
+				url: e, filename: d.n, saveAs: false,
 			}, f => {
 				chrome.runtime.lastError ? (console.error("TE_bg_dls: " + chrome.runtime.lastError.message), console.log(` - filename: ${d.n}\n - url: ${e}`)) :
 					(b.dl_current = f, chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"}),
@@ -399,7 +398,7 @@ function TE_nextDownload() {
 							chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
 							setTimeout(() => {
 								chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
-							}, 250)
+							}, 250);
 						}, 250), TE_setStorage({dl_current: b.dl_current, dl_queue: b.dl_queue}));
 			});
 		}
@@ -412,7 +411,7 @@ export function TE_updateVideosInfo(a, b = null) {
 	c.append("Content-Type", "application/json");
 	fetch("https://12041543-fd22-49b6-bf91-5fa9cf6046b2-bluemix.cloudant.com/tpvideos/v_Data%3Abff4cb5a16c3d92e443287a965d1f385", {
 		method: "GET",
-		headers: c
+		headers: c,
 	}).then(d => d.json()).then(d => {
 		if (!d.data || !d._id) throw "video-update bad request.";
 		const e = [], f = {};
@@ -429,24 +428,10 @@ export function TE_updateVideosInfo(a, b = null) {
 
 export function TE_updateInfo() {
 	chrome.storage.local.get({
-		videos_update: 0,
-		moodle_cal: true,
-		quick_login: true,
-		enable_login: false,
-		enable_external: false,
-		cal_seen: 0,
-		calendar_prop: "",
-		calendar_max: 0,
-		cal_killa: true,
-		cscal_update: 0,
-		uidn_arr: ["", ""],
-		cs_cal: false,
-		cs_cal_seen: {},
-		wcpass: "",
-		mncal_update: 0,
-		wwcal_switch: false,
-		wwcal_update: 0,
-		webwork_courses: {}
+		uidn_arr: ["", ""], quick_login: true, enable_login: false, enable_external: false,
+		calendar_prop: "", calendar_max: 0, moodle_cal: true, cal_seen: 0, cs_cal: false, cs_cal_seen: {},
+		cscal_update: 0, wcpass: "", wwcal_switch: false, wwcal_update: 0, webwork_courses: {},
+		videos_update: 0, cal_killa: true,
 	}, async a => {
 		if (chrome.runtime.lastError) console.error("TE_bg_Alarm: " + chrome.runtime.lastError.message);
 		else {
@@ -462,7 +447,7 @@ export function TE_updateInfo() {
 						TE_checkCalendarProp(a.calendar_prop);
 					}
 					if (webworkEh) await TE_getWebwork(f, a.webwork_courses);
-				}).catch(err => console.error("TE_back: forced_login_error -- " + err))
+				}).catch(err => console.error("TE_back: forced_login_error -- " + err));
 			} else if (moodleEh && a.calendar_prop !== "") {
 				await TE_loginToMoodle(false, a)
 					.then(TE_getCoursesMoodle)
@@ -474,7 +459,7 @@ export function TE_updateInfo() {
 				const b = [], d = Date.now();
 				Object.keys(a.user_agenda).forEach(c => {
 					let e = a.user_agenda[c].timestamp;
-					0 < e && 1728E5 < d - e && b.push(c)
+					0 < e && 1728E5 < d - e && b.push(c);
 				});
 				for (let c of b) delete a.user_agenda[c];
 				TE_setStorage({user_agenda: a.user_agenda});
@@ -492,7 +477,7 @@ export function TE_toggleBusAlert(a) {
 		if (b.buses_alerts.length === 0)
 			chrome.alarms.create("TE_buses_start", {
 				delayInMinutes: 1,
-				periodInMinutes: 1
+				periodInMinutes: 1,
 			});
 		if (-1 !== b.buses_alerts.indexOf(a.bus_kav)) {
 			b.buses_alerts.splice(b.buses_alerts.indexOf(a.bus_kav), 1);
@@ -519,7 +504,7 @@ function TE_busAlertError() {
 function TE_busAlertNow(a) {
 	let b = "";
 	for (let c = 0; c < a.length; c++) b += "קו " + a[c].Shilut + " יגיע לתחנה בעוד " + a[c].MinutesToArrival + " דקות.\n";
-	TE_notification(b, false)
+	TE_notification(b, false);
 	chrome.storage.local.get({buses_alerts: []}, d => {
 		for (let e = 0; e < a.length; e++) -1 !== d.buses_alerts.indexOf(a[e].Shilut) && d.buses_alerts.splice(d.buses_alerts.indexOf(a[e].Shilut), 1);
 		if (d.buses_alerts.length === 0) TE_shutBusesAlerts();
@@ -571,7 +556,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	switch (message.mess_t) {
 		case "singledownload":
 			chrome.downloads.download({url: message.link, filename: message.name, saveAs: false}, () => {
-				chrome.runtime.lastError && console.error("TE_bg_dl: " + chrome.runtime.lastError.message)
+				chrome.runtime.lastError && console.error("TE_bg_dl: " + chrome.runtime.lastError.message);
 			});
 			break;
 		case "multidownload":
@@ -590,12 +575,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 					"sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
 					"sec-fetch-dest": "document",
 					"sec-fetch-mode": "navigate",
-					"sec-fetch-site": "none"
+					"sec-fetch-site": "none",
 				},
 				body: null,
 				method: "HEAD",
 				mode: "cors",
-				credentials: "include"
+				credentials: "include",
 			}).then(res => sendResponse(res.url)).catch(err => console.error(err));
 			break;
 		case "silent_notification":
@@ -624,11 +609,11 @@ chrome.downloads.onChanged.addListener(delta => {
 		delta.id == b.dl_current && delta.paused ? false !== delta.paused.current && true !== delta.paused.previous || chrome.downloads.search({id: delta.id}, c => {
 			"interrupted" === c[0].state && (console.error(`TE_dlFailed ${delta.id} : ${["moodle", "panopto", "GR++", "webcourse"][b.dl_queue[0].sys]}`), b.dl_queue[0].list.length || b.dl_queue.shift(), b.dl_current = 0, TE_setStorage({
 				dl_current: b.dl_current,
-				dl_queue: b.dl_queue
+				dl_queue: b.dl_queue,
 			}), chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"}), TE_nextDownload());
 		}) : delta.id == b.dl_current && delta.state && ("interrupted" === delta.state.current && console.error(`TE_dlFailed ${delta.id} : ${["moodle", "panopto", "GR++", "webcourse"][b.dl_queue[0].sys]}`), "interrupted" === delta.state.current || "complete" === delta.state.current) && (b.dl_queue[0].list.length || b.dl_queue.shift(), b.dl_current = 0, TE_setStorage({
 			dl_current: b.dl_current,
-			dl_queue: b.dl_queue
+			dl_queue: b.dl_queue,
 		}), chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"}), TE_nextDownload());
 	});
 });
