@@ -1,6 +1,6 @@
 'use strict';
 
-(async function () {
+(function () {
 	// Duplicate of util.js due to the login script being executed in a different context
 	function reverseString(str) {
 		return str.split('').reverse().join('');

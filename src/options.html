@@ -12,7 +12,7 @@
     <h2>פרטי כניסה</h2>
     <div class="container">
         <div>
-            שם משתמש טכניוני<br/>
+            <label for="username">שם משתמש </label><label for="server">וסיומת אימייל </label>טכניוניים<br/>
             <span dir="ltr"><input type="text" id="username" placeholder="הכנס שם משתמש" maxlength="35"/> @
 		    <select id="server">
 			    <option id="campus">campus.technion.ac.il</option>
@@ -20,17 +20,18 @@
 		    </select>
             </span>
         </div>
-        <div>סיסמת משתמש טכניוני<br/><input type="password" id="password" placeholder="הכנס סיסמה" maxlength="256"/>
-        </div>
-        <div>מספר זהות *<br/>
-            <input type="text" placeholder="הכנס מספר זהות" maxlength="9" id="idn"/><br/>
-            <small> * נמצא בשימוש על ידי שליחת קבצים להדפסה וייבוא מטלות בית ממדמ"ח.</small>
+        <div>
+            <label for="password">סיסמת משתמש טכניוני</label><br/>
+            <input type="password" id="password" placeholder="הכנס סיסמה" maxlength="256"/>
         </div>
         <div>
-            <label><input type="checkbox" id="external_user"/> משתמש חיצוני</label>
-            <span class="description">
-			נא <b>לא</b> לסמן אם יש ברשותכם משתמש טכניוני. יש למלא מספר זהות.
-		</span>
+            <label for="idn">מספר זהות *</label><br/>
+            <input type="text" placeholder="הכנס מספר זהות" maxlength="9" id="idn"/><br/>
+            <span class="description"> * נמצא בשימוש על ידי שליחת קבצים להדפסה וייבוא מטלות בית ממדמ"ח.</span>
+        </div>
+        <div>
+            <label><input type="checkbox" id="external_user"/> משתמש חיצוני</label><br/>
+            <span class="big-description">נא <b>לא</b> לסמן אם יש ברשותכם משתמש טכניוני. יש למלא מספר זהות.</span>
         </div>
     </div>
 
@@ -40,90 +41,98 @@
         <div><label><input type="checkbox" id="dark_mode"/>הפעל מצב חשוך בעמוד זה ובמחשבון הממוצע האקדמי</label></div>
         <div>
             <label><input type="checkbox" id="panopto_save"/> שמירת העדפות בפנופטו</label>
-            <span class="description">תאפשר שמירה של מהירות ההפעלה ומצב התאורה בפנופטו.</span>
+            <span class="big-description">תאפשר שמירה של מהירות ההפעלה ומצב התאורה בפנופטו.</span>
         </div>
         <div>
-            קישור מותאם אישית <small>(מוצג בראש ה־popup של התוסף)</small><br/>
-            <input type="text" id="custom_name" placeholder="הכנס שם אתר" maxlength="22"/>
-            <input type="url" id="custom_link" placeholder="הכנס כתובת אתר"/>
-            <br/><small>
+            <label>
+                קישור מותאם אישית <small>(מוצג בראש ה־popup של התוסף)</small><br/>
+                <input type="text" id="custom_name" placeholder="הכנס שם אתר" maxlength="22"/>
+                <input type="url" id="custom_link" placeholder="הכנס כתובת אתר"/>
+            </label><br/>
+            <span class="description">
                 כאן ניתן להכניס כתובת לאתר אישי (למשל לדרייב הפקולטי).
                 הכתובת ושמה יוצגו בראש ה־popup של התוסף, ליד הקישורים למודל וסאפ.<br/>
                 השאירו תיבות טקסט אלו ריקות כדי לחזור לברירת המחדל (פנופטו).
-            </small>
+            </span>
         </div>
-        <div>אופן שימוש במייל <small style="margin: 0;">(בשימוש של שליחת קבצים להדפסה)</small><br/>
+        <div>
+            אופן שימוש במייל <small>(בשימוש של שליחת קבצים להדפסה)</small><br/>
             <label><input type="radio" name="mailclient" id="gmail_select"/> GMail (בדפדפן)</label><br/>
             <label><input type="radio" name="mailclient" id="outlook_select"/> תוכנה חיצונית (ברירת המחדל של הדפדפן,
-                למשל אאוטלוק)</label></div>
-        <div><label><input type="checkbox" id="allow_timings"/> הפעל את "מסעדות פתוחות בטכניון" ו"אוטובוסים
-            קרובים"</label>
-            <span class="description">
+                למשל אאוטלוק)</label>
+        </div>
+        <div>
+            <label><input type="checkbox" id="allow_timings"/>
+                הפעל את "מסעדות פתוחות בטכניון" ו"אוטובוסים קרובים"</label>
+            <span class="big-description">
 			כל בעיה שעלולה להתרחש מהשימוש בכלים הנ"ל, לרבות עקב תזמון שגוי של אוטובוס או עקב זמני פתיחה שגויים של מסעדה, אינה באחריות מפתח התוסף.<br/>
 			ובקיצור, האחריות על הפעלת ושימוש הכלים הנ"ל היא על המשתמש בלבד.
 		    </span>
         </div>
         <div>
-            עוצמת התראות
-            <div>0% <input type="range" min="0" max="1" step="0.1" value="1" id="notification_volume"/> 100%
+            <label for="notification_volume">עוצמת התראות</label>
+            <div>
+                0% <input type="range" min="0" max="1" step="0.1" value="1" id="notification_volume"/> 100%
                 <a id="try_vol">נסה</a></div>
-            <small>בשימוש על ידי התראות של מטלות חדשות ואוטובוסים.</small>
+            <span class="description">בשימוש על ידי התראות של מטלות חדשות ואוטובוסים.</span>
         </div>
     </div>
 
     <h2>מטלות בית</h2>
     <div class="container">
-        <div><label><input type="checkbox" id="allow_hw_alerts"/> הפעל התראות עבור מטלות בית חדשות</label>
-            <span class="description">יופעלו התראות כאשר התוסף יזהה מטלות חדשות עבור המערכות עבורן תבחר להציג מטלות קרובות.</span>
+        <div>
+            <label><input type="checkbox" id="allow_hw_alerts"/> הפעל התראות עבור מטלות בית חדשות</label>
+            <span class="big-description">יופעלו התראות כאשר התוסף יזהה מטלות חדשות עבור המערכות עבורן תבחר להציג מטלות קרובות.</span>
         </div>
-        <div><label><input type="checkbox" id="moodle_cal"/> הצג מטלות קרובות מהמודל</label>
-            <span class="description">חובה להפעיל התחברות אוטומטית.</span>
+        <div>
+            <label><input type="checkbox" id="moodle_cal"/> הצג מטלות קרובות מהמודל</label>
+            <span class="big-description">חובה להפעיל התחברות אוטומטית.</span>
         </div>
         <div>
             <label><input type="checkbox" id="cs_cal"/> הצג מטלות קרובות של הפקולטה למדמ"ח (GR++/Webcourse)</label>
-            <span class="description">חובה להגדיר מספר זהות וסיסמת יומן <span dir="ltr">GR++</span> לשם שימוש בתכונה זו. הפעלת התחברות אוטומטית אינה חובה עבור אפשרות זאת.</span>
+            <span class="big-description">חובה להגדיר מספר זהות וסיסמת יומן <span dir="ltr">GR++</span>
+                לשם שימוש בתכונה זו. הפעלת התחברות אוטומטית אינה חובה עבור אפשרות זאת.</span>
         </div>
         <div class="container" id="cscal_div">
             <div><b>מטלות מדמ"ח - הוראות ייבוא</b></div>
             <ol class="description">
                 <li>הכנס מספר זהות בתיבה המתאימה בחלק העליון של דף זה.</li>
                 <li>התחבר למערכת <span dir="ltr">GR++</span>, עבור לכרטיסיית "הגדרות" ושם לחץ על "עדכון אוטומטי".</li>
-                <li>עבור כל קורס שתרצה שיוצגו עבורו מטלות, סמן V בעמודה השלישית (עדכון תרגילי בית), לחץ על כפתור
-                    "בצע".
-                </li>
                 <li>
-                    מתחת לטבלה יופיע כפתור "העתק סיסמת יומן", לחץ עליו ולאחר מכן הדבק כאן את הסיסמה.
+                    עבור כל קורס שתרצה שיוצגו עבורו מטלות, סמן V בעמודה השלישית (עדכון תרגילי בית), לחץ על כפתור "בצע".
                 </li>
+                <li>מתחת לטבלה יופיע כפתור "העתק סיסמת יומן", לחץ עליו ולאחר מכן הדבק כאן את הסיסמה.</li>
             </ol>
             <div>
-                <b>סיסמת יומן <span dir="ltr">GR++</span></b><br/>
+                <label for="WCPass"><b>סיסמת יומן <span dir="ltr">GR++</span></b></label><br/>
                 <input type="text" placeholder="הכנס סיסמת יומן כאן" maxlength="8" id="WCPass"/>
             </div>
             <div>
                 <small><b><u>הערות</u></b></small>
-                <ol class="description">
+                <ul class="description">
+                    <li>אם כפתור "העתק סיסמת יומן" לא מופיע, יש ללחוץ על כפתור "צור סיסמת יומן חדשה".</li>
                     <li>
-                        אם כפתור "העתק סיסמת יומן" לא מופיע, יש ללחוץ על כפתור "צור סיסמת יומן חדשה".
-                    </li>
-                    <li>לסיסמה שתיווצר יש תוקף של שנה בלבד, לאחר שנה תתבקש ליצור סיסמה חדשה (התוסף יזכיר לך, לא תצטרך
-                        לזכור לבד).
+                        לסיסמה שתיווצר יש תוקף של שנה בלבד, לאחר שנה תתבקש ליצור סיסמה חדשה
+                        (התוסף יזכיר לך, לא תצטרך לזכור לבד).
                     </li>
                     <li>כדאי לבדוק בתחילת כל סמסטר שעבור הקורסים הרצויים אכן מסומן V בעמודת ייצוא תרגילי בית.</li>
-                </ol>
+                </ul>
             </div>
         </div>
         <div>
             <label><input type="checkbox" id="wwcal_switch"/> הצג מטלות קרובות של WeBWorK</label>
-            <span class="description">חובה להפעיל התחברות אוטומטית. התוסף יפתח מדי פעם כרטיסייה מודל ברקע (שתיסגר לאחר שניות בודדות) כדי לסרוק את WeBWorK.</span>
-            <span class="description" style="display: none;" id="ww_current">קורסים שנמצאו: <span>לא נמצאו קורסים</span>.</span>
+            <span class="big-description">חובה להפעיל התחברות אוטומטית.
+                התוסף יפתח מדי פעם כרטיסייה מודל ברקע (שתיסגר לאחר שניות בודדות) כדי לסרוק את WeBWorK.</span>
+            <span class="big-description" style="display: none;" id="ww_current">
+                קורסים שנמצאו: <span>לא נמצאו קורסים</span>.</span>
         </div>
     </div>
 
-    <h2>מידע על התוסף</h2>
-    <div id="ext_version">
-        גרסה מותקנת: <span>אירעה שגיאה! נא לדווח עליה.</span>
+    <h2>מידע טכני על התוסף</h2>
+    <div>
+        <span id="ext_version">גרסה מותקנת:</span><br/>
+        <span id="storage">זיכרון בשימוש:</span>
     </div>
-    <div id="storage">זיכרון בשימוש: </div>
 </div>
 
 <div id="fixed_footer">
