@@ -113,8 +113,8 @@ function main() {
 			create_download(buttons, moodle_num, 0, "הורדת כל הקבצים בקורס");
 			const semester = {
 				"חורף": "200",
-				"אביב": "100",
-				"קיץ": "300",
+				"אביב": "201",
+				"קיץ": "202",
 			}[course.groups.csemester];
 			create_element("a", "maor_download", {
 				href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2024/${semester}/SM/${course_num}`,

@@ -96,8 +96,8 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 						let k = 0, t = 0;
 						const z = {}, E = {
 							"200": "חורף",
-							"100": "אביב",
-							"300": "קיץ"
+							"201": "אביב",
+							"202": "קיץ"
 						}, A = [], B = [];
 						for (let f = 1; f < a.length; f++) {
 							let n = parseInt(a[f].split("UID:")[1].split("@moodle")[0]);
