@@ -1,7 +1,7 @@
 /* Configure main menu width */
 :root {
-    --menu-width: 130px;
-    --speed-width: 110px; /* speed and snapshot menu width, 20 px less than menu width */
+    --menu-width: 140px;
+    --speed-width: 120px; /* speed and snapshot menu width, 20 px less than menu width */
 }
 
 /* mark videos that the user already watched */
@@ -144,7 +144,7 @@ a.maor_panopto_action:hover {
     background-color: rgb(22, 37, 61);
     padding: 2px;
     border: 1px solid #000;
-    display: none;
+    display: none; !important;
     margin: -11px var(--speed-width) -11px 0;
     border-radius: 4px;
     box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
@@ -192,9 +192,14 @@ a.maor_panopto_action:hover {
     cursor: pointer;
 }
 
-#maor_content a:hover > div {
+#maor_content a#m_speed:hover > div {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+}
+
+#maor_content a#m_timestamp:hover > div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
 }
 
 #maor_content a#m_speed > div > span::after {

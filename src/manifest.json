@@ -188,7 +188,7 @@
     },
     {
       "resources": [
-        "icons/panopto_icons/*"
+        "icons/panopto/*"
       ],
       "matches": [
         "https://panoptotech.cloud.panopto.eu/*"
