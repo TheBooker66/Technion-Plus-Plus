@@ -227,8 +227,10 @@ function TE_alertMoodleCalendar(a, b, d, c) {
 			e = e.response["BEGIN:VEVENT"];
 			for (let k = 1; k < e.length; k++) {
 				let g = e[k].split("SUMMARY:")[1].split("\n")[0].trim();
-				if (c || "Attendance" === g || g.includes("ערעור") || g.includes("זום") || g.includes("Zoom")
-					|| g.includes("zoom") || g.includes("הרצאה") || g.includes("תרגול"))
+				if ((c.appeals && g.includes("ערעור"))
+					|| (c.zooms && (g.includes("זום") || g.includes("Zoom") || g.includes("zoom") || g.includes("הרצא") || g.includes("תרגול")))
+					|| (c.attendance && (g.includes("נוכחות") || g.includes("Attendance") || g.includes("attendance")))
+					|| (c.reserveDuty && g.includes("מילואים")))
 					continue;
 				g = g.split(" ");
 				if ("opens" !== g[g.length - 1] && "opens)" !== g[g.length - 1]) {
@@ -430,8 +432,8 @@ export function TE_updateInfo() {
 	chrome.storage.local.get({
 		uidn_arr: ["", ""], quick_login: true, enable_login: false, enable_external: false,
 		calendar_prop: "", calendar_max: 0, moodle_cal: true, cal_seen: 0, cs_cal: false, cs_cal_seen: {},
-		cscal_update: 0, wcpass: "", wwcal_switch: false, wwcal_update: 0, webwork_courses: {},
-		videos_update: 0, cal_killa: true,
+		cscal_update: 0, wcpass: "", wwcal_switch: false, wwcal_update: 0, webwork_courses: {}, videos_update: 0,
+		filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
 	}, async a => {
 		if (chrome.runtime.lastError) console.error("TE_bg_Alarm: " + chrome.runtime.lastError.message);
 		else {
@@ -452,7 +454,7 @@ export function TE_updateInfo() {
 				await TE_loginToMoodle(false, a)
 					.then(TE_getCoursesMoodle)
 					.catch(err => console.error("TE_back: login_error -- " + err));
-				TE_alertMoodleCalendar(a.cal_seen, a.calendar_prop, a.calendar_max, a.cal_killa);
+				TE_alertMoodleCalendar(a.cal_seen, a.calendar_prop, a.calendar_max, a.filter_toggles);
 			}
 			if (a.cs_cal && 288E5 < now - a.cscal_update) TE_csCalendarCheck(a.uidn_arr, a.wcpass, a.cs_cal_seen);
 			chrome.storage.local.get({user_agenda: {}}, a => {

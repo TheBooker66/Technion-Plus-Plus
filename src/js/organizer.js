@@ -3,10 +3,10 @@ import {toggle} from "./common_calendar.js";
 
 const loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
 
-function insertMessage(a, b) {
-	const c = document.getElementById("error").appendChild(document.createElement("div"));
-	c.className = b ? "error_bar" : "attention";
-	c.textContent = a;
+function insertMessage(messageText, errorEh) {
+	const element = document.getElementById("error").appendChild(document.createElement("div"));
+	element.className = errorEh ? "error_bar" : "attention";
+	element.textContent = messageText;
 }
 
 function checkForEmpty() {
@@ -17,166 +17,169 @@ function checkForEmpty() {
 	});
 }
 
-function openAssignment(a, b) {
-	const c = a.querySelector("a.button"), d = c.textContent;
-	c.textContent = "פותח...";
-	c.classList.add("small_spinner");
-	const f = () => {
-		c.classList.remove("small_spinner");
-		c.textContent = d;
+function openAssignment(assignment, gotoFunction) {
+	const button = assignment.querySelector("a.button"), originalText = button.textContent;
+	button.textContent = "פותח...";
+	button.classList.add("small_spinner");
+	const resetButton = () => {
+		button.classList.remove("small_spinner");
+		button.textContent = originalText;
 	};
-	b().then(f).catch(_ => {
-		a.setAttribute("style", "background-color: rgb(215, 0, 34, 0.8) !important;");
-		setTimeout(() => a.setAttribute("style", ""), 1E3);
-		f();
+	gotoFunction().then(resetButton).catch(_ => {
+		assignment.setAttribute("style", "background-color: rgb(215, 0, 34, 0.8) !important;");
+		setTimeout(() => assignment.setAttribute("style", ""), 1E3);
+		resetButton();
 	});
 }
 
-function insertAssignments(a, b) {
-	let c = new Set;
-	const d = (e, g, l) => {
-		g = g.querySelector(".list_item");
-		if (e.sys === "ua")
-			insertUserAssignment(e, g, l);
+function insertAssignments(newAssignments, finishedAssignments) {
+	let courses = new Set;
+	const insertAssignment = (assignmentData, templateClone, targetListID) => {
+		templateClone = templateClone.querySelector(".list_item");
+		if (assignmentData.sys === "ua")
+			insertUserAssignment(assignmentData, templateClone, targetListID);
 		else {
-			if (e.is_new) g.classList.add("starred");
-			if (e.sys === "cs") {
-				e.course = e.description;
-				e.description = "";
+			if (assignmentData.is_new) templateClone.classList.add("starred");
+			if (assignmentData.sys === "cs") {
+				assignmentData.course = assignmentData.description;
+				assignmentData.description = "";
 			}
 			const icons = {
 				webwork: ["webwork.svg", "וובוורק"],
 				moodle: ["moodle.svg", "מודל"],
-				cs: ["grpp.ico", 'מדמ"ח']
+				cs: ["grpp.ico", 'מדמ"ח'],
 			};
-			c.add(e.course);
-			g.querySelector(".system").src = "../icons/" + icons[e.sys][0];
-			g.querySelector(".system").title = "מטלת" + icons[e.sys][1];
-			g.querySelector(".assignment_header").textContent = e.header;
-			g.querySelector(".course_name").textContent += e.course;
-			g.dataset.course = "#" + e.course;
-			g.querySelector(".assignment_descripion").textContent = e.description;
-			g.querySelector(".end_time > span").textContent = e.final_date;
-			const m = g.querySelectorAll("a.button");
-			m[1].addEventListener("click", () => toggle(e.sys, e.event, g, 1));
-			m[2].addEventListener("click", () => toggle(e.sys, e.event, g, 0));
-			m[0].addEventListener("click", () => openAssignment(g, e.goToFunc));
-			g.querySelector(".assignment_header").addEventListener("click", () => openAssignment(g, e.goToFunc));
-			document.getElementById(l).appendChild(g);
+			courses.add(assignmentData.course);
+			templateClone.querySelector(".system").src = "../icons/" + icons[assignmentData.sys][0];
+			templateClone.querySelector(".system").title = "מטלת" + icons[assignmentData.sys][1];
+			templateClone.querySelector(".assignment_header").textContent = assignmentData.header;
+			templateClone.querySelector(".course_name").textContent += assignmentData.course;
+			templateClone.dataset.course = "#" + assignmentData.course;
+			templateClone.querySelector(".assignment_descripion").textContent = assignmentData.description;
+			templateClone.querySelector(".end_time > span").textContent = assignmentData.final_date;
+			const buttonElements = templateClone.querySelectorAll("a.button");
+			buttonElements[1].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, templateClone, 1));
+			buttonElements[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, templateClone, 0));
+			buttonElements[0].addEventListener("click", () => openAssignment(templateClone, assignmentData.goToFunc));
+			templateClone.querySelector(".assignment_header").addEventListener("click", () => openAssignment(templateClone, assignmentData.goToFunc));
+			document.getElementById(targetListID).appendChild(templateClone);
 		}
-	}, f = loadTemplate("assignment"), k = loadTemplate("userAgenda");
+	}, assignmentTemplate = loadTemplate("assignment"), userAgendaTemplate = loadTemplate("userAgenda");
 	const hw_sort = (a, b) => a.timestamp === b.timestamp ? a.header.localeCompare(b.header) : a.timestamp < b.timestamp ? -1 : a.timestamp > b.timestamp ? 1 : 0;
-	a.sort(hw_sort);
-	b.sort(hw_sort);
-	a.forEach(e => d(e, "ua" === e.sys ? k.cloneNode(true) : f.cloneNode(true), "new_assignments"));
-	b.forEach(e => d(e, "ua" === e.sys ? k.cloneNode(true) : f.cloneNode(true), "finished_assignments"));
-	const h = document.getElementById("course_filter");
-	Array.from(c).forEach(e => {
-		let g = h.appendChild(document.createElement("option"));
-		g.value = e;
-		g.textContent = e;
+	newAssignments.sort(hw_sort);
+	finishedAssignments.sort(hw_sort);
+	newAssignments.forEach(assignmentData => insertAssignment(assignmentData, "ua" === assignmentData.sys ? userAgendaTemplate.cloneNode(true) : assignmentTemplate.cloneNode(true), "new_assignments"));
+	finishedAssignments.forEach(assignmentData => insertAssignment(assignmentData, "ua" === assignmentData.sys ? userAgendaTemplate.cloneNode(true) : assignmentTemplate.cloneNode(true), "finished_assignments"));
+	const courseFilterElement = document.getElementById("course_filter");
+	Array.from(courses).forEach(courseName => {
+		let optionElement = courseFilterElement.appendChild(document.createElement("option"));
+		optionElement.value = courseName;
+		optionElement.textContent = courseName;
 	});
 	document.getElementById("spinner").style.display = "none";
 	checkForEmpty();
 }
 
-function editUA(a) {
-	chrome.storage.local.get({user_agenda: {}}, b => {
-		form.subject.value = b.user_agenda[a].header;
-		form.notes.value = b.user_agenda[a].description;
-		form.edit.value = a;
-		if (0 < b.user_agenda[a].timestamp) {
+function editUA(assignmentID) {
+	chrome.storage.local.get({user_agenda: {}}, storage => {
+		form.subject.value = storage.user_agenda[assignmentID].header;
+		form.notes.value = storage.user_agenda[assignmentID].description;
+		form.edit.value = assignmentID;
+		if (0 < storage.user_agenda[assignmentID].timestamp) {
 			form.no_end.checked = false;
-			form.end_time.valueAsNumber = b.user_agenda[a].timestamp
+			form.end_time.valueAsNumber = storage.user_agenda[assignmentID].timestamp;
 		} else {
 			form.no_end.checked = true;
 			form.end_time.value = "";
 		}
 
 		form_manual_events();
-		po_list.forEach(c => c.style.display = "none");
+		po_list.forEach(optionElement => optionElement.style.display = "none");
 		po_list[2].style.display = "block";
 	});
 }
 
-function removeUA(a) {
-	chrome.storage.local.get({user_agenda: {}}, b => {
-		if (b.user_agenda.hasOwnProperty(a))
-			if (window.confirm(`המטלה "${b.user_agenda[a].header}" תימחק!`)) {
-				delete b.user_agenda[a];
-				chrome.storage.local.set({user_agenda: b.user_agenda}, () => {
-					document.getElementById(`U_${a}`).remove();
+function removeUA(assignmentID) {
+	chrome.storage.local.get({user_agenda: {}}, storage => {
+		if (storage.user_agenda.hasOwnProperty(assignmentID))
+			if (window.confirm(`המטלה "${storage.user_agenda[assignmentID].header}" תימחק!`)) {
+				delete storage.user_agenda[assignmentID];
+				chrome.storage.local.set({user_agenda: storage.user_agenda}, () => {
+					document.getElementById(`U_${assignmentID}`).remove();
 					checkForEmpty();
 				});
 			}
 	});
 }
 
-function insertUserAssignment(a, b, c = null, d = false) {
-	if ("div" !== b.nodeName.toLowerCase()) b = b.querySelector(".list_item");
-	b.id = `U_${a.id}`;
-	b.querySelector(".assignment_header").textContent = a.header;
-	b.dataset.course = "#user-course";
-	let f = 20 * (a.description.split("\n").length + 1), k = b.querySelector(".assignment_descripion textarea");
-	k.textContent = a.description;
-	k.style.height = f + "px";
-	f = b.querySelector(".end_time > span");
-	0 < a.timestamp ? (f.parentNode.style.visibility = "visible", f.textContent =
-		(new Date(a.timestamp)).toLocaleString("iw-IL", {
+function insertUserAssignment(assignmentData, container, targetListID = null, insertAtBeginning = false) {
+	if ("div" !== container.nodeName.toLowerCase()) container = container.querySelector(".list_item");
+	container.id = `U_${assignmentData.id}`;
+	container.querySelector(".assignment_header").textContent = assignmentData.header;
+	container.dataset.course = "#user-course";
+	let textareaHeight = 20 * (assignmentData.description.split("\n").length + 1),
+		textareaElement = container.querySelector(".assignment_descripion textarea");
+	textareaElement.textContent = assignmentData.description;
+	textareaElement.style.height = textareaHeight + "px";
+	textareaHeight = container.querySelector(".end_time > span");
+	if (0 < assignmentData.timestamp) {
+		textareaHeight.parentNode.style.visibility = "visible";
+		textareaHeight.textContent = (new Date(assignmentData.timestamp)).toLocaleString("iw-IL", {
 			weekday: "long",
 			day: "2-digit",
 			month: "2-digit",
-			year: "numeric"
-		})) : f.parentNode.style.visibility = "hidden";
-	if (-1 == a.timestamp) b.classList.add("system_message");
-	if (c) {
-		c = document.getElementById(c);
-		b = d ? c.insertBefore(b, c.children[0]) : c.appendChild(b);
-		c = b.querySelectorAll("a.button");
-		c[0].addEventListener("click", () => editUA(a.id));
-		c[1].addEventListener("click", () => removeUA(a.id));
-		c[2].addEventListener("click", () => toggle(a.sys, a.event, b, 1));
-		c[3].addEventListener("click", () => toggle(a.sys, a.event, b, 0));
+			year: "numeric",
+		});
+	} else textareaHeight.parentNode.style.visibility = "hidden";
+	if (-1 == assignmentData.timestamp) container.classList.add("system_message");
+	if (targetListID) {
+		targetListID = document.getElementById(targetListID);
+		container = insertAtBeginning ? targetListID.insertBefore(container, targetListID.children[0]) : targetListID.appendChild(container);
+		targetListID = container.querySelectorAll("a.button");
+		targetListID[0].addEventListener("click", () => editUA(assignmentData.id));
+		targetListID[1].addEventListener("click", () => removeUA(assignmentData.id));
+		targetListID[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, container, 1));
+		targetListID[3].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, container, 0));
 	}
 }
 
 const assignments_promises = {}, CALENDARS = 3; // moodle, webwork, cs
 
-export function addAssignmentsToList(a, b) {
-	assignments_promises[b] = a;
+export function addAssignmentsToList(calendarPromise, calendarType) {
+	assignments_promises[calendarType] = calendarPromise;
 	Object.keys(assignments_promises).length === CALENDARS && chrome.storage.local.get({
 		moodle_cal: true,
 		cs_cal: false,
 		wwcal_switch: false,
 		quick_login: true,
 		enable_login: true,
-		user_agenda: {}
-	}, c => {
-		const d = {};
-		d.moodle = c.quick_login && c.enable_login && c.moodle_cal;
-		d.webwork = c.quick_login && c.enable_login && c.wwcal_switch;
-		d.cs = c.cs_cal;
-		let e = [], h = [], f = [];
-		const g = c.user_agenda;
-		Object.keys(g).forEach(l => {
-			g[l].id = l;
-			g[l].event = l;
-			g[l].sys = "ua";
-			g[l].done ? e.push(g[l]) : h.push(g[l])
+		user_agenda: {},
+	}, storage => {
+		const enabledCalendars = {};
+		enabledCalendars.moodle = storage.quick_login && storage.enable_login && storage.moodle_cal;
+		enabledCalendars.webwork = storage.quick_login && storage.enable_login && storage.wwcal_switch;
+		enabledCalendars.cs = storage.cs_cal;
+		let newAssignmentsList = [], finishedAssignmentsList = [], promisesList = [];
+		const userAgendaData = storage.user_agenda;
+		Object.keys(userAgendaData).forEach(agendaID => {
+			userAgendaData[agendaID].id = agendaID;
+			userAgendaData[agendaID].event = agendaID;
+			userAgendaData[agendaID].sys = "ua";
+			userAgendaData[agendaID].done ? newAssignmentsList.push(userAgendaData[agendaID]) : finishedAssignmentsList.push(userAgendaData[agendaID]);
 		});
-		for (let l of Object.keys(assignments_promises)) d[l] && f.push(assignments_promises[l]);
-		let k = 0;
-		for (let l of f) {
-			l().then(m => {
-				h = h.concat(m.new_list);
-				e = e.concat(m.finished_list);
+		for (let calendarType of Object.keys(assignments_promises)) enabledCalendars[calendarType] && promisesList.push(assignments_promises[calendarType]);
+		let completedPromises = 0;
+		for (let calendarPromise of promisesList) {
+			calendarPromise().then(calendarData => {
+				finishedAssignmentsList = finishedAssignmentsList.concat(calendarData.new_list);
+				newAssignmentsList = newAssignmentsList.concat(calendarData.finished_list);
 			}).catch(err => insertMessage(err.msg, err.is_error)).finally(() => {
-				if (++k === f.length) insertAssignments(h, e);
+				if (++completedPromises === promisesList.length) insertAssignments(finishedAssignmentsList, newAssignmentsList);
 			});
 		}
-		if (f.length === 0) {
-			insertAssignments(h, e);
-			insertMessage(`משיכת מטלות הבית עבור מודל, וובוורק ומדמ"ח כבויה. יש להגדיר הצגת מטלות בית עבור המערכות הרצויות בהגדרות התוסף`, false);
+		if (promisesList.length === 0) {
+			insertAssignments(finishedAssignmentsList, newAssignmentsList);
+			insertMessage(`משיכת מטלות הבית עבור מודל, וובוורק ומדמ"ח כבויה. יש להגדיר הצגת מטלות בית עבור המערכות הרצויות בהגדרות התוסף.`, false);
 		}
 	});
 }
@@ -203,58 +206,122 @@ function form_submit() {
 		return;
 	}
 	if (!form.no_end.checked && form.end_time.valueAsNumber < Date.now()) {
-		alert("תאריך הסיום שבחרת כבר עבר, נא לבחור תאריך סיום חדש")
+		alert("תאריך הסיום שבחרת כבר עבר, נא לבחור תאריך סיום חדש");
 		return;
 	}
 	chrome.storage.local.get({user_agenda: {}}, a => {
-		let agenda = a.user_agenda, b = parseInt(form.edit.value),
-			c = 0 < b ? agenda.hasOwnProperty(b) : false, d = c ? b : Date.now();
-		agenda[d] = {
+		let agenda = a.user_agenda, assignmentID = parseInt(form.edit.value),
+			isExistingAssignment = 0 < assignmentID ? agenda.hasOwnProperty(assignmentID) : false,
+			finalAssignmentID = isExistingAssignment ? assignmentID : Date.now();
+		agenda[finalAssignmentID] = {
 			header: form.subject.value.slice(0, 50),
 			description: form.notes.value.slice(0, 280),
 			timestamp: !form.no_end.checked && 0 < parseInt(form.end_time.valueAsNumber) ? parseInt(form.end_time.valueAsNumber) : 0,
-			done: c ? agenda[d].done : false
+			done: isExistingAssignment ? agenda[finalAssignmentID].done : false,
 		};
 		if (50 < Object.keys(agenda).length) {
-			alert("לא ניתן ליצור יותר מ־50 מטלות משתמש.")
+			alert("לא ניתן ליצור יותר מ־50 מטלות משתמש.");
 			return;
 		}
 		chrome.storage.local.set({user_agenda: agenda}, () => {
-			let f;
-			agenda[d].id = d;
-			if (c) {
-				f = document.querySelector(`#U_${d}`);
-				insertUserAssignment(agenda[d], f);
-				document.querySelector(".tab.current").click()
-			} else f = loadTemplate("userAgenda"), agenda[d].event = d, insertUserAssignment(agenda[d], f, "new_assignments", true), checkForEmpty(), po_tabs[0].click();
+			let assignmentElement;
+			agenda[finalAssignmentID].id = finalAssignmentID;
+			if (isExistingAssignment) {
+				assignmentElement = document.querySelector(`#U_${finalAssignmentID}`);
+				insertUserAssignment(agenda[finalAssignmentID], assignmentElement);
+				document.querySelector(".tab.current").click();
+			} else {
+				assignmentElement = loadTemplate("userAgenda");
+				agenda[finalAssignmentID].event = finalAssignmentID;
+				insertUserAssignment(agenda[finalAssignmentID], assignmentElement, "new_assignments", true);
+				checkForEmpty();
+				po_tabs[0].click();
+			}
 			form_reset_all();
 		});
 	});
+}
+
+function setUpFilters() {
+	const typeFiltersDiv = document.getElementById("type_filters_div"),
+		typeFilterToggle = document.getElementById("type_filter_toggle"),
+		filter_types = document.querySelectorAll("#type_filters_div input");
+	typeFilterToggle.onclick = function (_) {
+		if (typeFilterToggle.textContent === "בטל סינון") {
+			for (let i = 0; i < filter_types.length; i++)
+				filter_types[i].checked = false;
+			filter_types[0].dispatchEvent(new Event("change"));
+			typeFilterToggle.textContent = "סינון מטלות לפי סוג";
+		}
+		typeFilterToggle.textContent =
+			typeFilterToggle.textContent === "סינון מטלות לפי סוג" ? "בטל סינון" : "סינון מטלות לפי סוג";
+		typeFiltersDiv.classList.toggle("hidden");
+		document.getElementById("filters_div").classList.toggle("hidden");
+	};
+	chrome.storage.local.get({
+		filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
+	}, storage => {
+		if (chrome.runtime.lastError) {
+			console.error("TE_cal: " + chrome.runtime.lastError.message);
+			insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.", true);
+			return;
+		}
+		for (const type in storage.filter_toggles) {
+			document.getElementById(type).checked = storage.filter_toggles[type];
+			if (storage.filter_toggles[type]) {
+				typeFilterToggle.textContent = "בטל סינון";
+				typeFiltersDiv.classList.remove("hidden");
+				document.getElementById("filters_div").classList.remove("hidden");
+			}
+		}
+	});
+	for (let i = 0; i < filter_types.length; i++) {
+		filter_types[i].addEventListener("change", () => {
+			chrome.storage.local.get({
+				filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
+			}, storage => {
+				if (chrome.runtime.lastError) {
+					console.error("TE_cal: " + chrome.runtime.lastError.message);
+					insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.", true);
+					return;
+				}
+				for (const type in storage.filter_toggles) {
+					storage.filter_toggles[type] = document.getElementById(type).checked;
+				}
+				chrome.storage.local.set({filter_toggles: storage.filter_toggles}, () => {
+					if (chrome.runtime.lastError)
+						console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);
+					else location.reload();
+				});
+			});
+		});
+	}
 }
 
 const po_list = [document.getElementById("new_assignments"), document.getElementById("finished_assignments"), document.getElementById("add_assignment")],
 	po_tabs = document.querySelectorAll("#tabs > .tab"), form = document.querySelector("form");
 let input_counters;
 if (document.title === "ארגונית++") {
-	form.addEventListener("submit", a => {
-		a.preventDefault();
+	form.addEventListener("submit", event => {
+		event.preventDefault();
 		form_submit();
 	});
 	const form_buttons = form.querySelectorAll("a.button");
 	form_buttons[0].addEventListener("click", () => form_submit());
 	form_buttons[1].addEventListener("click", () => {
 		form_reset_all();
-		let a = document.querySelector(".tab.current");
-		a == po_tabs[2] ? po_tabs[0].click() : a.click();
+		let currentTab = document.querySelector(".tab.current");
+		currentTab === po_tabs[2] ? po_tabs[0].click() : currentTab.click();
 	});
 	po_tabs[2].addEventListener("click", form_reset_all);
 	const need_refresh = document.querySelector("#need_refresh");
 	need_refresh.querySelector("a.button").addEventListener("click", () => window.location.reload());
-	setInterval(() => chrome.storage.local.get({cal_seen: 0}, a => {
-		if (0 != a.cal_seen) need_refresh.style.display = "block";
+	setInterval(() => chrome.storage.local.get({cal_seen: 0}, storage => {
+		if (0 !== storage.cal_seen) need_refresh.style.display = "block";
 	}), 6E4);
-	const filters_div = document.getElementById("filtering"), filter = document.getElementById("course_filter"),
-		filters_toggle = document.getElementById("filters_toggle");
+	const course_filters_div = document.getElementById("course_filters_div"),
+		filter = document.getElementById("course_filter"),
+		course_filter_toggle = document.getElementById("course_filter_toggle");
 	filter.addEventListener("change", () => {
 		document.querySelectorAll(`.list_item[data-course^='#${filter.value.replace(/"/g, '\\"').replace(/'/g, "\\'")}']`)
 			.forEach(a => a.classList.remove("hidden"));
@@ -262,53 +329,60 @@ if (document.title === "ארגונית++") {
 			.forEach(a => a.classList.add("hidden"));
 		checkForEmpty();
 	});
-	filters_toggle.addEventListener("click", () => {
+	course_filter_toggle.addEventListener("click", () => {
 		filter.selectedIndex = 0;
 		filter.dispatchEvent(new Event("change"));
-		filters_toggle.textContent = "סינון מטלות" === filters_toggle.textContent ? "בטל סינון" : "סינון מטלות";
-		filters_div.classList.toggle("hidden");
+		course_filter_toggle.textContent =
+			course_filter_toggle.textContent === "סינון מטלות לפי קורס" ? "בטל סינון" : "סינון מטלות לפי קורס";
+		course_filters_div.classList.toggle("hidden");
+		if (document.getElementById("type_filter_toggle").textContent === "סינון מטלות לפי סוג")
+			document.getElementById("filters_div").classList.toggle("hidden");
 	});
-	for (let a = 0; a < po_tabs.length; a++) po_tabs[a].addEventListener("click", () => {
-		for (let b = 0; b < po_tabs.length; b++) {
-			po_tabs[b].className = b === a ? "tab current" : "tab";
-			po_list[b].style.display = b === a ? "block" : "none";
-		}
-	});
+	for (let i = 0; i < po_tabs.length; i++)
+		po_tabs[i].addEventListener("click", () => {
+			for (let j = 0; j < po_tabs.length; j++) {
+				po_tabs[j].className = j === i ? "tab current" : "tab";
+				po_list[j].style.display = j === i ? "block" : "none";
+				if (i === 2) document.getElementById("filters_div").classList.add("hidden");
+				else document.getElementById("filters_div").classList.remove("hidden");
+			}
+		});
 	document.getElementById("goToSettings").addEventListener("click", () => chrome.runtime.openOptionsPage());
-	window.addEventListener("contextmenu", a => a.preventDefault());
+	window.addEventListener("contextmenu", event => event.preventDefault());
 	input_counters = form.querySelectorAll("span");
 	form.subject.addEventListener("input", () => input_counters[0].textContent = form.subject.value.length);
 	form.notes.addEventListener("input", () => input_counters[1].textContent = form.notes.value.length);
 	form.no_end.addEventListener("input", () => form.end_time.disabled = form.no_end.checked);
+	setUpFilters();
 
 	chrome.storage.local.get({gmail: true}, a => {
-		const b = {
+		const emailInfo = {
 			ad: "ethan.amiran@gmail.com",
-			su: "יצירת קשר - Technion++"
+			su: "יצירת קשר - Technion++",
 		};
-		let c = a.gmail ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1" : "mailto:{1}?subject={2}";
-		c = c.replace("{1}", b.ad).replace("{2}", b.su);
-		document.getElementById("mailtome").setAttribute("href", c);
+		let emailURL = a.gmail ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1" : "mailto:{1}?subject={2}";
+		emailURL = emailURL.replace("{1}", emailInfo.ad).replace("{2}", emailInfo.su);
+		document.getElementById("mailtome").setAttribute("href", emailURL);
 		if (a.gmail) document.getElementById("mailtome").setAttribute("target", "_blank");
 	});
-	chrome.storage.local.get({organizer_fullscreen: false, organizer_darkmode: false}, a => {
-		let b = document.getElementById("fullscreen");
-		if (a.organizer_fullscreen) {
-			b.checked = true;
+	chrome.storage.local.get({organizer_fullscreen: false, organizer_darkmode: false}, storage => {
+		const fullscreenCheckbox = document.getElementById("fullscreen"),
+			darkmodeCheckbox = document.getElementById("darkmode");
+		if (storage.organizer_fullscreen) {
+			fullscreenCheckbox.checked = true;
 			chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"});
 		}
-		b.addEventListener("change", _ => {
-			chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: b.checked ? "maximized" : "normal"});
-			chrome.storage.local.set({organizer_fullscreen: b.checked})
+		fullscreenCheckbox.addEventListener("change", _ => {
+			chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
+			chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
 		});
-		let c = document.getElementById("darkmode");
-		if (a.organizer_darkmode) {
-			c.checked = true;
+		if (storage.organizer_darkmode) {
+			darkmodeCheckbox.checked = true;
 			document.querySelector("html").setAttribute("tplus", "dm");
 		}
-		c.addEventListener("change", _ => {
-			c.checked ? document.querySelector("html").setAttribute("tplus", "dm") : document.querySelector("html").removeAttribute("tplus");
-			chrome.storage.local.set({organizer_darkmode: c.checked});
+		darkmodeCheckbox.addEventListener("change", _ => {
+			darkmodeCheckbox.checked ? document.querySelector("html").setAttribute("tplus", "dm") : document.querySelector("html").removeAttribute("tplus");
+			chrome.storage.local.set({organizer_darkmode: darkmodeCheckbox.checked});
 		});
 	});
 }

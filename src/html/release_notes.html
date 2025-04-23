@@ -9,7 +9,7 @@
 
 <div id="header">
     <div class="wrapper">
-        <span id="date" hidden="hidden">2024-4-5</span>
+        <span id="date" hidden="hidden">2024-4-23</span>
         <span id="title"></span>
         <span id="logo">
             <span class="tpclass">Technion<sup>++</sup></span>
@@ -35,17 +35,11 @@
         <div class="tableRow">
             <div class="section"><img src="../icons/release_notes/added.svg" alt="חדש"/> <span>חדש</span></div>
             <div class="info">
-                <b>מודל</b>
+                <b>ארגונית++</b>
                 <ul>
+                    <li>נוספו מסננים למטלות נוכחות (מי שביקש – יודע) ולדברים הקשורים למילואים בארגונית.</li>
+                    <li>נוסף אייקון לכפתור של הוספת מטלה אישית בארגונית.</li>
                     <!--<li>לא נוסף דבר חדש בגרסה זו</li>-->
-                    <li>נוספה תמיכה (חלקית מאוד) לגרסה מודל של תשפ"ב.</li>
-                </ul>
-                <b>פנופטו</b>
-                <ul>
-                    <li>
-                        נוספה פונקציונליות העתקת קישור בזמן ספציפי מפנופטו, כמו שיש ביוטיוב.
-                        הכפתור לכך נמצא בחלונית של התוסף.
-                    </li>
                 </ul>
                 <small>אם יש לכם רעיונות לשיפור, אתם מוזמנים לפנות אליי.</small>
             </div>
@@ -56,24 +50,17 @@
             <div class="section"><img src="../icons/release_notes/refresh.svg" alt="שונה ותוקן"/>
                 <span>שונה ותוקן</span></div>
             <div class="info">
+                <b>ארגונית++</b>
+                <ul>
+                    <li>
+                        שונה אופן הפעולה של סינון המטלות בארגונית.
+                        בנוסף, כעת ניתן לסנן ערעורים וזומים (ומטלות נוכחות ומשימות למילואימניקים)
+                        באופן בת"ל (מי שביקש – יודע). בניסוח לא מתמטי, ניתן לסנן בנפרד כל אחת מארבע האופציות.
+                    </li>
+                </ul>
                 <b>כללי</b>
                 <ul>
-                    <li>
-                        היעילות הכללית של הקוד שופרה.
-                    </li>
-                </ul>
-                <b>מודל</b>
-                <ul>
-                    <li>תוקן באג קטן בכרטיסייה של טכניון++ בדף הראשי של המודל.</li>
-                    <li>תוקן באג במשיכת הסמסטר של מטלות.</li>
-                </ul>
-                <b>סאפ</b>
-                <ul>
-                    <li>
-                        תוקנו כמה באגים קטנים בהצגה של ההיסטוגרמות בסאפ.
-                        לצערי עדיין לא ניתן להציג אותן בתוך הסאפ הרגיל,
-                        אז כדי לראות אותן צריך ללחוץ על קישור מהמודל או מצ'יזפורק.
-                    </li>
+                    <li>תוקנו כמה אייקונים ברחבי התוסף.</li>
                 </ul>
             </div>
         </div>
@@ -82,14 +69,13 @@
         <div class="tableRow">
             <div class="section"><img src="../icons/release_notes/removed.svg" alt="בוטל"/> <span>בוטל</span></div>
             <div class="info">
-                <b>מודל</b>
+                <b>ארגונית++</b>
                 <ul>
                     <li>
-                        הוסרו מצבי הלילה המותאמים של המודל בכל גרסאות המודל הישנות עקב באגים רבים.
-                        עקב כך, ייתכנו בסבירות גבוהה באגים בשימוש בתוסף בגרסאות מודל ישנות.
+                        הוסרו אופציות הסינון בחלונית הקטנה של מטלות המודל.
+                        המטלות עדיין מסוננת שם, אולם כדי לשנות את הסינון, יש להיכנס לארגונית++.
                     </li>
-                    <li>הוסר פיצ'ר ישן הקשור למערכת של הטכניון שלא קיימת כבר מלא זמן.</li>
-                    <!--                    <li>לא היה מה להסיר :shrug:</li>-->
+<!--                    <li>לא היה מה להסיר :shrug:</li>-->
                 </ul>
             </div>
         </div>
@@ -112,15 +98,13 @@
                 </ul>
                 <!--
                 TODO: Update version in manifest.json and release date and the list of changes here.
-                - Add filtering of attendance missions and split the filtering of the appeals and the zooms.
                 - Add pinning to the Organizer.
                 - Figure out what causes message.fail to fail.
+                - Fix all the double used variable & migrate to TypeScript.
 
                 - Fix? the food popup.
-                - Figure out how to view the organizer on mobile
                 - Sort buses by time (this is too difficult to implement as of now).
-                - Fix all the double used variable & migrate to TypeScript.
-                - Check CATEGORIES code. Actually, I won't touch it unless someone else reports a bug.
+                - Figure out how to view the organizer on mobile (this is way too difficult to implement as of now).
                 -->
             </div>
         </div>
