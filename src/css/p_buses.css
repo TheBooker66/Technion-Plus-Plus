@@ -7,20 +7,20 @@
 }
 
 .drow.chosen {
-    background-color: rgba(69, 161, 255, 0.2);
+    background-color: rgb(69, 161, 255, 0.2);
 }
 
 .drow:nth-of-type(odd).chosen {
-    background-color: rgba(69, 161, 255, 0.6);
+    background-color: rgb(69, 161, 255, 0.6);
 }
 
 .drow:hover {
-    background-color: rgba(69, 161, 255, 0.9) !important;
+    background-color: rgb(69, 161, 255, 0.9) !important;
     cursor: pointer;
 }
 
 .drow.blat {
-    background-color: rgba(215, 0, 34, 0.8) !important;
+    background-color: rgb(215, 0, 34, 0.8) !important;
     transition: all .25s linear;
 }
 
@@ -93,8 +93,8 @@
     right: 50%;
     margin: 20px -10px;
     border-radius: 50%;
-    border-top: 4px solid rgba(0, 120, 220, 1.0);
-    border-right: 4px solid rgba(0, 120, 220, 0.0);
+    border-top: 4px solid rgb(0, 120, 220, 1.0);
+    border-right: 4px solid rgb(0, 120, 220, 0.0);
     animation: spinner .3s linear infinite;
 }
 

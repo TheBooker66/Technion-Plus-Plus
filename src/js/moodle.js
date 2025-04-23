@@ -24,7 +24,7 @@ function main() {
 			style: "background-image: url(" + chrome.runtime.getURL("../icons/technion_plus_plus/icon-32.png") + ");"
 		}, "Technion", cardBody)
 		create_element("sup", "", {}, "++", cardTitle);
-		const actionsContainer = create_element("div", "card-text mt-3", {style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(128,128,128,.3);"}, "", cardBody);
+		const actionsContainer = create_element("div", "card-text mt-3", {style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(128,128,128,.3);"}, "", cardBody);
 		const darkModeContainer = create_element("div", "card-text mt-3 tplus_main_actions", {}, "", cardBody);
 		const darkModeSwitchContainer = create_element("div", "custom-control custom-switch", {style: "text-align: right"}, "", darkModeContainer);
 		const darkModeCheckbox = create_element("input", "custom-control-input", {

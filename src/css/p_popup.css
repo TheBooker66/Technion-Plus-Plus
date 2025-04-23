@@ -1,20 +1,4 @@
-:root {
-    /*--prim-dark: #16253D;
-    --prim-cool: #043766;
-    --prim-kot: #061123;
-    --sec-light: rgb(246, 198, 54);
-    --sec-norm: rgb(238, 154, 65);
-    --sec-dark: rgb(205, 114, 19);
-    --sec-darker: rgb(119, 64, 6);*/
-    --prim-dark: hsl(208, 80%, 15%);
-    /*--prim-effect: #0A5191;*/
-    --prim-cool: hsl(208, 90%, 23%);
-    --prim-kot: hsl(208, 100%, 5%);
-    --sec-light: hsl(35, 100%, 64%);
-    --sec-norm: hsl(35, 100%, 48%);
-    --sec-dark: hsl(35, 100%, 35%);
-    --sec-darker: hsl(35, 100%, 25%);
-}
+@import "colours.css";
 
 html {
     overflow: hidden;
@@ -52,11 +36,11 @@ body {
 #koteret {
     background-color: var(--prim-kot);
     text-align: left;
-    color: rgba(237, 237, 240, 1);
+    color: rgb(237, 237, 240, 1);
     display: block;
     margin: 0;
     padding: 4px 8px;
-    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 5px 0 rgb(0, 0, 0, 0.2);
     z-index: 2;
     font-size: 14px;
     letter-spacing: 0.05em;
@@ -114,7 +98,7 @@ body {
 }
 
 #myform input[type=text] {
-    border: 1px solid rgba(12, 12, 13, 0.3);
+    border: 1px solid rgb(12, 12, 13, 0.3);
     border-radius: 2px;
     color: #0c0c0d;
     display: inline-block !important;
@@ -126,7 +110,7 @@ body {
 }
 
 #myform input[type=text]:hover {
-    border: 1px solid rgba(12, 12, 13, 0.5);
+    border: 1px solid rgb(12, 12, 13, 0.5);
 }
 
 #myform input[type=text]:focus {
@@ -156,8 +140,8 @@ body {
 
 h2 {
     background-color: var(--prim-dark);
-    box-shadow: 0 6px 4px -3px rgba(0, 0, 0, 0.3);
-    color: rgba(255, 255, 255, 0.87);
+    box-shadow: 0 6px 4px -3px rgb(0, 0, 0, 0.3);
+    color: rgb(255, 255, 255, 0.87);
     font-size: 13px;
     font-weight: 600;
     padding: 8px;
@@ -231,7 +215,7 @@ input[type="checkbox"] {
     height: 1.5em;
     border-radius: 50%;
     width: 1.5em;
-    box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.05), 0 0 1px 0 rgba(0, 0, 0, 0.12) inset;
+    box-shadow: 0 0 3px 1px rgb(0, 0, 0, 0.05), 0 0 1px 0 rgb(0, 0, 0, 0.12) inset;
     z-index: 1;
 }
 
@@ -304,7 +288,7 @@ input[type="checkbox"] {
     text-align: center;
     margin: 0 0 6px 0;
     padding: 0 8px;
-    box-shadow: 0 6px 4px -3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 4px -3px rgb(0, 0, 0, 0.3);
     z-index: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -314,7 +298,7 @@ input[type="checkbox"] {
 #tabs .tab {
     display: inline-block;
     cursor: pointer;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgb(255, 255, 255, 0.5);
     font-size: 12px;
     font-weight: 600;
     padding: 8px 0 6px;
@@ -322,13 +306,13 @@ input[type="checkbox"] {
 }
 
 #tabs .tab:hover {
-    color: rgba(255, 255, 255, 0.87);
+    color: rgb(255, 255, 255, 0.87);
     background: var(--prim-cool);
 }
 
 #tabs .current {
-    color: rgba(255, 255, 255, .87);
-    border-bottom-color: rgba(255, 255, 255, .87);
+    color: rgb(255, 255, 255, .87);
+    border-bottom-color: rgb(255, 255, 255, .87);
 }
 
 /*
@@ -340,7 +324,7 @@ input[type="checkbox"] {
     text-align: center;
     margin: 8px 0 0 0;
     padding: 0 2px;
-    box-shadow: 0 -5px 4px -4px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 -5px 4px -4px rgb(0, 0, 0, 0.12);
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     column-gap: 4px;
@@ -348,7 +332,7 @@ input[type="checkbox"] {
 
 #secondary_tabs .tab {
     cursor: pointer;
-    color: rgba(12, 12, 13, 0.4);
+    color: rgb(12, 12, 13, 0.4);
     font-size: 12px;
     font-weight: 400;
     padding: 6px 0 8px;
@@ -356,7 +340,7 @@ input[type="checkbox"] {
 }
 
 #secondary_tabs .tab:hover:not(.current) {
-    color: rgba(12, 12, 13, 0.75);
+    color: rgb(12, 12, 13, 0.75);
 }
 
 #secondary_tabs .current {
@@ -381,7 +365,7 @@ input[type="checkbox"] {
 
 .divider {
     border: 0;
-    border-bottom: 1px solid rgba(100, 100, 100, 0.12);
+    border-bottom: 1px solid rgb(100, 100, 100, 0.12);
     display: block;
     width: 80%;
     padding: 0;

@@ -115,7 +115,7 @@ function openAssignment(a, b) {
 	d.style.display = "none";
 	d.parentNode.classList.add("small_spinner");
 	b().catch(_ => {
-		a.setAttribute("style", "background-color: rgba(215, 0, 34, 0.8) !important; border-radius: 3px;");
+		a.setAttribute("style", "background-color: rgb(215, 0, 34, 0.8) !important; border-radius: 3px;");
 		setTimeout(() => a.setAttribute("style", ""), 1E3);
 	}).finally(() => {
 		d.style.display = "block";

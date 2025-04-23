@@ -94,7 +94,7 @@ small {
 
 .list_item:not(:last-of-type) {
     border-bottom: 1px solid;
-    border-image: linear-gradient(to right, transparent 10%, rgba(0, 0, 0, .12) 10% 90%, transparent 90%) 1;
+    border-image: linear-gradient(to right, transparent 10%, rgb(0, 0, 0, .12) 10% 90%, transparent 90%) 1;
 }
 
 .list_item div {

@@ -26,7 +26,7 @@ function openAssignment(a, b) {
 		c.textContent = d;
 	};
 	b().then(f).catch(_ => {
-		a.setAttribute("style", "background-color: rgba(215, 0, 34, 0.8) !important;");
+		a.setAttribute("style", "background-color: rgb(215, 0, 34, 0.8) !important;");
 		setTimeout(() => a.setAttribute("style", ""), 1E3);
 		f();
 	});

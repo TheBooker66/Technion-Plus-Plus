@@ -3,7 +3,7 @@ a.maor_download {
     color: #0c0c0d !important;
     border: 0;
     font-weight: 500;
-    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+    box-shadow: 0 3px 1px -2px rgb(0, 0, 0, 0.2), 0 2px 2px 0 rgb(0, 0, 0, 0.14), 0 1px 5px 0 rgb(0, 0, 0, .12);
 }
 
 a.maor_download, a.maor_download_light {
@@ -26,7 +26,7 @@ a.maor_download:hover {
 
 a.maor_download_light {
     /*color: #fff !important;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgb(255,255,255,0.1);
     border: 1px solid #fff;*/
     background-color: rgb(246, 198, 54);
     color: #0c0c0d !important;
@@ -77,7 +77,7 @@ a.maor_download_light:hover {
     width: 50px;
     background: #043766 no-repeat center center;
     border-radius: 4px;
-    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+    box-shadow: 0 3px 1px -2px rgb(0, 0, 0, 0.2), 0 2px 2px 0 rgb(0, 0, 0, 0.14), 0 1px 5px 0 rgb(0, 0, 0, .12);
     display: none;
     position: fixed;
     left: 20px;
@@ -126,7 +126,6 @@ a.maor_download_light:hover {
     -webkit-appearance: none;
     appearance: none;
     border-radius: 5px;
-    /*background-image: linear-gradient(to left, hsl(87, 77%, 25%) 0 8.3%, hsl(117, 77%, 25%) 8.3% 16.6%, hsl(147, 77%, 25%) 16.6% 25%, hsl(177, 77%, 25%) 25% 33.3%, hsl(207, 77%, 25%) 33.3% 41.6%, hsl(237, 77%, 25%) 41.6% 50%,hsl(267, 77%, 25%) 50% 58.3%,hsl(297, 77%, 25%) 58.3% 66.6%,hsl(327, 77%, 25%) 66.6% 75%, hsl(357, 77%, 25%) 75% 83.3%, hsl(27, 77%, 25%) 83.3% 91.6%, hsl(57, 77%, 25%) 91.6% 100%);*/
     background-image: linear-gradient(to left, hsl(82, 100%, 25%) 0 8.3%, hsl(112, 100%, 25%) 8.3% 16.6%, hsl(142, 100%, 25%) 16.6% 25%, hsl(172, 100%, 25%) 25% 33.3%, hsl(202, 100%, 25%) 33.3% 41.6%, hsl(232, 100%, 25%) 41.6% 50%, hsl(262, 100%, 25%) 50% 58.3%, hsl(292, 100%, 25%) 58.3% 66.6%, hsl(322, 100%, 25%) 66.6% 75%, hsl(352, 100%, 25%) 75% 83.3%, hsl(22, 100%, 25%) 83.3% 91.6%, hsl(52, 100%, 25%) 91.6% 100%);
     height: 0.8rem;
     width: 100%;

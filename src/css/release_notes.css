@@ -1,12 +1,4 @@
-:root {
-    --prim-dark: #16253D;
-    --prim-cool: #043766; /*002c54;*/
-    --prim-kot: #061123;
-    --sec-light: rgb(247, 199, 56); /*EFB509*/
-    --sec-norm: rgb(238, 154, 65);
-    --sec-dark: #CD7213;
-    --sec-darker: rgb(119, 64, 6);
-}
+@import "colours.css";
 
 body {
     font-family: 'Segoe UI', arial, sans-serif;
@@ -34,7 +26,7 @@ body {
     padding: 20px;
     margin-bottom: 20px;
     background-image: linear-gradient(15deg, var(--prim-cool) 50%, var(--prim-dark) 100%);
-    box-shadow: 0 1px 4px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 4px 2px rgb(0, 0, 0, 0.5);
     border-bottom: 1px solid #000;
 }
 
@@ -49,7 +41,7 @@ body {
 
 hr {
     border: 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgb(0, 0, 0, 0.2);
     margin: 30px auto;
     width: 80%;
 }
@@ -70,7 +62,7 @@ a:hover {
     border-radius: 10px;
     margin: 40px auto;
     width: 90%;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid rgb(0, 0, 0, 0.15);
 }
 
 .tableRow {

@@ -1,10 +1,4 @@
-:root {
-    --sec-light: hsl(45, 92%, 59%);
-    --prim-dark: hsl(208, 80%, 15%);
-    --prim-cool: hsl(208, 90%, 23%);
-    --prim-kot: hsl(208, 100%, 5%);
-    --sec-darker: hsl(35, 100%, 25%);
-}
+@import "colours.css";
 
 @media print {
     .no-print {
@@ -64,7 +58,7 @@
 }
 
 .norm_wrapper .maor_table_row div:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, .02);
+    background-color: rgb(0, 0, 0, .02);
 }
 
 .maor_table_header label {
@@ -97,7 +91,7 @@
     margin-right: 1ch;
     padding: 2px 8px;
     border-radius: 10px;
-    background-color: hsla(45, 92%, 59%, .3);
+    background-color: rgb(247, 199, 54, 0.3);
 }
 
 .maor_attention {
@@ -309,7 +303,7 @@
 }
 
 .dark-mode .norm_wrapper .maor_table_row div:nth-of-type(odd) {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgb(255, 255, 255, 0.05);
 }
 
 .dark-mode .maor_table_row:nth-of-type(odd) {
@@ -364,8 +358,8 @@
 }
 
 .dark-mode .maor_table_row.ignored > div.course_name::after {
-    background-color: hsl(59, 100%, 50%);
-    color: hsl(0, 100%, 50%);
+    background-color: rgb(255, 251, 0);
+    color: rgb(255, 0, 0);
 }
 
 .dark-mode .norm_wrapper .failed p, .dark-mode .norm_wrapper .failed div,

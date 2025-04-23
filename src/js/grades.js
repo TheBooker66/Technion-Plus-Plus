@@ -13,7 +13,7 @@
 			info_link: ["לחץ כאן", "press here"],
 		};
 		const html = (new DOMParser).parseFromString(`
-    <div style="margin-bottom: 1em; border-width: 2px 0; border-image: linear-gradient(to ${button_data.grad_dir[lang]}, hsl(208, 90%, 23%), transparent) 1; width: max-content;padding: ${button_data.padding[lang]}; border-style: solid;">
+    <div style="margin-bottom: 1em; border-width: 2px 0; border-image: linear-gradient(to ${button_data.grad_dir[lang]}, rgb(6, 62, 111), transparent) 1; width: max-content;padding: ${button_data.padding[lang]}; border-style: solid;">
         <a class="maor_download" id="cf_loader" title="${button_data.title[lang]}">
         	<i class="far fa-hand-point-${button_data.grad_dir[lang]} fa-fw"></i> ${button_data.button[lang]}
         </a><br />

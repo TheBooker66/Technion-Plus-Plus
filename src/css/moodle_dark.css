@@ -6,14 +6,14 @@
     --navbar_bottom: #557e22;
     --navbar_bg: #385c0c;
     --dark_bg: rgb(0, 51, 0);
-    --calendar_today: rgba(85, 139, 18, 0.1);
-    --shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -7px rgba(0, 0, 0, 0.2);
+    --calendar_today: rgb(85, 139, 18, 0.1);
+    --shadow: 0 16px 24px 2px rgb(0, 0, 0, 0.14), 0 6px 30px 5px rgb(0, 0, 0, 0.12), 0 8px 10px -7px rgb(0, 0, 0, 0.2);
 }
 
 [tplus=dm] body {
     color: #eee !important;
     /*background-size: 400px 400px;
-    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.7), rgba(0,0,0,0.9), rgba(0,0,0,0.7), rgba(0,0,0,0.9), rgba(0,0,0,0.7)) !important;
+    background-image: repeating-linear-gradient(45deg, rgb(0,0,0,0.7), rgb(0,0,0,0.9), rgb(0,0,0,0.7), rgb(0,0,0,0.9), rgb(0,0,0,0.7)) !important;
     */
     background-color: #070707 !important;
 }
@@ -52,7 +52,7 @@
 }
 
 [tplus=dm] div#learnrpage {
-    background-color: rgba(255, 255, 255, 0.05); /*var(--dark_bg);*/
+    background-color: rgb(255, 255, 255, 0.05); /*var(--dark_bg);*/
     border: 0;
     border-radius: 4px;
 }
@@ -62,16 +62,16 @@
 }
 
 [tplus=dm] #page-footer {
-    background-color: rgba(0, 0, 0, 0.6) !important;
+    background-color: rgb(0, 0, 0, 0.6) !important;
     border-top: 1px solid #262626 !important;
     border-image: linear-gradient(to right, transparent 5%, var(--navbar_bg), transparent 95%) 1;
-    /*box-shadow: 0 -5px 4px -4px rgba(255,255,255,0.5);*/
+    /*box-shadow: 0 -5px 4px -4px rgb(255,255,255,0.5);*/
 }
 
 [tplus=dm] #page div#learningcontent {
     position: relative;
     margin-top: 0;
-    /*background-color: rgba(5, 5, 5, 0.95) !important;*/
+    /*background-color: rgb(5, 5, 5, 0.95) !important;*/
     padding: 2rem !important;
     background-color: #070707 !important;
 }
@@ -90,7 +90,7 @@
 
 [tplus=dm] .card, [tplus=dm] #page-enrol-users #filterform, [tplus=dm] .que .history,
 [tplus=dm] .userprofile .profile_tree section, [tplus=dm] .groupinfobox, [tplus=dm] .well {
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: rgb(255, 255, 255, 0.05) !important;
 }
 
 [tplus=dm] section#region-main {
@@ -132,14 +132,14 @@
 [tplus=dm] .grade-report-user .user-grade .baggb,
 [tplus=dm] .path-mod-assign td.submissionnotgraded {
     color: #eee;
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: rgb(255, 255, 255, 0.05) !important;
 }
 
 [tplus=dm] .moodle-dialogue-base .moodle-dialogue-wrap, [tplus=dm] .fp-content .fp-upload-form,
 [tplus=dm] .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd.yui3-widget-hd,
 [tplus=dm] .file-picker .fp-content {
     color: #eee !important;
-    background-color: rgba(30, 30, 30, 1) !important;
+    background-color: rgb(30, 30, 30, 1) !important;
 }
 
 [tplus=dm] .categoryname {
@@ -173,7 +173,7 @@
 
 [tplus=dm] .activity-item.indented {
     margin: 0 !important;
-    border: 16px rgba(255, 255, 255, 0.05) !important;
+    border: 16px rgb(255, 255, 255, 0.05) !important;
 
 }
 
@@ -198,20 +198,20 @@
 }
 
 [tplus=dm] .coursecontrols .editcogbutton:first-child {
-    border-left: 1px solid rgba(255, 255, 255, .1);
+    border-left: 1px solid rgb(255, 255, 255, .1);
     margin-left: 20px;
 }
 
 [tplus=dm] nav.navbar {
     border-bottom: 0 solid var(--navbar_bottom);
-    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 0 4px 4px rgb(0, 0, 0, 0.5) !important;
     background-color: var(--navbar_bg) !important;
 }
 
 nav.navbar, nav.navbar.fixed-top.custom-color,
 nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     border-bottom: 0 solid var(--navbar_bottom);
-    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 0 4px 4px rgb(0, 0, 0, 0.5) !important;
     background-color: var(--navbar_bg) !important;
 }
 
@@ -257,11 +257,11 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 
 [tplus=dm] .section li.activity:not(.modtype_label):nth-of-type(odd),
 [tplus=dm] .generaltable tbody tr:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgb(0, 0, 0, 0.3);
 }
 
 [tplus=dm] .generaltable tbody tr:nth-of-type(even) {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgb(0, 0, 0, 0.2);
 }
 
 [tplus=dm] .section .activity .contentwithoutlink, [tplus=dm] .section .activity .activityinstance {
@@ -274,7 +274,7 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 }
 
 [tplus=dm] .calendar_event_course, [tplus=dm] .calendar_event_user {
-    background-color: rgba(0, 0, 0, 0.4) !important;
+    background-color: rgb(0, 0, 0, 0.4) !important;
 }
 
 [tplus=dm] .minicalendar .today {
@@ -316,21 +316,21 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 }
 
 [tplus=dm] .table th, [tplus=dm] table.collection th, [tplus=dm] table.flexible th, [tplus=dm] .generaltable th, [tplus=dm] .table td, [tplus=dm] table.collection td, [tplus=dm] table.flexible td, [tplus=dm] .generaltable td {
-    border-color: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgb(255, 255, 255, 0.2) !important;
     color: #eee;
 }
 
 [tplus=dm] table.quizreviewsummary td.cell {
-    background-color: rgba(0, 0, 0, 0.2) !important;
+    background-color: rgb(0, 0, 0, 0.2) !important;
 }
 
 [tplus=dm] table.quizreviewsummary th.cell {
-    background-color: rgba(0, 0, 0, 0.55) !important;
+    background-color: rgb(0, 0, 0, 0.55) !important;
 }
 
 [tplus=dm] .alert-info, [tplus=dm] #page-admin-index .releasenoteslink, [tplus=dm] #adminsettings .form-overridden, [tplus=dm] .que .formulation, [tplus=dm] .que .info {
     color: #ccc !important;
-    background-color: rgba(0, 0, 0, 0.4) !important;
+    background-color: rgb(0, 0, 0, 0.4) !important;
     border-color: #000 !important;
 }
 
@@ -349,7 +349,7 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 }
 
 [tplus=dm] .path-mod-quiz #mod_quiz_navblock .qnbutton {
-    background-color: rgba(0, 0, 0, 0.5) !important;
+    background-color: rgb(0, 0, 0, 0.5) !important;
 }
 
 [tplus=dm] .calendar_filters span .icon {
@@ -400,12 +400,12 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 
 /* other lists */
 [tplus=dm] .list-group-item {
-    background-color: rgba(0, 0, 0, .3);
+    background-color: rgb(0, 0, 0, .3);
 }
 
 [tplus=dm] #nav-drawer {
     background-color: var(--dark_bg) !important;
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+    background-image: linear-gradient(to bottom, rgb(0, 0, 0, 0.4), rgb(0, 0, 0, 0.4));
     box-shadow: var(--shadow);
 }
 
@@ -427,9 +427,9 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 [tplus=dm] a.left.carousel-control .fa-chevron-left, [tplus=dm] a.right.carousel-control .fa-chevron-right {
     transform: rotate(180deg);
     border-radius: 35px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgb(0, 0, 0, 0.5);
     padding: 5px;
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: rgb(255, 255, 255, 0.8) !important;
     font-size: 21px !important;
     width: 31px;
     margin: 2px 0;
@@ -438,7 +438,7 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 
 [tplus=dm] a.left.carousel-control .fa-chevron-left:hover, [tplus=dm] a.right.carousel-control .fa-chevron-right:hover {
     color: var(--a_color) !important;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgb(0, 0, 0, 0.8);
 }
 
 [tplus=dm] .carousel-item div {
@@ -484,7 +484,7 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 
 [tplus=dm] div#blockslider {
     background-color: #000 !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgb(255, 255, 255, 0.1) !important;
     margin-bottom: 1rem;
 }
 
@@ -523,7 +523,7 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 }
 
 [tplus=dm] .box.progress_bar {
-    background-color: rgba(255, 255, 255, .05);
+    background-color: rgb(255, 255, 255, .05);
 }
 
 [tplus=dm] .box.progress_bar .progress {

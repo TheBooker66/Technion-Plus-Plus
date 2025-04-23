@@ -2,8 +2,8 @@
     content: '';
     box-sizing: border-box;
     border-radius: 50%;
-    border-top: 4px solid rgba(0, 120, 220, 1.0);
-    border-right: 4px solid rgba(0, 120, 220, 0.0);
+    border-top: 4px solid rgb(0, 120, 220, 1.0);
+    border-right: 4px solid rgb(0, 120, 220, 0.0);
     animation: spinner .3s linear infinite;
     display: block;
 }
@@ -73,7 +73,7 @@
 }
 
 .list_item {
-    border-bottom: 1px solid rgba(100, 100, 100, 0.12);
+    border-bottom: 1px solid rgb(100, 100, 100, 0.12);
     display: flex;
     background-color: transparent;
     transition: background-color .5s ease;

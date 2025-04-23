@@ -1,12 +1,7 @@
+@import "colours.css";
+
 :root {
-    --prim-dark: hsl(208, 80%, 15%);
-    --prim-cool: hsl(208, 90%, 23%);
-    --prim-kot: hsl(208, 100%, 5%);
-    --sec-light: hsl(35, 100%, 64%);
-    --sec-norm: hsl(35, 100%, 48%);
-    --sec-dark: hsl(35, 100%, 35%);
-    --sec-darker: hsl(35, 100%, 25%);
-    --small-shade: 0px 3px 1px -2px rgba(255, 214, 214, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, .12);
+    --small-shade: 0px 3px 1px -2px rgb(255, 214, 214, 0.2), 0px 2px 2px 0px rgb(0, 0, 0, 0.14), 0px 1px 5px 0px rgb(0, 0, 0, .12);
 }
 
 html {
@@ -38,12 +33,12 @@ body {
 #koteret {
     background-color: var(--prim-kot);
     text-align: left;
-    color: rgba(237, 237, 240, 1);
+    color: rgb(237, 237, 240, 1);
     display: grid;
     grid-template-columns: 1fr 1fr;
     margin: 0;
     padding: 16px calc(1.5vmax + 8px);
-    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 5px 0 rgb(0, 0, 0, 0.2);
     z-index: 2;
     font-size: 24px;
     box-sizing: border-box;
@@ -116,7 +111,7 @@ body {
     font-size: 1.2em;
     font-weight: 600;
     padding: 8px 3ch;
-    border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 3px solid rgb(0, 0, 0, 0.1);
     align-items: center;
     gap: 1ch;
 }
@@ -130,7 +125,7 @@ body {
 
 #tabs .tab:hover {
     color: #000;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgb(0, 0, 0, 0.05);
 }
 
 #tabs .current {
@@ -147,8 +142,8 @@ body {
     content: '';
     box-sizing: border-box;
     border-radius: 50%;
-    border-top: 4px solid rgba(0, 120, 220, 1.0);
-    border-right: 4px solid rgba(0, 120, 220, 0.0);
+    border-top: 4px solid rgb(0, 120, 220, 1.0);
+    border-right: 4px solid rgb(0, 120, 220, 0.0);
     animation: spinner .3s linear infinite;
     display: block;
 }
@@ -446,7 +441,7 @@ input[type="hidden"][value="0"] + div {
 }
 
 #filtering {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgb(0, 0, 0, 0.05);
     border-radius: 8px;
     padding: 8px;
     box-sizing: border-box;
@@ -535,7 +530,7 @@ input[type="hidden"][value="0"] + div {
 }
 
 [tplus=dm] .list_item {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgb(255, 255, 255, 0.1);
     background-color: #252525;
 }
 
@@ -546,7 +541,7 @@ input[type="hidden"][value="0"] + div {
 
 [tplus=dm] #tabs .tab, [tplus=dm] #tabs .dummy {
     color: #ddd;
-    border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 3px solid rgb(255, 255, 255, 0.1);
 }
 
 [tplus=dm] #tabs .current {
@@ -556,11 +551,11 @@ input[type="hidden"][value="0"] + div {
 
 [tplus=dm] #tabs .tab:hover {
     color: #fff;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgb(0, 0, 0, 0.2);
 }
 
 [tplus=dm] #filtering {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgb(255, 255, 255, 0.1);
 }
 
 [tplus=dm] .end_time span {

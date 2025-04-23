@@ -1,8 +1,4 @@
-:root {
-    --prim-dark: hsl(208, 80%, 15%);
-    --prim-cool: hsl(208, 90%, 23%);
-    --prim-kot: hsl(208, 100%, 5%);
-}
+@import "colours.css";
 
 #TP_bigbox {
     padding: 1rem 2.5rem 1rem;
