@@ -271,12 +271,6 @@ b.assignment_header {
     display: none;
 }
 
-#message {
-    padding: 8px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
 footer {
     background-color: var(--prim-dark);
     color: #fff;

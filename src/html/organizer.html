@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <div id="message">
+        <div style="padding: 8px; overflow-y: auto; overflow-x: hidden;">
             <div id="filters_div" class="hidden">
                 <span>סינון</span>
                 <span id="type_filters_div" class="hidden">
@@ -51,42 +51,43 @@
 				</span>
             </div>
             <div id="spinner"></div>
-            <div id="new_assignments"></div>
-            <div id="finished_assignments"></div>
-            <div id="add_assignment">
-                <form>
-                    <input type="hidden" value="0" name="edit"/>
-                    <div>📝 עריכת מטלה</div>
-                    <div>
-                        <label for="subject">נושא:</label>
-                    </div>
-                    <div>
-                        <input type="text" maxlength="50" value="" name="subject" id="subject" required/>
-                        (<span>0</span>/50)
-                    </div>
-                    <div>
-                        <label for="notes">הערות:</label>
-                    </div>
-                    <div>
-                        <textarea maxlength="280" name="notes" id="notes"></textarea> (<span>0</span>/280)
-                    </div>
-                    <div>
-                        <label for="end_time">תאריך סיום:</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" name="no_end" id="no_end" checked/>
-                        <label for="no_end"> ללא תאריך סיום (המטלה לא תימחק אוטומטית)</label>
-                        <div style="margin-top: 6px;">
-                            <input type="date" lang="he" name="end_time" id="end_time"/>
-                            (המטלה תימחק אוטומטית יומיים לאחר סיומה)
+            <div id="bodies">
+                <div id="new_assignments" class="body"></div>
+                <div id="finished_assignments" class="body"></div>
+                <div id="add_assignment" class="body">
+                    <form>
+                        <input type="hidden" value="0" name="edit"/>
+                        <div>📝 עריכת מטלה</div>
+                        <div>
+                            <label for="subject">נושא:</label>
                         </div>
-                    </div>
-                    <div style="grid-column: 1 / 3;">
-                        <a class="button" style="display: inline-block">שמור מטלה</a>
-                        <a class="button" style="display: inline-block">ביטול</a>
-                    </div>
-
-                </form>
+                        <div>
+                            <input type="text" maxlength="50" value="" name="subject" id="subject" required/>
+                            (<span>0</span>/50)
+                        </div>
+                        <div>
+                            <label for="notes">הערות:</label>
+                        </div>
+                        <div>
+                            <textarea maxlength="280" name="notes" id="notes"></textarea> (<span>0</span>/280)
+                        </div>
+                        <div>
+                            <label for="end_time">תאריך סיום:</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="no_end" id="no_end" checked/>
+                            <label for="no_end"> ללא תאריך סיום (המטלה לא תימחק אוטומטית)</label>
+                            <div style="margin-top: 6px;">
+                                <input type="date" lang="he" name="end_time" id="end_time"/>
+                                (המטלה תימחק אוטומטית יומיים לאחר סיומה)
+                            </div>
+                        </div>
+                        <div style="grid-column: 1 / 3;">
+                            <a class="button" style="display: inline-block">שמור מטלה</a>
+                            <a class="button" style="display: inline-block">ביטול</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 

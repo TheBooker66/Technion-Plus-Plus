@@ -94,8 +94,8 @@ function editUA(assignmentID) {
 		}
 
 		form_manual_events();
-		po_list.forEach(optionElement => optionElement.style.display = "none");
-		po_list[2].style.display = "block";
+		tabContents.forEach(optionElement => optionElement.style.display = "none");
+		tabContents[2].style.display = "block";
 	});
 }
 
@@ -235,7 +235,7 @@ function form_submit() {
 				agenda[finalAssignmentID].event = finalAssignmentID;
 				insertUserAssignment(agenda[finalAssignmentID], assignmentElement, "new_assignments", true);
 				checkForEmpty();
-				po_tabs[0].click();
+				tabHeaders[0].click();
 			}
 			form_reset_all();
 		});
@@ -243,40 +243,38 @@ function form_submit() {
 }
 
 function setUpFilters() {
-	const typeFiltersDiv = document.getElementById("type_filters_div"),
+	const filtersDiv = document.getElementById("filters_div"),
+		typeFiltersDiv = document.getElementById("type_filters_div"),
 		typeFilterToggle = document.getElementById("type_filter_toggle"),
-		filter_types = document.querySelectorAll("#type_filters_div input");
-	typeFilterToggle.onclick = function (_) {
+		typeFilters = document.querySelectorAll("#type_filters_div input"),
+		courseFiltersDiv = document.getElementById("course_filters_div"),
+		courseFilterToggle = document.getElementById("course_filter_toggle"),
+		courseFilters = document.querySelector("#course_filters_div select");
+
+	typeFilterToggle.addEventListener("click", () => {
 		if (typeFilterToggle.textContent === "בטל סינון") {
-			for (let i = 0; i < filter_types.length; i++)
-				filter_types[i].checked = false;
-			filter_types[0].dispatchEvent(new Event("change"));
+			for (let i = 0; i < typeFilters.length; i++)
+				typeFilters[i].checked = false;
+			typeFilters[0].dispatchEvent(new Event("change"));
 			typeFilterToggle.textContent = "סינון מטלות לפי סוג";
-		}
-		typeFilterToggle.textContent =
-			typeFilterToggle.textContent === "סינון מטלות לפי סוג" ? "בטל סינון" : "סינון מטלות לפי סוג";
+		} else
+			typeFilterToggle.textContent = "בטל סינון";
 		typeFiltersDiv.classList.toggle("hidden");
-		document.getElementById("filters_div").classList.toggle("hidden");
-	};
-	chrome.storage.local.get({
-		filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
-	}, storage => {
-		if (chrome.runtime.lastError) {
-			console.error("TE_cal: " + chrome.runtime.lastError.message);
-			insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.", true);
-			return;
-		}
-		for (const type in storage.filter_toggles) {
-			document.getElementById(type).checked = storage.filter_toggles[type];
-			if (storage.filter_toggles[type]) {
-				typeFilterToggle.textContent = "בטל סינון";
-				typeFiltersDiv.classList.remove("hidden");
-				document.getElementById("filters_div").classList.remove("hidden");
-			}
-		}
+		if (courseFilterToggle.textContent === "סינון מטלות לפי קורס")
+			filtersDiv.classList.toggle("hidden");
 	});
-	for (let i = 0; i < filter_types.length; i++) {
-		filter_types[i].addEventListener("change", () => {
+	courseFilterToggle.addEventListener("click", () => {
+		courseFilters.selectedIndex = 0;
+		courseFilters.dispatchEvent(new Event("change"));
+		courseFilterToggle.textContent =
+			courseFilterToggle.textContent === "סינון מטלות לפי קורס" ? "בטל סינון" : "סינון מטלות לפי קורס";
+		courseFiltersDiv.classList.toggle("hidden");
+		if (typeFilterToggle.textContent === "סינון מטלות לפי סוג")
+			filtersDiv.classList.toggle("hidden");
+	});
+
+	for (let i = 0; i < typeFilters.length; i++) {
+		typeFilters[i].addEventListener("change", () => {
 			chrome.storage.local.get({
 				filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
 			}, storage => {
@@ -296,10 +294,38 @@ function setUpFilters() {
 			});
 		});
 	}
+	courseFilters.addEventListener("change", () => {
+		document.querySelectorAll(`.list_item[data-course^='#${courseFilters.value.replace(/"/g, '\\"').replace(/'/g, "\\'")}']`)
+			.forEach(event => event.classList.remove("hidden"));
+		document.querySelectorAll(`.list_item:not([data-course^='#${courseFilters.value.replace(/"/g, '\\"').replace(/'/g, "\\'")}'])`)
+			.forEach(event => event.classList.add("hidden"));
+		checkForEmpty();
+	});
+
+	chrome.storage.local.get({
+		filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
+	}, storage => {
+		if (chrome.runtime.lastError) {
+			console.error("TE_cal: " + chrome.runtime.lastError.message);
+			insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.", true);
+			return;
+		}
+		let filtersEnabledEh = false;
+		for (const type in storage.filter_toggles) {
+			document.getElementById(type).checked = storage.filter_toggles[type];
+			if (!filtersEnabledEh && storage.filter_toggles[type]) {
+				filtersEnabledEh = true;
+				typeFilterToggle.textContent = "בטל סינון";
+				typeFiltersDiv.classList.remove("hidden");
+				filtersDiv.classList.remove("hidden");
+			}
+		}
+	});
 }
 
-const po_list = [document.getElementById("new_assignments"), document.getElementById("finished_assignments"), document.getElementById("add_assignment")],
-	po_tabs = document.querySelectorAll("#tabs > .tab"), form = document.querySelector("form");
+const tabContents = document.querySelectorAll("#bodies > .body"),
+	tabHeaders = document.querySelectorAll("#tabs > .tab"),
+	form = document.querySelector("form");
 let input_counters;
 if (document.title === "ארגונית++") {
 	form.addEventListener("submit", event => {
@@ -311,42 +337,30 @@ if (document.title === "ארגונית++") {
 	form_buttons[1].addEventListener("click", () => {
 		form_reset_all();
 		let currentTab = document.querySelector(".tab.current");
-		currentTab === po_tabs[2] ? po_tabs[0].click() : currentTab.click();
+		currentTab === tabHeaders[2] ? tabHeaders[0].click() : currentTab.click();
 	});
-	po_tabs[2].addEventListener("click", form_reset_all);
+	tabHeaders[2].addEventListener("click", () => form_reset_all());
+
 	const need_refresh = document.querySelector("#need_refresh");
 	need_refresh.querySelector("a.button").addEventListener("click", () => window.location.reload());
 	setInterval(() => chrome.storage.local.get({cal_seen: 0}, storage => {
 		if (0 !== storage.cal_seen) need_refresh.style.display = "block";
 	}), 6E4);
-	const course_filters_div = document.getElementById("course_filters_div"),
-		filter = document.getElementById("course_filter"),
-		course_filter_toggle = document.getElementById("course_filter_toggle");
-	filter.addEventListener("change", () => {
-		document.querySelectorAll(`.list_item[data-course^='#${filter.value.replace(/"/g, '\\"').replace(/'/g, "\\'")}']`)
-			.forEach(a => a.classList.remove("hidden"));
-		document.querySelectorAll(`.list_item:not([data-course^='#${filter.value.replace(/"/g, '\\"').replace(/'/g, "\\'")}'])`)
-			.forEach(a => a.classList.add("hidden"));
-		checkForEmpty();
-	});
-	course_filter_toggle.addEventListener("click", () => {
-		filter.selectedIndex = 0;
-		filter.dispatchEvent(new Event("change"));
-		course_filter_toggle.textContent =
-			course_filter_toggle.textContent === "סינון מטלות לפי קורס" ? "בטל סינון" : "סינון מטלות לפי קורס";
-		course_filters_div.classList.toggle("hidden");
-		if (document.getElementById("type_filter_toggle").textContent === "סינון מטלות לפי סוג")
-			document.getElementById("filters_div").classList.toggle("hidden");
-	});
-	for (let i = 0; i < po_tabs.length; i++)
-		po_tabs[i].addEventListener("click", () => {
-			for (let j = 0; j < po_tabs.length; j++) {
-				po_tabs[j].className = j === i ? "tab current" : "tab";
-				po_list[j].style.display = j === i ? "block" : "none";
-				if (i === 2) document.getElementById("filters_div").classList.add("hidden");
-				else document.getElementById("filters_div").classList.remove("hidden");
+
+	const typeFilterToggle = document.getElementById("type_filter_toggle"),
+		courseFilterToggle = document.getElementById("course_filter_toggle");
+	for (let i = 0; i < tabHeaders.length; i++)
+		tabHeaders[i].addEventListener("click", () => {
+			for (let j = 0; j < tabHeaders.length; j++) {
+				tabHeaders[j].className = j === i ? "tab current" : "tab";
+				tabContents[j].style.display = j === i ? "block" : "none";
+				if (i === 2)
+					document.getElementById("filters_div").classList.add("hidden");
+				else if (typeFilterToggle.textContent !== "סינון מטלות לפי סוג" || courseFilterToggle.textContent !== "סינון מטלות לפי קורס")
+					document.getElementById("filters_div").classList.remove("hidden");
 			}
 		});
+
 	document.getElementById("goToSettings").addEventListener("click", () => chrome.runtime.openOptionsPage());
 	window.addEventListener("contextmenu", event => event.preventDefault());
 	input_counters = form.querySelectorAll("span");
@@ -355,15 +369,15 @@ if (document.title === "ארגונית++") {
 	form.no_end.addEventListener("input", () => form.end_time.disabled = form.no_end.checked);
 	setUpFilters();
 
-	chrome.storage.local.get({gmail: true}, a => {
+	chrome.storage.local.get({gmail: true}, storage => {
 		const emailInfo = {
 			ad: "ethan.amiran@gmail.com",
 			su: "יצירת קשר - Technion++",
 		};
-		let emailURL = a.gmail ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1" : "mailto:{1}?subject={2}";
+		let emailURL = storage.gmail ? "https://mail.google.com/mail/u/0/?view=cm&to={1}&su={2}&fs=1&tf=1" : "mailto:{1}?subject={2}";
 		emailURL = emailURL.replace("{1}", emailInfo.ad).replace("{2}", emailInfo.su);
 		document.getElementById("mailtome").setAttribute("href", emailURL);
-		if (a.gmail) document.getElementById("mailtome").setAttribute("target", "_blank");
+		if (storage.gmail) document.getElementById("mailtome").setAttribute("target", "_blank");
 	});
 	chrome.storage.local.get({organizer_fullscreen: false, organizer_darkmode: false}, storage => {
 		const fullscreenCheckbox = document.getElementById("fullscreen"),
