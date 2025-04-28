@@ -66,11 +66,11 @@
 		downloadAllLink.addEventListener("click", async () => {
 			const folderId = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0],
 				courseTitle = document.getElementById("contentHeaderText").textContent
-					.replace(/[0-9]{4,}[swi]: /, "")
-					.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "") + "/";
-			const response = await fetch("https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=" + folderId + "&type=mp4");
+					.replace(/[0-9]{4,}[swi]: /, "").replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "") + "/";
+			const response = await fetch(`https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=${folderId}&type=mp4`);
 			if (200 === response.status) {
-				const xmlItems = response.response.getElementsByTagName("item"),
+				const xml = (new DOMParser).parseFromString(await response.text(), "text/xml");
+				const xmlItems = xml.getElementsByTagName("item"),
 					downloadChunk = {sys: 1, sub_pre: "", list: []};
 				for (let i = 0; i < xmlItems.length; i++) {
 					let downloadItem = {};
