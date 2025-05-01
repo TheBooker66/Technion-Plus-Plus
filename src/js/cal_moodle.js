@@ -92,7 +92,10 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 			}
 			popup.XHR("https://moodle24.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&" + storage.calendar_prop, "text").then(res => {
 				if ("Invalid authentication" === res.response.trim()) {
-					chrome.storage.local.set({calendar_prop: ""});
+					chrome.storage.local.set({calendar_prop: ""}, () => {
+						if (chrome.runtime.lastError)
+							console.error("TE_cal_moodle: " + chrome.runtime.lastError.message);
+					});
 					TE_loginToMoodle(true).then(() => initializeCalendarProperties(reject)).catch(_ => reject({
 						msg: "לא ניתן למשוך מטלות מהמודל. נסה שנית מאוחר יותר, אם התקלה נמשכת - צור קשר עם המפתח.",
 						is_error: true,
@@ -112,6 +115,11 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 					"200": "חורף",
 					"201": "אביב",
 					"202": "קיץ",
+				}, datetimeFormat = {
+					weekday: "long",
+					day: "2-digit",
+					month: "2-digit",
+					year: "numeric",
 				};
 				let maxEventID = 0, finishedEvents = {},
 					newAssignmentsList = [], finishedAssignmentsList = [];
@@ -128,26 +136,24 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 
 						const titleWords = eventTitle.split(" ");
 						if ("opens" !== titleWords[titleWords.length - 1] && "opens)" !== titleWords[titleWords.length - 1]) {
+							const courseInfo = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
+							const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
+								semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
+							const course = storage.u_courses.hasOwnProperty(courseNum.toString()) ?
+								storage.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum]}` : "") : courseInfo;
+
 							let eventDescription = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0].replace(/\\n/g, "");
 							eventDescription = 95 < eventDescription.length ? eventDescription.slice(0, 90) + "..." : eventDescription;
+
 							let eventDate = cal[i].split("DTSTART")[1].split("\n")[0].replace(";VALUE=DATE:", "").replace(":", ""),
-								eventTime = eventDate.includes("T") ? eventDate.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3") : "21:55:00Z";
+								eventTime = !eventDate.includes("T") ? "21:55:00Z" :
+									eventDate.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3");
 							eventDate = eventDate.substring(0, 8).replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTime.trim();
 							eventDate = new Date(eventDate);
 							if (eventDate.getTime() < now.getTime() - 864E5)
 								continue;
+							eventTime = eventDate.toLocaleString("iw-IL", datetimeFormat);
 
-							eventTime = eventDate.toLocaleString("iw-IL", {
-								weekday: "long",
-								day: "2-digit",
-								month: "2-digit",
-								year: "numeric",
-							});
-							let courseInfo = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split("."),
-								courseNum = courseInfo[0].replace(/[^0-9]/i, "").trim(),
-								semesterNum = courseInfo[1].replace(/[^0-9]/i, "").trim();
-							semesterNum = semesterNum ? ` - ${semesters[semesterNum]}` : "";
-							courseNum = storage.u_courses.hasOwnProperty(courseNum.toString()) ? storage.u_courses[courseNum] + semesterNum : courseInfo;
 							let finishedEh = false;
 							if (storage.cal_finished.hasOwnProperty(eventID.toString())) {
 								finishedEh = true;
@@ -156,7 +162,7 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 							const event = {
 								header: eventTitle,
 								description: eventDescription,
-								course: courseNum,
+								course: course,
 								final_date: eventTime,
 								is_new: eventID > storage.calendar_max,
 								goToFunc: openMoodle(eventID, eventDate.getTime()),
@@ -168,7 +174,10 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 						}
 					}
 				}
-				chrome.storage.local.set({cal_finished: finishedEvents});
+				chrome.storage.local.set({cal_finished: finishedEvents}, () => {
+					if (chrome.runtime.lastError)
+						console.error("TE_cal_moodle: " + chrome.runtime.lastError.message);
+				});
 				updateCalendar(maxEventID, calendar.removeCalendarAlert(storage.cal_seen));
 				resolve({new_list: newAssignmentsList, finished_list: finishedAssignmentsList});
 

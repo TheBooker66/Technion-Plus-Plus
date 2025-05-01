@@ -4,7 +4,7 @@
   "author": "Ethan \"67\" A.",
   "description": "Get the Technion's web-experience out of the stone age.",
   "homepage_url": "https://github.com/TheBooker66/Technion-Plus-Plus",
-  "version": "3.7.3",
+  "version": "3.7.4",
   "manifest_version": 3,
   "minimum_chrome_version": "109.0",
   "background": {
@@ -15,6 +15,7 @@
     "browser_style": false,
     "default_icon": {
       "16": "icons/technion_plus_plus/icon-16.png",
+      "32": "icons/technion_plus_plus/icon-32.png",
       "48": "icons/technion_plus_plus/icon-48.png",
       "128": "icons/technion_plus_plus/icon-128.png"
     },
@@ -40,6 +41,7 @@
   ],
   "icons": {
     "16": "icons/technion_plus_plus/icon-16.png",
+    "32": "icons/technion_plus_plus/icon-32.png",
     "48": "icons/technion_plus_plus/icon-48.png",
     "128": "icons/technion_plus_plus/icon-128.png"
   },
