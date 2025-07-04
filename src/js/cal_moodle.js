@@ -136,23 +136,26 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 
 						const titleWords = eventTitle.split(" ");
 						if ("opens" !== titleWords[titleWords.length - 1] && "opens)" !== titleWords[titleWords.length - 1]) {
+							let eventDate = cal[i].split("DTSTART")[1].split("\n")[0].replace(";VALUE=DATE:", "")
+									.replace(":", ""),
+								eventTime = !eventDate.includes("T") ? "21:55:00Z" :
+									eventDate.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3");
+							eventDate = eventDate.substring(0, 8)
+								.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTime.trim();
+							eventDate = new Date(eventDate);
+							if (eventDate.getTime() < now.getTime() - 864E5)
+								continue;
+							eventTime = eventDate.toLocaleString("iw-IL", datetimeFormat);
+
 							const courseInfo = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
 							const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
 								semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
 							const course = storage.u_courses.hasOwnProperty(courseNum.toString()) ?
 								storage.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum]}` : "") : courseInfo;
 
-							let eventDescription = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0].replace(/\\n/g, "");
+							let eventDescription = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]
+								.replace(/\\n/g, ' ').replace(/\\,/g, ',').trim();
 							eventDescription = 95 < eventDescription.length ? eventDescription.slice(0, 90) + "..." : eventDescription;
-
-							let eventDate = cal[i].split("DTSTART")[1].split("\n")[0].replace(";VALUE=DATE:", "").replace(":", ""),
-								eventTime = !eventDate.includes("T") ? "21:55:00Z" :
-									eventDate.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3");
-							eventDate = eventDate.substring(0, 8).replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTime.trim();
-							eventDate = new Date(eventDate);
-							if (eventDate.getTime() < now.getTime() - 864E5)
-								continue;
-							eventTime = eventDate.toLocaleString("iw-IL", datetimeFormat);
 
 							let finishedEh = false;
 							if (storage.cal_finished.hasOwnProperty(eventID.toString())) {
