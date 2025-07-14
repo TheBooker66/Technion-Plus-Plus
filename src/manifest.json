@@ -4,7 +4,7 @@
   "author": "Ethan \"67\" A.",
   "description": "Get the Technion's web-experience out of the stone age.",
   "homepage_url": "https://github.com/TheBooker66/Technion-Plus-Plus",
-  "version": "3.7.5",
+  "version": "3.7.6",
   "manifest_version": 3,
   "minimum_chrome_version": "109.0",
   "background": {

@@ -227,7 +227,7 @@ chrome.storage.local.get({dark_mode: false, grades: []}, storage => {
 
 	// Auto-select latest semester and year courses
 	const latestYear = storage.grades.reduce((acc, course) => Math.max(acc, course.year), 1912).toString();
-	const latestSemester = storage.grades.find(course => course.year === latestYear)?.semester;
+	const latestSemester = storage.grades.findLast(course => course.year === latestYear)?.semester;
 	document.querySelectorAll("#grades_list .maor_table_row").forEach(row => {
 		const cells = row.querySelectorAll("div");
 		if (cells[5].textContent === latestYear && cells[4].textContent === latestSemester) {
