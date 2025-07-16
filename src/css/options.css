@@ -1,22 +1,74 @@
+@import "colours.css";
+
 body {
+    background: var(--prim-cool);
     color: #0c0c0d;
     cursor: default;
     font-family: 'Segoe UI', arial, sans-serif;
     font-size: 13px;
     margin: 0;
-    padding: 4px 4px 2px;
-    -moz-user-select: none;
-    background: #f9f9fa;
+    overflow: auto;
 }
 
-#myform {
-    min-width: 600px;
-    margin-bottom: 55px;
+header {
+    background-color: var(--prim-kot);
+    text-align: left;
+    color: rgb(237, 237, 240, 1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    padding: 16px calc(1.5vmax + 8px);
+    box-shadow: 0 4px 5px 0 rgb(0, 0, 0, 0.2);
+    z-index: 2;
+    font-size: 24px;
+    box-sizing: border-box;
 }
 
-#myform div {
-    margin: 10px 5px;
-    width: 95%;
+header div {
+    unicode-bidi: plaintext;
+}
+
+header .mod_name {
+    text-align: right;
+    font-size: 20px;
+    display: flex;
+    align-items: flex-end;
+    color: #fffa;
+}
+
+header img {
+    vertical-align: text-bottom;
+    margin-right: 8px;
+}
+
+header .mod_name img {
+    opacity: 0.7;
+    width: 24px;
+    height: 24px;
+}
+
+main {
+    background-color: #fff;
+    margin: 1.5vmax;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+h2 {
+    background-color: var(--prim-cool);
+    color: #fff;
+    text-align: right;
+    padding: 6px 30px;
+    border-radius: 10px;
+    width: max-content;
+}
+
+section {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f9f9fa;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 input[type="text"], input[type="password"], input[type="url"], select {
@@ -75,7 +127,7 @@ input[type="range"], input[type="range"]:hover, input[type="range"]:focus {
     text-decoration: none;
     color: #fff;
     padding: 8px;
-    background-color: #0060df;
+    background-color: var(--sec-norm);
     font-size: 13px;
     min-width: 132px;
     border-radius: 2px;
@@ -86,14 +138,6 @@ input[type="range"], input[type="range"]:hover, input[type="range"]:focus {
 
 .submit:hover, #try_vol:hover {
     background: #003eaa;
-}
-
-h2 {
-    border: 0;
-    color: #0c0c0d;
-    font-size: 17px;
-    font-weight: 600;
-    margin: 10px 5px 0;
 }
 
 .attention {
@@ -124,25 +168,16 @@ small, .description, .big-description {
     padding: 0 25px;
 }
 
-.container {
-    margin-bottom: 25px !important;
-    padding: 4px;
-    border: 1px solid #fff;
-    border-radius: 3px;
-    box-shadow: 0 1px 1px 1px rgb(0, 0, 0, 0.12);
-    background: #efefef;
-}
-
-#fixed_footer {
+footer {
     position: fixed;
     right: 0;
     bottom: 0;
     width: 100%;
     box-sizing: border-box;
-    background-color: #f9f9fa;
+    background-color: var(--prim-dark);
     padding: 5px 10px;
     box-shadow: 0 -5px 4px -4px rgb(0, 0, 0, 0.12);
-    border-top: 1px solid #d7d7db;
+    border-top: 1px solid #16253D;
     grid-template-columns: auto auto;
     display: grid;
 }
@@ -154,27 +189,17 @@ small, .description, .big-description {
     line-height: 300%;
 }
 
-.dark-mode {
-    background: #16253D;
-    color: lightgrey;
-}
+[tplus=dm] {
+    body {
+        color: #f9f9fa;
+    }
 
-.dark-mode .container {
-    border: 1px solid darkslateblue;
-    box-shadow: 0 1px 1px 1px rgb(0, 0, 0, 0.12);
-    background: darkslateblue;
-}
+    main {
+        background-color: #222;
+    }
 
-.dark-mode h2 {
-    color: lightgrey;
-}
-
-.dark-mode small, .dark-mode .description, .dark-mode .big-description {
-    color: slategrey;
-}
-
-.dark-mode #fixed_footer {
-    background-color: #16253D;
-    border-top: 1px solid #16253D;
-    box-shadow: 0 -5px 4px -4px rgb(0, 0, 0, 0.12);
+    section {
+        background-color: #333;
+        color: #f9f9fa;
+    }
 }

@@ -5,10 +5,10 @@ import {TE_updateInfo} from '../service_worker.js';
 (function () {
 	function encryptDecrypt(inputStr) {
 		const originalChars = inputStr.split(""), randomChars = [];
+		const specialChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=,.";
 		for (let i = 0; i < originalChars.length; i++) {
 			while (true) {
-				randomChars[i] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=,."
-					.charAt(Math.floor(78 * Math.random()));
+				randomChars[i] = specialChars.charAt(Math.floor(78 * Math.random()));
 				originalChars[i] = String.fromCharCode(inputStr.charCodeAt(i) ^ randomChars[i].charCodeAt(0));
 				if (/^[\040-\176]*$/.test(originalChars[i])) {
 					break;
@@ -66,12 +66,14 @@ import {TE_updateInfo} from '../service_worker.js';
 				setTimeout(() => status_bar.textContent = "", 2E3);
 			}
 		});
-		dark_mode ? document.body.classList.add("dark-mode") : document.body.classList.remove("dark-mode");
+		dark_mode ? document.querySelector("html").setAttribute("tplus", "dm") :
+			document.querySelector("html").removeAttribute("tplus");
 		if (moodle && loginEh && login) TE_updateInfo();
 		else chrome.action.getBadgeBackgroundColor({}, colors => {
 			chrome.action.getBadgeText({}, badgeText => {
 				if (164 === colors[0] && 127 === colors[1] && 0 === colors[2] && "!" === badgeText)
-					chrome.action.setBadgeText({text: ""}, () => {});
+					chrome.action.setBadgeText({text: ""}, () => {
+					});
 			});
 		});
 	}
@@ -103,7 +105,7 @@ import {TE_updateInfo} from '../service_worker.js';
 		}, function (storage) {
 			if (chrome.runtime.lastError) {
 				console.error("TE_opt: " + chrome.runtime.lastError.message);
-				document.getElementById("myform").textContent = "שגיאה באחזור הנתונים, אנא נסה שנית.";
+				document.getElementsByClassName("wrapper")[0].textContent = "שגיאה באחזור הנתונים, אנא נסה שנית.";
 			} else {
 				const decryptedPassword = reverseString(xorStrings(storage.term + storage.phrase, storage.maor_p)),
 					decryptedID = reverseString(xorStrings(storage.uidn_arr[0] + "", storage.uidn_arr[1]));
@@ -129,7 +131,8 @@ import {TE_updateInfo} from '../service_worker.js';
 				document.getElementById("dark_mode").checked = storage.dark_mode;
 				document.getElementById("custom_name").value = storage.custom_name;
 				document.getElementById("custom_link").value = storage.custom_link;
-				storage.dark_mode ? document.body.classList.add("dark-mode") : document.body.classList.remove("dark-mode");
+				storage.dark_mode ? document.querySelector("html").setAttribute("tplus", "dm") :
+					document.querySelector("html").removeAttribute("tplus");
 				if (storage.wwcal_switch) {
 					const webworkCoursesElement = document.getElementById("ww_current"),
 						webworkCourseNames = [];

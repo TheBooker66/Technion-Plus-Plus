@@ -6,11 +6,20 @@
     <link rel="stylesheet" href="./css/options.css" type="text/css">
 </head>
 <body>
-
-<div id="myform">
-    <h1>הגדרות <sup>++</sup>Technion</h1>
+<header>
+    <div class="mod_name">
+        <div>
+            <img src="../icons/preferences.svg" style="margin: 0 0 0 0.5ch;" alt="גלגל שיניים"/>
+            הגדרות
+        </div>
+    </div>
+    <div>
+        <img src="../icons/technion_plus_plus/icon-32.png" alt="טכניון++"/> Technion<sup>++</sup>
+    </div>
+</header>
+<main>
     <h2>פרטי כניסה</h2>
-    <div class="container">
+    <section class="container">
         <div>
             <label for="username">שם משתמש </label><label for="server">וסיומת אימייל </label>טכניוניים<br/>
             <span dir="ltr"><input type="text" id="username" placeholder="הכנס שם משתמש" maxlength="35"/> @
@@ -33,10 +42,10 @@
             <label><input type="checkbox" id="external_user"/> משתמש חיצוני</label><br/>
             <span class="big-description">נא <b>לא</b> לסמן אם יש ברשותכם משתמש טכניוני. יש למלא מספר זהות.</span>
         </div>
-    </div>
+    </section>
 
     <h2>הגדרות כלליות</h2>
-    <div class="container">
+    <section class="container">
         <div><label><input type="checkbox" id="quick_login"/> הפעל התחברות אוטומטית בכניסה לאתרי הטכניון</label></div>
         <div><label><input type="checkbox" id="dark_mode"/>הפעל מצב חשוך בעמוד זה ובמחשבון הממוצע האקדמי</label></div>
         <div>
@@ -76,10 +85,10 @@
                 <a id="try_vol">נסה</a></div>
             <span class="description">בשימוש על ידי התראות של מטלות חדשות ואוטובוסים.</span>
         </div>
-    </div>
+    </section>
 
     <h2>מטלות בית</h2>
-    <div class="container">
+    <section class="container">
         <div>
             <label><input type="checkbox" id="allow_hw_alerts"/> הפעל התראות עבור מטלות בית חדשות</label>
             <span class="big-description">יופעלו התראות כאשר התוסף יזהה מטלות חדשות עבור המערכות עבורן תבחר להציג מטלות קרובות.</span>
@@ -126,19 +135,19 @@
             <span class="big-description" style="display: none;" id="ww_current">
                 קורסים שנמצאו: <span>לא נמצאו קורסים</span>.</span>
         </div>
-    </div>
+    </section>
 
     <h2>מידע טכני על התוסף</h2>
-    <div>
+    <section>
         <span id="ext_version">גרסה מותקנת:</span><br/>
         <span id="storage">זיכרון בשימוש:</span>
-    </div>
-</div>
-
-<div id="fixed_footer">
+    </section>
+    <br/>
+</main>
+<footer>
     <div id="status"></div>
     <div style="text-align: left"><input type="button" id="save" value="שמור שינויים" class="submit"/></div>
-</div>
+</footer>
 <script type="module" src="js/options.js"></script>
 </body>
 </html>
