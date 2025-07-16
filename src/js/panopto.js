@@ -403,7 +403,7 @@
 				menuButton.style.backgroundImage = "url(" + chrome.runtime.getURL("icons/panopto/" + menuButton.id.replace(/_mp[34]/, "") + ".svg") + ")";
 		document.getElementById("transportControls").appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
 		document.getElementById("transportControls").appendChild(menu);
-		document.getElementById("maor_koteret").style.backgroundImage = "url(" + chrome.runtime.getURL("icons/technion_plus_plus/icon-16.png").toString() + ")";
+		document.getElementById("maor_koteret").style.backgroundImage = "url(" + chrome.runtime.getURL("icons/technion_plus_plus/logo.svg").toString() + ")";
 
 		setupVideoDownloadButtons();
 		snapshotHandler();

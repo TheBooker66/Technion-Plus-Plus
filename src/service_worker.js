@@ -147,7 +147,7 @@ function TE_notification(msg, silent, c = "") {
 	msg += "התראה התקבלה בשעה: " + (10 > hour ? "0" + hour : hour) + ":" + (10 > minutes ? "0" + minutes : minutes);
 	msg = {
 		type: "basic",
-		iconUrl: chrome.runtime.getURL("../icons/technion_plus_plus/icon-48.png"),
+		iconUrl: chrome.runtime.getURL("../icons/technion_plus_plus/icon-128.png"),
 		title: "Technion++",
 		message: msg,
 	};

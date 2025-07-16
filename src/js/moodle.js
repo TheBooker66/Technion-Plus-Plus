@@ -21,7 +21,7 @@ function main() {
 		const cardBody = create_element("div", "card-body", {}, "", section);
 		const cardTitle = create_element("h5", "card-title d-inline", {
 			dir: "ltr",
-			style: "background-image: url(" + chrome.runtime.getURL("../icons/technion_plus_plus/icon-32.png") + ");"
+			style: "background-image: url(" + chrome.runtime.getURL("../icons/technion_plus_plus/logo.svg") + ");"
 		}, "Technion", cardBody)
 		create_element("sup", "", {}, "++", cardTitle);
 		const actionsContainer = create_element("div", "card-text mt-3", {style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(128,128,128,.3);"}, "", cardBody);
