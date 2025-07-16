@@ -1,7 +1,11 @@
 'use strict';
 import {toggle} from "./common_calendar.js";
 
-const loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
+const tabContents = document.querySelectorAll("#bodies > .body"),
+	tabHeaders = document.querySelectorAll("#tabs > .tab"),
+	form = document.querySelector("form"),
+	loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
+let input_counters;
 
 function insertMessage(messageText, errorEh) {
 	const element = document.getElementById("error").appendChild(document.createElement("div"));
@@ -323,10 +327,7 @@ function setUpFilters() {
 	});
 }
 
-const tabContents = document.querySelectorAll("#bodies > .body"),
-	tabHeaders = document.querySelectorAll("#tabs > .tab"),
-	form = document.querySelector("form");
-let input_counters;
+// Initial setup and data load
 if (document.title === "ארגונית++") {
 	form.addEventListener("submit", event => {
 		event.preventDefault();
@@ -368,9 +369,8 @@ if (document.title === "ארגונית++") {
 	form.no_end.addEventListener("input", () => form.end_time.disabled = form.no_end.checked);
 	setUpFilters();
 
-	chrome.storage.local.get({organizer_fullscreen: false, organizer_darkmode: false}, storage => {
-		const fullscreenCheckbox = document.getElementById("fullscreen"),
-			darkmodeCheckbox = document.getElementById("darkmode");
+	chrome.storage.local.get({organizer_fullscreen: false, dark_mode: false}, storage => {
+		const fullscreenCheckbox = document.getElementById("fullscreen");
 		if (storage.organizer_fullscreen) {
 			fullscreenCheckbox.checked = true;
 			chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"});
@@ -379,13 +379,7 @@ if (document.title === "ארגונית++") {
 			chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
 			chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
 		});
-		if (storage.organizer_darkmode) {
-			darkmodeCheckbox.checked = true;
-			document.querySelector("html").setAttribute("tplus", "dm");
-		}
-		darkmodeCheckbox.addEventListener("change", _ => {
-			darkmodeCheckbox.checked ? document.querySelector("html").setAttribute("tplus", "dm") : document.querySelector("html").removeAttribute("tplus");
-			chrome.storage.local.set({organizer_darkmode: darkmodeCheckbox.checked});
-		});
+		storage.dark_mode ? document.querySelector("html").setAttribute("tplus", "dm") :
+			document.querySelector("html").removeAttribute("tplus");
 	});
 }
