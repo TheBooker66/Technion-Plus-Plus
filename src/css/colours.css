@@ -1,9 +1,19 @@
 :root {
+    /* Primary Palette (Teals) */
     --prim-dark: rgb(8, 40, 69);
     --prim-cool: rgb(6, 62, 111);
+    --prim-cooler: rgb(90, 140, 190);
     --prim-kot: rgb(0, 14, 26);
+
+    /* Secondary Palette (Oranges) */
     --sec-light: rgb(255, 179, 71);
     --sec-norm: rgb(245, 143, 0);
     --sec-dark: rgb(179, 104, 0);
     --sec-darker: rgb(128, 74, 0);
+
+    /* Global Status Colors */
+    --status-success: #28a745;
+    --status-danger: #a00000;
+    --status-dangerer: #6d0000;
+    --status-warning: #ffc107;
 }

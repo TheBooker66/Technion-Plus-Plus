@@ -1,97 +1,200 @@
 @import "colours.css";
 
+:root {
+    --main-text: #212529;
+    --main-font-family: 'Segoe UI', arial, sans-serif;
+    --border-radius-base: 4px;
+
+    --table-header-bg: #e9ecef;
+    --table-row-odd-bg: #fdfdfd;
+    --table-row-even-bg-alpha: rgba(0, 0, 0, .02);
+    --table-border-dotted: rgba(0, 0, 0, .1);
+    --table-row-hover-bg: #e0f2ff;
+
+    --input-bg: #f8f9fa;
+    --input-border: #ced4da;
+    --input-text-active: var(--prim-cool);
+    --input-disabled-text: #6c757d;
+    --input-disabled-bg: transparent;
+
+    --h2-bg: var(--prim-cool);
+    --h2-text: white;
+    --h3-bg: var(--sec-light);
+    --h3-text: var(--main-text);
+    --h4-bg: #dee2e6;
+    --h4-text: var(--main-text);
+
+    --button-primary-bg: var(--prim-cool);
+    --button-primary-hover-bg: var(--prim-dark);
+    --button-text-light: white;
+
+    --button-default-bg: #f0f0f0;
+    --button-default-text: #343a40;
+    --button-default-border: #adb5bd;
+    --button-default-hover-bg: #e2e6ea;
+    --button-default-hover-border: #6c757d;
+}
+
 @media print {
     .no-print {
         display: none;
     }
 }
 
-.maor_wrapper, .norm_wrapper {
+body {
+    background: var(--prim-cool);
+    color: #0c0c0d;
+    cursor: default;
+    font-family: var(--main-font-family);
     font-size: 13px;
-    font-family: 'Segoe UI', arial, sans-serif;
-    color: #000;
+    margin: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: auto;
 }
 
-.maor_wrapper {
-    text-align: center;
+.wrapper {
+    padding: 0;
+    margin: 0;
+    z-index: 0;
+    display: grid;
+    grid-template-rows: min-content 1fr max-content;
+    height: 100vh;
+    min-width: 1180px;
 }
 
-.norm_wrapper {
-    min-width: 1280px;
+header {
+    background-color: var(--prim-kot);
+    text-align: left;
+    color: rgb(237, 237, 240, 1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    padding: 16px calc(1.5vmax + 8px);
+    box-shadow: 0 4px 5px 0 rgb(0, 0, 0, 0.2);
+    z-index: 2;
+    font-size: 24px;
+    box-sizing: border-box;
 }
 
-.maor_table {
+header div {
+    unicode-bidi: plaintext;
+}
+
+header .mod_name {
+    text-align: right;
+    font-size: 20px;
+    display: flex;
+    align-items: flex-end;
+    color: #fffa;
+}
+
+header img {
+    vertical-align: text-bottom;
+    margin-right: 8px;
+}
+
+header .mod_name img {
+    filter: invert();
+    opacity: 0.7;
+}
+
+main {
+    background-color: #fff;
+    margin: 1.5vmax;
+    padding: 8px;
+    border-radius: var(--border-radius-base);
+    display: grid;
+    grid-template-rows: max-content minmax(200px, auto) max-content;
+}
+
+.section, #stats h3, .wrapper h2 {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius-base);
+}
+
+#stats h3 {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.wrapper h2 {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+table, #add_grade_form, #buttons {
     margin: 5px auto 5ch;
-    display: table;
     width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
-.maor_table_header {
+.grades {
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.grades thead tr {
     font-weight: 600;
-    background-color: #eee;
+    background-color: var(--table-header-bg);
     line-height: 200%;
+    border-radius: var(--border-radius-base) var(--border-radius-base) 0 0;
 }
 
-.norm_wrapper .maor_table .maor_table_header label:first-of-type {
-    border-radius: 0 4px 4px 0 !important;
+.wrapper .grades thead th:first-of-type {
+    border-radius: 0 var(--border-radius-base) var(--border-radius-base) 0 !important;
     width: 6ch;
 }
 
-.norm_wrapper .maor_table .maor_table_header label:last-of-type {
-    border-radius: 4px 0 0 4px !important;
+.wrapper .grades thead th:last-of-type {
+    border-radius: var(--border-radius-base) 0 0 var(--border-radius-base) !important;
 }
 
-.maor_table_header label.operator {
+.grades thead th.operator {
     text-align: center;
     padding: 1px;
 }
 
-.maor_table_row, .maor_table_header {
-    display: table-row;
-}
-
-.maor_table_row div, .maor_table_header label {
-    display: table-cell;
-    padding: 1px 5px;
+table td, table th, .grades td, .grades th {
+    padding: 4px 5px;
     text-align: right;
     width: auto;
 }
 
-.norm_wrapper .maor_table_row div:nth-of-type(odd) {
-    background-color: rgb(0, 0, 0, .02);
+.wrapper tbody tr:nth-of-type(odd), .wrapper .grades tbody tr:nth-of-type(odd) {
+    background-color: white;
 }
 
-.maor_table_header label {
-    padding: 1px 5px 1px 20px;
+.wrapper tbody tr:nth-of-type(even), .wrapper .grades tbody tr:nth-of-type(even) {
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
-.norm_wrapper .maor_table_row:not(:last-of-type) div {
-    border-bottom: 1px dotted #0002;
+.wrapper tbody tr:not(:last-of-type) td, .wrapper .grades tbody tr:not(:last-of-type) td {
+    border-bottom: 1px dotted var(--table-border-dotted);
 }
 
-.maor_table_row:nth-of-type(odd) {
-    background-color: #fcfcfc;
-}
-
-.maor_table_row div.grade {
+.grades td.grade {
     min-width: 16.5ch;
 }
 
-.maor_table_row div.center {
+.grades td.center {
     text-align: center;
     font-size: 0;
 }
 
-.maor_table_row.ignored > div.course_name::after {
+.wrapper .grades tbody tr:hover {
+    background-color: var(--table-row-hover-bg);
+}
+
+.grades tr.ignored > td.course_name::after {
     content: "התעלמות קבועה";
     display: inline-block;
     font-size: 0.8em;
     font-weight: bold;
-    color: var(--sec-darker);
+    color: var(--status-warning);
     margin-right: 1ch;
     padding: 2px 8px;
     border-radius: 10px;
-    background-color: rgb(247, 199, 54, 0.3);
+    background-color: rgba(255, 179, 71, 0.2);
 }
 
 .maor_attention {
@@ -103,110 +206,186 @@
 .maor_grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-column-gap: 10px;
-    grid-row-gap: 10px;
-    margin-top: 10px;
+    grid-column-gap: 60px;
+    grid-row-gap: 30px;
+    margin-top: 15px;
 }
 
-.norm_wrapper h1, .norm_wrapper h2, .norm_wrapper h3, .norm_wrapper h4 {
-    border-radius: 4px;
+#stats {
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 20px;
+}
+
+.wrapper h2, .wrapper h3, .wrapper h4 {
+    border-radius: var(--border-radius-base);
     margin: 0;
     padding: 6px;
+    text-align: center;
 }
 
-.norm_wrapper h1 {
-    background-color: var(--prim-cool);
-    color: #fff;
-    padding: 8px;
+.wrapper h2 {
+    background-color: var(--h2-bg);
+    color: var(--h2-text);
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: 500;
 }
 
-.norm_wrapper h2 {
-    background-color: var(--prim-dark);
-    color: #fff;
+.wrapper h3 {
+    background-color: var(--h3-bg);
+    color: black;
+    font-size: 16px;
+    font-weight: 500;
 }
 
-.norm_wrapper h3 {
-    background-color: var(--sec-light);
+#stats h3 {
+    margin: 0 10px;
 }
 
-.norm_wrapper h4 {
-    background-color: #ddd;
+.wrapper h4 {
+    background-color: var(--h4-bg);
+    color: var(--h4-text);
     font-weight: 400;
+    font-size: 14px;
 }
 
-.norm_wrapper input {
+.wrapper input {
     font-size: 15px;
-    font-family: 'Segoe UI', arial, sans-serif;
+    font-family: var(--main-font-family);
     margin: 5px 2px;
-    padding: 2px 5px;
+    padding: 4px 4px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-base);
+    box-sizing: border-box;
+    background-color: var(--input-bg);
+    color: var(--main-text);
 }
 
-.maor_table button {
-    padding: 2px 6px;
+.wrapper input:focus, .wrapper select:focus {
+    outline: none;
+    border-color: var(--input-text-active);
+    box-shadow: 0 0 0 2px rgba(6, 62, 111, 0.3);
+}
+
+.grades button {
+    padding: 4px 8px;
     font-size: 12px;
     margin: 4px 2px;
-    background-color: #0060df;
+    background-color: var(--button-primary-bg);
     min-width: 7ch;
     text-align: center;
     border: 0;
-    color: #fff;
-    border-radius: 4px;
-    font-family: 'Segoe UI', arial, sans-serif;
+    color: var(--button-text-light);
+    border-radius: var(--border-radius-base);
+    font-family: var(--main-font-family);
     box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.maor_table button:hover {
-    background-color: #003eaa;
+.grades button:hover {
+    background-color: var(--button-primary-hover-bg);
+    transform: translateY(-1px);
+}
+
+.grades button:focus {
+    background-color: var(--button-primary-hover-bg);
+}
+
+.grades button:active {
+    transform: translateY(0);
 }
 
 .danger button {
-    background-color: #d70022;
+    background-color: var(--status-danger);
 }
 
 .danger button:hover {
-    background-color: #a4000f;
+    background-color: var(--status-dangerer);
 }
 
-.maor_table input[type="number"]:disabled {
-    color: #000;
+.danger button:focus {
+    background-color: var(--status-dangerer);
+}
+
+input[type=checkbox]:hover, input[type=checkbox]:focus, #add_grade_form input:not([type=submit]):hover,
+#add_grade_form input:not([type=submit]):focus, #add_grade_form select:hover, #add_grade_form select:focus {
+    border-color: #007bff;
+    background-color: #f0f8ff;
+}
+
+.grades input[type=checkbox]:hover, .grades input[type=checkbox]:focus,
+#add_grade_form input:not([type=checkbox]):not([type=submit]):hover, #add_grade_form input:not([type=checkbox]):not([type=submit]):focus,
+#add_grade_form select:hover, #add_grade_form select:focus {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.grades input[type="number"]:disabled {
+    color: var(--input-disabled-text);
     border: 0;
-    border-bottom: 1px solid transparent;
-    background-color: transparent;
+    background-color: var(--input-disabled-bg);
+    -webkit-appearance: textfield;
 }
 
-.maor_table input[type="number"] {
+.grades input[type="number"] {
     margin: 0;
     font-size: inherit;
-    background-color: #eee;
-    border: 0;
-    border-bottom: 1px solid;
-    color: #0060df;
+    background-color: var(--input-bg);
+    border: 1px solid transparent;
+    border-radius: 2px;
+    color: var(--input-text-active);
     width: 6ch;
     -webkit-appearance: textfield;
-    border-radius: 2px;
 }
 
-.maor_table .failed input[type="number"]:disabled {
-    color: #ff0039;
+.grades .failed input[type="number"]:disabled {
+    color: #dc3545;
 }
 
-.norm_wrapper .failed, .norm_wrapper form.failed * {
-    color: #ff0039;
-    border-color: #ff0039;
-    transition: color 0.5s linear;
+.wrapper .failed, .wrapper form.failed * {
+    color: #dc3545;
+    border-color: #dc3545;
+    transition: color 0.5s linear, border-color 0.5s linear;
 }
 
-#footer {
-    margin-top: 50px;
-    text-align: center;
+footer {
+    background-color: var(--prim-dark);
+    padding: 16px calc(1.5vmax + 8px);
+    color: #fff;
+    text-align: right;
     font-weight: 600;
-    position: absolute;
+    position: relative;
     border-radius: 0 !important;
-    background-color: #eee;
     width: 100%;
-    right: 0;
-    padding: 40px;
     box-sizing: border-box;
+    display: grid;
+    grid-template-columns: max-content max-content 1fr;
+    grid-column-gap: 100px;
+}
+
+a {
+    margin-top: 4px;
+    min-width: 132px;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul {
+    padding: 0;
+    margin: 0;
+}
+
+#links {
+    margin-right: -20px;
+}
+
+#disclaimer {
+    text-align: center;
 }
 
 .temporary_remove, .temporary .center button:not(.temporary_remove) {
@@ -217,20 +396,20 @@
     display: inline-block;
 }
 
-.norm_wrapper .maor_table_row.animate div {
+.wrapper tr.animate td {
     animation: rowinsert 1.2s linear 0s;
 }
 
 #grades_list {
-    --color: #30e60b;
+    --color: var(--status-success);
 }
 
 #ignore_list {
-    --color: #ff0039;
+    --color: var(--status-danger);
 }
 
 #grades_list .grade:disabled {
-    border-bottom-color: #ccc;
+    border-bottom-color: var(--input-border);
 }
 
 @keyframes rowinsert {
@@ -243,138 +422,205 @@
 #add_grade_form input, #add_grade_form select {
     width: 100%;
     box-sizing: border-box;
-    padding: 5px;
+    padding: 8px 10px;
 }
 
 #add_grade_form .inputs, #add_grade_form .labels {
     display: grid;
     grid-template-columns: 15% 1fr 10% 10% 10% 10% 10%;
-    gap: 10px;
+    gap: 15px;
     align-items: center;
 }
 
 #add_grade_form .submit-button {
     display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
+    margin: 20px auto 10px;
+    padding: 10px 25px;
+    background-color: var(--prim-cool);
+    color: var(--button-text-light);
+    border: none;
+    border-radius: var(--border-radius-base);
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#add_grade_form .submit-button:hover {
+    background-color: var(--button-primary-hover-bg);
+    transform: translateY(-1px);
+}
+
+#add_grade_form .submit-button:focus {
+    background-color: var(--button-primary-hover-bg);
+}
+
+#add_grade_form .submit-button:active {
+    transform: translateY(0);
 }
 
 #add_grade_form label {
     white-space: nowrap;
     text-align: center;
+    font-weight: 500;
 }
 
-.dark-mode {
-    background-color: #16253D;
-    color: #e0e0e0;
+#buttons input {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid var(--button-default-border);
+    border-radius: var(--border-radius-base);
+    background-color: var(--button-default-bg);
+    color: var(--button-default-text);
+    cursor: pointer;
+    transition: background-color 1s ease, border-color 2s ease, color 1s ease, transform 0.1s ease;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
-.dark-mode p, .dark-mode div, .dark-mode span, .dark-mode label {
-    color: #e0e0e0;
+#buttons input:hover {
+    background-color: var(--button-default-hover-bg);
+    border-color: var(--button-default-hover-border);
+    transform: translateY(-1px);
 }
 
-.dark-mode .norm_wrapper h1 {
-    background-color: darkslateblue;
-    color: white;
+#buttons input:focus {
+    background-color: var(--button-default-hover-bg);
+    border-color: var(--button-default-hover-border);
 }
 
-.dark-mode .norm_wrapper h2 {
-    background-color: #2c3e50;
-    color: white;
+#buttons input:active {
+    transform: translateY(0);
 }
 
-.dark-mode .norm_wrapper h3 {
-    background-color: #34495e;
-    color: #e0e0e0;
+input#delete_grades {
+    background-color: var(--status-danger);
+    color: var(--button-text-light);
+    border-color: #a00000;
 }
 
-.dark-mode .norm_wrapper h4 {
-    background-color: #4a6572;
-    color: #bdbdbd;
+input#delete_grades:hover {
+    background-color: #a00000;
+    border-color: #a00000;
 }
 
-.dark-mode .maor_table_header {
-    background-color: #2c3e50;
-    color: #e0e0e0;
-}
-
-.dark-mode .maor_table_row div, .dark-mode .maor_table_header label {
-    border-bottom: 1px solid #34495e;
-}
-
-.dark-mode .norm_wrapper .maor_table_row div:nth-of-type(odd) {
-    background-color: rgb(255, 255, 255, 0.05);
-}
-
-.dark-mode .maor_table_row:nth-of-type(odd) {
-    background-color: #1a2c45;
-}
-
-.dark-mode .maor_table input[type="number"] {
-    background-color: #34495e;
-    color: #e0e0e0;
-    border-bottom: 1px solid #4a6572;
-}
-
-.dark-mode .maor_table input[type="number"]:disabled {
-    color: #bdbdbd;
-}
-
-.dark-mode .maor_table button {
-    background-color: #2980b9;
-    color: white;
-}
-
-.dark-mode .maor_table button:hover {
-    background-color: #1f618d;
-}
-
-.dark-mode .danger button {
-    background-color: #c0392b;
-}
-
-.dark-mode .danger button:hover {
-    background-color: #922b21;
-}
-
-.dark-mode #footer {
-    background-color: #2c3e50;
-    color: #e0e0e0;
-}
-
-.dark-mode #add_grade_form input, .dark-mode #add_grade_form select {
-    background-color: #34495e;
-    color: #e0e0e0;
-    border: 1px solid #4a6572;
-}
-
-.dark-mode #add_grade_form .submit-button {
-    background-color: #27ae60;
-    color: white;
-}
-
-.dark-mode #add_grade_form .submit-button:hover {
-    background-color: #219653;
-}
-
-.dark-mode .maor_table_row.ignored > div.course_name::after {
-    background-color: rgb(255, 251, 0);
-    color: rgb(255, 0, 0);
-}
-
-.dark-mode .norm_wrapper .failed p, .dark-mode .norm_wrapper .failed div,
-.dark-mode .norm_wrapper .failed span, .dark-mode .norm_wrapper .failed label,
-.dark-mode .norm_wrapper form.failed * {
-    color: #ff0039;
-    transition: color 0.5s linear;
+input#delete_grades:focus {
+    background-color: #a00000;
+    border-color: #a00000;
 }
 
 select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-image: url("../icons/arrowhead-down-white.svg");
+    background-image: url("../icons/arrowhead-down-black.svg");
     background-repeat: no-repeat;
     background-position: left 8px center;
+    background-size: 16px;
+    padding-left: 30px;
+}
 
+[tplus=dm] {
+    color-scheme: dark;
+    --main-text: #e0e0e0;
+
+    --table-header-bg: #2c3e50;
+    --table-row-odd-bg: #253444;
+    --table-row-even-bg-alpha: rgba(255, 255, 255, 0.02);
+    --table-border-dotted: #34495e;
+    --table-row-hover-bg: #3e5772;
+
+    --input-bg: #34495e;
+    --input-border: #4a6572;
+    --input-text-active: var(--prim-cooler);
+    --input-disabled-text: #bdbdbd;
+    --input-disabled-bg: transparent;
+
+    --h2-bg: var(--prim-cool);
+    --h3-bg: var(--sec-light);
+    --h4-bg: #2c3e50;
+    --h4-text: #fff;
+
+    --button-primary-bg: var(--prim-cooler);
+    --button-primary-hover-bg: var(--prim-cool);
+
+    --button-default-bg: #3a475a;
+    --button-default-text: #e0e0e0;
+    --button-default-border: #bdbdbd;
+    --button-default-hover-bg: #2e3948;
+    --button-default-hover-border: #bdbdbd;
+
+    --ignored-status-bg: rgba(255, 179, 71, 0.3);
+    --ignored-status-text: #fde79a;
+
+    select {
+        background-color: var(--input-bg);
+        background-image: url("../icons/arrowhead-down-white.svg");
+    }
+
+    body {
+        color: #f9f9fa;
+    }
+
+    main {
+        background-color: #222;
+    }
+
+    .wrapper tbody tr:nth-of-type(odd), .wrapper .grades tbody tr:nth-of-type(odd) {
+        background-color: #222;
+    }
+
+    .wrapper tbody tr:nth-of-type(even), .wrapper .grades tbody tr:nth-of-type(even) {
+        background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    input#delete_grades {
+        background-color: var(--status-danger);
+        border-color: #a00000;
+        color: white;
+    }
+
+    input#delete_grades:hover {
+        background-color: #a00000;
+        border-color: #a00000;
+    }
+
+    header {
+        box-shadow: 0 6px 10px rgba(255, 255, 255, 0.08), 0 3px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    #stats h3 {
+        box-shadow: 0 3px 8px rgba(255, 255, 255, 0.05), 0 1px 3px rgba(0, 0, 0, 0.7);
+    }
+
+    .wrapper h2 {
+        box-shadow: 0 3px 8px rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
+
+    #buttons input {
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05), 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .wrapper .grades tbody tr:hover {
+        background-color: var(--table-row-hover-bg);
+    }
+
+    input[type=checkbox]:hover, input[type=checkbox]:focus, #add_grade_form input:not([type=submit]):hover,
+    #add_grade_form input:not([type=submit]):focus, #add_grade_form select:hover, #add_grade_form select:focus {
+        border-color: #66afe9;
+        background-color: #444;
+    }
+
+    .grades input[type=checkbox]:hover, .grades input[type=checkbox]:focus,
+    #add_grade_form input:not([type=checkbox]):not([type=submit]):hover, #add_grade_form input:not([type=checkbox]):not([type=submit]):focus,
+    #add_grade_form select:hover, #add_grade_form select:focus {
+        box-shadow: 0 0 8px rgba(102, 175, 233, 0.7);
+    }
 }
