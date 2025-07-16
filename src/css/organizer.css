@@ -30,37 +30,6 @@ body {
     min-width: 1180px;
 }
 
-#koteret {
-    background-color: var(--prim-kot);
-    text-align: left;
-    color: rgb(237, 237, 240, 1);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin: 0;
-    padding: 16px calc(1.5vmax + 8px);
-    box-shadow: 0 4px 5px 0 rgb(0, 0, 0, 0.2);
-    z-index: 2;
-    font-size: 24px;
-    box-sizing: border-box;
-}
-
-#koteret div {
-    unicode-bidi: plaintext;
-}
-
-#koteret .mod_name {
-    text-align: right;
-    font-size: 16px;
-    display: flex;
-    align-items: flex-end;
-    color: #fffa;
-}
-
-#koteret img {
-    vertical-align: text-bottom;
-    margin-right: 8px;
-}
-
 #calendar-main {
     background-color: #fff;
     margin: 1.5vmax;
@@ -543,7 +512,7 @@ input[type="hidden"][value="0"] + div {
     background-color: #252525;
 }
 
-[tplus=dm] #tabs .tab img, #koteret .mod_name img {
+[tplus=dm] #tabs .tab img, header .mod_name img {
     filter: invert();
     opacity: 0.7;
 }

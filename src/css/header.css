@@ -1,0 +1,31 @@
+header {
+    background-color: var(--prim-kot);
+    text-align: left;
+    color: rgb(237, 237, 240, 1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    padding: 16px calc(1.5vmax + 8px);
+    box-shadow: 0 4px 5px 0 rgb(0, 0, 0, 0.2);
+    z-index: 2;
+    font-size: 24px;
+    box-sizing: border-box;
+}
+
+header div {
+    unicode-bidi: plaintext;
+}
+
+header .mod_name {
+    text-align: right;
+    font-size: 20px;
+    display: flex;
+    align-items: flex-end;
+    color: #fffa;
+}
+
+header img {
+    vertical-align: text-bottom;
+    margin-right: 8px;
+}
+
