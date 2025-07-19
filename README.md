@@ -1,4 +1,4 @@
-# [<img src="/assets/logo.svg" width="26"/>](/technion_plus_plus/logo.svg) Technion<sup>++</sup>
+# ![Technion Plus Plus Logo](./src/icons/technion_plus_plus/logo.svg) Technion<sup>++</sup>
 
 ## _Get the Technion's web-experience out of the stone age._
 
