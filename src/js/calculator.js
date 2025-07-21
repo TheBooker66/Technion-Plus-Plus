@@ -366,7 +366,9 @@ function setUpButtons() {
 			const grade = cells[3].querySelector("input")?.value || cells[3].querySelector("span")?.textContent || '';
 			const semester = cells[4].textContent;
 			const year = cells[5].textContent;
-			csvContent += `${courseNum},${courseName},${points},${grade},${semester},${year}\n`;
+
+			const escapeCsv = str => str.includes(',') || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str;
+			csvContent += `${courseNum},${escapeCsv(courseName)},${points},${grade},${semester},${year}\n`;
 		});
 
 		const downloadLink = document.createElement("a");
