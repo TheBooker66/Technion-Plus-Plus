@@ -3,7 +3,7 @@
 $excludedFiles = @(
     "*webwork.svg"
     "*paypal_logo.svg"
-    "*lib*"
+    "*lib\*"
 )
 
 # Define minifiable file extensions and commands
@@ -59,9 +59,18 @@ foreach ($file in $files)
     # Check if the file should be excluded
     if ($excludedFiles | Where-Object { $file -like $_ })
     {
-        Copy-Item -Path $file -Destination $outputPath
-        Write-Host "Copied excluded file: $( $outputPath )"
-        continue
+        if (Test-Path -Path $file -PathType Leaf)
+        {
+            Copy-Item -Path $file -Destination $outputPath
+            Write-Host "Copied excluded file: $( $outputPath )"
+            continue
+        }
+        else
+        {
+            Copy-Item -Path $file -Destination $outputPath -Container # Use -Container for folders explicitly
+            Write-Host "Copied excluded folder: $( $outputPath )"
+            continue
+        }
     }
 
     # Check if the file is an actual file
