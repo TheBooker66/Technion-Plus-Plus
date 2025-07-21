@@ -183,7 +183,6 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "icons/technion_plus_plus/icon-*.png",
         "icons/technion_plus_plus/logo.svg"
       ],
       "matches": [
@@ -201,7 +200,7 @@
     },
     {
       "resources": [
-        "cheesefork/share-histograms.js"
+        "lib/cheesefork/share-histograms.js"
       ],
       "matches": [
         "https://grades.technion.ac.il/*"

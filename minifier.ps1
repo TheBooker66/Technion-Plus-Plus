@@ -4,6 +4,8 @@ $excludedFiles = @(
     "*webwork.svg"
     "*paypal_logo.svg"
     "*share-histograms.js"
+    "*pdf.mjs"
+    "*pdf.worker.mjs"
 )
 
 # Define minifiable file extensions and commands

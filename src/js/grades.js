@@ -27,7 +27,7 @@
 		cf_loader.addEventListener("click", () => {
 			const script = document.createElement("script");
 			script.setAttribute("charset", "utf-8");
-			script.src = chrome.runtime.getURL("./cheesefork/share-histograms.js");
+			script.src = chrome.runtime.getURL("./lib/cheesefork/share-histograms.js");
 			script.onload = () => cf_loader.remove();
 			(document.head || document.documentElement).appendChild(script);
 		});

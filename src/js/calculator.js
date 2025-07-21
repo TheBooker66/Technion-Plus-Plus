@@ -37,7 +37,7 @@ function calculateTableStats(tableSelector) {
 
 		if (isNaN(grade)) {
 			totalPoints += points;
-			pointsWithPassingGrade += grade === "עובר" ? points : 0;
+			pointsWithPassingGrade += grade === "עובר" || grade === "פטור עם ניקוד" ? points : 0;
 		} else {
 			totalPoints += points;
 			pointsWithPassingGrade += 55 <= grade ? points : 0;
@@ -270,7 +270,7 @@ function validateCourseInput(course) {
 	if (!course.binary && (isNaN(course.grade) || course.grade < 0 || course.grade > 100)) {
 		return {isValid: false, message: "נא להזין ציון מספרי תקין בין 0 ל-100."};
 	}
-	if (course.binary && !["עובר", "נכשל"].includes(course.grade)) {
+	if (course.binary && !["עובר", "נכשל", "פטור", "פטור עם ניקוד", "פטור ללא ניקוד"].includes(course.grade)) {
 		return {isValid: false, message: "נא לבחור 'עובר' או 'נכשל' עבור ציון בינארי."};
 	}
 	if (course.year && (isNaN(course.year) || course.year < 1912 || course.year > 65537)) {
@@ -366,7 +366,7 @@ function setUpButtons() {
 				(currentMonth >= 4 && currentMonth <= 8) ? "אביב" : "קיץ";
 	});
 
-	document.getElementById("to_csv").addEventListener("click", () => {
+	document.getElementById("export").addEventListener("click", () => {
 		if (document.querySelectorAll("#grades_list tbody tr").length === 0) {
 			alert("אין קורסים לייצא. תתחילו בלהוסיף קורסים למחשבון.");
 			return;
@@ -394,81 +394,145 @@ function setUpButtons() {
 		downloadLink.remove();
 	});
 
-	document.getElementById("from_csv").addEventListener("click", () => {
+	document.getElementById("import").addEventListener("click", () => {
 		const input = document.createElement("input");
 		input.type = "file";
-		input.accept = ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
+		input.accept = ".csv, application/pdf";
 		input.onchange = event => {
 			const file = event.target.files[0];
 			if (!file) return;
 
-			const reader = new FileReader();
-			reader.readAsText(file, 'UTF-8');
-			reader.onload = event => {
-				const csvText = event.target.result;
-				const lines = csvText.split('\n').filter(line => line.trim() !== '');
-				const newCoursesFromCsv = [];
+			function smallValidate(currentStoredGrades, newCourses, course, line) {
+				const validationResult = validateCourseInput(course);
+				if (!validationResult.isValid) {
+					console.warn(`Validation failed for row: ${line} - ${validationResult.message}`);
+					return false;
+				}
 
-				chrome.storage.local.get({grades: []}, storage => {
-					const currentStoredGrades = storage.grades;
+				if (currentStoredGrades.some(c => c.num === course.num) || newCourses.some(c => c.num === course.num)) {
+					console.log(`Skipping duplicate course during CSV import: ${course.num}`);
+					return false;
+				}
+				return true;
+			}
 
-					for (let i = 1; i < lines.length; i++) {
-						const parts = lines[i].split(',');
-						if (parts.length !== 6) {
-							console.warn("Skipping malformed row (incorrect number of columns) during CSV import:", lines[i]);
-							continue;
-						}
-						const [numStr, name, pointsStr, gradeStr, semester, yearStr] = parts.map(p => p.trim());
+			function commitToStorage(currentStoredGrades) {
+				if (newCourses.length > 0) {
+					currentStoredGrades.push(...newCourses);
 
-						if (!numStr || !name || !pointsStr || !gradeStr || !semester || !yearStr) {
-							console.warn("Skipping incomplete row during CSV import:", lines[i]);
-							continue;
-						}
+					chrome.storage.local.set({grades: currentStoredGrades}, () => {
+						handleStorageError("import_grade");
+						renderAllCourses();
+					});
+					alert("הייבוא הושלם!");
+				} else {
+					alert("לא נמצאו קורסים תקינים לייבוא מהקובץ.");
+				}
+			}
 
-						const parsedPoints = parseFloat(pointsStr);
-						const parsedYear = parseInt(yearStr, 10);
-						const isBinary = isNaN(parseFloat(gradeStr));
-						const parsedGrade = isBinary ? gradeStr : parseFloat(gradeStr);
+			let newCourses = [];
+			if (file.name.endsWith(".csv")) {
+				const reader = new FileReader();
+				reader.readAsText(file, 'UTF-8');
+				reader.onload = (event) => {
+					const lines = event.target.result.split('\n').filter(line => line.trim() !== '');
 
-						const csvCourse = {
-							num: numStr,
-							name: name,
-							points: parsedPoints,
-							grade: parsedGrade,
-							semester: semester,
-							year: parsedYear,
-							binary: isBinary,
-							perm_ignored: false,
-							selected: false,
-						};
+					chrome.storage.local.get({grades: []}, storage => {
+						const currentStoredGrades = storage.grades;
 
-						const validationResult = validateCourseInput(csvCourse);
-						if (!validationResult.isValid) {
-							console.warn(`Validation failed for row: ${lines[i]} - ${validationResult.message}`);
-							continue;
-						}
+						lines.forEach(line => {
+							const parts = line.split(',');
+							if (parts.length !== 6) {
+								console.warn("Skipping malformed row (incorrect number of columns) during csv import:", line);
+								return;
+							}
 
-						if (currentStoredGrades.some(course => course.num === csvCourse.num) || newCoursesFromCsv.some(course => course.num === csvCourse.num)) {
-							console.warn("Skipping duplicate course during CSV import:", csvCourse.num);
-							continue;
-						}
+							const gradeStr = parts[3].trim();
+							const binaryEh = isNaN(parseFloat(gradeStr));
+							const csvCourse = {
+								num: parts[0].trim(),
+								name: parts[1].trim(),
+								points: parseFloat(parts[2].trim()),
+								grade: binaryEh ? gradeStr : parseFloat(gradeStr),
+								semester: parts[4].trim(),
+								year: parseInt(parts[5].trim(), 10),
+								binary: binaryEh,
+								perm_ignored: false,
+								selected: false,
+							};
 
-						newCoursesFromCsv.push(csvCourse);
-					}
-
-					if (newCoursesFromCsv.length > 0) {
-						currentStoredGrades.push(...newCoursesFromCsv);
-
-						chrome.storage.local.set({grades: currentStoredGrades}, () => {
-							handleStorageError("import_grade");
-							renderAllCourses();
+							if (smallValidate(currentStoredGrades, newCourses, csvCourse, line))
+								newCourses.push(csvCourse);
 						});
-						alert("הייבוא הושלם!");
-					} else {
-						alert("לא נמצאו קורסים תקינים לייבוא מהקובץ.");
-					}
-				});
-			};
+
+						commitToStorage(currentStoredGrades);
+					});
+				};
+			} else if (file.name.endsWith(".pdf")) {
+				const pdfjsPath = "lib/pdfjs/";
+				import(chrome.runtime.getURL(pdfjsPath + "pdf.mjs")).then(pdfjs => {
+					pdfjs.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL(pdfjsPath + "pdf.worker.mjs");
+
+					const reader = new FileReader();
+					reader.readAsArrayBuffer(file);
+					reader.onload = async (event) => {
+						const pdf = await pdfjs.getDocument(new Uint8Array(event.target.result)).promise;
+						let text = "";
+						for (let i = 1; i <= pdf.numPages; i++) {
+							const page = await pdf.getPage(i);
+							const content = await page.getTextContent();
+							text += content.items.map(item => item.str).join(" ") + "\n";
+						}
+						const lines = text
+							// Add a line break before any sequence of 6 or more digits not preceded by a line break
+							.replace(/([^\n])(\d{6,})/g, '$1\n$2')
+							.replace(/([^\n])(נקודות מצטברות)/g, '$1\n$2')
+							.replace(/([^\n])(\d+(?:.\d+)?\s*נקודות רישום:)/g, '$1\n$2')
+							// Split the text into lines
+							.split("\n")
+							.map(line => line.trim())
+							// Filter out empty lines
+							.filter(line => line.length > 0);
+						// Remove the last part of the last line
+						lines[lines.length - 1] = lines[lines.length - 1].substring(0, lines[lines.length - 1].indexOf('סוף תעודת הציונים')).trim();
+
+						const coursePattern = /^(\d{6}|\d{8}) ([\w\s\p{P}\u0590-\u05FF]+?) (1?\d(?:\.\d)? |20(?:\.0)? |)(\d{1,3}|עובר|לא עובר|פטור ללא ניקוד|פטור עם ניקוד|פטור) \d{4}-(\d{4}) (חורף|אביב|קיץ) ([\u0590-\u05FF]{3}"[\u0590-\u05FF]+)$/u;
+						chrome.storage.local.get({grades: []}, storage => {
+							const currentStoredGrades = storage.grades;
+
+							lines.forEach(line => {
+								const parts = coursePattern.exec(line);
+
+								if (!parts) {
+									console.warn("Skipping malformed row (regex didn't match) during pdf import:", line);
+									return;
+								}
+
+								const gradeStr = parts[4].trim();
+								const binaryEh = isNaN(parseFloat(gradeStr));
+								const pdfCourse = {
+									num: parts[1].trim(),
+									name: parts[2].trim(),
+									points: parts[3] ? parseFloat(parts[3].trim()) : 0,
+									grade: binaryEh ? gradeStr.trim() : parseFloat(gradeStr),
+									semester: parts[6].trim(),
+									year: parseInt(parts[5].trim(), 10),
+									binary: binaryEh,
+									perm_ignored: false,
+									selected: false,
+								};
+
+								if (smallValidate(currentStoredGrades, newCourses, pdfCourse, line))
+									newCourses.push(pdfCourse);
+							});
+
+							commitToStorage(currentStoredGrades);
+						});
+					};
+				}).catch(err => console.error("Error loading PDF.js library:", err));
+			} else {
+				alert("נא לבחור קובץ csv, Excel או pdf.");
+			}
 		};
 		input.click();
 	});
