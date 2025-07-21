@@ -342,13 +342,28 @@ function setUpButtons() {
 			storage.grades.push(newCourse);
 			chrome.storage.local.set({grades: storage.grades}, () => {
 				handleStorageError("add_grade");
-				document.getElementById("grades_list").querySelector('tbody')
-					.prepend(createCourseRowElement(newCourse, "grades_list"));
+				const newRow = createCourseRowElement(newCourse, "grades_list");
+				document.getElementById("grades_list").querySelector('tbody').prepend(newRow);
+
+				const latestYear = storage.grades.reduce((acc, course) => Math.max(acc, course.year), 1912);
+				const latestSemesterOrder = storage.grades
+					.filter(course => course.year === latestYear)
+					.reduce((maxOrder, course) => Math.max(maxOrder, semesterOrder[course.semester]), 0);
+				const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[key] === latestSemesterOrder);
+				if (newCourse.year === latestYear && newCourse.semester === latestSemester) {
+					newRow.classList.add("selected");
+					newRow.querySelector("input[type='checkbox']").checked = true;
+					newCourse.selected = true;
+				}
+				updateAllStats();
 			});
 		});
+
 		addGradeForm.reset();
 		binary_checkbox.dispatchEvent(new Event('change'));
-		updateAllStats();
+		document.getElementById("semester").value =
+			(currentMonth <= 4) ? "חורף" :
+				(currentMonth >= 4 && currentMonth <= 8) ? "אביב" : "קיץ";
 	});
 
 	document.getElementById("to_csv").addEventListener("click", () => {
