@@ -158,17 +158,15 @@ footer {
     line-height: 300%;
 }
 
-[tplus=dm] {
-    body {
-        color: #f9f9fa;
-    }
+[tplus=dm] body {
+    color: #f9f9fa;
+}
 
-    main {
-        background-color: #222;
-    }
+[tplus=dm] main {
+    background-color: #222;
+}
 
-    section {
-        background-color: #333;
-        color: #f9f9fa;
-    }
+[tplus=dm] section {
+    background-color: #333;
+    color: #f9f9fa;
 }

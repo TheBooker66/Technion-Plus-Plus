@@ -528,68 +528,69 @@ select {
 
     --ignored-status-bg: rgba(255, 179, 71, 0.3);
     --ignored-status-text: #fde79a;
+}
 
-    select {
-        background-color: var(--input-bg);
-        background-image: url("../icons/arrowhead-down-white.svg");
-    }
+[tplus=dm] body {
+    color: #f9f9fa;
+}
 
-    body {
-        color: #f9f9fa;
-    }
+[tplus=dm] main {
+    background-color: #222;
+}
 
-    main {
-        background-color: #222;
-    }
+[tplus=dm] select {
+    background-color: var(--input-bg);
+    background-image: url("../icons/arrowhead-down-white.svg");
+}
 
-    .wrapper tbody tr:nth-of-type(odd), .wrapper .grades tbody tr:nth-of-type(odd) {
-        background-color: #222;
-    }
+[tplus=dm] .wrapper tbody tr:nth-of-type(odd), [tplus=dm] .wrapper .grades tbody tr:nth-of-type(odd) {
+    background-color: #222;
+}
 
-    .wrapper tbody tr:nth-of-type(even), .wrapper .grades tbody tr:nth-of-type(even) {
-        background-color: rgba(255, 255, 255, 0.02);
-    }
+[tplus=dm] .wrapper tbody tr:nth-of-type(even), [tplus=dm] .wrapper .grades tbody tr:nth-of-type(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
 
-    input#delete_grades {
-        background-color: var(--status-danger);
-        border-color: #a00000;
-        color: white;
-    }
+[tplus=dm] input#delete_grades {
+    background-color: var(--status-danger);
+    border-color: #a00000;
+    color: white;
+}
 
-    input#delete_grades:hover {
-        background-color: #a00000;
-        border-color: #a00000;
-    }
+[tplus=dm] input#delete_grades:hover {
+    background-color: #a00000;
+    border-color: #a00000;
+}
 
-    header {
-        box-shadow: 0 6px 10px rgba(255, 255, 255, 0.08), 0 3px 6px rgba(0, 0, 0, 0.6);
-    }
+[tplus=dm] header {
+    box-shadow: 0 6px 10px rgba(255, 255, 255, 0.08), 0 3px 6px rgba(0, 0, 0, 0.6);
+}
 
-    #stats h3 {
-        box-shadow: 0 3px 8px rgba(255, 255, 255, 0.05), 0 1px 3px rgba(0, 0, 0, 0.7);
-    }
+[tplus=dm] #stats h3 {
+    box-shadow: 0 3px 8px rgba(255, 255, 255, 0.05), 0 1px 3px rgba(0, 0, 0, 0.7);
+}
 
-    .wrapper h2 {
-        box-shadow: 0 3px 8px rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.6);
-    }
+[tplus=dm] .wrapper h2 {
+    box-shadow: 0 3px 8px rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.6);
+}
 
-    #buttons input {
-        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05), 0 2px 5px rgba(0, 0, 0, 0.5);
-    }
+[tplus=dm] #buttons input {
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
 
-    .wrapper .grades tbody tr:hover {
-        background-color: var(--table-row-hover-bg);
-    }
+[tplus=dm] .wrapper .grades tbody tr:hover {
+    background-color: var(--table-row-hover-bg);
+}
 
-    input[type=checkbox]:hover, input[type=checkbox]:focus, #add_grade_form input:not([type=submit]):hover,
-    #add_grade_form input:not([type=submit]):focus, #add_grade_form select:hover, #add_grade_form select:focus {
-        border-color: #66afe9;
-        background-color: #444;
-    }
+[tplus=dm] input[type=checkbox]:hover, [tplus=dm] input[type=checkbox]:focus,
+[tplus=dm] #add_grade_form input:not([type=submit]):hover, [tplus=dm] #add_grade_form input:not([type=submit]):focus,
+[tplus=dm] #add_grade_form select:hover, [tplus=dm] #add_grade_form select:focus {
+    border-color: #66afe9;
+    background-color: #444;
+}
 
-    .grades input[type=checkbox]:hover, .grades input[type=checkbox]:focus,
-    #add_grade_form input:not([type=checkbox]):not([type=submit]):hover, #add_grade_form input:not([type=checkbox]):not([type=submit]):focus,
-    #add_grade_form select:hover, #add_grade_form select:focus {
-        box-shadow: 0 0 8px rgba(102, 175, 233, 0.7);
-    }
+[tplus=dm] .grades input[type=checkbox]:hover, [tplus=dm] .grades input[type=checkbox]:focus,
+[tplus=dm] #add_grade_form input:not([type=checkbox]):not([type=submit]):hover, [tplus=dm] #add_grade_form input:not([type=checkbox]):not([type=submit]):focus,
+[tplus=dm] #add_grade_form select:hover, [tplus=dm] #add_grade_form select:focus {
+    box-shadow: 0 0 8px rgba(102, 175, 233, 0.7);
 }
