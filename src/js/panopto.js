@@ -295,8 +295,7 @@
 		const timestampUrl = `${parsedURL}&start=${videoElement.currentTime}`;
 
 		if (!markdownLinkEh) {
-			navigator.clipboard.writeText(timestampUrl);
-			window.alert("הקישור הועתק ללוח!");
+			navigator.clipboard.writeText(timestampUrl).then(() => window.alert("הקישור הועתק ללוח!"));
 		} else {
 			let resultText = "";
 			const LEVEL_CONNECTION_SYMBOL = "→",
@@ -309,9 +308,26 @@
 			resultText += tabTitle;
 
 			const mdLink = `[${resultText}](${timestampUrl})`;
-			navigator.clipboard.writeText(mdLink);
-			window.alert("הקישור הועתק ללוח!");
+			navigator.clipboard.writeText(mdLink).then(() => window.alert("הקישור הועתק ללוח!"));
 		}
+	}
+
+	function changeRealTime(mutations, wrongTime, newTime) {
+		const splitTime = wrongTime.innerText.substring(1).split(':');
+		const rate = parseFloat(document.getElementById("primaryVideo").playbackRate) || 1;
+		const hoursEh = splitTime.length !== 2;
+		if (!hoursEh) splitTime.unshift("0");
+
+		const secs = Math.floor((parseInt(splitTime[0]) * 3600 + parseInt(splitTime[1]) * 60 + parseInt(splitTime[2])) / rate);
+		const hours = Math.floor(secs / 3600);
+		const minutes = Math.floor((secs - hours * 3600) / 60);
+		const seconds = secs - hours * 3600 - minutes * 60;
+
+		if (isNaN(minutes) || isNaN(seconds)) return;
+
+		newTime.innerHTML = ` <small>(x${rate})</small>  ` + (
+				hoursEh ? `-${('0000' + hours).slice(-2)}:` : "-")
+			+ `${('0000' + minutes).slice(-2)}:${('0000' + seconds).slice(-2)} `;
 	}
 
 	function setupMenu() {
@@ -400,10 +416,12 @@
 `, "text/html").getElementById("maor_menu_container");
 		for (let menuButton of menu.getElementsByTagName("a"))
 			if (menuButton.id)
-				menuButton.style.backgroundImage = "url(" + chrome.runtime.getURL("icons/panopto/" + menuButton.id.replace(/_mp[34]/, "") + ".svg") + ")";
-		document.getElementById("transportControls").appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
-		document.getElementById("transportControls").appendChild(menu);
-		document.getElementById("maor_koteret").style.backgroundImage = "url(" + chrome.runtime.getURL("icons/technion_plus_plus/logo.svg").toString() + ")";
+				menuButton.style.backgroundImage = `url(${chrome.runtime.getURL("icons/panopto/" + menuButton.id.replace(/_mp[34]/, "") + ".svg")})`;
+
+		const bigBossElement = document.getElementById("transportControls");
+		bigBossElement.appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
+		bigBossElement.appendChild(menu);
+		document.getElementById("maor_koteret").style.backgroundImage = `url(${chrome.runtime.getURL("icons/technion_plus_plus/logo.svg").toString()})`;
 
 		setupVideoDownloadButtons();
 		snapshotHandler();
@@ -416,6 +434,17 @@
 				document.pictureInPictureElement || document.querySelector(".video-js").requestPictureInPicture();
 			});
 		}
+
+		const wrongTime = document.getElementById("timeRemaining"),
+			realTime = document.createElement("div");
+		realTime.id = "ethan_realtimeRemaining";
+		realTime.style.cssText = "vertical-align: middle; width: 44px; font-size: 0.95em; color: #fff;";
+		bigBossElement.insertBefore(realTime, document.getElementById("liveButton"));
+		const observer =
+			new MutationObserver(mutations => changeRealTime(mutations, wrongTime, realTime));
+		setTimeout(() =>
+				observer.observe(wrongTime, {characterData: false, attributes: false, childList: true, subtree: false}),
+			1000);
 
 		for (const span of document.querySelectorAll("#m_speed span"))
 			span.addEventListener("click", () => {
