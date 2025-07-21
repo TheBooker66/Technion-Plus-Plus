@@ -12,7 +12,7 @@ function main() {
 
 	function create_download(parent, courseID, isLight, linkText) {
 		return create_element("a", isLight ? "maor_download_light" : "maor_download", {
-			href: `https://${window.location.hostname}/blocks/material_download/download_materialien.php?courseid=${courseID}"&ccsectid=${isLight}`
+			href: `https://${window.location.hostname}/blocks/material_download/download_materialien.php?courseid=${courseID}"&ccsectid=${isLight}`,
 		}, linkText, parent, false);
 	}
 
@@ -21,15 +21,15 @@ function main() {
 		const cardBody = create_element("div", "card-body", {}, "", section);
 		const cardTitle = create_element("h5", "card-title d-inline", {
 			dir: "ltr",
-			style: "background-image: url(" + chrome.runtime.getURL("../icons/technion_plus_plus/logo.svg") + ");"
-		}, "Technion", cardBody)
+			style: "background-image: url(" + chrome.runtime.getURL("../icons/technion_plus_plus/logo.svg") + ");",
+		}, "Technion", cardBody);
 		create_element("sup", "", {}, "++", cardTitle);
 		const actionsContainer = create_element("div", "card-text mt-3", {style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(128,128,128,.3);"}, "", cardBody);
 		const darkModeContainer = create_element("div", "card-text mt-3 tplus_main_actions", {}, "", cardBody);
 		const darkModeSwitchContainer = create_element("div", "custom-control custom-switch", {style: "text-align: right"}, "", darkModeContainer);
 		const darkModeCheckbox = create_element("input", "custom-control-input", {
 			id: "tp-darkmode",
-			type: "checkbox"
+			type: "checkbox",
 		}, "", darkModeSwitchContainer);
 		create_element("label", "custom-control-label", {"for": "tp-darkmode"}, "מצב לילה", darkModeSwitchContainer);
 		const colorSliderContainer = create_element("div", "", {id: "tp_colorswitcher"}, "", darkModeContainer);
@@ -38,7 +38,7 @@ function main() {
 			type: "range",
 			min: "0",
 			max: "330",
-			step: "30"
+			step: "30",
 		}, "", colorSliderContainer);
 		chrome.storage.local.get({remoodle: false, remoodle_angle: 120}, storage => {
 			darkModeCheckbox.checked = storage.remoodle;
@@ -66,7 +66,7 @@ function main() {
 		return actionsContainer;
 	}
 
-	if (".ac.il/" === window.location.href.split("technion")[1]) {
+	if (".ac.il/" === window.location.href.split("technion")[1]) { // Moodle main page
 		if (document.querySelector(".usermenu > .login")) return;
 		const courseTiles = document.getElementsByClassName("coursevisible"), userCourses = {},
 			courseNameRegex = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/, semesterRegex = / - (?:חורף|אביב|קיץ)/;
@@ -89,10 +89,10 @@ function main() {
 				courseLink = courseTiles[i].getElementsByClassName("coursestyle2url")[0].getAttribute("href");
 			course.includes("חורף") ? coursesBySemester[0].push({
 				cname: course.replace(" - חורף", ""),
-				clink: courseLink
+				clink: courseLink,
 			}) : course.includes("אביב") ? coursesBySemester[1].push({
 				cname: course.replace(" - אביב", ""),
-				clink: courseLink
+				clink: courseLink,
 			}) : coursesBySemester[2].push({cname: course, clink: courseLink});
 			create_download(downloadButtonContainer, courseTiles[i].getElementsByClassName("coursestyle2url")[0].getAttribute("href").split("?id=")[1], 0, "הורדת קבצי הקורס");
 		}
@@ -118,11 +118,11 @@ function main() {
 			}[course.groups.csemester];
 			create_element("a", "maor_download", {
 				href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2024/${semester}/SM/${course_num}`,
-				target: "_blank"
+				target: "_blank",
 			}, "דף הקורס בסאפ", buttons);
 			chrome.storage.local.get({
 				videos_data: {},
-				videos_courses: []
+				videos_courses: [],
 			}, storage => {
 				const short_course_num = course_num.substring(1, 4) + course_num.substring(5, 8);
 				let videoID = "";
@@ -142,7 +142,7 @@ function main() {
 						create_element("a", "maor_download", {
 							href: isPanopto ? `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${data[j].l}"` : `https://video.technion.ac.il/Courses/${data[j].l}.html`,
 							target: "_blank",
-							title: data[j]?.vn ?? short_course_num
+							title: data[j]?.vn ?? short_course_num,
 						}, text, buttons);
 					}
 				}
@@ -154,9 +154,22 @@ function main() {
 				element.getElementsByClassName("course-section-header")[0],
 				moodle_num,
 				element.getAttribute("id").split("section-")[1],
-				"הורדת כל הקבצים בנושא"
+				"הורדת כל הקבצים בנושא",
 			).style.marginRight = "auto";
 		}
+
+		document.addEventListener('click', event => {
+			const link = event.target.closest('a');
+			if (!link) return;
+			if (!link.href.includes("forcedownload=1")) return;
+			let url = link.href.replace(/\??forcedownload=1/g, "");
+
+			event.preventDefault();
+			event.stopImmediatePropagation();
+
+			window.open(url, '_blank');
+		}, true);
+
 	}
 }
 
@@ -170,11 +183,11 @@ function colourPage() {
 		["--navbar_bottom", "hsl(" + (82 + hueOffset) + ", 100%, 41%)"],
 		["--navbar_bg", "hsl(" + (82 + hueOffset) + ", 100%, 25%)"],
 		["--dark_bg", "hsl(" + (90 + hueOffset) + ", 100%, 10%)"],
-		["--calendar_today", "hsla(" + (70 + hueOffset) + ", 100%, 20%, 0.5)"]
+		["--calendar_today", "hsla(" + (70 + hueOffset) + ", 100%, 20%, 0.5)"],
 	];
 	chrome.storage.local.get({
 		remoodle: false,
-		remoodle_angle: 120
+		remoodle_angle: 120,
 	}, storage => {
 		if (chrome.runtime.lastError) console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
 		else {
