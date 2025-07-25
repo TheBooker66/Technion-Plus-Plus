@@ -410,7 +410,7 @@ function setUpButtons() {
 				}
 
 				if (currentStoredGrades.some(c => c.num === course.num) || newCourses.some(c => c.num === course.num)) {
-					console.log(`Skipping duplicate course during CSV import: ${course.num}`);
+					console.log(`Skipping duplicate course during import: ${course.num}`);
 					return false;
 				}
 				return true;
@@ -425,9 +425,8 @@ function setUpButtons() {
 						renderAllCourses();
 					});
 					alert("הייבוא הושלם!");
-				} else {
+				} else
 					alert("לא נמצאו קורסים תקינים לייבוא מהקובץ.");
-				}
 			}
 
 			let newCourses = [];
@@ -441,7 +440,32 @@ function setUpButtons() {
 						const currentStoredGrades = storage.grades;
 
 						lines.forEach(line => {
-							const parts = line.split(',');
+							const parts = [];
+							let currentField = "", charIndex = 0, inQuote = false;
+
+							while (charIndex < line.length) {
+								const char = line[charIndex], nextChar = line[charIndex + 1];
+
+								if (char === '"') {
+									if (inQuote && nextChar === '"') { // An escaped double quote ("")
+										currentField += '"';
+										charIndex++;
+									} else { // Start or end of a quoted field
+										inQuote = !inQuote;
+									}
+								} else if (char === ',') {
+									if (inQuote) { // Comma inside a quoted field
+										currentField += char;
+									} else { // Comma outside a quoted field
+										parts.push(currentField);
+										currentField = '';
+									}
+								} else
+									currentField += char;
+								charIndex++;
+							}
+							parts.push(currentField);
+
 							if (parts.length !== 6) {
 								console.warn("Skipping malformed row (incorrect number of columns) during csv import:", line);
 								return;
