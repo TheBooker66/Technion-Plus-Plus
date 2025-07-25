@@ -1,3 +1,5 @@
+@import "colours.css";
+
 .small_spinner:before, #spinner:before {
     content: '';
     box-sizing: border-box;
@@ -61,7 +63,6 @@
     color: var(--prim-dark);
 }
 
-/*.starred {border-right: 6px solid #ffe900; border-radius: 3px;}*/
 .list_item.starred {
     border-right: 4px solid var(--sec-light);
     border-radius: 0 6px 6px 0;

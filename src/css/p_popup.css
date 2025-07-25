@@ -236,15 +236,15 @@ input[type="checkbox"] {
 */
 .attention {
     display: block;
-    background: #ffe900 url('../icons/warning.svg') 98% 50% no-repeat;
-    color: #3e2800;
+    background: var(--status-warning) url('../icons/warning.svg') 98% 50% no-repeat;
+    color: var(--status-warninger);
     border-radius: 4px;
     padding: 4px 28px 4px 4px;
     margin: 8px 4px;
 }
 
 .error_bar {
-    background: #d70022 url('../icons/error.svg') 98% 50% no-repeat;
+    background: var(--status-danger) url('../icons/error.svg') 98% 50% no-repeat;
     color: #fff;
     border-radius: 4px;
     padding: 4px 28px 4px 4px;

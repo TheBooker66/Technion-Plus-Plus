@@ -4,19 +4,7 @@
     --small-shade: 0px 3px 1px -2px rgb(255, 214, 214, 0.2), 0px 2px 2px 0px rgb(0, 0, 0, 0.14), 0px 1px 5px 0px rgb(0, 0, 0, .12);
 }
 
-html {
-    overflow: hidden;
-}
-
-body {
-    background: var(--prim-cool);
-    color: #0c0c0d;
-    cursor: default;
-    font-family: 'Segoe UI', arial, sans-serif;
-    font-size: 13px;
-    margin: 0;
-    user-select: none;
-    -webkit-user-select: none;
+html, body {
     overflow: hidden;
 }
 
@@ -30,11 +18,7 @@ body {
     min-width: 1180px;
 }
 
-#calendar-main {
-    background-color: #fff;
-    margin: 1.5vmax;
-    padding: 8px;
-    border-radius: 4px;
+main {
     display: grid;
     grid-template-rows: max-content minmax(200px, auto) max-content;
 }
@@ -51,13 +35,12 @@ body {
 }
 
 .attention {
-    background: #ffe900 url('../icons/warning.svg') calc(100% - 8px) 50% no-repeat;
-    color: #3e2800;
-
+    background: var(--status-warning) url('../icons/warning.svg') calc(100% - 8px) 50% no-repeat;
+    color: var(--status-warninger);
 }
 
 .error_bar {
-    background: #d70022 url('../icons/error.svg') calc(100% - 8px) 50% no-repeat;
+    background: var(--status-danger) url('../icons/error.svg') calc(100% - 8px) 50% no-repeat;
     color: #fff;
 }
 
@@ -138,22 +121,13 @@ body {
     }
 }
 
-ul {
-    padding: 0;
-    margin: 0;
-}
-
-#links {
-    margin-right: -20px;
-}
-
 .list_item.starred, .list_item.system_message {
     border-right-color: var(--sec-light);
     border-radius: 0 0 16px 0;
 }
 
 .list_item.system_message {
-    border-right-color: #d70022;
+    border-right-color: var(--status-danger);
 }
 
 .list_item {
@@ -221,7 +195,7 @@ b.assignment_header {
 
 .system_message b.assignment_header::after {
     content: "הודעת מערכת";
-    background-color: #d70022;
+    background-color: var(--status-danger);
 }
 
 .course_name {
@@ -241,12 +215,8 @@ b.assignment_header {
 }
 
 footer {
-    background-color: var(--prim-dark);
-    color: #fff;
-    padding: 16px calc(1.5vmax + 8px);
-    display: grid;
-    grid-template-columns: max-content 1fr max-content;
     grid-column-gap: 100px;
+    grid-template-columns: max-content 1fr max-content;
 }
 
 a.button {
@@ -295,23 +265,13 @@ a.button.finish:hover, a.button.restore:hover {
 }
 
 a.button.finish {
-    --button-color: #058b00;
-    --button-hover-color: #006504;
+    --button-color: var(--status-success);
+    --button-hover-color: var(--status-successer);
 }
 
 a.button.restore {
-    --button-color: #d70022;
-    --button-hover-color: #a4000f;
-}
-
-a:not(.button) {
-    color: #fff;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-a:not(.button):hover {
-    text-decoration: underline;
+    --button-color: var(--status-danger);
+    --button-hover-color: var(--status-dangerer);
 }
 
 form {
@@ -503,7 +463,7 @@ input[type="hidden"][value="0"] + div {
     color: #f9f9fa;
 }
 
-[tplus=dm] #calendar-main {
+[tplus=dm] main {
     background-color: #222;
 }
 
@@ -512,7 +472,7 @@ input[type="hidden"][value="0"] + div {
     background-color: #252525;
 }
 
-[tplus=dm] #tabs .tab img, header .mod_name img {
+[tplus=dm] #tabs .tab img {
     filter: invert();
     opacity: 0.7;
 }

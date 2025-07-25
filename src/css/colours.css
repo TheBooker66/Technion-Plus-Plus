@@ -12,7 +12,10 @@
     --sec-darker: rgb(128, 74, 0);
 
     /* Global Status Colors */
-    --status-success: #28a745;
-    --status-danger: #a00000;
-    --status-dangerer: #6d0000;
+    --status-success: #058b00;
+    --status-successer: #006504;
+    --status-danger: #d70022;
+    --status-dangerer: #a4000f;
+    --status-warning: #ffe900;
+    --status-warninger: #3e2800;
 }

@@ -1,3 +1,5 @@
+@import "colours.css";
+
 :root {
     --prog: 0%;
 }
@@ -56,7 +58,7 @@ small {
 }
 
 #progress::before {
-    background-image: linear-gradient(to right, #058b00, #006504, #058b00);
+    background-image: linear-gradient(to right, var(--status-success), var(--status-successer), var(--status-success));
     background-size: 200%;
     content: "";
     display: block;
@@ -125,10 +127,10 @@ small {
 }
 
 #myform #cancelAll.submit {
-    background-color: #d70022;
+    background-color: var(--status-danger);
 }
 
 #myform #cancelAll.submit:hover {
-    background-color: #a4000f;
+    background-color: var(--status-dangerer);
 }
 

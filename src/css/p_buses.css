@@ -1,3 +1,5 @@
+@import "colours.css";
+
 .drow, .blat {
     display: table-row;
 }
@@ -54,6 +56,15 @@
 
 #additional .settings {
     padding: 6px 4px;
+}
+
+#notice {
+    font-size: 13px;
+    background-color: var(--status-warning);
+    border-radius: 4px;
+    color: var(--status-warninger);
+    margin: 8px 4px;
+    padding: 8px 4px;
 }
 
 .settings small {

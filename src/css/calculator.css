@@ -2,49 +2,21 @@
 
 :root {
     --main-text: #212529;
-    --main-font-family: 'Segoe UI', arial, sans-serif;
     --border-radius-base: 4px;
 
     --table-header-bg: #e9ecef;
-    --table-row-odd-bg: #fdfdfd;
-    --table-row-even-bg-alpha: rgba(0, 0, 0, .02);
     --table-border-dotted: rgba(0, 0, 0, .1);
     --table-row-hover-bg: #e0f2ff;
 
     --input-bg: #f8f9fa;
     --input-border: #ced4da;
-    --input-text-active: var(--prim-cool);
     --input-disabled-text: #6c757d;
-    --input-disabled-bg: transparent;
-
-    --h2-bg: var(--prim-cool);
-    --h2-text: white;
-    --h3-bg: var(--sec-light);
-    --h3-text: var(--main-text);
-    --h4-bg: #dee2e6;
-    --h4-text: var(--main-text);
-
-    --button-primary-bg: var(--prim-cool);
-    --button-primary-hover-bg: var(--prim-dark);
-    --button-text-light: white;
 
     --button-default-bg: #f0f0f0;
     --button-default-text: #343a40;
     --button-default-border: #adb5bd;
     --button-default-hover-bg: #e2e6ea;
     --button-default-hover-border: #6c757d;
-}
-
-body {
-    background: var(--prim-cool);
-    color: #0c0c0d;
-    cursor: default;
-    font-family: var(--main-font-family);
-    font-size: 13px;
-    margin: 0;
-    user-select: none;
-    -webkit-user-select: none;
-    overflow: auto;
 }
 
 .wrapper {
@@ -55,20 +27,6 @@ body {
     grid-template-rows: min-content 1fr max-content;
     height: 100vh;
     min-width: 1180px;
-}
-
-header .mod_name img {
-    filter: invert();
-    opacity: 0.7;
-}
-
-main {
-    background-color: #fff;
-    margin: 1.5vmax;
-    padding: 8px;
-    border-radius: var(--border-radius-base);
-    display: grid;
-    grid-template-rows: max-content minmax(200px, auto) max-content;
 }
 
 .section, #stats h3, .wrapper h2 {
@@ -123,16 +81,17 @@ table td, table th, .grades td, .grades th {
     width: auto;
 }
 
-.wrapper tbody tr:nth-of-type(odd), .wrapper .grades tbody tr:nth-of-type(odd) {
-    background-color: white;
+.wrapper tbody tr, .wrapper .grades tbody tr {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px dotted var(--table-border-dotted);
 }
 
 .wrapper tbody tr:nth-of-type(even), .wrapper .grades tbody tr:nth-of-type(even) {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: transparent;
 }
 
-.wrapper tbody tr:not(:last-of-type) td, .wrapper .grades tbody tr:not(:last-of-type) td {
-    border-bottom: 1px dotted var(--table-border-dotted);
+.wrapper tbody tr:last-of-type, .wrapper .grades tbody tr:last-of-type {
+    border-bottom: 0;
 }
 
 .grades td.grade {
@@ -153,11 +112,11 @@ table td, table th, .grades td, .grades th {
     display: inline-block;
     font-size: 0.8em;
     font-weight: bold;
-    color: rgba(255, 193, 7, 1);
+    color: var(--status-warning);
     margin-right: 1ch;
     padding: 2px 8px;
     border-radius: 10px;
-    background-color: rgba(255, 179, 71, 0.2);
+    background-color: var(--sec-darker);
 }
 
 .maor_attention {
@@ -179,7 +138,7 @@ table td, table th, .grades td, .grades th {
     grid-column-gap: 20px;
 }
 
-.wrapper h2, .wrapper h3, .wrapper h4 {
+.wrapper h2, .wrapper h3 {
     border-radius: var(--border-radius-base);
     margin: 0;
     padding: 6px;
@@ -187,15 +146,15 @@ table td, table th, .grades td, .grades th {
 }
 
 .wrapper h2 {
-    background-color: var(--h2-bg);
-    color: var(--h2-text);
+    background-color: var(--prim-cool);
+    color: white;
     margin-bottom: 10px;
     font-size: 18px;
     font-weight: 500;
 }
 
 .wrapper h3 {
-    background-color: var(--h3-bg);
+    background-color: var(--sec-light);
     color: black;
     font-size: 16px;
     font-weight: 500;
@@ -205,16 +164,9 @@ table td, table th, .grades td, .grades th {
     margin: 0 10px;
 }
 
-.wrapper h4 {
-    background-color: var(--h4-bg);
-    color: var(--h4-text);
-    font-weight: 400;
-    font-size: 14px;
-}
-
 .wrapper input {
     font-size: 15px;
-    font-family: var(--main-font-family);
+    font-family: 'Segoe UI', arial, sans-serif;
     margin: 5px 2px;
     padding: 4px 4px;
     border: 1px solid var(--input-border);
@@ -226,7 +178,7 @@ table td, table th, .grades td, .grades th {
 
 .wrapper input:focus, .wrapper select:focus {
     outline: none;
-    border-color: var(--input-text-active);
+    border-color: var(--prim-cooler);
     box-shadow: 0 0 0 2px rgba(6, 62, 111, 0.3);
 }
 
@@ -234,25 +186,25 @@ table td, table th, .grades td, .grades th {
     padding: 4px 8px;
     font-size: 12px;
     margin: 4px 2px;
-    background-color: var(--button-primary-bg);
+    background-color: var(--prim-cooler);
     min-width: 7ch;
     text-align: center;
     border: 0;
-    color: var(--button-text-light);
+    color: white;
     border-radius: var(--border-radius-base);
-    font-family: var(--main-font-family);
+    font-family: 'Segoe UI', arial, sans-serif;
     box-sizing: border-box;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .grades button:hover {
-    background-color: var(--button-primary-hover-bg);
+    background-color: var(--prim-cool);
     transform: translateY(-1px);
 }
 
 .grades button:focus {
-    background-color: var(--button-primary-hover-bg);
+    background-color: var(--prim-cool);
 }
 
 .grades button:active {
@@ -286,7 +238,7 @@ input[type=checkbox]:hover, input[type=checkbox]:focus, #add_grade_form input:no
 .grades input[type="number"]:disabled {
     color: var(--input-disabled-text);
     border: 0;
-    background-color: var(--input-disabled-bg);
+    background-color: transparent;
     -webkit-appearance: textfield;
 }
 
@@ -296,55 +248,34 @@ input[type=checkbox]:hover, input[type=checkbox]:focus, #add_grade_form input:no
     background-color: var(--input-bg);
     border: 1px solid transparent;
     border-radius: 2px;
-    color: var(--input-text-active);
+    color: var(--prim-cooler);
     width: 6ch;
     -webkit-appearance: textfield;
 }
 
 .grades .failed input[type="number"]:disabled {
-    color: #dc3545;
+    color: var(--status-danger);
 }
 
 .wrapper .failed, .wrapper form.failed * {
-    color: #dc3545;
-    border-color: #dc3545;
+    color: var(--status-danger);
+    border-color: var(--status-danger);
     transition: color 0.5s linear, border-color 0.5s linear;
 }
 
 footer {
-    background-color: var(--prim-dark);
-    padding: 16px calc(1.5vmax + 8px);
-    color: #fff;
     text-align: right;
     font-weight: 600;
     position: relative;
     border-radius: 0 !important;
-    width: 100%;
     box-sizing: border-box;
-    display: grid;
-    grid-template-columns: max-content max-content 1fr;
     grid-column-gap: 100px;
+    grid-template-columns: max-content max-content 1fr;
 }
 
 a {
     margin-top: 4px;
     min-width: 132px;
-    color: #fff;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-ul {
-    padding: 0;
-    margin: 0;
-}
-
-#links {
-    margin-right: -20px;
 }
 
 #disclaimer {
@@ -400,7 +331,7 @@ ul {
     margin: 20px auto 10px;
     padding: 10px 25px;
     background-color: var(--prim-cool);
-    color: var(--button-text-light);
+    color: white;
     border: none;
     border-radius: var(--border-radius-base);
     cursor: pointer;
@@ -409,12 +340,12 @@ ul {
 }
 
 #add_grade_form .submit-button:hover {
-    background-color: var(--button-primary-hover-bg);
+    background-color: var(--prim-cool);
     transform: translateY(-1px);
 }
 
 #add_grade_form .submit-button:focus {
-    background-color: var(--button-primary-hover-bg);
+    background-color: var(--prim-cool);
 }
 
 #add_grade_form .submit-button:active {
@@ -465,7 +396,7 @@ ul {
 
 input#delete_grades {
     background-color: var(--status-danger);
-    color: var(--button-text-light);
+    color: white;
     border-color: var(--status-danger);
 }
 
@@ -495,33 +426,18 @@ select {
     --main-text: #e0e0e0;
 
     --table-header-bg: #2c3e50;
-    --table-row-odd-bg: #253444;
-    --table-row-even-bg-alpha: rgba(255, 255, 255, 0.02);
     --table-border-dotted: #34495e;
     --table-row-hover-bg: #3e5772;
 
     --input-bg: #34495e;
     --input-border: #4a6572;
-    --input-text-active: var(--prim-cooler);
     --input-disabled-text: #bdbdbd;
-    --input-disabled-bg: transparent;
-
-    --h2-bg: var(--prim-cool);
-    --h3-bg: var(--sec-light);
-    --h4-bg: #2c3e50;
-    --h4-text: #fff;
-
-    --button-primary-bg: var(--prim-cooler);
-    --button-primary-hover-bg: var(--prim-cool);
 
     --button-default-bg: #3a475a;
     --button-default-text: #e0e0e0;
     --button-default-border: #bdbdbd;
     --button-default-hover-bg: #2e3948;
     --button-default-hover-border: #bdbdbd;
-
-    --ignored-status-bg: rgba(255, 179, 71, 0.3);
-    --ignored-status-text: #fde79a;
 }
 
 [tplus=dm] body {
@@ -537,12 +453,12 @@ select {
     background-image: url("../icons/arrowhead-down-white.svg");
 }
 
-[tplus=dm] .wrapper tbody tr:nth-of-type(odd), [tplus=dm] .wrapper .grades tbody tr:nth-of-type(odd) {
-    background-color: #222;
+[tplus=dm] .wrapper tbody tr, [tplus=dm] .wrapper .grades tbody tr {
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
-[tplus=dm] .wrapper tbody tr:nth-of-type(even), [tplus=dm] .wrapper .grades tbody tr:nth-of-type(even) {
-    background-color: rgba(255, 255, 255, 0.02);
+[tplus=dm] .wrapper tbody tr:nth-of-type(2n), [tplus=dm] .wrapper .grades tbody tr:nth-of-type(2n) {
+    background-color: transparent;
 }
 
 [tplus=dm] header {
@@ -559,10 +475,6 @@ select {
 
 [tplus=dm] #buttons input {
     box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05), 0 2px 5px rgba(0, 0, 0, 0.5);
-}
-
-[tplus=dm] .wrapper .grades tbody tr:hover {
-    background-color: var(--table-row-hover-bg);
 }
 
 [tplus=dm] input[type=checkbox]:hover, [tplus=dm] input[type=checkbox]:focus,

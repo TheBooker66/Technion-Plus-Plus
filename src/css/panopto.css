@@ -1,3 +1,5 @@
+@import "colours.css";
+
 /* Configure main menu width */
 :root {
     --menu-width: 140px;
@@ -295,7 +297,7 @@ sounds control panel
 }
 
 #maor_sound > div.m_header > span:hover {
-    background-color: #d70022;
+    background-color: var(--status-danger);
 }
 
 #maor_sound > div.m_grid {
