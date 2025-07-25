@@ -35,12 +35,6 @@
     --button-default-hover-border: #6c757d;
 }
 
-@media print {
-    .no-print {
-        display: none;
-    }
-}
-
 body {
     background: var(--prim-cool);
     color: #0c0c0d;
