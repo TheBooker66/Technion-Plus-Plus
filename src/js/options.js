@@ -146,8 +146,8 @@ import {TE_updateInfo} from '../service_worker.js';
 		document.getElementById("ext_version").textContent += ` ${chrome.runtime.getManifest().version}`;
 		if ("function" === typeof chrome.storage.local.getBytesInUse)
 			chrome.storage.local.getBytesInUse(null, bytes => {
-				bytes /= 1024;
-				document.getElementById("storage").textContent += ` ${bytes.toFixed(3)}Kb`;
+				bytes /= 1000;
+				document.getElementById("storage").textContent += ` ${bytes.toFixed(3)}kB`;
 			});
 		else document.getElementById("storage").textContent += " אירעה שגיאה! נא לדווח עליה.";
 
