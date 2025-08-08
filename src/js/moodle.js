@@ -51,18 +51,18 @@ function main() {
 			});
 		});
 		colorSlider.addEventListener("change", () => {
-			const m = parseInt(colorSlider.value);
-			chrome.storage.local.set({remoodle_angle: m}, () => {
+			const newAngle = parseInt(colorSlider.value.toString());
+			chrome.storage.local.set({remoodle_angle: newAngle}, () => {
 				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
-					chrome.runtime.sendMessage({mess_t: "TE_remoodle_reangle", angle: m});
+					chrome.runtime.sendMessage({mess_t: "TE_remoodle_reangle", angle: newAngle});
 			});
 		});
 		let colorGradientString = "";
-		for (let i = 0; i < 12; i++) {
-			colorGradientString += `hsl(${82 + 30 * i}, 100%, 25%) ${100 * i / 12}% ${100 * (i + 1) / 12}%`;
-			if (11 > i) colorGradientString += ", ";
+		for (let gradientStep = 0; gradientStep < 12; gradientStep++) {
+			colorGradientString += `hsl(${82 + 30 * gradientStep}, 100%, 25%) ${100 * gradientStep / 12}% ${100 * (gradientStep + 1) / 12}%`;
+			if (11 > gradientStep) colorGradientString += ", ";
 		}
-		colorSlider.setAttribute("style", "background-image: linear-gradient(to left, " + colorGradientString + ") !important");
+		colorSlider.style.backgroundImage = "linear-gradient(to left, " + colorGradientString + ") !important";
 		return actionsContainer;
 	}
 
@@ -78,7 +78,8 @@ function main() {
 			userCourses[courseMatch.cnum.trim()] = courseMatch.cname.trim();
 		}
 		0 < Object.keys(userCourses).length && chrome.storage.local.set({u_courses: userCourses}, () => {
-			chrome.runtime.lastError && console.error("TE_moodle_001_" + mess + ": " + chrome.runtime.lastError.message);
+			if (chrome.runtime.lastError)
+				console.error("TE_moodle_001_: " + chrome.runtime.lastError.message);
 		});
 		const coursesBySemester = [[], [], []];
 		if (0 < courseTiles.length) for (let i = 0; i < courseTiles.length; i++) {

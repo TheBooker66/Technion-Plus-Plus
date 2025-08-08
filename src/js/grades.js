@@ -7,7 +7,7 @@
 		const button_data = {
 			grad_dir: ["left", "right"],
 			padding: ["1em 0 1em 3em", "1em 3em 1em 0"],
-			title: ["לחץ להתחלת תהליך השיתוף", "Click to start sharing process"],
+			title: ["לחץ להתחלת תהליך השיתוף", "Click to start the sharing process"],
 			button: ["שיתוף היסטוגרמות עם CheeseFork", "Share histograms with CheeseFork"],
 			info: ["למידע אודות שיתוף היסטוגרמות", "For information about sharing histograms"],
 			info_link: ["לחץ כאן", "press here"],
@@ -23,12 +23,13 @@
         </small>
     </div>`, "text/html").body.firstChild;
 		const page = document.getElementById("contents");
-		const cf_loader = page.insertBefore(html, page.firstChild).querySelector("#cf_loader");
-		cf_loader.addEventListener("click", () => {
+		const element = page.insertBefore(html, page.firstChild);
+		const loader = element.querySelector("#cf_loader");
+		loader.addEventListener("click", () => {
 			const script = document.createElement("script");
 			script.setAttribute("charset", "utf-8");
 			script.src = chrome.runtime.getURL("./lib/cheesefork/share-histograms.js");
-			script.onload = () => cf_loader.remove();
+			script.onload = () => loader.remove();
 			(document.head || document.documentElement).appendChild(script);
 		});
 	}

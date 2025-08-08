@@ -3,15 +3,15 @@ import {CommonPopup} from './common_popup.js';
 import {reverseString, xorStrings} from './utils.js';
 
 (function () {
-	function make_tabs_clicky(tabs, popup, func = null) {
-		for (let g = 0; g < tabs.length; g++) {
-			tabs[g].addEventListener("click", () => {
-				if (tabs[g].classList.contains("current")) return;
-				for (let m = 0; m < tabs.length; m++) {
-					tabs[m].className = m === g ? "tab current" : "tab";
-					popup[m].style.display = m === g ? "block" : "none";
+	function makeTabsClicky(tabs, popup, func = null) {
+		for (let i = 0; i < tabs.length; i++) {
+			tabs[i].addEventListener("click", () => {
+				if (tabs[i].classList.contains("current")) return;
+				for (let j = 0; j < tabs.length; j++) {
+					tabs[j].className = j === i ? "tab current" : "tab";
+					popup[j].style.display = j === i ? "block" : "none";
 				}
-				func && func(g);
+				if (func) func(i);
 			});
 		}
 	}
@@ -21,24 +21,27 @@ import {reverseString, xorStrings} from './utils.js';
 	popup.popupWrap();
 
 	const OS = navigator.userAgentData ? navigator.userAgentData : "navigator.userAgentData is not supported!";
-	OS.toString().includes("Android") || chrome.action.getBadgeBackgroundColor({}, c => {
-		chrome.action.getBadgeText({}, h => {
-			if (215 == c[0] && 0 == c[1] && 34 == c[2] && "!" == h) {
-				chrome.action.setBadgeText({text: ""});
+	OS.toString().includes("Android") || chrome.action.getBadgeBackgroundColor({}, badgeColor => {
+		chrome.action.getBadgeText({}, badgeText => {
+			if (215 === badgeColor[0] && 0 === badgeColor[1] && 34 === badgeColor[2] && "!" === badgeText) {
+				void chrome.action.setBadgeText({text: ""});
 				document.getElementById("bus_error").style.display = "block";
 			}
 		});
 	});
 	const apps = document.getElementById("apps_menu"), links = document.getElementById("more_links"),
-		l = document.getElementById("print"), n = document.getElementById("apps_links");
+		print = document.getElementById("print"), moreApps = document.getElementById("apps_links");
 	apps.addEventListener("click", () => apps.className = "collapsed");
-	document.getElementById("apps_link")
-		.addEventListener("click", () => window.open("https://cis-shop.technion.ac.il/product-category/software/"));
-	[{b: "gotoPrint", from: links, to: l}, {b: "gotoApps", from: links, to: n},
-		{b: "returnFromPrint", from: l, to: links}, {b: "returnFromApps", from: n, to: links}].forEach(c => {
-		document.getElementById(c.b).addEventListener("click", () => {
-			c.to.style.display = "block";
-			c.from.style.display = "none";
+	document.getElementById("apps_link").addEventListener("click", () => window.open("https://cis-shop.technion.ac.il/product-category/software/"));
+	[
+		{b: "gotoPrint", from: links, to: print},
+		{b: "gotoApps", from: links, to: moreApps},
+		{b: "returnFromPrint", from: print, to: links},
+		{b: "returnFromApps", from: moreApps, to: links},
+	].forEach(linkObject => {
+		document.getElementById(linkObject.b).addEventListener("click", () => {
+			linkObject.to.style.display = "block";
+			linkObject.from.style.display = "none";
 			apps.className = "collapse";
 		});
 	});
@@ -57,29 +60,32 @@ import {reverseString, xorStrings} from './utils.js';
 	document.getElementById("organizer").addEventListener("click", () => chrome.windows.create(popup_window));
 	document.getElementById("release_notes").addEventListener("click", () => chrome.tabs.create({url: "html/release_notes.html"}));
 	document.getElementById("calculator").addEventListener("click", () => chrome.tabs.create({url: "html/calculator.html"}));
-	const t = document.getElementById("tools_content").getElementsByTagName("a");
-	for (let c = 0; c < t.length; c++) {
-		if ([4, 5, 7].includes(c)) continue; // 4 - Organiser, 5 - grades sheet, 7 - printer
-		t[c].addEventListener("click", () => window.location.href = "html/p_" + t[c].id + ".html");
+	const toolLinks = document.getElementById("tools_content").getElementsByTagName("a");
+	for (let i = 0; i < toolLinks.length; i++) {
+		if ([4, 5, 7].includes(i)) continue; // 4 - Organiser, 5 - grades sheet, 7 - printer
+		toolLinks[i].addEventListener("click", () => window.location.href = "html/p_" + toolLinks[i].id + ".html");
 	}
 	const linksDiv = document.querySelectorAll("#more_links > div"),
 		tabsDiv = document.getElementById("secondary_tabs").getElementsByTagName("div"),
 		pages = [document.getElementById("single_page"), document.getElementById("double_page"), document.getElementById("quadruple_page")];
-	make_tabs_clicky(linksDiv[0].querySelectorAll(".tab"), Array.from(linksDiv).slice(1), _ => apps.className = "collapse");
-	make_tabs_clicky(tabsDiv, pages);
+	makeTabsClicky(linksDiv[0].querySelectorAll(".tab"), Array.from(linksDiv).slice(1), _ => apps.className = "collapse");
+	makeTabsClicky(tabsDiv, pages);
 	document.getElementById("cant_login").getElementsByTagName("u")[0].addEventListener("click", () => {
 		chrome.runtime.openOptionsPage(() => {
-			chrome.runtime.lastError && console.error("TE_p: " + chrome.runtime.lastError.message);
+			if (chrome.runtime.lastError)
+				console.error("TE_p: " + chrome.runtime.lastError.message);
 		});
 	});
 	document.getElementById("quick_login").addEventListener("change", () => {
 		chrome.storage.local.set({quick_login: document.getElementById("quick_login").checked}, () => {
-			chrome.runtime.lastError && console.error("TE_popup_login: " + chrome.runtime.lastError.message);
+			if (chrome.runtime.lastError)
+				console.error("TE_popup_login: " + chrome.runtime.lastError.message);
 		});
 	});
 	document.getElementById("mute_alerts_toggle").addEventListener("change", () => {
 		chrome.storage.local.set({alerts_sound: document.getElementById("mute_alerts_toggle").checked}, () => {
-			chrome.runtime.lastError && console.error("TE_popup_mute_alerts: " + chrome.runtime.lastError.message);
+			if (chrome.runtime.lastError)
+				console.error("TE_popup_mute_alerts: " + chrome.runtime.lastError.message);
 		});
 	});
 	chrome.storage.local.get({
@@ -99,62 +105,71 @@ import {reverseString, xorStrings} from './utils.js';
 		server: true,
 		custom_name: "",
 		custom_link: "",
-	}, function (c) {
-		document.getElementById("quick_login").checked = c.quick_login;
-		document.getElementById("mute_alerts_toggle").checked = c.alerts_sound;
-		document.getElementById("cant_login").style.display = c.enable_login ? "none" : "block";
-		document.getElementById("cal_moodle").style.display = c.enable_login && c.moodle_cal && c.quick_login ? "block" : "none";
-		document.getElementById("cal_cs").style.display = c.cs_cal ? "block" : "none";
-		document.getElementById("cal_webwork").style.display = c.enable_login && c.quick_login && c.wwcal_switch ? "block" : "none";
-		let k, h = ["cal_moodle", "cal_cs", "cal_mathnet", "cal_webwork"];
-		for (k = 0; k < h.length; k++)
-			c.cal_seen & Math.pow(2, k) && (document.getElementById(h[k]).className = "major hw");
-		0 != c.dl_current && document.getElementById("downloads").classList.add("active");
-		let id = reverseString(xorStrings(c.uidn_arr[0] + "", c.uidn_arr[1]));
+	}, function (storageData) {
+		document.getElementById("quick_login").checked = storageData.quick_login;
+		document.getElementById("mute_alerts_toggle").checked = storageData.alerts_sound;
+		document.getElementById("cant_login").style.display = storageData.enable_login ? "none" : "block";
+		document.getElementById("cal_moodle").style.display = storageData.enable_login && storageData.moodle_cal && storageData.quick_login ? "block" : "none";
+		document.getElementById("cal_cs").style.display = storageData.cs_cal ? "block" : "none";
+		document.getElementById("cal_webwork").style.display = storageData.enable_login && storageData.quick_login && storageData.wwcal_switch ? "block" : "none";
+
+		const calendarIDs = ["cal_moodle", "cal_cs", "cal_mathnet", "cal_webwork"];
+		for (let i = 0; i < calendarIDs.length; i++) {
+			if (storageData.cal_seen & Math.pow(2, i))
+				document.getElementById(calendarIDs[i]).className = "major hw";
+		}
+
+		if (storageData.dl_current !== 0) document.getElementById("downloads").classList.add("active");
+
+		let id = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
 		id = "" === id ? "הקלד מספר זהות כאן" : id;
-		k = c.gmail && !chrome.runtime.lastError;
-		const g = document.getElementById("print").getElementsByTagName("a");
-		for (let p = 0; p < g.length; p++) {
-			g[p].setAttribute("href", k ? "https://mail.google.com/mail/u/0/?view=cm&to=print." + g[p].id + "@campus.technion.ac.il&su=" + id + "&fs=1&tf=1" : "mailto:print." + g[p].id + "@campus.technion.ac.il?subject=" + id);
+		let gmailEh = storageData.gmail && !chrome.runtime.lastError;
+		const printerLinks = document.getElementById("print").getElementsByTagName("a");
+		for (let i = 0; i < printerLinks.length; i++) {
+			const emailURL = gmailEh
+				? "https://mail.google.com/mail/u/0/?view=cm&to=print." + printerLinks[i].id + "@campus.technion.ac.il&su=" + id + "&fs=1&tf=1"
+				: "mailto:print." + printerLinks[i].id + "@campus.technion.ac.il?subject=" + id;
+			printerLinks[i].setAttribute("href", emailURL);
 			if (id !== "הקלד מספר זהות כאן" && id !== "") continue;
-			g[p].addEventListener("click", () => {
+			printerLinks[i].addEventListener("click", () => {
 				chrome.runtime.sendMessage({
 					mess_t: "silent_notification",
-					message: 'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.'
-				}, {}, () => {
-					chrome.runtime.lastError && console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
+					message: 'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.',
+				}, () => {
+					if (chrome.runtime.lastError)
+						console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
 				});
 			});
 		}
-		const m = document.getElementById("UGS_Link"), custom_link = document.getElementById("custom_link");
-		m.addEventListener("click", async () => {
-			let p = setInterval(() => {
-				m.textContent = 7 > m.textContent.length ? m.textContent + "." : "טוען";
+		const studentsLink = document.getElementById("UGS_Link"), customLink = document.getElementById("custom_link");
+		studentsLink.addEventListener("click", async () => {
+			let loadingInterval = setInterval(() => {
+				studentsLink.textContent = 7 > studentsLink.textContent.length ? studentsLink.textContent + "." : "טוען";
 			}, 500);
-			let q = await fetch("https://students.technion.ac.il/auth/oidc/", {method: "HEAD"})
-				.then(w => w.url)
+			let authURL = await fetch("https://students.technion.ac.il/auth/oidc/", {method: "HEAD"})
+				.then(response => response.url)
 				.catch(_ => "https://students.technion.ac.il/auth/oidc/");
-			if (c.enable_login && c.quick_login && q.includes("?")) {
-				q = q.split("?");
-				const u = new URLSearchParams(q[1]);
-				u.delete("prompt");
-				u.append("login_hint", c.username + "@" + (c.server ? "campus." : "") + "technion.ac.il");
-				q = q[0] + "?" + u.toString();
+			if (storageData.enable_login && storageData.quick_login && authURL.includes("?")) {
+				authURL = authURL.split("?");
+				const urlParams = new URLSearchParams(authURL[1]);
+				urlParams.delete("prompt");
+				urlParams.append("login_hint", storageData.username + "@" + (storageData.server ? "campus." : "") + "technion.ac.il");
+				authURL = authURL[0] + "?" + urlParams.toString();
 			}
-			chrome.tabs.create({url: q}, () => {
-				clearInterval(p);
-				m.textContent = "Students";
+			chrome.tabs.create({url: authURL}, () => {
+				clearInterval(loadingInterval);
+				studentsLink.textContent = "Students";
 			});
 		});
 
-		if (c.custom_name && c.custom_link) {
-			custom_link.textContent = c.custom_name;
-			custom_link.title = "קישור אישי שלכם! מעניין מה הוספתם...";
-			custom_link.setAttribute("href", c.custom_link);
+		if (storageData.custom_name && storageData.custom_link) {
+			customLink.textContent = storageData.custom_name;
+			customLink.title = "קישור אישי שלכם! מעניין מה הוספתם...";
+			customLink.setAttribute("href", storageData.custom_link);
 		} else {
-			custom_link.textContent = "פנופטו";
-			custom_link.title = "מאגר קורסים מצולמים";
-			custom_link.setAttribute("href", "https://panoptotech.cloud.panopto.eu");
+			customLink.textContent = "פנופטו";
+			customLink.title = "מאגר קורסים מצולמים";
+			customLink.setAttribute("href", "https://panoptotech.cloud.panopto.eu");
 		}
-	})
+	});
 })();

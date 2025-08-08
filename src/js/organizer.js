@@ -4,7 +4,9 @@ import {toggle} from "./common_calendar.js";
 const tabContents = document.querySelectorAll("#bodies > .body"),
 	tabHeaders = document.querySelectorAll("#tabs > .tab"),
 	form = document.querySelector("form"),
-	loadTemplate = (a, b = document) => document.importNode(b.querySelector("template#" + a).content, true);
+	loadTemplate = (templateID, documentContext = document) => {
+		return document.importNode(documentContext.querySelector("template#" + templateID).content, true);
+	};
 let input_counters;
 
 function insertMessage(messageText, errorEh) {
@@ -30,8 +32,8 @@ function openAssignment(assignment, gotoFunction) {
 		button.textContent = originalText;
 	};
 	gotoFunction().then(resetButton).catch(_ => {
-		assignment.setAttribute("style", "background-color: rgb(215, 0, 34, 0.8) !important;");
-		setTimeout(() => assignment.setAttribute("style", ""), 1E3);
+		assignment.style.background = "rgb(215, 0, 34, 0.8)" + "!important";
+		setTimeout(() => assignment.style.background = "", 1E3);
 		resetButton();
 	});
 }
@@ -59,7 +61,7 @@ function insertAssignments(newAssignments, finishedAssignments) {
 			templateClone.querySelector(".assignment_header").textContent = assignmentData.header;
 			templateClone.querySelector(".course_name").textContent += assignmentData.course;
 			templateClone.dataset.course = "#" + assignmentData.course;
-			templateClone.querySelector(".assignment_descripion").textContent = assignmentData.description;
+			templateClone.querySelector(".assignment_description").textContent = assignmentData.description;
 			templateClone.querySelector(".end_time > span").textContent = assignmentData.final_date;
 			const buttonElements = templateClone.querySelectorAll("a.button");
 			buttonElements[1].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, templateClone, 1));
@@ -122,7 +124,7 @@ function insertUserAssignment(assignmentData, container, targetListID = null, in
 	container.querySelector(".assignment_header").textContent = assignmentData.header;
 	container.dataset.course = "#user-course";
 	let textareaHeight = 20 * (assignmentData.description.split("\n").length + 1),
-		textareaElement = container.querySelector(".assignment_descripion textarea");
+		textareaElement = container.querySelector(".assignment_description textarea");
 	textareaElement.textContent = assignmentData.description;
 	textareaElement.style.height = textareaHeight + "px";
 	textareaHeight = container.querySelector(".end_time > span");
@@ -135,7 +137,7 @@ function insertUserAssignment(assignmentData, container, targetListID = null, in
 			year: "numeric",
 		});
 	} else textareaHeight.parentNode.style.visibility = "hidden";
-	if (-1 == assignmentData.timestamp) container.classList.add("system_message");
+	if (assignmentData.timestamp === -1) container.classList.add("system_message");
 	if (targetListID) {
 		targetListID = document.getElementById(targetListID);
 		container = insertAtBeginning ? targetListID.insertBefore(container, targetListID.children[0]) : targetListID.appendChild(container);
@@ -213,8 +215,8 @@ function form_submit() {
 		alert("תאריך הסיום שבחרת כבר עבר, נא לבחור תאריך סיום חדש");
 		return;
 	}
-	chrome.storage.local.get({user_agenda: {}}, a => {
-		let agenda = a.user_agenda, assignmentID = parseInt(form.edit.value),
+	chrome.storage.local.get({user_agenda: {}}, storageData => {
+		let agenda = storageData.user_agenda, assignmentID = parseInt(form.edit.value),
 			isExistingAssignment = 0 < assignmentID ? agenda.hasOwnProperty(assignmentID) : false,
 			finalAssignmentID = isExistingAssignment ? assignmentID : Date.now();
 		agenda[finalAssignmentID] = {
@@ -369,15 +371,15 @@ if (document.title === "ארגונית++") {
 	form.no_end.addEventListener("input", () => form.end_time.disabled = form.no_end.checked);
 	setUpFilters();
 
-	chrome.storage.local.get({organizer_fullscreen: false, dark_mode: false}, storage => {
+	chrome.storage.local.get({organizer_fullscreen: false, dark_mode: false}, async storage => {
 		const fullscreenCheckbox = document.getElementById("fullscreen");
 		if (storage.organizer_fullscreen) {
 			fullscreenCheckbox.checked = true;
-			chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"});
+			await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"});
 		}
-		fullscreenCheckbox.addEventListener("change", _ => {
-			chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
-			chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
+		fullscreenCheckbox.addEventListener("change", async _ => {
+			await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
+			await chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
 		});
 		storage.dark_mode ? document.querySelector("html").setAttribute("tplus", "dm") :
 			document.querySelector("html").removeAttribute("tplus");

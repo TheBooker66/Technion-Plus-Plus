@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<template id="busline">
+<template id="bus_line">
     <div class="drow">
         <div class="dcell"></div>
         <div class="dcell"></div>
@@ -35,22 +35,22 @@
             </div>
             <h3>הגדרות</h3>
             <div class="settings" style="border: 0;">
-                <div style="text-align: left">
-                    <span style="float: right">תחנה:</span>
+                <div>
+                    <label for="station_select">תחנה:</label>
                     <select id="station_select"></select>
                 </div>
                 <small>שינוי ימחק התראות קיימות.</small>
             </div>
             <div class="settings">
-                התראה לפני הגעה לתחנה:
-                <span style="float: left">
-					<select id="min_select">
+                <span>
+					<label for="min_select">התראה לפני הגעה לתחנה:</label>
+                    <select id="min_select">
 						<option value="5">5 דקות</option>
 						<option value="10">10 דקות</option>
 						<option value="15">15 דקות</option>
 					</select>
 				</span>
-                <small>שינוי ישפיע על ההתראות הקיימות.</small>
+                <small>שינוי ישפיע על התראות קיימות.</small>
             </div>
         </div>
         <div id="error" class="error_bar" style="display: none"></div>

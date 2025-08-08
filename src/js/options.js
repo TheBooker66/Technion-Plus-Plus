@@ -44,9 +44,9 @@ import {TE_updateInfo} from '../service_worker.js';
 			cs = document.getElementById("cs_cal").checked,
 			WCPass = document.getElementById("WCPass").value,
 			webwork = document.getElementById("wwcal_switch").checked,
-			dark_mode = document.getElementById("dark_mode").checked,
-			custom_name = document.getElementById("custom_name").value,
-			custom_link = document.getElementById("custom_link").value;
+			darkMode = document.getElementById("dark_mode").checked,
+			customName = document.getElementById("custom_name").value,
+			customLink = document.getElementById("custom_link").value;
 		const loginEh = "" !== username && "" !== password,
 			externalEh = external && "" !== password && "" !== idn;
 		chrome.storage.local.set({
@@ -55,7 +55,7 @@ import {TE_updateInfo} from '../service_worker.js';
 			enable_login: loginEh, quick_login: login, allow_timings: timings, panopto_save: panopto,
 			external_u: external, enable_external: externalEh, hw_alerts: hw_alerts,
 			moodle_cal: moodle, cs_cal: cs, wcpass: WCPass, wwcal_switch: webwork, wwcal_update: 0,
-			notif_vol: notif_vol, dark_mode: dark_mode, custom_name: custom_name, custom_link: custom_link,
+			notif_vol: notif_vol, dark_mode: darkMode, custom_name: customName, custom_link: customLink,
 		}, () => {
 			const status_bar = document.getElementById("status");
 			if (chrome.runtime.lastError) {
@@ -66,7 +66,7 @@ import {TE_updateInfo} from '../service_worker.js';
 				setTimeout(() => status_bar.textContent = "", 2E3);
 			}
 		});
-		dark_mode ? document.querySelector("html").setAttribute("tplus", "dm") :
+		darkMode ? document.querySelector("html").setAttribute("tplus", "dm") :
 			document.querySelector("html").removeAttribute("tplus");
 		if (moodle && loginEh && login) TE_updateInfo();
 		else chrome.action.getBadgeBackgroundColor({}, colors => {
@@ -85,16 +85,15 @@ import {TE_updateInfo} from '../service_worker.js';
 		elem.setAttribute("autobuffer", "true");
 		elem.volume = document.getElementById("notification_volume").value;
 		elem.src = chrome.runtime.getURL("resources/notification.mp3");
-		// noinspection JSIgnoredPromiseFromCall
-		elem.play();
+		void elem.play();
 	});
 	document.getElementById("notification_volume").addEventListener("change", () => {
 		document.getElementById("try_vol").textContent =
 			"נסה (" + 100 * document.getElementById("notification_volume").value + "%)";
 	});
 	document.getElementById("cs_cal").addEventListener("change", () => {
-		document.getElementById("cscal_div").style.cssText =
-			document.getElementById("cs_cal").checked ? "display: block; margin-right: 20px !important" : "display: none";
+		document.getElementById("cscal_div").style.marginRight = "20px !important";
+		document.getElementById("cscal_div").style.display = document.getElementById("cs_cal").checked ? "block" : "none";
 	});
 	document.addEventListener("DOMContentLoaded", () => {
 		chrome.storage.local.get({
@@ -124,7 +123,8 @@ import {TE_updateInfo} from '../service_worker.js';
 				document.getElementById("idn").value = decryptedID;
 				document.getElementById("WCPass").value = storage.wcpass;
 				document.getElementById("cs_cal").checked = storage.cs_cal;
-				document.getElementById("cscal_div").style.cssText = storage.cs_cal ? "display: block; margin-right: 20px !important" : "display: none";
+				document.getElementById("cscal_div").style.marginRight = "20px !important";
+				document.getElementById("cscal_div").style.display = storage.cs_cal ? "block" : "none";
 				document.getElementById("wwcal_switch").checked = storage.wwcal_switch;
 				document.getElementById("external_user").checked = storage.external_u;
 				document.getElementById("allow_hw_alerts").checked = storage.hw_alerts;

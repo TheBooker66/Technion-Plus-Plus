@@ -12,52 +12,52 @@ export class CommonCalendar {
 
 	calendarWrap() {
 		if (this.type === "ארגונית++") return;
-		const a = [document.getElementById("new_assignments"), document.getElementById("finished_assignments")],
-			b = document.getElementById("tabs").getElementsByTagName("div");
-		for (let d = 0; d < b.length; d++) {
-			b[d].addEventListener("click", () => {
-				for (let c = 0; c < 2; c++) {
-					b[c].className = c === d ? "tab current" : "tab";
-					a[c].style.display = c === d ? "block" : "none";
+		const assignmentTabs = [document.getElementById("new_assignments"), document.getElementById("finished_assignments")],
+			tabButtons = document.getElementById("tabs").getElementsByTagName("div");
+		for (let tabIndex = 0; tabIndex < tabButtons.length; tabIndex++) {
+			tabButtons[tabIndex].addEventListener("click", () => {
+				for (let listIndex = 0; listIndex < 2; listIndex++) {
+					tabButtons[listIndex].className = listIndex === tabIndex ? "tab current" : "tab";
+					assignmentTabs[listIndex].style.display = listIndex === tabIndex ? "block" : "none";
 				}
 			});
 		}
 	}
 
-	removeCalendarAlert(a) {
-		if (this.type === "ארגונית++") a &= -12; else a &= ~this.flags[this.name];
-		if (!navigator.userAgent.includes("Android") && !a) chrome.action.setBadgeText({text: ""});
-		return a;
+	removeCalendarAlert(currentAlertFlags) {
+		if (this.type === "ארגונית++") currentAlertFlags &= -12; else currentAlertFlags &= ~this.flags[this.name];
+		if (!navigator.userAgent.includes("Android") && !currentAlertFlags) void chrome.action.setBadgeText({text: ""});
+		return currentAlertFlags;
 	}
 
-	insertAssignments(a, b) {
-		const d = (c, e, f) => {
-			e = e.querySelector(".list_item");
-			if (c.is_new) e.classList.add("starred");
-			e.querySelector(".assignment_header").textContent = c.header;
-			e.querySelector(".course_name").textContent += c.course;
-			e.querySelector(".assignment_descripion").textContent = c.description;
-			e.querySelector(".end_time").textContent += c.final_date;
-			const g = e.querySelectorAll("img");
-			g[1].addEventListener("click", () => toggle(this.name, c.event, e, 1));
-			g[2].addEventListener("click", () => toggle(this.name, c.event, e, 0));
-			g[0].title = "moodle" === this.name ? "עבור להגשה במודל" : "עבור לאתר הקורס";
-			g[0].addEventListener("click", () => openAssignment(e, c.goToFunc));
-			e.querySelector(".assignment_header").addEventListener("click", () => openAssignment(e, c.goToFunc));
-			document.getElementById(f).appendChild(e);
+	insertAssignments(newAssignmentsList, finishedAssignmentsList) {
+		const createAssignmentElement = (assignmentData, templateNode, containerId) => {
+			templateNode = templateNode.querySelector(".list_item");
+			if (assignmentData.is_new) templateNode.classList.add("starred");
+			templateNode.querySelector(".assignment_header").textContent = assignmentData.header;
+			templateNode.querySelector(".course_name").textContent += assignmentData.course;
+			templateNode.querySelector(".assignment_description").textContent = assignmentData.description;
+			templateNode.querySelector(".end_time").textContent += assignmentData.final_date;
+			const actionButtons = templateNode.querySelectorAll("img");
+			actionButtons[1].addEventListener("click", () => toggle(this.name, assignmentData.event, templateNode, 1));
+			actionButtons[2].addEventListener("click", () => toggle(this.name, assignmentData.event, templateNode, 0));
+			actionButtons[0].title = "moodle" === this.name ? "עבור להגשה במודל" : "עבור לאתר הקורס";
+			actionButtons[0].addEventListener("click", () => openAssignment(templateNode, assignmentData.goToFunc));
+			templateNode.querySelector(".assignment_header").addEventListener("click", () => openAssignment(templateNode, assignmentData.goToFunc));
+			document.getElementById(containerId).appendChild(templateNode);
 		};
-		this.common.useTemplatesFile("calendar", c => {
-			const e = this.common.loadTemplate("assignment", c);
-			a.forEach(f => d(f, e.cloneNode(true), "new_assignments"));
-			b.forEach(f => d(f, e.cloneNode(true), "finished_assignments"));
-			0 === a.length + b.length && insertMessage("לא נמצאו אירועים קרובים לתצוגה.", false);
+		this.common.useTemplatesFile("calendar", templateHtml => {
+			const assignmentTemplate = this.common.loadTemplate("assignment", templateHtml);
+			newAssignmentsList.forEach(f => createAssignmentElement(f, assignmentTemplate.cloneNode(true), "new_assignments"));
+			finishedAssignmentsList.forEach(f => createAssignmentElement(f, assignmentTemplate.cloneNode(true), "finished_assignments"));
+			0 === newAssignmentsList.length + finishedAssignmentsList.length && insertMessage("לא נמצאו אירועים קרובים לתצוגה.", false);
 			stopSpinning();
 		});
 	}
 
-	progress(a) {
-		if (this.type === "ארגונית++") addAssignmentsToList(a, this.name);
-		else a().then(b => this.insertAssignments(b.new_list, b.finished_list)).catch(err => insertMessage(err.msg, err.is_error));
+	progress(promiseCreator) {
+		if (this.type === "ארגונית++") addAssignmentsToList(promiseCreator, this.name);
+		else promiseCreator().then(b => this.insertAssignments(b.new_list, b.finished_list)).catch(err => insertMessage(err.msg, err.is_error));
 	}
 }
 
@@ -76,18 +76,18 @@ function stopSpinning() {
 
 function insertMessage(msg, errorEh) {
 	stopSpinning();
-	const d = document.getElementById("error").appendChild(document.createElement("div"));
-	d.className = errorEh ? "error_bar" : "attention";
-	d.textContent = msg;
+	const messageElement = document.getElementById("error").appendChild(document.createElement("div"));
+	messageElement.className = errorEh ? "error_bar" : "attention";
+	messageElement.textContent = msg;
 }
 
 export function toggle(sys, event, item, VorX) {
 	if (sys === "ua") {
-		chrome.storage.local.get({user_agenda: {}}, b => {
+		chrome.storage.local.get({user_agenda: {}}, storageData => {
 			if (chrome.runtime.lastError) console.error("TE_organize7: " + chrome.runtime.lastError.message);
 			else {
-				b.user_agenda[event].done = 1 - b.user_agenda[event].done;
-				chrome.storage.local.set({user_agenda: b.user_agenda});
+				storageData.user_agenda[event].done = 1 - storageData.user_agenda[event].done;
+				void chrome.storage.local.set({user_agenda: storageData.user_agenda});
 			}
 		});
 	} else {
@@ -96,13 +96,13 @@ export function toggle(sys, event, item, VorX) {
 			cs: "cs_cal_finished",
 			webwork: "webwork_cal",
 		}[sys];
-		chrome.storage.local.get(calendar, d => {
+		chrome.storage.local.get(calendar, storageData => {
 			if (chrome.runtime.lastError)
 				console.error("TE_cal7: " + chrome.runtime.lastError.message);
 			else {
-				if (d[calendar].hasOwnProperty(event.toString())) delete d[calendar][event.toString()];
-				else d[calendar][event.toString()] = 0;
-				chrome.storage.local.set({[calendar]: d[calendar]});
+				if (storageData[calendar].hasOwnProperty(event.toString())) delete storageData[calendar][event.toString()];
+				else storageData[calendar][event.toString()] = 0;
+				void chrome.storage.local.set({[calendar]: storageData[calendar]});
 			}
 		});
 	}
@@ -110,15 +110,16 @@ export function toggle(sys, event, item, VorX) {
 	checkForEmpty();
 }
 
-function openAssignment(a, b) {
-	const d = a.querySelector("img");
-	d.style.display = "none";
-	d.parentNode.classList.add("small_spinner");
-	b().catch(_ => {
-		a.setAttribute("style", "background-color: rgb(215, 0, 34, 0.8) !important; border-radius: 3px;");
-		setTimeout(() => a.setAttribute("style", ""), 1E3);
+function openAssignment(assignmentItem, openFunction) {
+	const spinner = assignmentItem.querySelector("img");
+	spinner.style.display = "none";
+	spinner.parentNode.classList.add("small_spinner");
+	openFunction().catch(_ => {
+		assignmentItem.style.borderRadius = "3px";
+		assignmentItem.style.backgroundColor = "rgb(215, 0, 34, 0.8)" + "!important";
+		setTimeout(() => assignmentItem.style.backgroundColor = "", 1E3);
 	}).finally(() => {
-		d.style.display = "block";
-		d.parentNode.classList.remove("small_spinner");
+		spinner.style.display = "block";
+		spinner.parentNode.classList.remove("small_spinner");
 	});
 }

@@ -10,52 +10,55 @@ import {CommonCalendar} from './common_calendar.js';
 	popup.popupWrap();
 	calendar.calendarWrap();
 
-	calendar.progress(() => new Promise((e, b) => chrome.storage.local.get({
+	calendar.progress(_ => new Promise((resolve, reject) => chrome.storage.local.get({
 		webwork_cal: {},
 		cal_seen: 0,
 		wwcal_update: 0,
-		webwork_courses: {}
-	}, function (f) {
-		const m = {};
-		for (let c of Object.values(f.webwork_courses)) m[c.lti] = c.name;
+		webwork_courses: {},
+	}, function (storageData) {
 		if (chrome.runtime.lastError) {
 			console.error("TE_ww_cal: " + chrome.runtime.lastError.message);
-			b({
+			reject({
 				msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
-				is_error: true
-			})
-		} else {
-			document.getElementById("lastcheck").style.display = "block";
-			let date = new Date(f.wwcal_update);
-			let fix_date = a => 9 < a ? a : "0" + a;
-			document.getElementById("lastcheck").textContent += f.wwcal_update ? date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ", בשעה " + fix_date(date.getHours()) + ":" + fix_date(date.getMinutes()) : "לא ידוע";
-			const d = [], k = f.webwork_cal;
-			Object.keys(k).forEach(a => {
-				d.push([a, k[a]])
+				is_error: true,
 			});
-			d.sort((a, b) => {
-				return a[1].ts === b[1].ts ? a[1].h.localeCompare(b[1].h) : 0 === a[1].ts ? 1 : 0 === b[1].ts || a[1].ts < b[1].ts ? -1 : a[1].ts > b[1].ts ? 1 : 0;
-			});
-			let c = [], g = [];
-			for (let a = 0; a < d.length; a++) {
-				let n = d[a][0].split("_")[0];
-				let p = {
-					header: d[a][1].h,
-					description: "",
-					course: m[n],
-					final_date: d[a][1].due,
-					is_new: !d[a][1].seen,
-					goToFunc: () => new Promise((t, _) => t(chrome.tabs.create({url: `https://moodle24.technion.ac.il/mod/lti/launch.php?id=${n}`}))),
-					event: d[a][0],
-					timestamp: d[a][1].ts,
-					sys: "webwork",
-				};
-				1 == d[a][1].done ? g.push(p) : c.push(p);
-				d[a][1].seen = 1
-			}
-			f = calendar.removeCalendarAlert(f.cal_seen);
-			chrome.storage.local.set({cal_seen: f, webwork_cal: k});
-			e({new_list: c, finished_list: g})
+			return;
 		}
+
+		const courseMap = {};
+		for (let course of Object.values(storageData.webwork_courses))
+			courseMap[course.lti] = course.name;
+		document.getElementById("lastcheck").style.display = "block";
+		let date = new Date(storageData.wwcal_update);
+		let fix_date = a => 9 < a ? a : "0" + a;
+		document.getElementById("lastcheck").textContent += storageData.wwcal_update ? date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ", בשעה " + fix_date(date.getHours()) + ":" + fix_date(date.getMinutes()) : "לא ידוע";
+		const sortedAssignments = [], webworkCalendarData = storageData.webwork_cal;
+		Object.keys(webworkCalendarData).forEach(assignment => {
+			sortedAssignments.push([assignment, webworkCalendarData[assignment]]);
+		});
+		sortedAssignments.sort((a, b) => {
+			return a[1].ts === b[1].ts ? a[1].h.localeCompare(b[1].h) : 0 === a[1].ts ? 1 : 0 === b[1].ts || a[1].ts < b[1].ts ? -1 : a[1].ts > b[1].ts ? 1 : 0;
+		});
+		let newAssignmentsList = [], finishedAssignmentsList = [];
+		for (let i = 0; i < sortedAssignments.length; i++) {
+			let courseLTI = sortedAssignments[i][0].split("_")[0];
+			let assignmentObject = {
+				header: sortedAssignments[i][1].h,
+				description: "",
+				course: courseMap[courseLTI],
+				final_date: sortedAssignments[i][1].due,
+				is_new: !sortedAssignments[i][1].seen,
+				goToFunc: () => chrome.tabs.create({url: `https://moodle24.technion.ac.il/mod/lti/launch.php?id=${courseLTI}`}),
+				event: sortedAssignments[i][0],
+				timestamp: sortedAssignments[i][1].ts,
+				sys: "webwork",
+			};
+			if (sortedAssignments[i][1].done) finishedAssignmentsList.push(assignmentObject);
+			else newAssignmentsList.push(assignmentObject);
+			sortedAssignments[i][1].seen = true;
+		}
+		storageData = calendar.removeCalendarAlert(storageData.cal_seen);
+		void chrome.storage.local.set({cal_seen: storageData, webwork_cal: webworkCalendarData});
+		resolve({new_list: newAssignmentsList, finished_list: finishedAssignmentsList});
 	})));
 })();

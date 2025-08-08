@@ -11,10 +11,10 @@
 				.then(text => (new DOMParser).parseFromString(text, "text/xml"))
 				.then(html => {
 					if (html.getElementsByTagName("item").length !== 0) {
+						downloadAllButton.style.marginRight = "8px";
+						downloadSelectedButton.style.marginRight = "8px";
 						downloadAllButton.setAttribute("class", "maor_panopto_action css-fehuet");
-						downloadAllButton.setAttribute("style", "margin-right: 8px");
 						downloadSelectedButton.setAttribute("class", "maor_panopto_action css-fehuet");
-						downloadSelectedButton.setAttribute("style", "margin-right: 8px");
 						const pollingInterval = setInterval(() => {
 							if (document.getElementById("loadingMessage").style.display === "none" &&
 								document.getElementsByClassName("thumbnail-link").length > 0 &&
@@ -28,8 +28,8 @@
 										downloadLink.setAttribute("class", "maor_download");
 										downloadLink.textContent = "הורדה";
 										downloadLink.addEventListener("click", () => {
-											chrome.runtime.sendMessage({
-												mess_t: "singledownload",
+											void chrome.runtime.sendMessage({
+												mess_t: "single_download",
 												link: "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/" + tableRows[i].getAttribute("id") + ".mp4",
 												name: titleElement.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4",
 											});
@@ -80,7 +80,7 @@
 					downloadChunk.list.push(downloadItem);
 				}
 				if (downloadChunk.list.length > 0) await chrome.runtime.sendMessage({
-					mess_t: "multidownload", chunk: downloadChunk,
+					mess_t: "multi_download", chunk: downloadChunk,
 				});
 			} else window.alert("שגיאה בניסיון הורדת הקורס, אנא נסה שנית מאוחר יותר.");
 		});
@@ -98,9 +98,10 @@
 				downloadItem.n = courseTitle + listRows[i].querySelector("a.detail-title").textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
 				downloadChunk.list.push(downloadItem);
 			}
-			if (downloadChunk.list.length > 0) chrome.runtime.sendMessage({
-				mess_t: "multidownload", chunk: downloadChunk,
-			});
+			if (downloadChunk.list.length > 0)
+				void chrome.runtime.sendMessage({
+					mess_t: "multi_download", chunk: downloadChunk,
+				});
 		});
 
 		actionHeaderDiv.insertBefore(downloadAllLink, actionHeaderDiv.childNodes[0]);
@@ -131,8 +132,8 @@
 					const downloadButton = document.getElementById(`m_download_mp${downloadType}`);
 					downloadButton.classList.remove("maor_hidden");
 					downloadButton.addEventListener("click", () => {
-						chrome.runtime.sendMessage({
-							mess_t: "singledownload", link: downloads[downloadType].url,
+						void chrome.runtime.sendMessage({
+							mess_t: "single_download", link: downloads[downloadType].url,
 							name: downloads[downloadType].name,
 						});
 					});
@@ -210,12 +211,12 @@
 								toggleSecondaryVideoDisplay(true);
 								const newWindow = window.open("", "Technion", "width=830,height=655,menubar=no,statusbar=no,titlebar=no,toolbar=no");
 								newWindow.document.title = "Technion - " + document.title;
-								newWindow.document.body.setAttribute("style", "text-align: center; background: #000; font-family: arial; direction: rtl; font-size: 11px; color: #f9f9fa;");
+								newWindow.document.body.setAttribute("style", "{text-align: center; background: #000; font-family: arial,serif; direction: rtl; font-size: 11px; color: #f9f9fa;}".replace(/[{}]/g, ''));
 								const newWindowCanvas = document.createElement("canvas");
 								newWindow.document.body.appendChild(newWindowCanvas);
 								newWindowCanvas.height = secondaryVideoElements.videoHeight;
 								newWindowCanvas.width = secondaryVideoElements.videoWidth;
-								newWindowCanvas.setAttribute("style", "max-width: 800px; border: 1px solid #fff; margin: auto; display: block;");
+								newWindowCanvas.setAttribute("style", "{max-width: 800px; border: 1px solid #fff; margin: auto; display: block;}".replace(/[{}]/g, ''));
 								const newWindowContext = newWindowCanvas.getContext("2d");
 								newWindowContext.drawImage(secondaryVideoElements, 0, 0);
 								const drawVideoFrame = () => {
@@ -232,15 +233,18 @@
 									instructionsSpan = document.createElement("span");
 								let NewWindowFullscreenEh = false;
 								fullscreenButton.textContent = "מסך מלא";
-								fullscreenButton.setAttribute("style", "margin: 8px; cursor: pointer");
+								fullscreenButton.style.margin = "8px";
+								fullscreenButton.style.cursor = "pointer";
 								instructionsSpan.textContent = "ניתן לגרור את החלון למסך שני וכך לצפות בווידאו במצב מסך מלא בשני המסכים.";
 								newWindow.document.addEventListener("dblclick", () => {
 									if (!NewWindowFullscreenEh) return;
+									// noinspection JSUnresolvedReference
 									"function" === typeof newWindow.document.mozCancelFullScreen ?
 										newWindow.document.mozCancelFullScreen() : newWindow.document.webkitExitFullscreen();
 									NewWindowFullscreenEh = false;
 								});
 								fullscreenButton.addEventListener("click", () => {
+									// noinspection JSUnresolvedReference
 									"function" === typeof newWindowCanvas.mozRequestFullScreen ? newWindowCanvas.mozRequestFullScreen() : newWindowCanvas.webkitRequestFullscreen();
 									NewWindowFullscreenEh = true;
 								});
@@ -260,8 +264,21 @@
 
 	function toggleDarkMode(styleSheet) {
 		if (styleSheet.cssRules.length === 1)
-			["#viewer {background-color: #000 !important;}", "#viewerHeader, .transport-button, #timeElapsed, #timeRemaining, #positionControl, .viewer .transport-button .clicked, #volumeFlyout, #playSpeedExpander, #qualityButton, #qualityExpander, #inlineMessageLetterbox, .next-delivery-thumb, #thumbnailList, #thumbnailList img, .thumbnail-timestamp {filter:invert(1);}", "#leftPane aside {background-color: #eee; filter: invert(1);}", "#leftPane {background-color: #111;}", "#playControlsWrapper {background-color: #000;}", "#playControls {background-color: #000; border-top: 1px solid #555; opacity: 0.8;}", "#playControls:hover, #playControls:focus {opacity: 1;}", "#thumbnailList {background-color: #eee;}", "#leftPane #eventTabs #eventTabControl .event-tab-header{filter:invert(0.05);}", "#leftPane #searchRegion input {background-color: transparent}", "#transportControls {background-color: transparent !important; border-left-color: #0c0c0d !important;}", "#playSpeedExpander > div, #qualityExpander > div {filter: none !important;}", "#thumbnailList img {opacity: 0.5;}", "#thumbnailList img:hover{opacity:1}"]
-				.forEach(cssRule => styleSheet.insertRule(cssRule, 0));
+			["#viewer {background-color: #000 !important;}",
+				"#viewerHeader, .transport-button, #timeElapsed, #timeRemaining, #positionControl, .viewer .transport-button .clicked, #volumeFlyout, #playSpeedExpander, #qualityButton, #qualityExpander, #inlineMessageLetterbox, .next-delivery-thumb, #thumbnailList, #thumbnailList img, .thumbnail-timestamp {filter:invert(1);}",
+				"#leftPane aside {background-color: #eee; filter: invert(1);}",
+				"#leftPane {background-color: #111;}",
+				"#playControlsWrapper {background-color: #000;}",
+				"#playControls {background-color: #000; border-top: 1px solid #555; opacity: 0.8;}",
+				"#playControls:hover, #playControls:focus {opacity: 1;}",
+				"#thumbnailList {background-color: #eee;}",
+				"#leftPane #eventTabs #eventTabControl .event-tab-header{filter:invert(0.05);}",
+				"#leftPane #searchRegion input {background-color: transparent}",
+				"#transportControls {background-color: transparent !important; border-left-color: #0c0c0d !important;}",
+				"#playSpeedExpander > div, #qualityExpander > div {filter: none !important;}",
+				"#thumbnailList img {opacity: 0.5;}",
+				"#thumbnailList img:hover{opacity:1}",
+			].forEach(cssRule => styleSheet.insertRule(cssRule, 0));
 		else while (styleSheet.cssRules.length > 1) styleSheet.deleteRule(0);
 	}
 
@@ -438,7 +455,7 @@
 		const wrongTime = document.getElementById("timeRemaining"),
 			realTime = document.createElement("div");
 		realTime.id = "ethan_realtimeRemaining";
-		realTime.style.cssText = "vertical-align: middle; width: 44px; font-size: 0.95em; color: #fff;";
+		realTime.setAttribute("style", "{vertical-align: middle; width: 44px; font-size: 0.95em; color: #fff;}".replace(/[{}]/g, ''));
 		bigBossElement.insertBefore(realTime, document.getElementById("liveButton"));
 		const observer =
 			new MutationObserver(mutations => changeRealTime(mutations, wrongTime, realTime));

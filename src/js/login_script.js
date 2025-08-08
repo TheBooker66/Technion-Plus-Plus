@@ -18,29 +18,29 @@
 		input.type = "hidden";
 	}
 
-	function login_moodle_url(a) {
+	function login_moodle_url(storageData) {
 		chrome.runtime.sendMessage({mess_t: "login_moodle_url", url: window.location.hostname}, url => {
 			url = url.split("?");
 			const params = new URLSearchParams(url[1]);
 			params.delete("prompt");
 			params.delete("login_hint");
-			params.append("login_hint", a.username + "@" + (a.server ? "campus." : "") + "technion.ac.il");
+			params.append("login_hint", storageData.username + "@" + (storageData.server ? "campus." : "") + "technion.ac.il");
 			location.href = url[0] + "?" + params.toString();
 		});
 	}
 
-	function microsoft(a) {
-		const d = () => {
-			const loginForm = document.forms.f1, microsoftLoginButton = document.getElementById("idSIButton9");
+	function microsoft(storageData) {
+		const handleMicrosoftLogin = () => {
+			const loginForm = document.forms["f1"], microsoftLoginButton = document.getElementById("idSIButton9");
 			if (loginForm && !document.getElementById("passwordError") &&
 				(location.pathname.includes("/oauth2/authorize") || location.pathname.includes("/saml2"))) {
 				const SelectAccountPageEh = location.href.includes("select_account");
 				const LoginHintPresentInUrlEh = location.href.includes("login_hint");
-				if (loginForm.passwd || !document.getElementById("tilesHolder")
+				if (loginForm["passwd"] || !document.getElementById("tilesHolder")
 					|| SelectAccountPageEh || LoginHintPresentInUrlEh) {
 					if (!SelectAccountPageEh && LoginHintPresentInUrlEh) {
 						document.title = "Technion++ - חיבור אוטומטי";
-						loginForm.passwd.value = a.password;
+						loginForm["passwd"].value = storageData.password;
 						loginForm.submit();
 					} else {
 						document.title = "Technion++ - חיבור אוטומטי";
@@ -49,7 +49,7 @@
 
 						urlParameters.delete("prompt");
 						urlParameters.delete("login_hint");
-						urlParameters.append("login_hint", `${a.username}@${a.server ? "campus." : ""}technion.ac.il`);
+						urlParameters.append("login_hint", `${storageData.username}@${storageData.server ? "campus." : ""}technion.ac.il`);
 						location.href = `${urlParts[0]}?${urlParameters.toString()}`;
 					}
 				}
@@ -60,14 +60,14 @@
 				}
 			}
 		};
-		document.querySelector(".banner-logo") ? d() : (new MutationObserver(_ => d()))
+		document.querySelector(".banner-logo") ? handleMicrosoftLogin() : (new MutationObserver(_ => handleMicrosoftLogin()))
 			.observe(document.forms[0] ?? document.body, {childList: true, attributes: false, subtree: true});
 	}
 
-	function techwww(a) {
+	function techwww(storageData) {
 		const form = document.createElement("form");
-		appendInfo(form, "username", a.d);
-		appendInfo(form, "password", a.password);
+		appendInfo(form, "username", storageData.username_ext);
+		appendInfo(form, "password", storageData.password);
 		appendInfo(form, "Current_language", "HEBREW");
 		form.setAttribute("action", "https://moodle.technion.ac.il/login/index.php");
 		form.setAttribute("target", "_self");
@@ -76,30 +76,30 @@
 		form.submit();
 	}
 
-	function moodle(a) {
+	function moodle(storageData) {
 		if (document.getElementsByClassName("navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
-		a.enable_external ? window.location.href = "https://techwww.technion.ac.il/tech_ident/" : login_moodle_url(a);
+		storageData.enable_external ? window.location.href = "https://techwww.technion.ac.il/tech_ident/" : login_moodle_url(storageData);
 	}
 
-	function cs(a) {
+	function cs(storageData) {
 		if (document.getElementsByTagName("form")[0].getElementsByClassName("red-text").length !== 0 ||
 			document.referrer.includes("grades.cs.technion.ac.il")) return;
 		const username = document.getElementById("ID"),
 			password = document.getElementById("password");
 		if (!username || !password) return;
-		username.value = a.username;
-		password.value = a.password;
+		username.value = storageData.username;
+		password.value = storageData.password;
 		if (document.getElementsByTagName("form")[0].getElementsByClassName("white-button").length > 0)
 			document.getElementsByTagName("form")[0].submit();
 		else document.getElementsByTagName("form")[0].getElementsByClassName("submit-button")[0].click();
 	}
 
-	function sap(a) {
+	function sap(storageData) {
 		if ((document.getElementById("certLogonForm") === null || document.referrer.includes("portalex"))
 			&& !document.getElementById("divChangeContent")) {
 			const form = document.createElement("form");
-			appendInfo(form, "j_username", a.username);
-			appendInfo(form, "j_password", a.password);
+			appendInfo(form, "j_username", storageData.username);
+			appendInfo(form, "j_password", storageData.password);
 			appendInfo(form, "_eventId_proceed", "המשך");
 			form.setAttribute("action", window.location.href);
 			form.setAttribute("method", "post");
@@ -116,12 +116,12 @@
 			document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton").click();
 	}
 
-	function grades(a) {
+	function grades(storageData) {
 		const username = document.getElementById("Usertxt"),
 			password = document.getElementById("Passwordtxt");
 		if (!username || !password) return;
-		username.value = a.username;
-		password.value = a.password;
+		username.value = storageData.username;
+		password.value = storageData.password;
 		document.forms[0].submit();
 	}
 
@@ -156,7 +156,7 @@
 				grades(storage);
 			}
 		} else if (storage.enable_external) {
-			storage.d = reverseString(xorStrings(storage.uidn_arr[0] + "", storage.uidn_arr[1]));
+			storage.username_ext = reverseString(xorStrings(storage.uidn_arr[0] + "", storage.uidn_arr[1]));
 			if (/moodle[0-9]+.technion.ac.il/.test(website)) moodle(storage);
 			else if (website === "techwww.technion.ac.il") techwww(storage);
 		}

@@ -1,384 +1,532 @@
 'use strict';
 import {reverseString, xorStrings} from "./js/utils.js";
 
-function TE_setStorage(a, b) {
-	chrome.storage.local.set(a, () => {
-		chrome.runtime.lastError && console.error("TE_bg_" + b + ": " + chrome.runtime.lastError.message);
+
+const courseRegex = /(?<cname>.+)\s-\s(?<cnum>\d{6,8})/, semesterRegex = / - (?:קיץ|חורף|אביב)/;
+
+function TE_setStorage(data, callerName = "unknown") {
+	chrome.storage.local.set(data, () => {
+		if (chrome.runtime.lastError) console.error(`TE_bg_${callerName}: ${chrome.runtime.lastError.message}`);
 	});
 }
 
-function XHR(url, resType, body = "", reqType = false) {
-	return new Promise((e, g) => {
-		const headers = {
-			headers: {},
-			method: reqType ? "head" : "get",
-		};
-		if (body !== "") {
-			headers.method = "post";
-			headers.body = body;
-			headers.headers["Content-type"] = "application/x-www-form-urlencoded";
-		}
-		(async () => {
-			try {
-				const response = await fetch(url, headers);
-				if (!response.ok)
-					throw new Error(response.statusText);
+async function XHR(url, resType, body = "", reqType = false) {
+	const options = {
+		method: reqType ? "HEAD" : "GET", headers: {},
+	};
 
-				const data = {
-					response: {} = resType === "json" ? JSON.parse(await response.text()) :
-						await chrome.runtime.sendMessage({
-							mess_t: "DOMParser",
-							data: await response.text(),
-						}),
-					responseURL: response.url,
-				};
-				setInterval(() => {
-				}, 1e4);
-				console.assert(data.response !== undefined && data.response !== null, "XHR: response is null or undefined");
+	if (body) {
+		options.method = "POST";
+		options.body = body;
+		options.headers["Content-Type"] = "application/x-www-form-urlencoded";
+	}
 
-				e(data);
+	const response = await fetch(url, options);
+	if (!response.ok) {
+		throw new Error(`HTTP error! status: ${response.status} – ${response.statusText}`);
+	}
 
-			} catch (err) {
-				g(err);
-			}
-		})();
-	});
+	const responseText = await response.text();
+	let responsePayload;
+
+	if (resType === "json") {
+		responsePayload = JSON.parse(responseText);
+	} else if (resType === "document") {
+		await setupOffscreenDocument();
+		responsePayload = await chrome.runtime.sendMessage({mess_t: "DOMParser", data: responseText});
+		await chrome.offscreen.closeDocument();
+	} else { // "text"
+		responsePayload = responseText.toString();
+	}
+
+	console.assert(responsePayload !== undefined && responsePayload !== null, "XHR: response payload is null or undefined");
+
+	return {
+		response: responsePayload, responseURL: response.url,
+	};
 }
 
-export function TE_loginToMoodle(x = false, a = {}) {
-	return new Promise((b, d) => {
-		const failure = err => {
-			console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err}} at ${Date.now()}`);
-			d();
-		}, success = f => {
+export async function TE_loginToMoodle(headRequestEh = false, storageData = {}, times = 0) {
+	try {
+		const response = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", headRequestEh);
+
+		if (!response.responseURL.includes("microsoft")) {
 			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
-			b(f);
-		};
-		XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", x).then(res => {
-			!res.responseURL.includes("microsoft") ? success(res) : chrome.storage.local.get({
+			return response;
+		} else {
+			const loginDetails = await chrome.storage.local.get({
 				username: "", server: true, enable_login: false,
-			}, id => chrome.runtime.sendMessage({
-				mess_t: "iframe", a: a, fail: failure, succeed: success, id: id, response: res, XHR: XHR,
-			}));
-		}).catch(async err => {
-			if (err === "TypeError: Failed to fetch") {
-				console.error(`${err}, ${Date.now}, OOF.`);
-				await TE_loginToMoodle(x, a);
-			}
-			failure(err);
-		});
-	});
-}
-
-export function TE_forcedAutoLogin(a = false) {
-	return new Promise((b, d) => {
-		const failure = err => {
-			console.error(`TE_back_M_forced_login: could not connect to moodle. {reason: ${err}} at ${Date.now()}`);
-			d();
-		}, success = f => {
-			console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
-			b(f);
-		};
-		chrome.storage.local.get({enable_external: false}, f => {
-			f.enable_external ? TE_forcedAutoLoginExternalPromise(success, failure) : TE_forcedAutoLoginNormalPromise(success, failure, a);
-		});
-	});
-}
-
-function TE_forcedAutoLoginNormalPromise(a, b, d) {
-	const c = async (e, f) => {
-		if (30 <= f) {
-			await chrome.tabs.remove(e);
-			b("Could not reach moodle, possibly wrong username/password.");
-			return;
-		}
-		chrome.tabs.get(e, async tab => {
-			if (tab.url === "https://moodle24.technion.ac.il/") {
-				console.log("close the tab");
-				await chrome.tabs.remove(e);
-				XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", d).then(k => a(k));
-			} else setTimeout(() => c(e, f + 1), 500);
-		});
-	};
-	XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", d).then(e => {
-		if (!e.responseURL.includes("microsoft")) {
-			a(e);
-			return;
-		}
-		chrome.storage.local.get({
-			username: "",
-			server: true,
-			enable_login: false,
-		}, f => {
-			if (chrome.runtime.lastError) return b("b_storage - " + chrome.runtime.lastError.message);
-			if (!f.enable_login) return b("No username/password");
-			const g = e.responseURL.split("?"), k = new URLSearchParams(g[1]);
-			k.delete("prompt");
-			k.append("login_hint", f.username + "@" + (f.server ? "campus." : "") + "technion.ac.il");
-			chrome.tabs.create({url: g[0] + "?" + k.toString(), active: false}, p => c(p.id, 0));
-		});
-	}).catch(b);
-}
-
-function TE_forcedAutoLoginExternalPromise(a, b) {
-	const d = (c, e) => {
-		8 <= e ? (chrome.tabs.remove(c), b("Could not login to moodle, possibly wrong username/password.")) : chrome.tabs.get(c, _ => {
-			XHR("https://moodle24.technion.ac.il/", "document").then(g => {
-				if (g.response[".usertext"]) {
-					a(g);
-					console.log("close the tab");
-					chrome.tabs.remove(c);
-				} else setTimeout(() => d(c, e + 1), 1E3);
 			});
-		});
-	};
-	XHR("https://moodle24.technion.ac.il/", "document").then(c => {
-		if (c.response[".usertext"]) return a(c);
-		chrome.tabs.create({
-			url: "https://moodle24.technion.ac.il/",
-			active: false,
-		}, tab => d(tab.id, 0));
-	}).catch(b);
-}
 
-function TE_notification(msg, silent, c = "") {
-	const date = new Date;
-	const hour = date.getHours(), minutes = date.getMinutes();
-	msg += "התראה התקבלה בשעה: " + (10 > hour ? "0" + hour : hour) + ":" + (10 > minutes ? "0" + minutes : minutes);
-	msg = {
-		type: "basic",
-		iconUrl: chrome.runtime.getURL("../icons/technion_plus_plus/icon-128.png"),
-		title: "Technion++",
-		message: msg,
-	};
-	"Chromium" === ("undefined" !== typeof browser ? "Firefox" : "Chromium") && (msg.silent = true);
-	if (c !== "") chrome.notifications.clear(c);
-	chrome.notifications.create(c, msg, _ => {
-		if (silent) return;
-		chrome.storage.local.get({notif_vol: 1, alerts_sound: true}, f => {
-			if (chrome.runtime.lastError) console.error("TE_bg_notification_err: " + chrome.runtime.lastError.message);
-			else if (f.alerts_sound) chrome.runtime.sendMessage({mess_t: "audio notification", volume: f.notif_vol});
-		});
-	});
-}
+			await setupOffscreenDocument();
+			const messageResponse = await chrome.runtime.sendMessage({
+				mess_t: "iframe", data: storageData, id: loginDetails, response: response, XHR: XHR,
+			});
+			await chrome.offscreen.closeDocument();
 
-function TE_reBadge(a) {
-	const OS = navigator.userAgentData ? navigator.userAgentData : "navigator.userAgentData is not supported!";
-	if (OS.toString().includes("Android")) return;
-	chrome.action.getBadgeBackgroundColor({}, b => {
-		chrome.action.getBadgeText({}, c => {
-			if (215 != b[0] || 0 != b[1] || 34 != b[2] || "!" != c) {
-				chrome.action.setBadgeBackgroundColor({color: a ? [215, 0, 34, 185] : [164, 127, 0, 185]});
-				chrome.action.setBadgeText({text: "!"});
-			}
-		});
-	});
-}
-
-function TE_alertNewHW(a) {
-	const b = [
-		{mess: "מודל", binary_flag: 1},
-		{mess: 'מדמ"ח', binary_flag: 2},
-		{mess: "לא אמור לקרות", binary_flag: 4},
-		{mess: "WeBWorK", binary_flag: 8},
-	][a];
-	TE_reBadge(false);
-	chrome.storage.local.get({cal_seen: 0, hw_alerts: true}, d => {
-		chrome.runtime.lastError && console.error("TE_bg_HWA: " + chrome.runtime.lastError.message);
-		d.hw_alerts && TE_notification(`יש לך מטלות חדשות ב${b.mess}!`, false);
-		TE_setStorage({cal_seen: d.cal_seen | b.binary_flag}, "HWA");
-	});
-}
-
-function TE_getCoursesMoodle(a) {
-	const b = {}, d = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/, c = / - (?:קיץ|חורף|אביב)/;
-	a = a.response["coursevisible"];
-	if (0 == a.length) console.error("TE_login: failed to fetch moodle courses.");
-	else {
-		for (let f = 0; f < a.length; f++) {
-			let e = a[f]["h3"].replace(c, "").match(d);
-			e && (e = e.groups, b[e.cnum.trim()] = e.cname.trim());
+			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
+			return messageResponse;
 		}
-		0 < Object.keys(b).length && chrome.storage.local.set({u_courses: b}, () => {
-			chrome.runtime.lastError &&
-			console.error("TE_chk_get_cnames" + mess + ": " + chrome.runtime.lastError.message);
-		});
+	} catch (err) {
+		if (err.message.includes("Failed to fetch")) {
+			if (times > 30) {
+				console.error(`${err}, ${Date.now()}, Big OOF.`);
+				return;
+			}
+			void TE_loginToMoodle(headRequestEh, storageData, times + 1); // Fire-and-forget retry (kinda)
+		}
+		console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err}} at ${Date.now()}`);
+		throw err; // Re-throw the error to propagate it to the caller
 	}
 }
 
-function TE_checkCalendarProp(a) {
-	if (a !== "") return;
-	XHR("https://moodle24.technion.ac.il/calendar/export.php", "document").then(b => {
-		const d = b.response["sesskey"];
-		XHR(b.responseURL, "document", "sesskey=" + d + "&_qf__core_calendar_export_form=1&events[exportevents]=all&period[timeperiod]=recentupcoming&generateurl=\u05d4\u05e9\u05d2+\u05d0\u05ea+\u05db\u05ea\u05d5\u05d1\u05ea+\u05d4-URL+\u05e9\u05dc+\u05dc\u05d5\u05d7+\u05d4\u05e9\u05e0\u05d4")
-			.then(c => {
-				c = "userid=" + c.response["calendarexporturl"].split("userid=")[1].split("&preset_what=all")[0];
-				TE_setStorage({calendar_prop: c}, "cal2");
-			}).catch(err => console.error("TE_back: prop error -- " + err));
-	}).catch(err => console.error("TE_back: prop error -- " + err));
+const chromeTabsCreate = (createProperties) => {
+	return new Promise((resolve, reject) => {
+		chrome.tabs.create(createProperties, (tab) => {
+			if (chrome.runtime.lastError) {
+				reject(chrome.runtime.lastError);
+			} else {
+				resolve(tab);
+			}
+		});
+	});
+};
+
+const chromeTabsGet = (tabId) => {
+	return new Promise((resolve, reject) => {
+		chrome.tabs.get(tabId, (tab) => {
+			if (chrome.runtime.lastError) {
+				reject(chrome.runtime.lastError);
+			} else {
+				resolve(tab);
+			}
+		});
+	});
+};
+
+const chromeStorageGet = (keys) => {
+	return new Promise((resolve, reject) => {
+		chrome.storage.local.get(keys, (storage) => {
+			if (chrome.runtime.lastError) {
+				reject(chrome.runtime.lastError);
+			} else {
+				resolve(storage);
+			}
+		});
+	});
+};
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+
+async function TE_forcedAutoLoginNormal(isHeadRequest) {
+	try {
+		const initialResponse = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", isHeadRequest);
+		if (!initialResponse.responseURL.includes("microsoft")) {
+			console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
+			return initialResponse;
+		}
+
+		const storage = await chromeStorageGet({
+			username: "", server: true, enable_login: false,
+		});
+
+		if (!storage.enable_login) {
+			console.error("No username/password");
+			return {response: "No username/password"};
+		}
+
+		const urlParts = initialResponse.responseURL.split("?");
+		const params = new URLSearchParams(urlParts[1]);
+		params.delete("prompt");
+		params.append("login_hint", `${storage.username}@${storage.server ? "campus." : ""}technion.ac.il`);
+
+		const tab = await chromeTabsCreate({
+			url: `${urlParts[0]}?${params.toString()}`, active: false,
+		});
+		const tabId = tab.id;
+
+		const MAX_RETRIES = 30, RETRY_DELAY = 500;
+		let retryCount = 0;
+
+		while (retryCount < MAX_RETRIES) {
+			const currentTab = await chromeTabsGet(tabId);
+			if (currentTab.url === "https://moodle24.technion.ac.il/") {
+				void chrome.tabs.remove(tabId);
+				const finalResponse = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", isHeadRequest);
+				console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
+				return finalResponse;
+			}
+			await delay(RETRY_DELAY);
+			retryCount++;
+		}
+
+		void chrome.tabs.remove(tabId);
+		console.error("Could not login to moodle, possibly wrong username/password (normal).");
+		return {response: "Could not login to moodle, possibly wrong username/password (normal)."};
+	} catch (err) {
+		console.error(`TE_back_M_forced_login: could not connect to moodle. {reason: ${err.message}} at ${Date.now()}`);
+	}
 }
 
-function TE_alertMoodleCalendar(a, b, d, c) {
-	if (a & 1) return TE_reBadge(false);
-	if (b === "0") return;
-	XHR("https://moodle24.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&" + b, "text")
-		.then(e => {
-			let f = d;
-			e = e.response["BEGIN:VEVENT"];
-			for (let k = 1; k < e.length; k++) {
-				let g = e[k].split("SUMMARY:")[1].split("\n")[0].trim();
-				if ((c.appeals && g.includes("ערעור"))
-					|| (c.zooms && (g.includes("זום") || g.includes("Zoom") || g.includes("zoom") || g.includes("הרצא") || g.includes("תרגול")))
-					|| (c.attendance && (g.includes("נוכחות") || g.includes("Attendance") || g.includes("attendance")))
-					|| (c.reserveDuty && g.includes("מילואים")))
-					continue;
-				g = g.split(" ");
-				if ("opens" !== g[g.length - 1] && "opens)" !== g[g.length - 1]) {
-					g = parseInt(e[k].split("UID:")[1].split("@moodle")[0]);
-					f = g > f ? g : f;
+async function TE_forcedAutoLoginExternal() {
+	try {
+		const moodlePage = await XHR("https://moodle24.technion.ac.il/", "document");
+		if (moodlePage.response[".usertext"]) {
+			console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
+			return moodlePage;
+		}
+
+		const tab = await chromeTabsCreate({
+			url: "https://moodle24.technion.ac.il/", active: false,
+		});
+		const tabId = tab.id;
+
+		const MAX_RETRIES = 8, RETRY_DELAY = 1000;
+		let retryCount = 0;
+
+		while (retryCount < MAX_RETRIES) {
+			try {
+				const moodleResponse = await XHR("https://moodle24.technion.ac.il/", "document");
+				if (moodleResponse.response[".usertext"]) {
+					void chrome.tabs.remove(tabId);
+					console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
+					return moodleResponse;
+				}
+			} catch (err) {
+				// If XHR fails, it might be a temporary network issue.
+			}
+			await delay(RETRY_DELAY);
+			retryCount++;
+		}
+
+		void chrome.tabs.remove(tabId);
+		console.error("Could not login to moodle, possibly wrong username/password (external).");
+		return {response: "Could not login to moodle, possibly wrong username/password (external)."};
+	} catch (err) {
+		console.error(`TE_back_M_forced_login: could not connect to moodle. {reason: ${err.message}} at ${Date.now()}`);
+	}
+}
+
+export async function TE_forcedAutoLogin(isHeadRequest) {
+	const storage = await chromeStorageGet({enable_external: false});
+	if (storage.enable_external) return await TE_forcedAutoLoginExternal();
+	else return await TE_forcedAutoLoginNormal(isHeadRequest);
+}
+
+
+function TE_notification(message, isSilent, notificationId = "") {
+	const now = new Date();
+	const hour = now.getHours().toString().padStart(2, '0'), minutes = now.getMinutes().toString().padStart(2, '0');
+	const timestamp = `התראה התקבלה בשעה: ${hour}:${minutes}`;
+
+	const notificationOptions = {
+		type: "basic", iconUrl: chrome.runtime.getURL("../icons/technion_plus_plus/icon-128.png"), title: "Technion++",
+		message: `${message}\n${timestamp}`,
+	};
+
+	if (navigator.userAgent.includes("Chromium")) notificationOptions.silent = true;
+	if (notificationId) chrome.notifications.clear(notificationId);
+	chrome.notifications.create(notificationId, notificationOptions, () => {
+		if (isSilent) return;
+
+		chrome.storage.local.get({notif_vol: 1, alerts_sound: true}, async (storage) => {
+			if (chrome.runtime.lastError) {
+				console.error("TE_bg_notification_err: " + chrome.runtime.lastError.message);
+			} else if (storage.alerts_sound) {
+				await setupOffscreenDocument();
+				await chrome.runtime.sendMessage({mess_t: "audio notification", volume: storage.notif_vol});
+				await chrome.offscreen.closeDocument();
+			}
+		});
+	});
+}
+
+function TE_reBadge(isError) {
+	if (navigator.userAgentData?.platform === "Android") return;
+
+	chrome.action.getBadgeBackgroundColor({}, (colour) => {
+		chrome.action.getBadgeText({}, (text) => {
+			if (!(colour[0] === 215 && colour[1] === 0 && colour[2] === 34 && text === "!")) {
+				void chrome.action.setBadgeBackgroundColor({color: isError ? [215, 0, 34, 185] : [164, 127, 0, 185]});
+				void chrome.action.setBadgeText({text: "!"});
+			}
+		});
+	});
+}
+
+function TE_alertNewHW(sourceIndex) {
+	const sourceInfo = [{name: "מודל", flag: 1}, {name: 'מדמ"ח', flag: 2}, {
+		name: "לא אמור לקרות", flag: 4,
+	}, {name: "WeBWorK", flag: 8}][sourceIndex];
+
+	TE_reBadge(false);
+
+	chrome.storage.local.get({cal_seen: 0, hw_alerts: true}, (storage) => {
+		if (chrome.runtime.lastError) {
+			console.error("TE_bg_HWA: " + chrome.runtime.lastError.message);
+			return;
+		}
+		TE_setStorage({cal_seen: storage.cal_seen | sourceInfo.flag}, "HWA");
+		if (storage.hw_alerts) TE_notification(`יש לך מטלות חדשות ב${sourceInfo.name}!`, false);
+	});
+}
+
+function TE_getCoursesMoodle(moodleData) {
+	if (!moodleData.response["coursevisible"] || moodleData.response["coursevisible"].length === 0) {
+		console.error("TE_login: failed to fetch moodle courses.");
+		return;
+	}
+
+	const courses = {}, coursesResponse = moodleData.response["h3"];
+	for (const courseHTML of coursesResponse) {
+		const match = courseHTML.replace(semesterRegex, "").match(courseRegex);
+		if (match) {
+			const {cnum, cname} = match.groups;
+			courses[cnum.trim()] = cname.trim();
+		}
+	}
+
+	if (Object.keys(courses).length > 0) {
+		TE_setStorage({u_courses: courses}, "chk_get_cname");
+	}
+}
+
+async function TE_checkCalendarProp(calendarProp) {
+	if (calendarProp !== "") return;
+
+	try {
+		const mainPageResponse = await XHR("https://moodle24.technion.ac.il/calendar/export.php", "document");
+		const sesskey = mainPageResponse.response["sesskey"];
+		const postBody = `sesskey=${sesskey}&_qf__core_calendar_export_form=1&events[exportevents]=all&period[timeperiod]=recentupcoming&generateurl=\u05d4\u05e9\u05d2+\u05d0\u05ea+\u05db\u05ea\u05d5\u05d1\u05ea+\u05d4-URL+\u05e9\u05dc+\u05dc\u05d5\u05d7+\u05d4\u05e9\u05e0\u05d4`;
+
+		const exportResponse = await XHR(mainPageResponse.responseURL, "document", postBody);
+		const calendarUrl = exportResponse.response["calendarexporturl"];
+		const userProp = "userid=" + calendarUrl.split("userid=")[1].split("&preset_what=all")[0];
+		TE_setStorage({calendar_prop: userProp}, "cal2");
+	} catch (err) {
+		console.error("TE_back_prop_err: " + err);
+	}
+}
+
+
+async function TE_alertMoodleCalendar(seenStatus, calendarProp, maxEventId, filterToggles) {
+	// noinspection JSBitwiseOperatorUsage
+	if (seenStatus & 1) { // Moodle has been checked
+		TE_reBadge(false);
+		return;
+	}
+	if (calendarProp === "0") return;
+
+	const calendarUrl = `https://moodle24.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&${calendarProp}`;
+	try {
+		const calendarData = await XHR(calendarUrl, "text");
+		const events = calendarData.response["BEGIN:VEVENT"];
+		let latestEventId = maxEventId;
+
+		if (!events || !Array.isArray(events) || events.length <= 1) {
+			console.log("No Moodle calendar events found to process.");
+			return;
+		}
+
+		for (let i = 1; i < events.length; i++) {
+			const eventText = events[i];
+			let summary = eventText.split("SUMMARY:")[1].split("\n")[0].trim();
+
+			const appealEh = filterToggles.appeals && summary.includes("ערעור"),
+				zoomEh = filterToggles.zooms && /(זום|Zoom|zoom|הרצא|תרגול)/.test(summary),
+				attendanceEh = filterToggles.attendance && /(נוכחות|Attendance|attendance)/.test(summary),
+				reserveDutyEh = filterToggles.reserveDuty && summary.includes("מילואים");
+			if (appealEh || zoomEh || attendanceEh || reserveDutyEh) continue;
+
+			const summaryWords = summary.split(" ");
+			if (summaryWords.at(-1) !== "opens" && summaryWords.at(-1) !== "opens)") {
+				const eventUid = parseInt(eventText.split("UID:")[1].split("@moodle")[0]);
+				if (eventUid > latestEventId) {
+					latestEventId = eventUid;
 				}
 			}
-			f <= d || TE_alertNewHW(0);
-		}).catch(err => console.error("TE_back: moodle_cal_error --" + err));
+		}
+
+		if (latestEventId > maxEventId) TE_alertNewHW(0);
+	} catch (err) {
+		console.error("TE_back_moodle_cal_err: " + err);
+	}
 }
 
-function TE_csCalendarCheck(a, b, d) {
-	a = reverseString(xorStrings(a[0] + "", a[1]));
-	"" != a && "" != b && (b = `https://grades.cs.technion.ac.il/cal/${a}/${encodeURIComponent(b)}`, XHR(b, "text").then(function (c) {
+
+function TE_csCalendarCheck(uidnArray, webcoursePassword, seenStatus) {
+	const csPass = reverseString(xorStrings(uidnArray[0] + "", uidnArray[1]));
+	if (!csPass || !webcoursePassword) return;
+
+	const calendarUrl = `https://grades.cs.technion.ac.il/cal/${csPass}/${encodeURIComponent(webcoursePassword)}`;
+	XHR(calendarUrl, "text").then(calendarData => {
 		console.log("Checking GR++...");
-		c = c.response["BEGIN:VEVENT"];
-		if (1 != c.length) {
-			let e = Date.now(), f = new Set, g = {
-				banned: /Exam|moed| - Late|\u05d4\u05e8\u05e6\u05d0\u05d4|\u05ea\u05e8\u05d2\u05d5\u05dc/,
-				summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
-				uid: /UID:([0-9.a-zA-Z-]+)/,
-				time: /(?<Y>[0-9]{4})(?<M>[0-9]{2})(?<D>[0-9]{2})(T(?<TH>[0-9]{2})(?<TM>[0-9]{2}))?/,
-			};
-			for (let k = 1; k < c.length; k++) {
-				let p = c[k].match(g.summary)[1];
-				let m = p.split("(")[0].trim();
-				if (g.banned.test(m)) continue;
-				let l = c[k].match(g.uid)[1] || p, h = c[k].match(g.time).groups;
-				h = new Date(`${h.Y}-${h.M}-${h.D}T${h.TH || 23}:${h.TM || 59}:00+03:00`);
-				if (!(h < e || h > e + 2592E6)) {
-					if ("icspasswordexpires" == l) {
-						f.clear();
-						TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח תפוג בקרוב, אנא כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!', false);
+		const events = calendarData.response["BEGIN:VEVENT"];
+		if (events.length <= 1) return;
+
+		const now = Date.now(), newHwSet = new Set(), regexes = {
+			banned: /Exam|moed| - Late|\u05d4\u05e8\u05e6\u05d0\u05d4|\u05ea\u05e8\u05d2\u05d5\u05dc/,
+			summary: /SUMMARY;LANGUAGE=en-US:(.+)/, uid: /UID:([0-9.a-zA-Z-]+)/,
+			time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
+		};
+
+		for (let i = 1; i < events.length; i++) {
+			const eventText = events[i];
+			const summary = eventText.match(regexes.summary)[1];
+			const trimmedSummary = summary.split("(")[0].trim();
+
+			if (regexes.banned.test(trimmedSummary)) continue;
+
+			const uid = eventText.match(regexes.uid)[1] || summary;
+			const timeMatch = eventText.match(regexes.time).groups;
+			const dueDate = new Date(`${timeMatch.Y}-${timeMatch.M}-${timeMatch.D}T${timeMatch.TH || 23}:${timeMatch.TM || 59}:00+03:00`);
+
+			if (dueDate < now || dueDate > now + 2592E6) continue;
+
+			if (uid === "icspasswordexpires") {
+				newHwSet.clear();
+				TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח תפוג בקרוב, אנא כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!', false);
+				break;
+			}
+
+
+			if (uid.includes(".PHW")) newHwSet.delete(uid.replace(".PHW", ".HW")); else {
+				newHwSet.add(uid);
+				const courseNum = summary.split("(")[1].split(")")[0];
+				if (seenStatus[courseNum]?.includes(`[[${trimmedSummary}]]`)) {
+					newHwSet.delete(uid);
+				}
+			}
+		}
+
+		TE_setStorage({cscal_update: now}, "cal332122");
+		if (newHwSet.size > 0) TE_alertNewHW(1);
+	}).catch(err => console.error("TE_back_cal_cs_err: " + err));
+}
+
+async function TE_getWebwork(moodleData, existingWebworkCourses) {
+	if (!moodleData.response["coursevisible"] || moodleData.response["coursevisible"].length === 0) {
+		console.error("TE_login: failed to fetch webwork courses.");
+		return;
+	}
+
+	const newWebworkCourses = {}, webworkRegex = /webwork|וובוורק|ווב-וורק/i, // The Next line is HARDCODED COURSE NUMBERS
+		mathCourseNums = "01040000 01040003 01040004 01040012 01040013 01040016 01040018 01040019 01040022 01040031 01040032 01040033 01040034 01040035 01040036 01040038 01040041 01040042 01040043 01040044 01040064 01040065 01040066 01040131 01040136 01040166 01040174 01040192 01040195 01040215 01040220 01040221 01040228 01040281 01040285 01040295".split(" ");
+
+	let courseHeadings = moodleData.response["h3"];
+	const courseUrlElements = moodleData.response["coursestyle2url"];
+
+	for (let i = 0; i < courseUrlElements.length; i++) {
+		const courseMatch = courseHeadings[i].replace(semesterRegex, "").match(courseRegex);
+		if (courseMatch) {
+			const {cname, cnum} = courseMatch.groups;
+			const courseNumStr = parseInt(cnum).toString();
+
+			if (mathCourseNums.includes(courseNumStr)) {
+				const courseId = courseUrlElements[i].split("id=")[1];
+				if (existingWebworkCourses[courseId]) {
+					newWebworkCourses[courseId] = existingWebworkCourses[courseId];
+					continue;
+				}
+
+				const ltiIndexPage = await XHR(`https://moodle24.technion.ac.il/mod/lti/index.php?id=${courseId}`, "document");
+				const links = ltiIndexPage.response[".mod_index .lastcol a"];
+				let ltiId = "";
+				for (const link of links) {
+					if (webworkRegex.test(link.textContent)) {
+						ltiId = link.getAttribute("href").split("id=")[1];
 						break;
 					}
-					h = l.includes(".PHW");
-					p = p.split("(")[1].split(")")[0];
-					h ? f.delete(l.replace(".PHW", ".HW")) : (f.add(l), d.hasOwnProperty(p) && d[p].includes("[[" + m + "]]") && f.delete(l));
 				}
+
+				if (ltiId) newWebworkCourses[courseId] = {name: cname.trim(), lti: ltiId};
 			}
-			0 < f.size && TE_alertNewHW(1);
-			TE_setStorage({cscal_update: e}, "cal332122");
 		}
-	}).catch(err => console.error("TE_back: cal_cs_error --" + err)));
+	}
+
+	TE_setStorage({webwork_courses: newWebworkCourses}, "webworkCourses");
+	TE_webworkScan();
 }
 
-function TE_getWebwork(a, b) {
-	return (async () => {
-		const d = {}, c = /(?<cname>.+)\s*-\s*(?<cnum>[0-9]+)/,
-			e = / - (?:קיץ|חורף|אביב)/,
-			f = /webwork|וובוורק|ווב-וורק/i, // The Next line is HARDCODED COURSE NUMBERS
-			g = "01040000 01040003 01040004 01040012 01040013 01040016 01040018 01040019 01040022 01040031 01040032 01040033 01040034 01040035 01040036 01040038 01040041 01040042 01040043 01040044 01040064 01040065 01040066 01040131 01040136 01040166 01040174 01040192 01040195 01040215 01040220 01040221 01040228 01040281 01040285 01040295".split(" ");
-		const k = await a.response["coursevisible"];
-		if (0 == k.length) console.error("TE_login: failed to fetch webwork courses.");
-		else {
-			const p = l => {
-				l = l.response[".mod_index .lastcol a"];
-				let n = "";
-				for (let q = 0; q < l.length; q++) f.test(l[q].textContent) && (n = l[q]);
-				return n ? n.getAttribute("href").split("id=")[1] : "";
-			};
-			for (let l = 0; l < k.length; l++) {
-				let h = k[l]["h3"].replace(e, "").match(c);
-				if (h) {
-					h = h.groups;
-					let m = parseInt(h.cnum).toString();
-					if (g.includes(m)) {
-						m = k[l]["coursestyle2url"].split("id=")[1];
-						if (b.hasOwnProperty(m)) {
-							d[m] = b[m];
-							continue;
-						}
-						let n = await XHR(`https://moodle24.technion.ac.il/mod/lti/index.php?id=${m}`, "document").then(p);
-						"" != n && (d[m] = {name: h.cname.trim(), lti: n});
-					}
-				}
-			}
-			TE_setStorage({webwork_courses: d}, "webworkCourses");
-			TE_webworkScan();
-		}
-	})();
-}
+async function TE_webworkStep(url, body = "") {
+	const webworkRegex = /webwork/i;
+	try {
+		const response = await XHR(url, "document", body);
+		const form = response.response["form"];
+		if (!form) return false;
 
-function TE_webworkStep(a, b = "") {
-	return (async () => {
-		const d = /webwork/i;
-		return await XHR(a, "document", b).then(c => {
-			let e = c.response["form"];
-			if (!e) return false;
-			c = e.getAttribute("action");
-			e = new FormData(e);
-			const f = e.get("redirect_uri") || e.get("target_link_uri") || c;
-			return d.test(f) ? [c, e] : false;
-		});
-	})();
+		const actionUrl = form.getAttribute("action"), formData = new FormData(form);
+		const redirectUri = formData.get("redirect_uri") || formData.get("target_link_uri") || actionUrl;
+
+		return webworkRegex.test(redirectUri) ? [actionUrl, formData] : false;
+	} catch (err) {
+		return false;
+	}
 }
 
 function TE_webworkScan() {
-	chrome.storage.local.get({webwork_courses: {}, webwork_cal: {}}, a => (async () => {
-		const b = /(?<day>[0-9]{2}).(?<month>[0-9]{2}).(?<year>[0-9]{4}) @ (?<hour>[0-9]{2}):(?<minute>[0-9]{2})/,
-			d = /^\u05d9\u05d9\u05e4\u05ea\u05d7|^\u05e1\u05d2\u05d5\u05e8/, c = {};
-		let e = false;
-		for (let g of Object.values(a.webwork_courses)) {
-			let f = await TE_webworkStep(`https://moodle24.technion.ac.il/mod/lti/launch.php?id=${g.lti}`);
-			if (!f) continue;
-			f = await TE_webworkStep(f[0], (new URLSearchParams(f[1])).toString());
-			if (!f) continue;
-			f = await TE_webworkStep(f[0], (new URLSearchParams(f[1])).toString());
-			if (!f) continue;
-			let k = (new URLSearchParams(f[1])).toString();
-			f = await XHR(f[0], "document", k).then(p => {
-				let h = {};
-				p = p.response[".problem_set_table tr"];
-				for (let l = 1; l < p.length; l++) {
-					let m = p[l]["td"];
-					if (d.test(m[1].textContent)) continue;
-					let n = b.exec(m[1].textContent).groups;
-					m = m[0].textContent;
-					let q = `${g.lti}_${m}`, r = 0, t = 0;
-					a.webwork_cal.hasOwnProperty(q) ? (r = a.webwork_cal[q].seen, t = a.webwork_cal[q].done) : e = true;
-					h[q] = {
-						h: m,
-						ts: (new Date(n.year, parseInt(n.month) - 1, n.day, n.hour, n.minute)).getTime(),
-						due: `${n.day}.${n.month}.${n.year} - ${n.hour}:${n.minute}`,
-						seen: r,
-						done: t,
-					};
+	chrome.storage.local.get({webwork_courses: {}, webwork_cal: {}}, async (storage) => {
+		const newWebworkCal = {}, statusRegex = /^ייפתח|^סגור/,
+			dateRegex = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4}) @ (?<hour>\d{2}):(?<minute>\d{2})/;
+		let foundNewAssignment = false;
+
+		for (const courseData of Object.values(storage.webwork_courses)) {
+			let step1 = await TE_webworkStep(`https://moodle24.technion.ac.il/mod/lti/launch.php?id=${courseData.lti}`);
+			if (!step1) continue;
+
+			let step2 = await TE_webworkStep(step1[0], new URLSearchParams(step1[1]).toString());
+			if (!step2) continue;
+
+			let step3 = await TE_webworkStep(step2[0], new URLSearchParams(step2[1]).toString());
+			if (!step3) continue;
+
+			const finalBody = new URLSearchParams(step3[1]).toString();
+			const page = await XHR(step3[0], "document", finalBody);
+			const assignments = {}, tableRows = page.response[".problem_set_table tr"];
+
+			for (let i = 1; i < tableRows.length; i++) {
+				const cells = tableRows[i]["td"];
+				if (statusRegex.test(cells[1].textContent)) continue;
+
+				const dateMatch = dateRegex.exec(cells[1].textContent).groups;
+				const hwName = cells[0].textContent;
+				const assignmentId = `${courseData.lti}_${hwName}`;
+
+				let seen = false, done = false;
+				if (storage.webwork_cal[assignmentId]) {
+					seen = storage.webwork_cal[assignmentId].seen;
+					done = storage.webwork_cal[assignmentId].done;
+				} else {
+					foundNewAssignment = true;
 				}
-				return h;
-			});
-			Object.assign(c, f);
+
+				assignments[assignmentId] = {
+					h: hwName,
+					ts: (new Date(dateMatch.year, parseInt(dateMatch.month) - 1, dateMatch.day, dateMatch.hour, dateMatch.minute)).getTime(),
+					due: `${dateMatch.day}.${dateMatch.month}.${dateMatch.year} - ${dateMatch.hour}:${dateMatch.minute}`,
+					seen: seen, done: done,
+				};
+			}
+			Object.assign(newWebworkCal, assignments);
 		}
-		TE_setStorage({webwork_cal: c, wwcal_update: Date.now()}, "wwcfail_1");
-		if (e) TE_alertNewHW(3);
-	})());
+
+		TE_setStorage({webwork_cal: newWebworkCal, wwcal_update: Date.now()}, "wwcfail_1");
+		if (foundNewAssignment) TE_alertNewHW(3);
+	});
 }
 
-function TE_doDownloads(a) {
-	chrome.storage.local.get({dl_queue: []}, b => {
-		b.dl_queue.push(a.chunk);
-		chrome.storage.local.set({dl_queue: b.dl_queue}, () => {
+function TE_doDownloads(message) {
+	chrome.storage.local.get({dl_queue: []}, (storage) => {
+		storage.dl_queue.push(message.chunk);
+		TE_setStorage({dl_queue: storage.dl_queue}, () => {
 			if (chrome.runtime.lastError) {
 				console.error("TE_bg_download_fail: " + chrome.runtime.lastError.message);
-				const c = 1E6 < JSON.stringify(b.dl_queue).length ? "ייתכן שהתוסף מנסה להוריד יותר מידי קבצים בו זמנית." : "";
-				TE_notification(`שליחת הקבצים להורדה נכשלה. ${c}\n`, true, "downloads");
+				const sizeError = JSON.stringify(storage.dl_queue).length > 1E6 ? "ייתכן שהתוסף מנסה להוריד יותר מידי קבצים בו זמנית." : "";
+				TE_notification(`שליחת הקבצים להורדה נכשלה. ${sizeError}\n`, true, "downloads");
 			} else {
-				TE_notification(a.chunk.list.length + ` פריטים נשלחו להורדה. ${1 < b.dl_queue.length ?
-					"התוסף יוריד אותם מיד לאחר הקבצים שכבר נמצאים בהורדה." : ""}\n`, true, "downloads");
+				const newMessage = `${message.chunk.list.length} פריטים נשלחו להורדה. ${storage.dl_queue.length > 1 ? "התוסף יוריד אותם מיד לאחר הקבצים שכבר נמצאים בהורדה." : ""}\n`;
+				TE_notification(newMessage, true, "downloads");
 				TE_nextDownload();
 			}
 		});
@@ -386,108 +534,141 @@ function TE_doDownloads(a) {
 }
 
 function TE_nextDownload() {
-	const a = ["https://moodle24.technion.ac.il/blocks/material_download/download_materialien.php?courseid=", "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/", "https://grades.cs.technion.ac.il/grades.cgi?", "https://webcourse.cs.technion.ac.il/"];
-	chrome.storage.local.get({dl_current: 0, dl_queue: []}, b => {
-		if (0 == b.dl_current && 0 != b.dl_queue.length) {
-			const c = b.dl_queue[0], d = c.list.shift(), e = a[c.sys] + c.sub_pre + d.u;
-			b.dl_queue[0] = c;
+	const urlPrefixes = ["https://moodle24.technion.ac.il/blocks/material_download/download_materialien.php?courseid=", "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/", "https://grades.cs.technion.ac.il/grades.cgi?", "https://webcourse.cs.technion.ac.il/"];
+	chrome.storage.local.get({dl_current: 0, dl_queue: []}, (storage) => {
+		if (storage.dl_current === 0 && storage.dl_queue.length > 0) {
+			const currentQueueItem = storage.dl_queue[0];
+			const downloadItem = currentQueueItem.list.shift();
+			const fullUrl = urlPrefixes[currentQueueItem.sys] + currentQueueItem.sub_pre + downloadItem.u;
+
 			chrome.downloads.download({
-				url: e, filename: d.n, saveAs: false,
-			}, f => {
-				chrome.runtime.lastError ? (console.error("TE_bg_dls: " + chrome.runtime.lastError.message), console.log(` - filename: ${d.n}\n - url: ${e}`)) :
-					(b.dl_current = f, chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"}),
+				url: fullUrl, filename: downloadItem.n, saveAs: false,
+			}, (downloadId) => {
+				if (chrome.runtime.lastError) {
+					console.error("TE_bg_dls: " + chrome.runtime.lastError.message);
+					console.log(` - filename: ${downloadItem.n}\n - url: ${fullUrl}`);
+				} else {
+					storage.dl_current = downloadId;
+					void chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
+					setTimeout(() => {
+						void chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
 						setTimeout(() => {
-							chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
-							setTimeout(() => {
-								chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
-							}, 250);
-						}, 250), TE_setStorage({dl_current: b.dl_current, dl_queue: b.dl_queue}));
+							void chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
+						}, 250);
+					}, 250);
+					TE_setStorage({dl_current: storage.dl_current, dl_queue: storage.dl_queue});
+				}
 			});
 		}
 	});
 }
 
-export function TE_updateVideosInfo(a, b = null) {
-	const c = new Headers;
-	c.append("Authorization", "Basic Y291bHBsZWRseXNlcXVhbGxvbmVyd2FyOjZhODk1NTljMmQyYzFlNDViZTQyYzk3MDQ3N2E3MDRhMDkwNjg0ODg=");
-	c.append("Content-Type", "application/json");
-	fetch("https://12041543-fd22-49b6-bf91-5fa9cf6046b2-bluemix.cloudant.com/tpvideos/v_Data%3Abff4cb5a16c3d92e443287a965d1f385", {
-		method: "GET",
-		headers: c,
-	}).then(d => d.json()).then(d => {
-		if (!d.data || !d._id) throw "video-update bad request.";
-		const e = [], f = {};
-		for (const g in d.data) d.data[g].a ?
-			e.push([g, d.data[g].n, d.data[g].a]) : e.push([g, d.data[g].n]), f[g] = d.data[g].v;
-		console.log(`TE_back: found ${e.length} courses for videos-db (${a})`);
-		TE_setStorage({videos_courses: e, videos_data: f, videos_update: a}, "uc");
-		b?.[0](e, f);
-	}).catch(err => {
-		console.error("TE_back: video_update_error -- " + err);
-		b?.[1]();
-	});
+export async function TE_updateVideosInfo(timestamp, callbacks = null) {
+	const headers = new Headers();
+	headers.append("Authorization", "Basic Y291bHBsZWRseXNlcXVhbGxvbmVyd2FyOjZhODk1NTljMmQyYzFlNDViZTQyYzk3MDQ3N2E3MDRhMDkwNjg0ODg=");
+	headers.append("Content-Type", "application/json");
+
+	try {
+		const response = await fetch("https://12041543-fd22-49b6-bf91-5fa9cf6046b2-bluemix.cloudant.com/tpvideos/v_Data%3Abff4cb5a16c3d92e443287a965d1f385", {
+			method: "GET", headers: headers,
+		});
+		const dbData = await response.json();
+
+		if (!dbData["data"] || !dbData["_id"]) {
+			console.error("TE_back_video_update_err: video-update bad request.");
+			callbacks?.[1]?.();
+		}
+
+		const coursesList = [], videosData = {};
+		for (const courseId in dbData.data) {
+			const courseInfo = dbData.data[courseId];
+			const courseEntry = [courseId, courseInfo.n];
+			if (courseInfo.a) courseEntry.push(courseInfo.a);
+			coursesList.push(courseEntry);
+			videosData[courseId] = courseInfo.v;
+		}
+		console.log(`TE_back: found ${coursesList.length} courses for videos-db (${timestamp})`);
+		TE_setStorage({
+			videos_courses: coursesList, videos_data: videosData, videos_update: timestamp,
+		}, "uc");
+		callbacks?.[0]?.(coursesList, videosData);
+	} catch (err) {
+		console.error("TE_back_video_update_err: " + err);
+		callbacks?.[1]?.();
+	}
 }
 
 export function TE_updateInfo() {
 	chrome.storage.local.get({
-		uidn_arr: ["", ""], quick_login: true, enable_login: false, enable_external: false,
-		calendar_prop: "", calendar_max: 0, moodle_cal: true, cal_seen: 0, cs_cal: false, cs_cal_seen: {},
-		cscal_update: 0, wcpass: "", wwcal_switch: false, wwcal_update: 0, webwork_courses: {}, videos_update: 0,
+		uidn_arr: ["", ""], quick_login: true, enable_login: false, enable_external: false, calendar_prop: "",
+		calendar_max: 0, moodle_cal: true, cal_seen: 0, cs_cal: false, cs_cal_seen: {}, cscal_update: 0, wcpass: "",
+		wwcal_switch: false, wwcal_update: 0, webwork_courses: {}, videos_update: 0,
 		filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
-	}, async a => {
-		if (chrome.runtime.lastError) console.error("TE_bg_Alarm: " + chrome.runtime.lastError.message);
-		else {
-			const now = Date.now();
-			if (a.videos_update < now - 2592E5) TE_updateVideosInfo(now);
-			const loginEh = (a.enable_external || a.enable_login) && a.quick_login,
-				moodleEh = loginEh && a.moodle_cal,
-				webworkEh = loginEh && a.wwcal_switch && 288E5 < now - a.wwcal_update;
-			if (webworkEh || moodleEh && a.calendar_prop === "") {
-				TE_forcedAutoLogin().then(async f => {
-					if (moodleEh && a.calendar_prop === "") {
-						TE_getCoursesMoodle(f);
-						TE_checkCalendarProp(a.calendar_prop);
-					}
-					if (webworkEh) await TE_getWebwork(f, a.webwork_courses);
-				}).catch(err => console.error("TE_back: forced_login_error -- " + err));
-			} else if (moodleEh && a.calendar_prop !== "") {
-				await TE_loginToMoodle(false, a)
-					.then(TE_getCoursesMoodle)
-					.catch(err => console.error("TE_back: login_error -- " + err));
-				TE_alertMoodleCalendar(a.cal_seen, a.calendar_prop, a.calendar_max, a.filter_toggles);
-			}
-			if (a.cs_cal && 288E5 < now - a.cscal_update) TE_csCalendarCheck(a.uidn_arr, a.wcpass, a.cs_cal_seen);
-			chrome.storage.local.get({user_agenda: {}}, a => {
-				const b = [], d = Date.now();
-				Object.keys(a.user_agenda).forEach(c => {
-					let e = a.user_agenda[c].timestamp;
-					0 < e && 1728E5 < d - e && b.push(c);
-				});
-				for (let c of b) delete a.user_agenda[c];
-				TE_setStorage({user_agenda: a.user_agenda});
-			});
+	}, async (storage) => {
+		if (chrome.runtime.lastError) {
+			console.error("TE_bg_Alarm: " + chrome.runtime.lastError.message);
+			return;
 		}
+
+		const THIRTY_DAYS = 2592E5, EIGHT_HOURS = 288E5, TWO_DAYS = 1728E5, now = Date.now();
+		if (storage.videos_update < now - THIRTY_DAYS) await TE_updateVideosInfo(now);
+
+		const loginEnabledEh = (storage.enable_external || storage.enable_login) && storage.quick_login,
+			moodleCheckDueEh = loginEnabledEh && storage.moodle_cal,
+			webworkCheckDueEh = loginEnabledEh && storage.wwcal_switch && now - storage.wwcal_update > EIGHT_HOURS;
+
+		if (webworkCheckDueEh || (moodleCheckDueEh && storage.calendar_prop === "")) {
+			TE_forcedAutoLogin(false).then(async (moodleData) => {
+				if (moodleCheckDueEh && storage.calendar_prop === "") {
+					TE_getCoursesMoodle(moodleData);
+					await TE_checkCalendarProp(storage.calendar_prop);
+				}
+				if (webworkCheckDueEh) {
+					await TE_getWebwork(moodleData, storage.webwork_courses);
+				}
+			}).catch(err => console.error("TE_back: forced_login_err -- " + err));
+		} else if (moodleCheckDueEh && storage.calendar_prop !== "") {
+			TE_loginToMoodle(false, storage)
+				.then(TE_getCoursesMoodle)
+				.catch(err => console.error("TE_back: login_err -- " + err));
+			await TE_alertMoodleCalendar(storage.cal_seen, storage.calendar_prop, storage.calendar_max, storage.filter_toggles);
+		}
+
+		if (storage.cs_cal && now - storage.cscal_update > EIGHT_HOURS) TE_csCalendarCheck(storage.uidn_arr, storage.wcpass, storage.cs_cal_seen);
+
+		chrome.storage.local.get({user_agenda: {}}, ({user_agenda}) => {
+			let hasChanged = false;
+			for (const key in user_agenda) {
+				const timestamp = user_agenda[key].timestamp;
+				if (timestamp > 0 && now - timestamp > TWO_DAYS) {
+					delete user_agenda[key];
+					hasChanged = true;
+				}
+			}
+			if (hasChanged) TE_setStorage({user_agenda});
+		});
 	});
 }
 
-export function TE_toggleBusAlert(a) {
-	chrome.storage.local.get({buses_alerts: []}, b => {
+export function TE_toggleBusAlert(message) {
+	chrome.storage.local.get({buses_alerts: []}, (storage) => {
 		if (chrome.runtime.lastError) {
-			console.error("TE_back_bus: error -- " + chrome.runtime.lastError.message);
+			console.error("TE_back_bus_err: " + chrome.runtime.lastError.message);
 			return;
 		}
-		if (b.buses_alerts.length === 0)
-			chrome.alarms.create("TE_buses_start", {
-				delayInMinutes: 1,
-				periodInMinutes: 1,
+		if (storage.buses_alerts.length === 0)
+			void chrome.alarms.create("TE_buses_start", {
+				delayInMinutes: 1, periodInMinutes: 1,
 			});
-		if (-1 !== b.buses_alerts.indexOf(a.bus_kav)) {
-			b.buses_alerts.splice(b.buses_alerts.indexOf(a.bus_kav), 1);
-			TE_setStorage({buses_alerts: b.buses_alerts}, "toggleBus");
-			if (b.buses_alerts.length === 0) TE_shutBusesAlerts();
-		}
-		b.buses_alerts.push(a.bus_kav);
-		TE_setStorage({buses_alerts: b.buses_alerts}, "toggleBus");
+
+		const busLine = message.bus_kav;
+		const alertIndex = storage.buses_alerts.indexOf(busLine);
+		if (alertIndex !== -1) {
+			storage.buses_alerts.splice(alertIndex, 1);
+			if (storage.buses_alerts.length === 0) TE_shutBusesAlerts();
+		} else storage.buses_alerts.push(busLine);
+
+		TE_setStorage({buses_alerts: storage.buses_alerts}, "toggleBus");
 		TE_checkBuses();
 	});
 }
@@ -495,7 +676,7 @@ export function TE_toggleBusAlert(a) {
 export function TE_shutBusesAlerts() {
 	console.log("TE_shutBusesAlerts");
 	TE_setStorage({buses_alerts: []}, "shutBuses");
-	chrome.alarms.clear("TE_buses_start");
+	void chrome.alarms.clear("TE_buses_start");
 }
 
 function TE_busAlertError() {
@@ -503,65 +684,86 @@ function TE_busAlertError() {
 	TE_shutBusesAlerts();
 }
 
-function TE_busAlertNow(a) {
-	let b = "";
-	for (let c = 0; c < a.length; c++) b += "קו " + a[c].Shilut + " יגיע לתחנה בעוד " + a[c].MinutesToArrival + " דקות.\n";
-	TE_notification(b, false);
-	chrome.storage.local.get({buses_alerts: []}, d => {
-		for (let e = 0; e < a.length; e++) -1 !== d.buses_alerts.indexOf(a[e].Shilut) && d.buses_alerts.splice(d.buses_alerts.indexOf(a[e].Shilut), 1);
-		if (d.buses_alerts.length === 0) TE_shutBusesAlerts();
+function TE_busAlertNow(arrivingBuses) {
+	let messageBody = "";
+	for (const bus of arrivingBuses) {
+		messageBody += `קו ${bus["Shilut"]} יגיע לתחנה בעוד ${bus["MinutesToArrival"]} דקות.\n`;
+	}
+	TE_notification(messageBody, false);
+
+	chrome.storage.local.get({buses_alerts: []}, (storage) => {
+		const alertedLines = arrivingBuses.map(bus => bus["Shilut"]);
+		storage.buses_alerts = storage.buses_alerts.filter(line => !alertedLines.includes(line));
+		TE_setStorage({buses_alerts: storage.buses_alerts}, "removeAlertedBuses");
+
+		if (storage.buses_alerts.length === 0) TE_shutBusesAlerts();
 	});
 }
 
 function TE_checkBuses() {
 	console.log("TE_checkBuses");
-	chrome.storage.local.get({bus_station: 41205, bus_time: 10, buses_alerts: []}, a => {
-		chrome.runtime.lastError ? console.error("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message) :
-			XHR("https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/" + a.bus_station + "/he/false", "json")
-				.then(res => {
-					res = res.response;
-					if (res.length === 0) {
-						TE_busAlertError();
-						return;
-					}
+	chrome.storage.local.get({bus_station: 41205, bus_time: 10, buses_alerts: []}, (storage) => {
+		if (chrome.runtime.lastError) {
+			console.error("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message);
+			return;
+		}
+		if (storage.buses_alerts.length === 0) return;
 
-					const c = [];
-					for (let i = 0; i < res.length; i++) {
-						if (-1 !== a.buses_alerts.indexOf(res[i].Shilut))
-							res[i].MinutesToArrival <= a.bus_time && c.push(res[i]);
-					}
-					if (c.length > 0) TE_busAlertNow(c);
-				}).catch(_ => TE_busAlertError());
+		XHR(`https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/${storage.bus_station}/he/false`, "json")
+			.then(response => {
+				const realtimeData = response.response;
+				if (!Array.isArray(realtimeData)) {
+					TE_busAlertError();
+					return;
+				}
+
+				const busesToAlert = realtimeData.filter(bus => storage.buses_alerts.includes(bus["Shilut"]) && bus["MinutesToArrival"] <= storage.bus_time);
+
+				if (busesToAlert.length > 0) TE_busAlertNow(busesToAlert);
+			}).catch(TE_busAlertError);
 	});
 }
 
 function TE_sendMessageToTabs(data) {
 	chrome.tabs.query({}, tabs => {
-		for (const tab of tabs.filter(tab => tab.url.includes("moodle"))) {
-			chrome.tabs.sendMessage(tab.id, data, {}, _ => {
-				chrome.runtime.lastError && console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);
+		const moodleTabs = tabs.filter(tab => tab.url.includes("moodle"));
+		for (const tab of moodleTabs) {
+			chrome.tabs.sendMessage(tab.id, data, {}, () => {
+				if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);
 			});
 		}
 	});
 }
 
-function TE_startExtension() {
-	chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
-	TE_setStorage({buses_alerts: []});
-	chrome.storage.local.get({dl_current: 0, dl_queue: []}, _ => {
-		chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
-		TE_setStorage({dl_queue: [], dl_current: 0});
+async function setupOffscreenDocument() {
+	const offscreenUrl = chrome.runtime.getURL('html/offscreen.html');
+	// noinspection JSCheckFunctionSignatures
+	const existingContexts = await chrome.runtime.getContexts({
+		contextTypes: ['OFFSCREEN_DOCUMENT'], documentUrls: [offscreenUrl],
 	});
+
+	if (existingContexts.length > 0) return;
+
+	// noinspection JSCheckFunctionSignatures
+	await chrome.offscreen.createDocument({
+		url: offscreenUrl, reasons: ["DOM_PARSER", "AUDIO_PLAYBACK"],
+		justification: `עמוד הרקע נחוץ על מנת לנתח מידע ממודל, וובוורק, ושרת מדמ"ח, ולהשמיע צלילי התראות.`,
+	}).catch(console.error);
+}
+
+function TE_startExtension() {
+	void chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
+	TE_setStorage({buses_alerts: [], dl_queue: [], dl_current: 0});
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	switch (message.mess_t) {
-		case "singledownload":
+		case "single_download":
 			chrome.downloads.download({url: message.link, filename: message.name, saveAs: false}, () => {
-				chrome.runtime.lastError && console.error("TE_bg_dl: " + chrome.runtime.lastError.message);
+				if (chrome.runtime.lastError) console.error("TE_bg_dl: " + chrome.runtime.lastError.message);
 			});
 			break;
-		case "multidownload":
+		case "multi_download":
 			TE_doDownloads(message);
 			break;
 		case "bus_alert":
@@ -571,20 +773,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			fetch(`https://${message.url}/auth/oidc/`, {
 				headers: {
 					accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-					"accept-language": "en-US,en;q=0.9",
-					"cache-control": "no-cache",
-					pragma: "no-cache",
+					"accept-language": "en-US,en;q=0.9", "cache-control": "no-cache", pragma: "no-cache",
 					"sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
-					"sec-fetch-dest": "document",
-					"sec-fetch-mode": "navigate",
-					"sec-fetch-site": "none",
-				},
-				body: null,
-				method: "HEAD",
-				mode: "cors",
-				credentials: "include",
-			}).then(res => sendResponse(res.url)).catch(err => console.error(err));
-			break;
+					"sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none",
+				}, body: null, method: "HEAD", mode: "cors", credentials: "include",
+			}).then(res => sendResponse(res.url)).catch(console.error);
+			return true;
 		case "silent_notification":
 			TE_notification(message.message, true);
 			break;
@@ -599,28 +793,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			break;
 		case "buses":
 			fetch(message.url)
-				.then(async response => sendResponse(await response.json()))
-				.catch(err => console.error("Error:", err));
-			break;
+				.then(response => response.json()).then(data => sendResponse(data)).catch(console.error);
+			return true;
 	}
 	return true;
 });
 
-chrome.downloads.onChanged.addListener(delta => {
-	chrome.storage.local.get({dl_current: 0, dl_queue: []}, b => {
-		delta.id == b.dl_current && delta.paused ? false !== delta.paused.current && true !== delta.paused.previous || chrome.downloads.search({id: delta.id}, c => {
-			"interrupted" === c[0].state && (console.error(`TE_dlFailed ${delta.id} : ${["moodle", "panopto", "GR++", "webcourse"][b.dl_queue[0].sys]}`), b.dl_queue[0].list.length || b.dl_queue.shift(), b.dl_current = 0, TE_setStorage({
-				dl_current: b.dl_current,
-				dl_queue: b.dl_queue,
-			}), chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"}), TE_nextDownload());
-		}) : delta.id == b.dl_current && delta.state && ("interrupted" === delta.state.current && console.error(`TE_dlFailed ${delta.id} : ${["moodle", "panopto", "GR++", "webcourse"][b.dl_queue[0].sys]}`), "interrupted" === delta.state.current || "complete" === delta.state.current) && (b.dl_queue[0].list.length || b.dl_queue.shift(), b.dl_current = 0, TE_setStorage({
-			dl_current: b.dl_current,
-			dl_queue: b.dl_queue,
-		}), chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"}), TE_nextDownload());
+chrome.downloads.onChanged.addListener((delta) => {
+	chrome.storage.local.get({dl_current: 0, dl_queue: []}, (storage) => {
+		if (delta.id !== storage.dl_current) return;
+
+		const finishDownload = (isError = false) => {
+			if (isError) {
+				const systemName = ["moodle", "panopto", "GR++", "webcourse"][storage.dl_queue[0]?.sys] ?? "unknown";
+				console.error(`TE_dlFailed ${delta.id} : ${systemName}`);
+			}
+
+			if (storage.dl_queue[0]?.list.length === 0) storage.dl_queue.shift();
+			storage.dl_current = 0;
+			TE_setStorage({
+				dl_current: storage.dl_current, dl_queue: storage.dl_queue,
+			});
+			void chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
+			TE_nextDownload();
+		};
+
+		if (delta.state) {
+			if (delta.state.current === "complete") finishDownload(false); else if (delta.state.current === "interrupted") finishDownload(true);
+		} else if (delta.paused && delta.paused.current === false) {
+			chrome.downloads.search({id: delta.id}, (downloads) => {
+				if (downloads[0]?.state === "interrupted") finishDownload(true);
+			});
+		}
 	});
 });
 
-chrome.alarms.onAlarm.addListener(alarm => {
+chrome.alarms.onAlarm.addListener((alarm) => {
 	switch (alarm.name) {
 		case "TE_update_info":
 			TE_updateInfo();
@@ -633,29 +841,10 @@ chrome.alarms.onAlarm.addListener(alarm => {
 	}
 });
 
-chrome.runtime.onInstalled.addListener(async details => {
-	if ("install" === details.reason)
-		console.log("Technion++: Welcome!"); // TODO: Do something in the future
-	else if ("update" === details.reason)
-		await chrome.tabs.create({url: 'html/release_notes.html'});
+chrome.runtime.onInstalled.addListener(details => {
+	if (details.reason === "install") console.log("Technion++: Welcome!"); // TODO: Do something in the future
+	else if (details.reason === "update") void chrome.tabs.create({url: 'html/release_notes.html'});
 	TE_startExtension();
-	await chrome.offscreen.createDocument({
-		url: 'html/offscreen.html',
-		reasons: ["DOM_PARSER", "LOCAL_STORAGE", "AUDIO_PLAYBACK"],
-		justification: `עמוד הרקע נחוץ על מנת לשלוח בקשות כמו שצריך למודל, לוובוורק ולשרת של מדמ"ח,
-		ולשלוח התראות כאשר יש מטלות חדשות.`,
-	}).catch(err => console.error(err));
 });
 
-chrome.runtime.onStartup.addListener(async () => {
-	TE_startExtension();
-	await chrome.offscreen.createDocument({
-		url: 'html/offscreen.html',
-		reasons: ["DOM_PARSER", "LOCAL_STORAGE", "AUDIO_PLAYBACK"],
-		justification: `עמוד הרקע נחוץ על מנת לשלוח בקשות כמו שצריך למודל, לוובוורק ולשרת של מדמ"ח,
-		ולשלוח התראות כאשר יש מטלות חדשות.`,
-	}).catch(err => console.error(err));
-});
-
-self.onmessage = _ => {
-}; // keepAlive
+chrome.runtime.onStartup.addListener(TE_startExtension);

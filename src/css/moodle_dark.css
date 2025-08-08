@@ -84,7 +84,7 @@
 }
 
 [tplus=dm] .card-body, [tplus=dm] .userprofile .profile_tree section {
-    border: 0 inherit !important;
+    border: inherit !important;
     border-radius: 4px;
 }
 

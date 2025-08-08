@@ -2,24 +2,26 @@
 import {CommonPopup} from "./common_popup.js";
 
 (function () {
-	function oops(m) {
+	function oops(message) {
 		let element = document.getElementById("info");
 		element.className = "error_bar";
 		element.style.display = "block";
-		element.textContent = m;
+		element.textContent = message;
 	}
 
 	let popup = new CommonPopup;
 	popup.title = "מסעדות פתוחות בחיפה ובנשר";
 	popup.popupWrap();
-	chrome.storage.local.get({allow_timings: false}, cookie => {
+	chrome.storage.local.get({allow_timings: false}, storageData => {
 		if (chrome.runtime.lastError) {
 			console.error("TE_food_err: " + chrome.runtime.lastError.message);
 			oops("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");
 			return;
 		}
-		if (!cookie.allow_timings)
-			return oops('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.');
+		if (!storageData.allow_timings) {
+			oops('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.');
+			return;
+		}
 
 		popup.XHR("../resources/food.csv", "csv").then(res => {
 			// Split the string into an array of strings
@@ -41,7 +43,7 @@ import {CommonPopup} from "./common_popup.js";
 				item['working_hours'] = item['working_hours'].replace('"{', '{').replace('}"', '}');
 				item['working_hours'] = JSON.parse(item['working_hours']);
 
-				// Parse the phone number (israeli format)
+				// Parse the phone number (Israeli format)
 				item['phone'] = item['phone'].replace('+972 ', '0').replace(/-/g, '');
 			});
 
@@ -112,10 +114,10 @@ import {CommonPopup} from "./common_popup.js";
 
 			document.getElementById("info").textContent =
 				counter === 0 ? "כל המסעדות בחיפה ונשר סגורות." :
-					"הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. המסעדות מסודרות לפי מרחק מהטכניון. כל המידע באדיבות גוגל מפות."
+					"הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. המסעדות מסודרות לפי מרחק מהטכניון. כל המידע באדיבות גוגל מפות.";
 		}).catch(err => {
-			console.error("TE_Error_FOOD: " + err)
+			console.error("TE_Error_FOOD: " + err);
 			oops("שגיאה בעיבוד הנתונים, אנא נסה שנית.");
-		})
-	})
+		});
+	});
 })();

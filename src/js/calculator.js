@@ -528,7 +528,7 @@ function setUpButtons() {
 								const parts = coursePattern.exec(line);
 
 								if (!parts) {
-									console.warn("Skipping malformed row (regex didn't match) during pdf import:", line);
+									console.warn("Skipping malformed row (regex didn't match) during PDF import:", line);
 									return;
 								}
 
