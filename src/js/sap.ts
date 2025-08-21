@@ -1,9 +1,7 @@
-'use strict';
-
 (function () {
-	function show_histograms(src, course) {
-		const expand = src.getElementsByClassName("TP_expand"),
-			iframe = src.getElementsByTagName("iframe");
+	function show_histograms(src: HTMLDivElement, course: string) {
+		const expand = src.querySelectorAll(".TP_expand"),
+			iframe = src.querySelectorAll("iframe");
 		src.setAttribute("data-course", course);
 		for (let i = 0; i < expand.length; i++)
 			expand[i].addEventListener("click", () => {
@@ -15,8 +13,9 @@
 					expand[i].setAttribute("data-expanded", "false");
 				}
 			});
-		const tpBlock = src.querySelector("#TP_infobox > div"), checkbox = src.querySelector("input[type='checkbox']"),
-			toggleHists = histsEh => {
+		const tpBlock = src.querySelector("#TP_infobox > div") as HTMLDivElement,
+			checkbox = src.querySelector("input[type='checkbox']") as HTMLInputElement,
+			toggleHists = (histsEh: boolean) => {
 				checkbox.checked = histsEh;
 				if (histsEh) {
 					tpBlock.style.display = "block";
@@ -78,7 +77,7 @@
 </div>
 </div>
 </div>
-</div>`, "text/html").body.firstChild;
+</div>`, "text/html").body.firstChild as HTMLDivElement;
 		father.insertBefore(src, father.querySelector("#__xmlview1--objectPageLayout-0-1"));
 		show_histograms(src, course);
 	}

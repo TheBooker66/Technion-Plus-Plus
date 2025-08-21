@@ -17,7 +17,7 @@
 </template>
 <div class="wrapper">
     <div class="main-content">
-        <div id="myblock">
+        <div id="block" style="min-height: 170px">
             <div id="search_block">
                 <div id="query">קריטריון חיפוש:</div>
                 <div id="message"></div>
@@ -33,7 +33,7 @@
         <h3>חפש מחדש</h3>
         <div id="myform" style="display: block; padding: 8px; text-align: center;">
             <form action="p_recordings.html" method="get" id="theform">
-                <input type="text" placeholder="הקלד שם או מספר קורס" name="course"/>
+                <input type="text" id="course" placeholder="הקלד שם או מספר קורס" name="course"/>
                 <input type="submit" id="susubmit" class="submit" name="search" value="חפש"/>
             </form>
         </div>

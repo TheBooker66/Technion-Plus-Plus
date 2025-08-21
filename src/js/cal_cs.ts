@@ -1,21 +1,16 @@
-'use strict';
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
-import {reverseString, xorStrings} from './utils.js';
+import {reverseString, xorStrings, HWAssignment} from './utils.js';
 
 (function () {
-	const popup = new CommonPopup(document.title);
-	popup.title = "מטלות קרובות - מודל";
-	popup.css_list = ["calendar"];
+	const popup = new CommonPopup("מטלות קרובות - מדמ\"ח", ["calendar"], document.title);
 	const calendar = new CommonCalendar(popup, "cs", document.title);
-	popup.popupWrap();
-	calendar.calendarWrap();
 
-	calendar.progress(_ => new Promise((resolve, reject) => chrome.storage.local.get({
+	calendar.progress(() => new Promise((resolve, reject) => chrome.storage.local.get({
 		cs_cal_finished: {},
 		cs_cal_seen: {},
 		uidn_arr: ["", ""],
-		wcpass: "",
+		cs_pass: "",
 		cal_seen: 0,
 	}, function (storageData) {
 		if (chrome.runtime.lastError) {
@@ -27,15 +22,15 @@ import {reverseString, xorStrings} from './utils.js';
 			return;
 		}
 		const calendarPass = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
-		if (calendarPass.length === "" || storageData.wcpass === "") {
+		if (calendarPass.length === 0 || storageData.cs_pass === "") {
 			reject({
 				msg: "לא הגדרת מספר זהות/סיסמת יומן; יש למלא פרטים אלו בהגדרות התוסף.",
 				is_error: true,
 			});
 			return;
 		}
-		const calendarUrl = `https://grades.cs.technion.ac.il/cal/${calendarPass}/${encodeURIComponent(storageData.wcpass)}`;
-		popup.XHR(calendarUrl, "text").then(responseData => {
+		const calendarUrl = `https://grades.cs.technion.ac.il/cal/${calendarPass}/${encodeURIComponent(storageData.cs_pass)}`;
+		popup.XHR(calendarUrl, "text").then((responseData: { response: string, responseURL: string }) => {
 			const eventSections = responseData.response.split("BEGIN:VEVENT");
 			if (eventSections.length === 1) {
 				resolve({new_list: [], finished_list: []});
@@ -49,27 +44,29 @@ import {reverseString, xorStrings} from './utils.js';
 				url: /URL:(.+)/,
 				time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
 			};
-			let finishedItems = {}, seenItems = {}, toDoList = [], finishedList = [], courseName;
+			let finishedItems: { [key: string]: string | boolean } = {}, seenItems: { [key: string]: string } = {},
+				toDoList: HWAssignment[] = [], finishedList: HWAssignment[] = [], courseName = "";
 			for (let i = 1; i < eventSections.length; i++) {
-				let newEventEh = eventSections[i].match(regexPatterns.summary)[1],
-					parsedEvent = newEventEh.split("(")[0].trim();
+				const eventSummary = (eventSections[i].match(regexPatterns.summary) as RegExpMatchArray)[1];
+				let parsedEvent = eventSummary.split("(")[0].trim();
 				if (regexPatterns.banned.test(parsedEvent)) continue;
 
-				let eventID = eventSections[i].match(regexPatterns.uid)[1] || newEventEh,
-					timeMatchGroups = eventSections[i].match(regexPatterns.time).groups,
+				const eventID = (eventSections[i].match(regexPatterns.uid) as RegExpMatchArray)[1] || eventSummary,
+					timeMatchGroups = (eventSections[i].match(regexPatterns.time) as RegExpMatchArray).groups as {
+						[key: string]: string
+					},
 					eventDate = new Date(`${timeMatchGroups.Y}-${timeMatchGroups.M}-${timeMatchGroups.D}T${timeMatchGroups.TH || 23}:${timeMatchGroups.TM || 59}:00+03:00`);
 				if (eventID.includes(".PHW")) {
-					if (eventDate > currentTime) {
+					if (eventDate.getTime() > currentTime) {
 						let newEventUID = eventID.replace(".PHW", ".HW");
 						parsedEvent = parsedEvent.replace("פרסום של ", "");
-						// noinspection JSUnusedAssignment
 						seenItems.hasOwnProperty(courseName) && (seenItems[courseName] = seenItems[courseName].replace("[[" + parsedEvent + "]]", ""));
-						toDoList = toDoList.filter(element => element.uid !== newEventUID);
-						finishedList = finishedList.filter(element => element.uid !== newEventUID);
+						toDoList = toDoList.filter(element => element.eventID !== parseInt(newEventUID));
+						finishedList = finishedList.filter(element => element.eventID !== parseInt(newEventUID));
 					}
 					continue;
 				}
-				if (eventDate < currentTime || eventDate > currentTime + 2592E6) continue;
+				if (eventDate.getTime() < currentTime || eventDate.getTime() > currentTime + 2592E6) continue;
 
 				if (eventID === "icspasswordexpires" || eventID === "icspasswordexpires1") {
 					if (eventID === "icspasswordexpires")
@@ -79,37 +76,37 @@ import {reverseString, xorStrings} from './utils.js';
 						});
 					continue;
 				}
-
-				const formattedDate = "יום " + calendar.w_days[eventDate.getDay()] + ", " + timeMatchGroups.D + "." + timeMatchGroups.M + "." + timeMatchGroups.Y,
-					description = eventSections[i].match(regexPatterns.description)[1],
-					eventURL = eventSections[i].match(regexPatterns.url)[1],
+				const days = "ראשון שני שלישי רביעי חמישי שישי שבת".split(" ");
+				const formattedDate = "יום " + days[eventDate.getDay()] + ", " + timeMatchGroups.D + "." + timeMatchGroups.M + "." + timeMatchGroups.Y,
+					description = (eventSections[i].match(regexPatterns.description) as RegExpMatchArray)[1],
+					eventURL = (eventSections[i].match(regexPatterns.url) as RegExpMatchArray)[1],
 					finishedEh = storageData.cs_cal_finished.hasOwnProperty(eventID);
 				finishedItems[eventID] = !finishedEh;
 
-				courseName = newEventEh.split("(")[1].split(")")[0];
+				courseName = eventSummary.split("(")[1].split(")")[0];
 				seenItems.hasOwnProperty(courseName) || (seenItems[courseName] = "");
 				seenItems[courseName] += "[[" + parsedEvent + "]]";
 
-				newEventEh = !(storageData.cs_cal_seen.hasOwnProperty(courseName) &&
+				const newEventEh = !(storageData.cs_cal_seen.hasOwnProperty(courseName) &&
 					storageData.cs_cal_seen[courseName].includes("[[" + parsedEvent + "]]"));
-				parsedEvent = {
-					header: parsedEvent,
+				const Assignment: HWAssignment = {
+					name: parsedEvent,
 					description: description,
-					final_date: formattedDate,
-					is_new: newEventEh,
-					goToFunc: () => new Promise(y => y(chrome.tabs.create({url: eventURL}))),
-					event: eventID,
-					timestamp: eventDate,
+					finalDate: formattedDate,
+					newEh: newEventEh,
+					goToFunc: () => new Promise(go => go(chrome.tabs.create({url: eventURL}))),
+					eventID: parseInt(eventID),
+					timestamp: eventDate.getTime(),
 					sys: "cs",
-					uid: eventID,
+					course: courseName,
 				};
-				finishedEh ? finishedList.push(parsedEvent) : toDoList.push(parsedEvent);
+				finishedEh ? finishedList.push(Assignment) : toDoList.push(Assignment);
 			}
 			void chrome.storage.local.set({
 				cs_cal_finished: finishedItems,
 				cs_cal_seen: seenItems,
 				cal_seen: calendar.removeCalendarAlert(storageData.cal_seen),
-				cscal_update: currentTime,
+				cs_cal_update: currentTime,
 			});
 			toDoList.sort((a, b) => a.timestamp - b.timestamp);
 			resolve({new_list: toDoList, finished_list: finishedList});

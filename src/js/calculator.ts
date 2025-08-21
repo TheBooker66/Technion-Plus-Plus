@@ -1,4 +1,4 @@
-'use strict';
+import type {CalculatorCourse} from "./utils.js";
 
 const semesterOrder = {
 	"חורף": 1,
@@ -6,13 +6,7 @@ const semesterOrder = {
 	"קיץ": 3,
 };
 
-function sorter(list) {
-	return list.sort((a, b) =>
-		a.year - b.year || semesterOrder[a.semester] - semesterOrder[b.semester] || a.num.localeCompare(b.num),
-	);
-}
-
-function handleStorageError(operation) {
+function handleStorageError(operation: string) {
 	if (chrome.runtime.lastError) {
 		console.error(`TE_calculator_${operation}: ${chrome.runtime.lastError.message}`);
 		return true;
@@ -20,14 +14,14 @@ function handleStorageError(operation) {
 	return false;
 }
 
-function calculateTableStats(tableSelector) {
-	const gradeElements = document.querySelectorAll(`${tableSelector} .grade`),
-		pointsElements = document.querySelectorAll(`${tableSelector} .points`);
+function calculateTableStats(tableSelector: string) {
+	const gradeElements = document.querySelectorAll(`${tableSelector} .grade`) as NodeListOf<HTMLInputElement>,
+		pointsElements = document.querySelectorAll(`${tableSelector} .points`) as NodeListOf<HTMLInputElement>;
 	let sum = 0, totalPoints = 0, pointsForAverage = 0, pointsWithPassingGrade = 0;
 
 	for (let i = 0; i < gradeElements.length; i++) {
 		const points = parseFloat(pointsElements[i].value);
-		let grade;
+		let grade: number | string;
 
 		if (gradeElements[i].tagName === 'INPUT') {
 			grade = parseFloat(gradeElements[i].value);
@@ -35,13 +29,13 @@ function calculateTableStats(tableSelector) {
 			grade = gradeElements[i].textContent;
 		}
 
-		if (isNaN(grade)) {
+		if (Number.isNaN(grade)) {
 			totalPoints += points;
 			pointsWithPassingGrade += grade === "עובר" || grade === "פטור עם ניקוד" ? points : 0;
 		} else {
 			totalPoints += points;
-			pointsWithPassingGrade += 55 <= grade ? points : 0;
-			sum += points * grade;
+			pointsWithPassingGrade += 55 <= (grade as number) ? points : 0;
+			sum += points * (grade as number);
 			pointsForAverage += points;
 		}
 	}
@@ -68,51 +62,51 @@ function updateSelectedCoursesStats() {
 
 function updateAllStats() {
 	const allGradesStats = calculateTableStats("#grades_list"),
-		allPointsElements = document.querySelectorAll("#grades_list tr .points"),
-		passingPointsElements = document.querySelectorAll("#grades_list tr:not(.failed) .points"),
-		totalPoints = Array.from(allPointsElements)
+		allPointsElements = document.querySelectorAll("#grades_list tr .points") as NodeListOf<HTMLInputElement>,
+		passingPointsElements = document.querySelectorAll("#grades_list tr:not(.failed) .points") as NodeListOf<HTMLInputElement>;
+	const totalPoints = Array.from(allPointsElements)
 			.reduce((sum, element) => sum + parseFloat(element.value), 0),
 		totalPassingPoints = Array.from(passingPointsElements)
 			.reduce((sum, element) => sum + parseFloat(element.value), 0);
 
-	document.getElementById("avg_grade").textContent = allGradesStats.avg;
-	document.getElementById("total_points").textContent = allGradesStats.points_passed.toString();
-	document.getElementById("success_rate").textContent = totalPoints ? (100 * totalPassingPoints / totalPoints).toFixed(2) : 0;
+	document.getElementById("avg_grade")!.textContent = allGradesStats.avg;
+	document.getElementById("total_points")!.textContent = allGradesStats.points_passed.toString();
+	document.getElementById("success_rate")!.textContent = totalPoints ? (100 * totalPassingPoints / totalPoints).toFixed(2) : "0";
 	updateSelectedCoursesStats();
 }
 
-function createCourseRowElement(courseData, mainList) {
-	const templateContent = document.querySelector(`#${mainList}_template`).content.cloneNode(true);
-	const rowElement = templateContent.querySelector("tr");
+function createCourseRowElement(courseData: CalculatorCourse, mainList: string) {
+	const templateContent = (document.querySelector(`#${mainList}_template`) as HTMLTemplateElement)?.content.cloneNode(true) as DocumentFragment;
+	const rowElement = templateContent.querySelector("tr") as HTMLTableRowElement;
 
 	rowElement.classList.add("animate");
-	if (courseData.grade < 55 || courseData.grade === "נכשל") rowElement.classList.add("failed");
+	if (parseInt(courseData.grade.toString()) < 55 || courseData.grade === "נכשל") rowElement.classList.add("failed");
 	if (courseData.perm_ignored) rowElement.classList.add("ignored");
 
 	const cellElements = rowElement.querySelectorAll("td");
-	cellElements[0].textContent = courseData.num;
-	cellElements[0].id = "course_" + courseData.num;
+	cellElements[0].textContent = courseData.num.toString();
+	cellElements[0].id = "course_" + courseData.num.toString();
 	cellElements[1].textContent = courseData.name;
-	cellElements[2].querySelector(".points").value = courseData.points;
+	(cellElements[2].querySelector(".points") as HTMLInputElement).value = courseData.points.toString();
 	cellElements[4].textContent = courseData.semester;
-	cellElements[5].textContent = courseData.year;
+	cellElements[5].textContent = courseData.year.toString();
 
-	const gradeInput = cellElements[3].querySelector(".grade");
-	const editButton = cellElements[3].querySelector("button");
+	const gradeInput = cellElements[3].querySelector(".grade") as HTMLInputElement;
+	const editButton = cellElements[3].querySelector("button") as HTMLButtonElement;
 
-	if (isNaN(courseData.grade)) {
+	if (Number.isNaN(courseData.grade)) {
 		const gradeText = document.createElement("span");
 		gradeText.classList.add('grade');
 		gradeInput.replaceWith(gradeText);
-		gradeText.textContent = courseData.grade;
+		gradeText.textContent = courseData.grade.toString();
 		rowElement.classList.toggle("failed", gradeText.textContent === "נכשל");
 		if (editButton) editButton.remove();
 	} else {
-		gradeInput.value = courseData.grade;
+		gradeInput.value = courseData.grade.toString();
 	}
 
 	if (mainList === "grades_list" && courseData.selected) {
-		const checkbox = rowElement.querySelector("input[type='checkbox']");
+		const checkbox = rowElement.querySelector("input[type='checkbox']") as HTMLInputElement;
 		rowElement.classList.add("selected");
 		checkbox.checked = true;
 	}
@@ -120,30 +114,32 @@ function createCourseRowElement(courseData, mainList) {
 	return rowElement;
 }
 
-function handleGradesListClick(event) {
-	const target = event.target;
+function handleGradesListClick(event: PointerEvent) {
+	const target = event.target as HTMLElement;
+	if (!target) return;
+
 	const rowElement = target.closest("tr");
 	if (!rowElement) return;
-	if (rowElement.parentElement.tagName !== 'TBODY') return;
+	if (rowElement.parentElement?.tagName !== 'TBODY') return;
+	if (!target.matches("td button")) return;
 
 	if (target.matches("td input[type='checkbox'].select_course")) {
-		target.checked ? rowElement.classList.add("selected") : rowElement.classList.remove("selected");
+		(target as HTMLInputElement).checked ? rowElement.classList.add("selected") : rowElement.classList.remove("selected");
 		updateSelectedCoursesStats();
 		return;
 	}
-	if (!target.matches("td button")) return;
 
 	chrome.storage.local.get({grades: []}, storage => {
 		const allGrades = storage.grades;
-		const courseNum = rowElement.querySelector("td:first-child").textContent;
-		const courseData = allGrades.find(course => course.num === courseNum);
+		const courseNum = (rowElement.querySelector("td:first-child") as HTMLTableCellElement).textContent;
+		const courseData = allGrades.find((course: CalculatorCourse) => course.num === parseInt(courseNum));
 
 		if (!courseData) {
 			console.error("Course not found in storage for num:", courseNum);
 			return;
 		}
 
-		const gradeInput = rowElement.querySelector(".grade");
+		const gradeInput = rowElement.querySelector(".grade") as HTMLInputElement;
 		// noinspection FallThroughInSwitchStatementJS
 		switch (target.textContent) {
 			case "ערוך":
@@ -153,7 +149,7 @@ function handleGradesListClick(event) {
 				break;
 			case "אישור":
 				const newGradeValue = parseFloat(gradeInput.value.toString());
-				if (isNaN(newGradeValue) || newGradeValue < 0 || newGradeValue > 100) {
+				if (Number.isNaN(newGradeValue) || newGradeValue < 0 || newGradeValue > 100) {
 					alert("נא להזין ציון תקין בין 0 ל-100.");
 					gradeInput.classList.add("failed");
 					setTimeout(() => gradeInput.classList.remove("failed"), 1000);
@@ -164,15 +160,15 @@ function handleGradesListClick(event) {
 				target.textContent = "ערוך";
 				if (newGradeValue === courseData.grade) return;
 
-				gradeInput.value = newGradeValue;
+				gradeInput.value = newGradeValue.toString();
 				rowElement.classList.toggle("failed", newGradeValue <= 55);
 
 				if (!rowElement.classList.contains("temporary")) {
 					rowElement.classList.add("temporary", "animate");
 					rowElement.querySelectorAll("td")[4].textContent = "-";
 					rowElement.querySelectorAll("td")[5].textContent = "-";
-					document.getElementById("ignore_list").querySelector('tbody')
-						.prepend(createCourseRowElement(courseData, "ignore_list"));
+					document.getElementById("ignore_list")?.querySelector('tbody')
+						?.prepend(createCourseRowElement(courseData, "ignore_list"));
 				}
 				break;
 			case "תמיד":
@@ -183,32 +179,34 @@ function handleGradesListClick(event) {
 			// NO BREAK;
 			case "התעלם":
 				rowElement.remove();
-				document.getElementById("ignore_list").querySelector('tbody')
-					.prepend(createCourseRowElement(courseData, "ignore_list"));
+				document.getElementById("ignore_list")?.querySelector('tbody')
+					?.prepend(createCourseRowElement(courseData, "ignore_list"));
 				break;
 			case "מחק":
 				rowElement.remove();
-				document.getElementById("ignore_list").querySelector(`#course_${courseNum}`)
-					.closest("tr").remove();
-				document.getElementById("grades_list").querySelector('tbody')
-					.prepend(createCourseRowElement(courseData, "grades_list"));
+				document.getElementById("ignore_list")?.querySelector(`#course_${courseNum}`)
+					?.closest("tr")?.remove();
+				document.getElementById("grades_list")?.querySelector('tbody')
+					?.prepend(createCourseRowElement(courseData, "grades_list"));
 				break;
 		}
 		updateAllStats();
 	});
 }
 
-function handleIgnoreListClick(event) {
-	const target = event.target;
+function handleIgnoreListClick(event: PointerEvent) {
+	const target = event.target as HTMLElement;
+	if (!target) return;
+
 	const rowElement = target.closest("tr");
 	if (!rowElement) return;
-	if (rowElement.parentElement.tagName !== 'TBODY') return;
+	if (rowElement.parentElement?.tagName !== 'TBODY') return;
 	if (!target.matches("td button")) return;
 
 	chrome.storage.local.get({grades: []}, storage => {
 		const allGrades = storage.grades;
-		const courseNum = rowElement.querySelector("td:first-child").textContent;
-		const courseData = allGrades.find(course => course.num === courseNum);
+		const courseNum = (rowElement.querySelector("td:first-child") as HTMLTableCellElement).textContent;
+		const courseData = allGrades.find((course: CalculatorCourse) => course.num === parseInt(courseNum));
 
 		if (!courseData) {
 			console.error("Course not found in storage for num:", courseNum);
@@ -219,10 +217,10 @@ function handleIgnoreListClick(event) {
 			case "שחזר":
 				courseData.perm_ignored = false;
 				rowElement.remove();
-				document.getElementById("grades_list").querySelector(`#course_${courseNum}`)
-					?.closest("tr").remove();
-				document.getElementById("grades_list").querySelector('tbody')
-					.prepend(createCourseRowElement(courseData, "grades_list"));
+				document.getElementById("grades_list")?.querySelector(`#course_${courseNum}`)
+					?.closest("tr")?.remove();
+				document.getElementById("grades_list")?.querySelector('tbody')
+					?.prepend(createCourseRowElement(courseData, "grades_list"));
 				chrome.storage.local.set({grades: allGrades}, () => {
 					handleStorageError("restore_grade");
 				});
@@ -232,9 +230,9 @@ function handleIgnoreListClick(event) {
 				if (!sureEh) return;
 
 				rowElement.remove();
-				document.getElementById("grades_list").querySelector(`#course_${courseNum}`)
-					?.closest("tr").remove();
-				const updatedGrades = allGrades.filter(course => course.num !== courseNum);
+				document.getElementById("grades_list")?.querySelector(`#course_${courseNum}`)
+					?.closest("tr")?.remove();
+				const updatedGrades = allGrades.filter((course: CalculatorCourse) => course.num !== parseInt(courseNum));
 				chrome.storage.local.set({grades: updatedGrades}, () => {
 					handleStorageError("delete_grade");
 				});
@@ -247,33 +245,26 @@ function handleIgnoreListClick(event) {
 
 /**
  * Validates course input data, for both form and CSV inputs.
- * @param {object} course - The course object to validate.
- * @param {string} course.num - The course number.
- * @param {string} course.name - The course name.
- * @param {number} course.points - The course points.
- * @param {boolean} course.binary - True if the grade is binary, false otherwise.
- * @param {number|string} course.grade - The course grade (number or "עובר"/"נכשל").
- * @param {number} [course.year] - The course year (optional for some validations).
- * @param {string} [course.semester] - The course semester (optional for some validations).
+ * @param {CalculatorCourse} course - The course object to validate.
  * @returns {{isValid: boolean, message: string}} - An object indicating validity and a message if invalid.
  */
-function validateCourseInput(course) {
-	if (!/^[0-9A-Za-z]{8}$/.test(course.num)) {
+function validateCourseInput(course: CalculatorCourse): { isValid: boolean; message: string; } {
+	if (!/^[0-9A-Za-z]{8}$/.test(course.num.toString())) {
 		return {isValid: false, message: "מספר הקורס חייב להיות בן 8 תווים (ספרות או אותיות)."};
 	}
 	if (!course.name || course.name.length === 0) {
 		return {isValid: false, message: "שם הקורס אינו יכול להיות ריק."};
 	}
-	if (isNaN(course.points) || course.points < 0) {
+	if (Number.isNaN(course.points) || parseInt(course.points.toString()) < 0) {
 		return {isValid: false, message: "נא לכתוב מספר נקודות זכות תקין (מספר חיובי)."};
 	}
-	if (!course.binary && (isNaN(course.grade) || course.grade < 0 || course.grade > 100)) {
+	if (!course.binary && (Number.isNaN(course.grade) || (parseInt(course.grade.toString())) < 0 || (parseInt(course.grade.toString())) > 100)) {
 		return {isValid: false, message: "נא להזין ציון מספרי תקין בין 0 ל-100."};
 	}
-	if (course.binary && !["עובר", "נכשל", "פטור", "פטור עם ניקוד", "פטור ללא ניקוד"].includes(course.grade)) {
+	if (course.binary && !["עובר", "נכשל", "פטור", "פטור עם ניקוד", "פטור ללא ניקוד"].includes(course.grade.toString())) {
 		return {isValid: false, message: "נא לבחור 'עובר' או 'נכשל' עבור ציון בינארי."};
 	}
-	if (course.year && (isNaN(course.year) || course.year < 1912 || course.year > 65537)) {
+	if (course.year && (Number.isNaN(course.year) || course.year < 1912 || course.year > 65537)) {
 		return {isValid: false, message: "שנה לא תקינה."};
 	}
 	if (course.semester && !["חורף", "אביב", "קיץ"].includes(course.semester)) {
@@ -284,11 +275,11 @@ function validateCourseInput(course) {
 
 
 function setUpButtons() {
-	const binary_checkbox = document.getElementById("binaryEh"),
-		gradeInput = document.getElementById("grade"),
-		gradeLabel = document.getElementById("grade_label"),
-		binaryGradeInput = document.getElementById("binary_grade"),
-		binaryGradeLabel = document.getElementById("binary_grade_label");
+	const binary_checkbox = document.getElementById("binaryEh") as HTMLInputElement,
+		gradeInput = document.getElementById("grade") as HTMLInputElement,
+		gradeLabel = document.getElementById("grade_label") as HTMLLabelElement,
+		binaryGradeInput = document.getElementById("binary_grade") as HTMLInputElement,
+		binaryGradeLabel = document.getElementById("binary_grade_label") as HTMLLabelElement;
 
 	binary_checkbox.addEventListener("change", () => {
 		gradeInput.hidden = binary_checkbox.checked;
@@ -297,29 +288,28 @@ function setUpButtons() {
 		binaryGradeLabel.hidden = !binary_checkbox.checked;
 	});
 
-	const addGradeForm = document.getElementById("add_grade_form");
 	const currentMonth = (new Date()).getMonth() + 1;
-	document.getElementById("semester").value =
+	(document.getElementById("semester") as HTMLSelectElement).value =
 		(currentMonth <= 4) ? "חורף" :
 			(currentMonth >= 4 && currentMonth <= 8) ? "אביב" : "קיץ";
 
+	const addGradeForm = document.getElementById("add_grade_form") as HTMLFormElement;
 	addGradeForm.addEventListener("submit", event => {
 		event.preventDefault();
 		const formData = new FormData(addGradeForm);
 		const {
 			num, name, points, binaryEh, grade,
 			binary_grade, year, semester,
-		} = Object.fromEntries(formData.entries());
+		} = Object.fromEntries(formData) as { [key: string]: string };
 
-		// noinspection JSCheckFunctionSignatures
-		const newCourse = {
-			num: num.trim(),
+		const newCourse: CalculatorCourse = {
+			num: parseInt(num),
 			name: name.trim(),
 			points: parseFloat(points),
 			binary: binaryEh === 'on',
 			grade: binaryEh === 'on' ? binary_grade.trim() : parseFloat(grade),
 			year: parseInt(year, 10),
-			semester: semester.trim(),
+			semester: semester.trim() as "חורף" | "אביב" | "קיץ",
 			perm_ignored: false,
 			selected: false,
 		};
@@ -333,7 +323,7 @@ function setUpButtons() {
 		}
 
 		chrome.storage.local.get({grades: []}, storage => {
-			if (storage.grades.some(course => course.num === newCourse.num)) {
+			if (storage.grades.some((course: CalculatorCourse) => course.num === newCourse.num)) {
 				alert(`קורס עם המספר ${newCourse.num} כבר קיים ברשימה.`);
 				addGradeForm.classList.add("failed");
 				setTimeout(() => addGradeForm.classList.remove("failed"), 1000);
@@ -343,16 +333,16 @@ function setUpButtons() {
 			chrome.storage.local.set({grades: storage.grades}, () => {
 				handleStorageError("add_grade");
 				const newRow = createCourseRowElement(newCourse, "grades_list");
-				document.getElementById("grades_list").querySelector('tbody').prepend(newRow);
+				document.getElementById("grades_list")?.querySelector('tbody')?.prepend(newRow);
 
-				const latestYear = storage.grades.reduce((acc, course) => Math.max(acc, course.year), 1912);
+				const latestYear = storage.grades.reduce((acc: number, course: CalculatorCourse) => Math.max(acc, course.year), 1912);
 				const latestSemesterOrder = storage.grades
-					.filter(course => course.year === latestYear)
-					.reduce((maxOrder, course) => Math.max(maxOrder, semesterOrder[course.semester]), 0);
-				const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[key] === latestSemesterOrder);
+					.filter((course: CalculatorCourse) => course.year === latestYear)
+					.reduce((maxOrder: number, course: CalculatorCourse) => Math.max(maxOrder, semesterOrder[course.semester]), 0);
+				const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[(key as "חורף" | "אביב" | "קיץ")] === latestSemesterOrder);
 				if (newCourse.year === latestYear && newCourse.semester === latestSemester) {
 					newRow.classList.add("selected");
-					newRow.querySelector("input[type='checkbox']").checked = true;
+					(newRow.querySelector("input[type='checkbox']") as HTMLInputElement).checked = true;
 					newCourse.selected = true;
 				}
 				updateAllStats();
@@ -361,12 +351,12 @@ function setUpButtons() {
 
 		addGradeForm.reset();
 		binary_checkbox.dispatchEvent(new Event('change'));
-		document.getElementById("semester").value =
+		(document.getElementById("semester") as HTMLSelectElement).value =
 			(currentMonth <= 4) ? "חורף" :
 				(currentMonth >= 4 && currentMonth <= 8) ? "אביב" : "קיץ";
 	});
 
-	document.getElementById("export").addEventListener("click", () => {
+	(document.getElementById("export") as HTMLInputElement).addEventListener("click", () => {
 		if (document.querySelectorAll("#grades_list tbody tr").length === 0) {
 			alert("אין קורסים לייצא. תתחילו בלהוסיף קורסים למחשבון.");
 			return;
@@ -377,12 +367,12 @@ function setUpButtons() {
 			const cells = Array.from(row.querySelectorAll("td"));
 			const courseNum = cells[0].textContent;
 			const courseName = cells[1].textContent;
-			const points = cells[2].querySelector("input").value;
+			const points = cells[2].querySelector("input")?.value || "0";
 			const grade = cells[3].querySelector("input")?.value || cells[3].querySelector("span")?.textContent || '';
 			const semester = cells[4].textContent;
 			const year = cells[5].textContent;
 
-			const escapeCsv = str => str.includes(',') || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str;
+			const escapeCsv = (str: string) => str.includes(',') || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str;
 			csvContent += `${courseNum},${escapeCsv(courseName)},${points},${grade},${semester},${year}\n`;
 		});
 
@@ -394,29 +384,31 @@ function setUpButtons() {
 		downloadLink.remove();
 	});
 
-	document.getElementById("import").addEventListener("click", () => {
+	(document.getElementById("import") as HTMLInputElement).addEventListener("click", () => {
 		const input = document.createElement("input");
 		input.type = "file";
 		input.accept = ".csv, application/pdf";
 		input.onchange = event => {
-			const file = event.target.files[0];
+			const target = event.target as HTMLInputElement;
+			if (!target) return;
+			const file = target.files?.[0];
 			if (!file) return;
 
-			function smallValidate(currentStoredGrades, newCourses, course, line) {
+			function smallValidate(currentStoredGrades: CalculatorCourse[], newCourses: CalculatorCourse[], course: CalculatorCourse, line: string) {
 				const validationResult = validateCourseInput(course);
 				if (!validationResult.isValid) {
 					console.warn(`Validation failed for row: ${line} - ${validationResult.message}`);
 					return false;
 				}
 
-				if (currentStoredGrades.some(c => c.num === course.num) || newCourses.some(c => c.num === course.num)) {
+				if (currentStoredGrades.some((c: CalculatorCourse) => c.num === course.num) || newCourses.some((c: CalculatorCourse) => c.num === course.num)) {
 					console.log(`Skipping duplicate course during import: ${course.num}`);
 					return false;
 				}
 				return true;
 			}
 
-			function commitToStorage(currentStoredGrades) {
+			function commitToStorage(currentStoredGrades: CalculatorCourse[]) {
 				if (newCourses.length > 0) {
 					currentStoredGrades.push(...newCourses);
 
@@ -429,12 +421,12 @@ function setUpButtons() {
 					alert("לא נמצאו קורסים תקינים לייבוא מהקובץ.");
 			}
 
-			let newCourses = [];
+			let newCourses: CalculatorCourse[] = [];
 			if (file.name.endsWith(".csv")) {
 				const reader = new FileReader();
 				reader.readAsText(file, 'UTF-8');
 				reader.onload = (event) => {
-					const lines = event.target.result.split('\n').filter(line => line.trim() !== '');
+					const lines = (event?.target?.result as string)?.split('\n').filter(line => line.trim() !== '');
 
 					chrome.storage.local.get({grades: []}, storage => {
 						const currentStoredGrades = storage.grades;
@@ -472,13 +464,13 @@ function setUpButtons() {
 							}
 
 							const gradeStr = parts[3].trim();
-							const binaryEh = isNaN(parseFloat(gradeStr));
-							const csvCourse = {
-								num: parts[0].trim(),
+							const binaryEh = Number.isNaN(parseFloat(gradeStr));
+							const csvCourse: CalculatorCourse = {
+								num: parseInt(parts[0]),
 								name: parts[1].trim(),
 								points: parseFloat(parts[2].trim()),
 								grade: binaryEh ? gradeStr : parseFloat(gradeStr),
-								semester: parts[4].trim(),
+								semester: parts[4].trim() as "חורף" | "אביב" | "קיץ",
 								year: parseInt(parts[5].trim(), 10),
 								binary: binaryEh,
 								perm_ignored: false,
@@ -500,12 +492,12 @@ function setUpButtons() {
 					const reader = new FileReader();
 					reader.readAsArrayBuffer(file);
 					reader.onload = async (event) => {
-						const pdf = await pdfjs.getDocument(new Uint8Array(event.target.result)).promise;
+						const pdf = await pdfjs.getDocument(new Uint8Array(event?.target?.result as ArrayBuffer)).promise;
 						let text = "";
 						for (let i = 1; i <= pdf.numPages; i++) {
 							const page = await pdf.getPage(i);
 							const content = await page.getTextContent();
-							text += content.items.map(item => item.str).join(" ") + "\n";
+							text += content.items.map((item: { str: string }) => item.str).join(" ") + "\n";
 						}
 						const lines = text
 							// Add a line break before any sequence of 6 or more digits not preceded by a line break
@@ -533,13 +525,13 @@ function setUpButtons() {
 								}
 
 								const gradeStr = parts[4].trim();
-								const binaryEh = isNaN(parseFloat(gradeStr));
-								const pdfCourse = {
-									num: parts[1].trim(),
+								const binaryEh = Number.isNaN(parseFloat(gradeStr));
+								const pdfCourse: CalculatorCourse = {
+									num: parseInt(parts[1]),
 									name: parts[2].trim(),
 									points: parts[3] ? parseFloat(parts[3].trim()) : 0,
 									grade: binaryEh ? gradeStr.trim() : parseFloat(gradeStr),
-									semester: parts[6].trim(),
+									semester: parts[6].trim() as "חורף" | "אביב" | "קיץ",
 									year: parseInt(parts[5].trim(), 10),
 									binary: binaryEh,
 									perm_ignored: false,
@@ -561,22 +553,22 @@ function setUpButtons() {
 		input.click();
 	});
 
-	document.getElementById("delete_grades").addEventListener("click", () => {
+	document.getElementById("delete_grades")?.addEventListener("click", () => {
 		const sureEh = confirm("האם אתה בטוח שברצונך למחוק את כל הציונים מזיכרון התוסף? פעולה זו אינה הפיכה!");
 		if (!sureEh) return;
 
 		chrome.storage.local.set({grades: []}, () => {
 			if (!handleStorageError("delete_all_grades")) {
-				document.getElementById("grades_list").querySelector("tbody").innerHTML = '';
-				document.getElementById("ignore_list").querySelector("tbody").innerHTML = '';
+				document.getElementById("grades_list")!.querySelector("tbody")!.innerHTML = '';
+				document.getElementById("ignore_list")!.querySelector("tbody")!.innerHTML = '';
 				updateAllStats();
 				alert("כל הציונים נמחקו בהצלחה.");
 			} else alert("אירעה שגיאה בעת מחיקת הציונים. אנא רעננו את העמוד ונסו שנית.");
 		});
 	});
 
-	document.getElementById("grades_list").addEventListener("click", handleGradesListClick);
-	document.getElementById("ignore_list").addEventListener("click", handleIgnoreListClick);
+	(document.getElementById("grades_list") as HTMLTableElement).addEventListener("click", handleGradesListClick);
+	(document.getElementById("ignore_list") as HTMLTableElement).addEventListener("click", handleIgnoreListClick);
 }
 
 function renderAllCourses() {
@@ -584,14 +576,14 @@ function renderAllCourses() {
 		let allGrades = storage.grades, latestYear = 1912, latestSemesterOrder = 0;
 
 		if (allGrades.length > 0) {
-			latestYear = allGrades.reduce((acc, course) => Math.max(acc, course.year), 1912);
+			latestYear = allGrades.reduce((acc: number, course: CalculatorCourse) => Math.max(acc, course.year), 1912);
 			latestSemesterOrder = allGrades
-				.filter(course => course.year === latestYear)
-				.reduce((maxOrder, course) => Math.max(maxOrder, semesterOrder[course.semester]), 0);
+				.filter((course: CalculatorCourse) => course.year === latestYear)
+				.reduce((maxOrder: number, course: CalculatorCourse) => Math.max(maxOrder, semesterOrder[course.semester]), 0);
 		}
-		const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[key] === latestSemesterOrder);
+		const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[key as "חורף" | "אביב" | "קיץ"] === latestSemesterOrder);
 
-		const gradesToPersist = allGrades.map(course => {
+		const gradesToPersist = allGrades.map((course: CalculatorCourse) => {
 			course.selected = course.semester === latestSemester && course.year === latestYear;
 			return course;
 		});
@@ -600,21 +592,21 @@ function renderAllCourses() {
 			handleStorageError("initial_selection_update");
 
 			const lists = {
-				"grades_list": storage.grades.filter(course => !course.perm_ignored),
-				"ignore_list": storage.grades.filter(course => course.perm_ignored),
+				"grades_list": storage.grades.filter((course: CalculatorCourse) => !course.perm_ignored),
+				"ignore_list": storage.grades.filter((course: CalculatorCourse) => course.perm_ignored),
 			};
 
 			for (const listKey in lists) {
-				if (lists.hasOwnProperty(listKey)) {
-					document.getElementById(listKey).querySelector('tbody').innerHTML = '';
-					const fragment = document.createDocumentFragment();
-					const sortedData = sorter([...lists[listKey]]);
-					sortedData.forEach(courseData => {
-						const rowElement = createCourseRowElement(courseData, listKey);
-						fragment.prepend(rowElement);
-					});
-					document.getElementById(listKey).querySelector('tbody').appendChild(fragment);
-				}
+				document.getElementById(listKey)!.querySelector('tbody')!.innerHTML = '';
+				const fragment = document.createDocumentFragment();
+				const sortedData: CalculatorCourse[] = ([...lists[listKey as "grades_list" | "ignore_list"]]).sort((a: CalculatorCourse, b: CalculatorCourse) =>
+					a.year - b.year || semesterOrder[a.semester] - semesterOrder[b.semester] || a.num - b.num,
+				);
+				sortedData.forEach((courseData: CalculatorCourse) => {
+					const rowElement = createCourseRowElement(courseData, listKey);
+					fragment.prepend(rowElement);
+				});
+				document.getElementById(listKey)?.querySelector('tbody')?.appendChild(fragment);
 			}
 			updateAllStats();
 		});
@@ -623,8 +615,8 @@ function renderAllCourses() {
 
 // Initial setup and data load
 chrome.storage.local.get({dark_mode: false}, storage => {
-	storage.dark_mode ? document.querySelector("html").setAttribute("tplus", "dm") :
-		document.querySelector("html").removeAttribute("tplus");
+	const entirePage = document.querySelector("html") as HTMLHtmlElement;
+	storage.dark_mode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
 });
 setUpButtons();
 renderAllCourses();

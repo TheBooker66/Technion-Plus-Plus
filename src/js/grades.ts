@@ -1,5 +1,3 @@
-'use strict';
-
 (function () {
 	const path = document.location.pathname.toLowerCase();
 	if ("/index.aspx" === path || "/indexeng.aspx" === path) {
@@ -21,10 +19,10 @@
             (${button_data.info[lang]} 
             <a href="https://cheesefork.cf/share-histograms.html" target="_blank">${button_data.info_link[lang]}</a>.)
         </small>
-    </div>`, "text/html").body.firstChild;
-		const page = document.getElementById("contents");
+    </div>`, "text/html").body.firstChild as HTMLDivElement;
+		const page = document.getElementById("contents") as HTMLDivElement;
 		const element = page.insertBefore(html, page.firstChild);
-		const loader = element.querySelector("#cf_loader");
+		const loader = element.querySelector("#cf_loader") as HTMLAnchorElement;
 		loader.addEventListener("click", () => {
 			const script = document.createElement("script");
 			script.setAttribute("charset", "utf-8");

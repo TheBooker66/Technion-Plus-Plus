@@ -1,21 +1,21 @@
-'use strict';
-
 (function () {
-	function createDownloadButton(fileLinks, parentContainer, buttonText, index) {
+	function createDownloadButton(fileLinks: string[][], parentContainer: HTMLDivElement, buttonText: string, index: number) {
 		if (0 >= fileLinks.length) return;
 		const downloadButton = document.createElement("a");
 		downloadButton.setAttribute("class", "maor_download");
 		downloadButton.addEventListener("click", () => {
 			const pagePrefix = window.location.href.includes("ho_") ? decodeURIComponent(decodeURIComponent(window.location.href.split("ho_")[1].split(".html")[0])).replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "").trim() + "/" : "",
-				downloadChunk = {sub_pre: "", list: []};
-			let courseTitle = document.querySelector(".titlebarname span");
-			courseTitle = courseTitle.querySelector(".lang-en") ? courseTitle.querySelector(".lang-en").textContent.trim() : courseTitle.textContent.trim();
-			courseTitle = courseTitle !== "" ? courseTitle : document.getElementsByTagName("html")[0].getAttribute("data-course").trim();
+				downloadChunk: { sys: number, sub_pre: string, list: { [key: string]: string }[] } = {
+					sys: 1, sub_pre: "", list: [],
+				};
+			const courseTitleElement = document.querySelector(".titlebarname span") as HTMLSpanElement;
+			let courseTitle = courseTitleElement.querySelector(".lang-en") ? courseTitleElement.querySelector(".lang-en")!.textContent.trim() : courseTitleElement.textContent.trim();
+			courseTitle = courseTitle !== "" ? courseTitle : document.querySelector("html")!.getAttribute("data-course")!.trim();
 			courseTitle = courseTitle.replace(/\./g, " ").replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "");
 			const webcourseEh = window.location.hostname.includes("webcourse");
 			for (let i = 0; i < fileLinks.length; i++) {
-				const subdirectory = document.getElementById("maor_sub_" + index).checked ? fileLinks[i][1].replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "").trim() + "/" : "";
-				let downloadItem = {};
+				const subdirectory = (document.getElementById("maor_sub_" + index) as HTMLInputElement).checked ? fileLinks[i][1].replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "").trim() + "/" : "";
+				let downloadItem: { [key: string]: string } = {};
 				if (webcourseEh) {
 					const urlParts = fileLinks[i][0].split("/");
 					downloadItem.n = courseTitle + "/" + pagePrefix + subdirectory + decodeURIComponent(urlParts[urlParts.length - 1].split("?")[0]).replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_. ]/g, "").trim();
@@ -31,25 +31,25 @@
 			void chrome.runtime.sendMessage({mess_t: "multi_download", chunk: downloadChunk});
 		});
 		downloadButton.textContent = "הכל" === buttonText ? "הורדת כל הקבצים " : "הורדת קבצי " + buttonText + " ";
-		buttonText = document.createElement("span");
-		buttonText.style.display = "inline-block";
-		buttonText.textContent = " (" + fileLinks.length + ")";
-		downloadButton.appendChild(buttonText);
+		const spanElement = document.createElement("span");
+		spanElement.style.display = "inline-block";
+		spanElement.textContent = " (" + fileLinks.length + ")";
+		downloadButton.appendChild(spanElement);
 		parentContainer.appendChild(downloadButton);
 	}
 
-	let allLinks = document.getElementsByTagName("a");
+	let allLinks = document.querySelectorAll("a");
 	for (let i = 0; i < allLinks.length; i++)
 		allLinks[i].getAttribute("target") === "wc_output" && allLinks[i].setAttribute("target", "_blank");
 	if (window.location.href.includes("ho.html") || window.location.href.search("ho_.*.html") !== -1)
-		for (let ticketContainers = document.getElementsByClassName("tickets"), i = 0; i < ticketContainers.length; i++) {
+		for (let ticketContainers = document.querySelectorAll(".tickets"), i = 0; i < ticketContainers.length; i++) {
 			let pdfLinks = [], pptLinks = [], docLinks = [], zipLinks = [], otherLinks = [],
-				ticketItems = ticketContainers[i].getElementsByClassName("ticket");
+				ticketItems = ticketContainers[i].querySelectorAll(".ticket");
 			for (let j = 0; j < ticketItems.length; j++) {
-				const fileAnchors = ticketItems[j].getElementsByTagName("a"),
-					ticketTitle = ticketItems[j].getElementsByTagName("h2")[0].textContent;
+				const fileAnchors = ticketItems[j].querySelectorAll("a"),
+					ticketTitle = ticketItems[j].querySelector("h2")!.textContent;
 				for (let k = 0; k < fileAnchors.length; k++) {
-					const fileURL = fileAnchors[k].getAttribute("href");
+					const fileURL = fileAnchors[k].getAttribute("href") as string;
 					if (/Spring|Summer|Winter/i.test(fileURL)) {
 						if (/\.pdf$/i.test(fileURL))
 							pdfLinks.push([fileURL, ticketTitle]);
@@ -71,8 +71,8 @@
 				downloadButtonsContainer = document.createElement("div");
 			fieldset.appendChild(document.createElement("legend")).textContent = "Technion";
 			downloadButtonsContainer.className = "maor_flex";
-			allLinks.length > pdfLinks.length && allLinks.length > pptLinks.length && allLinks.length > docLinks.length && allLinks.length > zipLinks.length &&
-			createDownloadButton(allLinks, downloadButtonsContainer, "הכל", i);
+			if (allLinks.length > pdfLinks.length && allLinks.length > pptLinks.length && allLinks.length > docLinks.length && allLinks.length > zipLinks.length)
+				createDownloadButton(allLinks, downloadButtonsContainer, "הכל", i);
 			createDownloadButton(pdfLinks, downloadButtonsContainer, "PDF", i);
 			createDownloadButton(pptLinks, downloadButtonsContainer, "PowerPoint", i);
 			createDownloadButton(docLinks, downloadButtonsContainer, "Word", i);
@@ -90,6 +90,7 @@
 			checkboxLabel.appendChild(checkboxDiv);
 			downloadButtonsContainer.appendChild(checkboxLabel);
 			fieldset.appendChild(downloadButtonsContainer);
-			ticketContainers[i].insertBefore(document.createElement("div").appendChild(fieldset).parentNode, ticketContainers[i].firstChild).className = "maor_fieldset";
+			(ticketContainers[i].insertBefore(document.createElement("div").appendChild(fieldset).parentNode as Node, ticketContainers[i].firstChild) as HTMLElement)
+				.className = "maor_fieldset";
 		}
 })();

@@ -1,6 +1,4 @@
-'use strict';
-
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 	switch (message.mess_t) {
 		case "audio notification":
 			const audio = new Audio(chrome.runtime.getURL("../resources/notification.mp3"));
@@ -10,21 +8,21 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 			break;
 		case "DOMParser":
 			const doc = new DOMParser().parseFromString(message.data, "text/html");
-			const courseVisibleElements = Array.from(doc.getElementsByClassName("coursevisible")),
+			const courseVisibleElements = Array.from(doc.querySelectorAll(".coursevisible")),
 				problemSetTableRows = Array.from(doc.querySelectorAll(".problem_set_table tr"));
 
 			sendResponse({
 				"coursevisible": courseVisibleElements,
-				"h3": courseVisibleElements.map(e => e.getElementsByTagName("h3")[0].textContent),
-				"sesskey": doc.getElementsByName("sesskey")[0] ? doc.getElementsByName("sesskey")[0].value : "",
-				"calendarexporturl": doc.getElementById("calendarexporturl") ? doc.getElementById("calendarexporturl").value : "",
-				"coursestyle2url": courseVisibleElements.map(e => e.getElementsByClassName("coursestyle2url")[0].getAttribute("href")),
+				"h3": courseVisibleElements.map(e => e.querySelector("h3")!.textContent),
+				"sesskey": doc.querySelector("[name='sesskey']") ? (doc.querySelector("[name='sesskey']") as HTMLInputElement).value : "",
+				"calendarexporturl": doc.getElementById("calendarexporturl") ? (doc.getElementById("calendarexporturl") as HTMLInputElement).value : "",
+				"coursestyle2url": courseVisibleElements.map(e => e.querySelector(".coursestyle2url")!.getAttribute("href")),
 				".problem_set_table tr": problemSetTableRows,
-				"td": problemSetTableRows.map(t => t.getElementsByTagName("td")),
+				"td": problemSetTableRows.map(t => t.querySelectorAll("td")),
 				".usertext": doc.querySelector(".usertext"),
 				".mod_index .lastcol a": doc.querySelectorAll(".mod_index .lastcol a"),
 				"form": doc.querySelector("form"),
-				"BEGIN:VEVENT": doc.activeElement.innerHTML.split("BEGIN:VEVENT"),
+				"BEGIN:VEVENT": doc.activeElement?.innerHTML.split("BEGIN:VEVENT"),
 			});
 			break;
 		case "iframe":
@@ -38,12 +36,13 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 			}, onSecondLoad = () => {
 				iframe.removeEventListener("load", onSecondLoad);
 				if (iframe.getAttribute("timer_over")) return;
-				clearTimeout(timeoutFunc);
+				clearTimeout(timeoutID);
 				iframe.setAttribute("login_over", "1");
-				message.XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", message.data).then(res => {
-					if (res.responseURL.includes("microsoft")) throw new Error("stuck on microsoft");
-					else sendResponse(res);
-				});
+				message.XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", message.data)
+					.then((res: { response: any, responseURL: string }) => {
+						if (res.responseURL.includes("microsoft")) throw new Error("stuck on microsoft");
+						else sendResponse(res);
+					});
 			}, timeoutFunc = () => {
 				if (iframe.getAttribute("login_over")) return;
 				iframe.setAttribute("timer_over", "1");
@@ -60,7 +59,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 			iframe.src = `${baseUrl}?${params.toString()}`;
 			document.body.appendChild(iframe);
 
-			setTimeout(timeoutFunc, 4E3);
+			const timeoutID = setTimeout(timeoutFunc, 4E3);
 			break;
 	}
 	return true;

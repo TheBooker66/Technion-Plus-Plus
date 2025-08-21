@@ -1,13 +1,13 @@
-'use strict';
 import {CommonPopup} from './common_popup.js';
+import type {DownloadItem} from "./utils.js";
 
 (function () {
-	function updateTextContent(element, newText) {
+	function updateTextContent(element: HTMLElement, newText: string) {
 		if (element.textContent === newText) return;
 		element.textContent = newText;
 	}
 
-	function updateProgressDisplay(element, percentage) {
+	function updateProgressDisplay(element: HTMLElement, percentage: string) {
 		if (element.textContent === percentage + "%") return;
 		element.textContent = percentage + "%";
 		document.documentElement.style.setProperty("--prog", percentage);
@@ -17,8 +17,6 @@ import {CommonPopup} from './common_popup.js';
 		chrome.storage.local.get({dl_current: 0}, storageData => {
 			if (storageData.dl_current !== 0)
 				chrome.downloads.search({id: storageData.dl_current}, downloads => {
-					if (document.getElementById("myform").style.display === "block")
-						document.getElementById("myform").style.display = "block";
 					if (downloads[0].filename) {
 						updateTextContent(currentDownloadElements[0], downloads[0].filename);
 						let statusText = downloads[0].paused ? "מושהה" : "פעיל";
@@ -26,32 +24,32 @@ import {CommonPopup} from './common_popup.js';
 						if (0 < downloads[0].totalBytes) {
 							statusText += " - " + (downloads[0].bytesReceived / 1048576).toFixed(1) + "/" + (downloads[0].totalBytes / 1048576).toFixed(1) + "MB";
 							updateTextContent(currentDownloadElements[1], statusText);
-							downloads = (100 * downloads[0].bytesReceived / downloads[0].totalBytes).toFixed(1);
-							updateProgressDisplay(currentDownloadElements[2], downloads);
-						} else updateProgressDisplay(currentDownloadElements[2], 0);
+							updateProgressDisplay(currentDownloadElements[2], (100 * downloads[0].bytesReceived / downloads[0].totalBytes).toFixed(1));
+						} else updateProgressDisplay(currentDownloadElements[2], "0");
 					}
 				});
 			else {
-				if (document.getElementById("myform").style.display !== "none")
-					document.getElementById("myform").style.display = "none";
+				const form = document.getElementById("myform") as HTMLFormElement;
+				if (form.style.display !== "none") form.style.display = "none";
+
 				updateTextContent(currentDownloadElements[0], "אין קבצים בהורדה על ידי התוסף.");
 				updateTextContent(currentDownloadElements[1], "");
-				updateProgressDisplay(currentDownloadElements[2], 0);
+				updateProgressDisplay(currentDownloadElements[2], "0");
 			}
 		});
 	}
 
 	function updateDownloadQueue() {
-		while (queueList.firstChild) queueList.removeChild(queueList.lastChild);
+		while (queueList.firstChild) queueList.removeChild(queueList.lastChild as Node);
 		chrome.storage.local.get({dl_queue: []}, storageData => {
 			let itemCount = 0;
-			storageData.dl_queue.forEach(downloadEntry => {
+			storageData.dl_queue.forEach((downloadEntry: DownloadItem) => {
 				for (let i = 0; i < downloadEntry.list.length; i++) {
 					let file = downloadEntry.list[i],
-						listItem = itemTemplate.cloneNode(true).querySelector(".list_item");
-					listItem.querySelector(".dl_name").textContent = file.n;
-					listItem.querySelector(".dl_from").src = "../icons/" + ["moodle.svg", "panopto.ico", "grpp.ico", "grpp.ico"][downloadEntry.sys];
-					listItem.querySelector(".remove").addEventListener("click", () => {
+						listItem = (popup.loadTemplate("dl_item").cloneNode(true) as HTMLElement).querySelector(".list_item") as HTMLDivElement;
+					(listItem.querySelector(".dl_name") as HTMLElement).textContent = file.n;
+					(listItem.querySelector(".dl_from") as HTMLImageElement).src = "../icons/" + ["moodle.svg", "panopto.ico", "grpp.ico", "grpp.ico"][downloadEntry.sys];
+					(listItem.querySelector(".remove") as HTMLImageElement).addEventListener("click", () => {
 						let fileIndex = downloadEntry.list.indexOf(file);
 						downloadEntry.list.splice(fileIndex, 1);
 						if (downloadEntry.list.length === 0)
@@ -60,7 +58,7 @@ import {CommonPopup} from './common_popup.js';
 						listItem.remove();
 						if (!queueList.firstChild) {
 							queueList.appendChild(document.createElement("span")).textContent = "אין קבצים בהמתנה להורדה על ידי התוסף.";
-							queueList.firstChild.style.padding = "8px";
+							(queueList.firstChild! as HTMLElement).style.padding = "8px";
 						}
 					});
 					queueList.appendChild(listItem);
@@ -69,18 +67,14 @@ import {CommonPopup} from './common_popup.js';
 			});
 			if (itemCount === 0) {
 				queueList.appendChild(document.createElement("span")).textContent = "אין קבצים בהמתנה להורדה על ידי התוסף.";
-				queueList.firstChild.style.padding = "8px";
+				(queueList.firstChild! as HTMLElement).style.padding = "8px";
 			}
 		});
 	}
 
-	const popup = new CommonPopup;
-	popup.title = "מנהל הורדות";
-	popup.css_list = ["downloads"];
-	popup.popupWrap();
-	const currentDownloadElements = document.querySelectorAll("#current span"),
-		queueList = document.getElementById("queue"),
-		itemTemplate = popup.loadTemplate("dl_item");
+	const popup = new CommonPopup("מנהל הורדות", ["downloads"], document.title);
+	const currentDownloadElements = document.querySelectorAll("#current span") as NodeListOf<HTMLSpanElement>,
+		queueList = document.getElementById("queue") as HTMLDivElement;
 	updateCurrentDownload();
 	setInterval(updateCurrentDownload, 350);
 	updateDownloadQueue();
@@ -88,7 +82,7 @@ import {CommonPopup} from './common_popup.js';
 	chrome.downloads.onChanged.addListener(changes => {
 		if (changes.state || changes.paused) updateDownloadQueue();
 	});
-	document.getElementById("pause").addEventListener("click", () => {
+	(document.getElementById("pause") as HTMLInputElement).addEventListener("click", () => {
 		chrome.storage.local.get({dl_current: 0}, storageData => {
 			if (storageData.dl_current !== 0) void chrome.downloads.search({id: storageData.dl_current}, downloads => {
 				if (!downloads[0]) return;
@@ -96,12 +90,12 @@ import {CommonPopup} from './common_popup.js';
 			});
 		});
 	});
-	document.getElementById("cancel").addEventListener("click", () => {
+	(document.getElementById("cancel") as HTMLInputElement).addEventListener("click", () => {
 		chrome.storage.local.get({dl_current: 0}, storageData => {
 			if (storageData.dl_current !== 0) void chrome.downloads.cancel(storageData.dl_current);
 		});
 	});
-	document.getElementById("cancelAll").addEventListener("click", () => {
+	(document.getElementById("cancelAll") as HTMLInputElement).addEventListener("click", () => {
 		chrome.storage.local.get({dl_current: 0}, storageData => {
 			chrome.storage.local.set({
 				dl_current: 0,

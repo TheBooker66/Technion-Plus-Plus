@@ -1,20 +1,20 @@
-'use strict';
 import {CommonPopup} from "./common_popup.js";
-import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
+import {TE_shutBusesAlerts} from "../service_worker.js";
+import type {BusLine} from "./utils.js";
 
 (function () {
-	function createBusLineElement(lineDetails = ["", "", ""], parentContainer) {
+	function createBusLineElement(lineDetails = ["", "", 0], parentContainer: HTMLDivElement) {
 		const busLineTemplate = popup.loadTemplate("bus_line");
 		const detailElements = busLineTemplate.querySelectorAll(".drow div");
-		for (let i = 0; 3 > i; i++) detailElements[i].textContent = lineDetails[i];
-		return parentContainer.appendChild(busLineTemplate.querySelector(".drow"));
+		for (let i = 0; 3 > i; i++) detailElements[i].textContent = lineDetails[i].toString();
+		return parentContainer.appendChild(busLineTemplate.querySelector(".drow") as Node);
 	}
 
-	function setupBusLineClickEvent(busData, arrivalTimeIndex, alertList, parentContainer) {
-		const element = createBusLineElement([busData["Shilut"], busData["DestinationQuarterName"], busData["MinutesToArrivalList"][arrivalTimeIndex]], parentContainer);
+	function setupBusLineClickEvent(busData: BusLine, arrivalTimeIndex: number, alertList: string[], parentContainer: HTMLDivElement) {
+		const element = createBusLineElement([busData["Shilut"], busData["DestinationQuarterName"], busData["MinutesToArrivalList"][arrivalTimeIndex]], parentContainer) as HTMLDivElement;
 		if (alertList.indexOf(busData["Shilut"]) !== -1 && arrivalTimeIndex === 0) element.classList.add("chosen");
 		element.addEventListener("click", () => {
-			if (busData["MinutesToArrivalList"][arrivalTimeIndex] <= parseInt(document.getElementById("min_select").value)) {
+			if (busData["MinutesToArrivalList"][arrivalTimeIndex] <= parseInt((document.getElementById("min_select") as HTMLInputElement)?.value)) {
 				element.classList.add("blat");
 				setTimeout(() => element.classList.remove("blat"), 1E3);
 			} else {
@@ -26,10 +26,9 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 					element.classList.add("blat");
 					setTimeout(() => element.classList.remove("blat"), 1E3);
 				} else {
-					TE_toggleBusAlert({
+					void chrome.runtime.sendMessage({
 						mess_t: "bus_alert",
 						bus_kav: busData["Shilut"],
-						bus_before: arrivalTimeIndex,
 					});
 					element.classList.contains("chosen") ? element.className = "drow" : element.classList.add("chosen");
 				}
@@ -37,15 +36,15 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 		});
 	}
 
-	function displayError(msg) {
-		document.getElementById("additional").style.display = "none";
-		document.getElementById("error").style.display = "block";
-		document.getElementById("error").textContent = msg;
+	function displayError(msg: string) {
+		(document.getElementById("additional") as HTMLDivElement).style.display = "none";
+		(document.getElementById("error") as HTMLDivElement).style.display = "block";
+		(document.getElementById("error") as HTMLDivElement).textContent = msg;
 	}
 
-	function fetchBusData(intervalID) {
+	function fetchBusData(intervalID: number) {
 		const url = encodeURI("https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/"
-			+ document.getElementById("station_select").value + "/he/false");
+			+ (document.getElementById("station_select") as HTMLSelectElement).value + "/he/false");
 		chrome.storage.local.get({buses_alerts: []}, storageData => {
 			if (chrome.runtime.lastError) {
 				console.error("TE_bus_err: " + chrome.runtime.lastError.message);
@@ -54,8 +53,8 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 				return;
 			}
 
-			chrome.runtime.sendMessage({mess_t: "buses", url: url}, apiResponse => {
-				const busTable = document.getElementById("bus_table");
+			chrome.runtime.sendMessage({mess_t: "buses", url: url}, (apiResponse: BusLine[]) => {
+				const busTable = document.getElementById("bus_table") as HTMLDivElement;
 				if (apiResponse.length === 0)
 					createBusLineElement(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""], busTable);
 				let count = 0;
@@ -68,14 +67,14 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 					}
 				}
 				if (count === 0) createBusLineElement(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""], busTable);
-				document.getElementById("spinner").style.display = "none";
+				(document.getElementById("spinner") as HTMLDivElement).style.display = "none";
 			});
 		});
 	}
 
 	function saveSettings() {
 		let alertTime;
-		switch (document.getElementById("min_select").value) {
+		switch ((document.getElementById("min_select") as HTMLSelectElement).value) {
 			case "10":
 				alertTime = 10;
 				break;
@@ -85,7 +84,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 			default:
 				alertTime = 5;
 		}
-		const stationID = parseInt(document.getElementById("station_select").value);
+		const stationID = parseInt((document.getElementById("station_select") as HTMLSelectElement).value);
 		chrome.storage.local.set({bus_time: alertTime, bus_station: stationID}, () => {
 			if (chrome.runtime.lastError)
 				console.error("TE_bus_err: " + chrome.runtime.lastError.message);
@@ -93,7 +92,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 	}
 
 	function clearBusTable() {
-		const busTable = document.getElementById("bus_table");
+		const busTable = document.getElementById("bus_table") as HTMLDivElement;
 		for (let i = busTable.childNodes.length - 1; 3 <= i; i--)
 			busTable.removeChild(busTable.childNodes[i]);
 	}
@@ -105,10 +104,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 		fetchBusData(0);
 	}
 
-	const popup = new CommonPopup;
-	popup.title = "אוטובוסים קרובים - זמן אמת";
-	popup.css_list = ["buses"];
-	popup.popupWrap();
+	const popup = new CommonPopup("אוטובוסים קרובים - זמן אמת", ["buses"], document.title);
 	const bus_stops = [
 		{
 			name: 'מל"ל/הצפירה',
@@ -159,12 +155,14 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 			return;
 		}
 
-		document.getElementById("min_select").getElementsByTagName("option")[storageData.bus_time / 5 - 1].selected = true;
-		document.getElementById("min_select").addEventListener("change", saveSettings);
-		const stationSelectElement = document.getElementById("station_select");
+		const timeSelector = document.getElementById("min_select") as HTMLSelectElement;
+		timeSelector.querySelectorAll("option")[storageData.bus_time / 5 - 1].selected = true;
+		timeSelector.addEventListener("change", saveSettings);
+
+		const stationSelectElement = document.getElementById("station_select") as HTMLSelectElement;
 		bus_stops.forEach(stopData => {
-			const optionElement = document.createElement("option");
-			optionElement.value = stopData.val;
+			const optionElement = document.createElement("option") as HTMLOptionElement;
+			optionElement.value = stopData.val.toString();
 			optionElement.textContent = stopData.name;
 			stopData.val === storageData.bus_station && (optionElement.selected = true);
 			stationSelectElement.appendChild(optionElement);

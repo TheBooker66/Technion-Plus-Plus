@@ -1,7 +1,7 @@
-'use strict';
+import type {DownloadItem} from "./utils.js";
 
 (function () {
-	function setupListDownloadButtons(downloadAllButton, downloadSelectedButton) {
+	function setupListDownloadButtons(downloadAllButton: HTMLAnchorElement, downloadSelectedButton: HTMLAnchorElement) {
 		downloadAllButton.setAttribute("class", "hidden-command-button");
 		downloadSelectedButton.setAttribute("class", "hidden-command-button");
 		if (window.location.href.includes("folderID")) {
@@ -10,20 +10,20 @@
 				.then(res => res.text())
 				.then(text => (new DOMParser).parseFromString(text, "text/xml"))
 				.then(html => {
-					if (html.getElementsByTagName("item").length !== 0) {
+					if (html.querySelectorAll("item").length !== 0) {
 						downloadAllButton.style.marginRight = "8px";
 						downloadSelectedButton.style.marginRight = "8px";
 						downloadAllButton.setAttribute("class", "maor_panopto_action css-fehuet");
 						downloadSelectedButton.setAttribute("class", "maor_panopto_action css-fehuet");
 						const pollingInterval = setInterval(() => {
-							if (document.getElementById("loadingMessage").style.display === "none" &&
-								document.getElementsByClassName("thumbnail-link").length > 0 &&
-								document.getElementsByClassName("thumbnail-link")[0].style.display !== "none") {
+							if ((document.getElementById("loadingMessage") as HTMLElement).style.display === "none" &&
+								document.querySelectorAll(".thumbnail-link").length > 0 &&
+								(document.querySelector(".thumbnail-link") as HTMLElement).style.display !== "none") {
 								clearInterval(pollingInterval);
-								const tableRows = document.getElementById("listViewContainer").getElementsByTagName("tr");
+								const tableRows = (document.getElementById("listViewContainer") as HTMLTableElement).querySelectorAll("tr");
 								for (let i = 0; i < tableRows.length - 1; i++) {
-									const titleElement = tableRows[i].getElementsByClassName("item-title")[0];
-									if (titleElement.getElementsByClassName("maor_download").length === 0) {
+									const titleElement = tableRows[i].querySelector(".item-title") as HTMLElement;
+									if (titleElement.querySelectorAll(".maor_download").length === 0) {
 										const downloadLink = document.createElement("a");
 										downloadLink.setAttribute("class", "maor_download");
 										downloadLink.textContent = "הורדה";
@@ -58,24 +58,26 @@
 	function setupFolderDownloadButtons() {
 		if (window.location.href.includes("query=")) return;
 
-		const downloadAllLink = document.createElement("a"),
-			downloadSelectedLink = document.createElement("a"),
-			actionHeaderDiv = document.querySelector("#actionHeader > div");
+		const downloadAllLink = document.createElement("a") as HTMLAnchorElement,
+			downloadSelectedLink = document.createElement("a") as HTMLAnchorElement,
+			actionHeaderDiv = document.querySelector("#actionHeader > div") as HTMLDivElement;
 
 		downloadAllLink.textContent = "הורד את כל הקורס";
 		downloadAllLink.addEventListener("click", async () => {
 			const folderId = decodeURIComponent(window.location.href).split('folderID="')[1].split('"')[0],
-				courseTitle = document.getElementById("contentHeaderText").textContent
+				courseTitle = document.getElementById("contentHeaderText")?.textContent
 					.replace(/[0-9]{4,}[swi]: /, "").replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "") + "/";
 			const response = await fetch(`https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=${folderId}&type=mp4`);
 			if (200 === response.status) {
 				const xml = (new DOMParser).parseFromString(await response.text(), "text/xml");
-				const xmlItems = xml.getElementsByTagName("item"),
-					downloadChunk = {sys: 1, sub_pre: "", list: []};
+				const xmlItems = xml.querySelectorAll("item"),
+					downloadChunk: { sys: number, sub_pre: string, list: { [key: string]: string }[] } = {
+						sys: 1, sub_pre: "", list: [],
+					};
 				for (let i = 0; i < xmlItems.length; i++) {
-					let downloadItem = {};
-					downloadItem.u = xmlItems[i].getElementsByTagName("guid")[0].textContent.split("/Syndication/")[1];
-					downloadItem.n = courseTitle + xmlItems[i].getElementsByTagName("title")[0].textContent
+					let downloadItem: { [key: string]: string } = {};
+					downloadItem.u = xmlItems[i].querySelector("guid")!.textContent.split("/Syndication/")[1];
+					downloadItem.n = courseTitle + xmlItems[i].querySelector("title")!.textContent
 						.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
 					downloadChunk.list.push(downloadItem);
 				}
@@ -88,14 +90,15 @@
 		downloadSelectedLink.textContent = "הורד פריטים שנבחרו";
 		downloadSelectedLink.addEventListener("click", () => {
 			const listRows = document.querySelectorAll("#listViewContainer tr.list-view-row"),
-				courseTitle = document.getElementById("contentHeaderText").textContent
+				courseTitle = document.getElementById("contentHeaderText")?.textContent
 					.replace(/[0-9]{4,}[swi]: /, "").replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "") + "/",
-				downloadChunk = {sys: 1, sub_pre: "", list: []};
+				downloadChunk: DownloadItem = {sys: 1, sub_pre: "", list: []};
 			for (let i = 0; i < listRows.length; i++) {
-				if (!listRows[i].querySelector(".maor_check").checked) continue;
-				let downloadItem = {};
-				downloadItem.u = listRows[i].id + ".mp4";
-				downloadItem.n = courseTitle + listRows[i].querySelector("a.detail-title").textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
+				if (!(listRows[i].querySelector(".maor_check") as HTMLInputElement).checked) continue;
+				let downloadItem = {
+					u: listRows[i].id + ".mp4",
+					n: courseTitle + listRows[i].querySelector("a.detail-title")?.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4",
+				};
 				downloadChunk.list.push(downloadItem);
 			}
 			if (downloadChunk.list.length > 0)
@@ -116,25 +119,25 @@
 		const videoID = window.location.href.split("?")[1].split("id=")[1].split("&")[0],
 			videoTitle = document.title.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, ""),
 			downloads = {
-				3: { // short for mp3
+				"3": { // short for mp3
 					url: `https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/${videoID}.mp4?mediaTargetType=audioPodcast`,
 					name: videoTitle + "_voice.mp4",
 				},
-				4: { // short for mp4
+				"4": { // short for mp4
 					url: `https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/${videoID}.mp4`,
 					name: videoTitle + ".mp4",
 				},
 			};
 		Object.keys(downloads).forEach(downloadType => {
-			fetch(downloads[downloadType].url, {method: "head", mode: "no-cors"}).then(response => {
+			fetch(downloads[downloadType as "3" | "4"].url, {method: "head", mode: "no-cors"}).then(response => {
 				if (response.status === 0) {
-					document.getElementById("m_cant_download").classList.add("maor_hidden");
-					const downloadButton = document.getElementById(`m_download_mp${downloadType}`);
+					(document.getElementById("m_cant_download") as HTMLDivElement).classList.add("maor_hidden");
+					const downloadButton = document.getElementById(`m_download_mp${downloadType as "3" | "4"}`) as HTMLAnchorElement;
 					downloadButton.classList.remove("maor_hidden");
 					downloadButton.addEventListener("click", () => {
 						void chrome.runtime.sendMessage({
-							mess_t: "single_download", link: downloads[downloadType].url,
-							name: downloads[downloadType].name,
+							mess_t: "single_download", link: downloads[downloadType as "3" | "4"].url,
+							name: downloads[downloadType as "3" | "4"].name,
 						});
 					});
 				}
@@ -143,29 +146,29 @@
 	}
 
 	function snapshotHandler() {
-		const snapshotButton = document.getElementById("m_snapshot"),
-			videoSelectionContainer = document.getElementById("m_vid_list"),
-			previewCanvases = videoSelectionContainer.getElementsByTagName("canvas"),
-			videoElements = document.getElementsByClassName("video-js"),
-			drawPreviewThumbnail = i => {
+		const snapshotButton = document.getElementById("m_snapshot") as HTMLAnchorElement,
+			videoSelectionContainer = document.getElementById("m_vid_list") as HTMLDivElement,
+			previewCanvases = videoSelectionContainer?.querySelectorAll("canvas") as NodeListOf<HTMLCanvasElement>,
+			videoElements = document.querySelectorAll(".video-js") as NodeListOf<HTMLVideoElement>,
+			drawPreviewThumbnail = (i: 0 | 1) => {
 				previewCanvases[i].width = 28 / videoElements[i].videoHeight * videoElements[i].videoWidth;
 				previewCanvases[i].height = 28;
-				previewCanvases[i].getContext("2d").drawImage(videoElements[i], 0, 0, videoElements[i].videoWidth, videoElements[i].videoHeight, 0, 0, previewCanvases[i].width, previewCanvases[i].height);
+				previewCanvases[i].getContext("2d")?.drawImage(videoElements[i], 0, 0, videoElements[i].videoWidth, videoElements[i].videoHeight, 0, 0, previewCanvases[i].width, previewCanvases[i].height);
 			};
-		videoSelectionContainer.getElementsByTagName("span")[2].addEventListener("click", () => {
+		videoSelectionContainer.querySelectorAll("span")[2].addEventListener("click", () => {
 			videoSelectionContainer.className = "maor_hidden";
-			document.getElementById("maor_menu").classList.remove("start", "overlaid");
+			(document.getElementById("maor_menu") as HTMLDivElement).classList.remove("start", "overlaid");
 		});
 		const canvas = document.createElement("canvas"),
 			downloadAnchors = [document.createElement("a"), document.createElement("a")],
 			clickEvent = new MouseEvent("click", {bubbles: true, cancelable: true, view: window});
-		const takeAndDownloadSnapshot = i => {
+		const takeAndDownloadSnapshot = (i: 0 | 1) => {
 			canvas.width = videoElements[i].videoWidth;
 			canvas.height = videoElements[i].videoHeight;
-			canvas.getContext("2d").drawImage(videoElements[i], 0, 0);
+			canvas.getContext("2d")?.drawImage(videoElements[i], 0, 0);
 			try {
 				downloadAnchors[i].href = canvas.toDataURL("image/png");
-			} catch (err) {
+			} catch (err: any) {
 				if (err.name === "SecurityError")
 					return window.alert("לא ניתן לצלם תמונה מהווידאו עקב הגנות דפדפן. נסו לעשות צילום מסך עם win+shift+s.");
 			}
@@ -177,7 +180,7 @@
 		snapshotButton.addEventListener("click", () => {
 			drawPreviewThumbnail(0);
 			if (videoElements.length === 2) {
-				document.getElementById("maor_menu").classList.add("start", "overlaid");
+				(document.getElementById("maor_menu") as HTMLDivElement).classList.add("start", "overlaid");
 				videoSelectionContainer.className = "maor_persist";
 				drawPreviewThumbnail(1);
 			} else takeAndDownloadSnapshot(0);
@@ -188,19 +191,20 @@
 		(new MutationObserver((records, observer) => {
 			for (const record of records)
 				for (let i = 0; i < record.addedNodes.length; i++) {
-					let node = record.addedNodes[i];
+					let node = record.addedNodes[i] as HTMLElement;
 					if ("function" === typeof node.querySelector && !document.getElementById("new_win") &&
-						node.classList.contains("player") && document.getElementsByClassName("video-js").length === 2) {
+						node.classList.contains("player") && document.querySelectorAll(".video-js").length === 2) {
 						const newWindowMessageDiv = (new DOMParser).parseFromString(`
 <div style="color: #777; font-style: italic; z-index:1; width: 250px; margin:auto; padding: 10px; line-height:1; position: relative;text-align: center; direction: rtl; display: none">
     <h4 dir="ltr">Technion<sup>++</sup></h4>
     הוידאו נפתח לתצוגה בחלון חדש, יש לסגור את החלון החדש כדי לחזור ולצפות בווידאו כאן.
-</div>`, "text/html").querySelector("div");
-						document.getElementById("secondaryScreen").insertBefore(newWindowMessageDiv, document.getElementById("secondaryScreen").childNodes[0]);
-						const expandButton = document.getElementById("m_expand"),
-							videoElements = document.getElementsByClassName("video-js"),
-							secondaryVideoElements = videoElements[videoElements.length - 1],
-							toggleSecondaryVideoDisplay = HideVideoEh => {
+</div>`, "text/html").querySelector("div") as HTMLDivElement;
+						(document.getElementById("secondaryScreen") as HTMLDivElement)
+							.insertBefore(newWindowMessageDiv, (document.getElementById("secondaryScreen") as HTMLDivElement).childNodes[0]);
+						const expandButton = document.getElementById("m_expand") as HTMLAnchorElement,
+							videoElements = document.querySelectorAll(".video-js") as NodeListOf<HTMLVideoElement>,
+							secondaryVideoElements = videoElements[videoElements.length - 1] as HTMLVideoElement,
+							toggleSecondaryVideoDisplay = (HideVideoEh: boolean) => {
 								secondaryVideoElements.style.display = HideVideoEh ? "none" : "block";
 								newWindowMessageDiv.style.display = HideVideoEh ? "block" : "none";
 								expandButton.style.opacity = HideVideoEh ? "0.3" : "1.0";
@@ -209,7 +213,7 @@
 						expandButton.addEventListener("click", () => {
 							if (expandButton.style.opacity !== "0.3") {
 								toggleSecondaryVideoDisplay(true);
-								const newWindow = window.open("", "Technion", "width=830,height=655,menubar=no,statusbar=no,titlebar=no,toolbar=no");
+								const newWindow = window.open("", "Technion", "width=830,height=655,menubar=no,statusbar=no,titlebar=no,toolbar=no") as Window;
 								newWindow.document.title = "Technion - " + document.title;
 								newWindow.document.body.setAttribute("style", "{text-align: center; background: #000; font-family: arial,serif; direction: rtl; font-size: 11px; color: #f9f9fa;}".replace(/[{}]/g, ''));
 								const newWindowCanvas = document.createElement("canvas");
@@ -217,13 +221,12 @@
 								newWindowCanvas.height = secondaryVideoElements.videoHeight;
 								newWindowCanvas.width = secondaryVideoElements.videoWidth;
 								newWindowCanvas.setAttribute("style", "{max-width: 800px; border: 1px solid #fff; margin: auto; display: block;}".replace(/[{}]/g, ''));
-								const newWindowContext = newWindowCanvas.getContext("2d");
-								newWindowContext.drawImage(secondaryVideoElements, 0, 0);
+								newWindowCanvas.getContext("2d")!.drawImage(secondaryVideoElements, 0, 0);
 								const drawVideoFrame = () => {
 									if (secondaryVideoElements.paused || secondaryVideoElements.ended) return;
 									newWindowCanvas.height = secondaryVideoElements.videoHeight;
 									newWindowCanvas.width = secondaryVideoElements.videoWidth;
-									newWindowContext.drawImage(secondaryVideoElements, 0, 0);
+									newWindowCanvas.getContext("2d")!.drawImage(secondaryVideoElements, 0, 0);
 									setTimeout(drawVideoFrame, 1E3 / 60);
 								};
 								drawVideoFrame();
@@ -238,13 +241,12 @@
 								instructionsSpan.textContent = "ניתן לגרור את החלון למסך שני וכך לצפות בווידאו במצב מסך מלא בשני המסכים.";
 								newWindow.document.addEventListener("dblclick", () => {
 									if (!NewWindowFullscreenEh) return;
-									// noinspection JSUnresolvedReference
-									"function" === typeof newWindow.document.mozCancelFullScreen ?
-										newWindow.document.mozCancelFullScreen() : newWindow.document.webkitExitFullscreen();
+									// @ts-ignore
+									"function" === typeof newWindow.document.mozCancelFullScreen ? newWindow.document.mozCancelFullScreen() : newWindow.document.webkitExitFullscreen();
 									NewWindowFullscreenEh = false;
 								});
 								fullscreenButton.addEventListener("click", () => {
-									// noinspection JSUnresolvedReference
+									// @ts-ignore
 									"function" === typeof newWindowCanvas.mozRequestFullScreen ? newWindowCanvas.mozRequestFullScreen() : newWindowCanvas.webkitRequestFullscreen();
 									NewWindowFullscreenEh = true;
 								});
@@ -259,10 +261,10 @@
 						return;
 					}
 				}
-		})).observe(document.getElementById("viewerContent"), {childList: true, subtree: true});
+		})).observe((document.getElementById("viewerContent") as HTMLElement), {childList: true, subtree: true});
 	}
 
-	function toggleDarkMode(styleSheet) {
+	function toggleDarkMode(styleSheet: CSSStyleSheet) {
 		if (styleSheet.cssRules.length === 1)
 			["#viewer {background-color: #000 !important;}",
 				"#viewerHeader, .transport-button, #timeElapsed, #timeRemaining, #positionControl, .viewer .transport-button .clicked, #volumeFlyout, #playSpeedExpander, #qualityButton, #qualityExpander, #inlineMessageLetterbox, .next-delivery-thumb, #thumbnailList, #thumbnailList img, .thumbnail-timestamp {filter:invert(1);}",
@@ -282,33 +284,33 @@
 		else while (styleSheet.cssRules.length > 1) styleSheet.deleteRule(0);
 	}
 
-	function saveSetting(settingsKey) {
-		const settingsObj = {};
+	function saveSetting(settingsKey: "showhide" | "darkmode" | "speed" | "settings") {
+		const settingsObj: { [key: string]: string | boolean | number } = {};
 		switch (settingsKey) {
 			case "showhide":
-				settingsObj.panopto_hide = "true" !== document.getElementById("toggleThumbnailsButton").getAttribute("aria-expanded");
+				settingsObj.panopto_hide = "true" !== (document.getElementById("toggleThumbnailsButton") as HTMLElement).getAttribute("aria-expanded");
 				break;
 			case "darkmode":
-				settingsObj.panopto_light = document.getElementById("m_darkmode").checked;
+				settingsObj.panopto_light = (document.getElementById("m_darkmode") as HTMLInputElement).checked;
 				break;
 			case "speed":
-				settingsObj.panopto_speed = document.querySelector(".play-speed.selected").id;
+				settingsObj.panopto_speed = (document.querySelector(".play-speed .selected") as HTMLDivElement).id;
 				break;
 			case "settings":
-				settingsObj.panopto_save = document.getElementById("m_save").checked;
+				settingsObj.panopto_save = (document.getElementById("m_save") as HTMLInputElement).checked;
 		}
 		chrome.storage.local.set(settingsObj, () => {
 			if (chrome.runtime.lastError) console.error("TE_panopto: " + chrome.runtime.lastError.message);
 		});
 	}
 
-	function copyTimestampedURL(markdownLinkEh) {
+	function copyTimestampedURL(markdownLinkEh: boolean) {
 		const url = document.URL, startPos = url.indexOf("&");
 		const parsedURL = startPos === -1 ? url : url.substring(0, startPos);
 
 		const videoElement =
-			document.querySelector("video#secondaryVideo") || // Dual player
-			document.querySelector("video#primaryVideo"); // Single player
+			document.querySelector("video#secondaryVideo") as HTMLVideoElement || // Dual player
+			document.querySelector("video#primaryVideo") as HTMLVideoElement; // Single player
 		const timestampUrl = `${parsedURL}&start=${videoElement.currentTime}`;
 
 		if (!markdownLinkEh) {
@@ -329,9 +331,9 @@
 		}
 	}
 
-	function changeRealTime(mutations, wrongTime, newTime) {
+	function changeRealTime(wrongTime: HTMLDivElement, newTime: HTMLDivElement) {
 		const splitTime = wrongTime.innerText.substring(1).split(':');
-		const rate = parseFloat(document.getElementById("primaryVideo").playbackRate) || 1;
+		const rate = (document.getElementById("primaryVideo") as HTMLVideoElement).playbackRate || 1;
 		const hoursEh = splitTime.length !== 2;
 		if (!hoursEh) splitTime.unshift("0");
 
@@ -340,7 +342,7 @@
 		const minutes = Math.floor((secs - hours * 3600) / 60);
 		const seconds = secs - hours * 3600 - minutes * 60;
 
-		if (isNaN(minutes) || isNaN(seconds)) return;
+		if (Number.isNaN(minutes) || Number.isNaN(seconds)) return;
 
 		newTime.innerHTML = ` <small>(x${rate})</small>  ` + (
 				hoursEh ? `-${('0000' + hours).slice(-2)}:` : "-")
@@ -430,49 +432,50 @@
         </div>
     </div>
 </div>
-`, "text/html").getElementById("maor_menu_container");
-		for (let menuButton of menu.getElementsByTagName("a"))
+`, "text/html").getElementById("maor_menu_container") as HTMLDivElement;
+		for (let menuButton of menu.querySelectorAll("a"))
 			if (menuButton.id)
 				menuButton.style.backgroundImage = `url(${chrome.runtime.getURL("icons/panopto/" + menuButton.id.replace(/_mp[34]/, "") + ".svg")})`;
 
-		const bigBossElement = document.getElementById("transportControls");
+		const bigBossElement = document.getElementById("transportControls") as HTMLDivElement;
 		bigBossElement.appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
 		bigBossElement.appendChild(menu);
-		document.getElementById("maor_koteret").style.backgroundImage = `url(${chrome.runtime.getURL("icons/technion_plus_plus/logo.svg").toString()})`;
+		(document.getElementById("maor_koteret") as HTMLDivElement).style.backgroundImage = `url(${chrome.runtime.getURL("icons/technion_plus_plus/logo.svg").toString()})`;
 
 		setupVideoDownloadButtons();
 		snapshotHandler();
 
-		document.getElementById("m_save").addEventListener("change", () => saveSetting("settings"));
+		(document.getElementById("m_save") as HTMLAnchorElement).addEventListener("change", () => saveSetting("settings"));
 
-		if (document.pictureInPictureEnabled && !document.querySelector(".video-js").disablePictureInPicture) {
-			document.getElementById("m_float").classList.remove("maor_hidden");
-			document.getElementById("m_float").addEventListener("click", () => {
-				document.pictureInPictureElement || document.querySelector(".video-js").requestPictureInPicture();
+		if (document.pictureInPictureEnabled && !(document.querySelector(".video-js") as HTMLVideoElement).disablePictureInPicture) {
+			const floatyButton = document.getElementById("m_float") as HTMLAnchorElement;
+			floatyButton.classList.remove("maor_hidden");
+			floatyButton.addEventListener("click", () => {
+				if (!document.pictureInPictureElement) void (document.querySelector(".video-js") as HTMLVideoElement).requestPictureInPicture();
 			});
 		}
 
-		const wrongTime = document.getElementById("timeRemaining"),
-			realTime = document.createElement("div");
+		const wrongTime = document.getElementById("timeRemaining") as HTMLDivElement,
+			realTime = document.createElement("div") as HTMLDivElement;
 		realTime.id = "ethan_realtimeRemaining";
 		realTime.setAttribute("style", "{vertical-align: middle; width: 44px; font-size: 0.95em; color: #fff;}".replace(/[{}]/g, ''));
 		bigBossElement.insertBefore(realTime, document.getElementById("liveButton"));
 		const observer =
-			new MutationObserver(mutations => changeRealTime(mutations, wrongTime, realTime));
+			new MutationObserver(_ => changeRealTime(wrongTime, realTime));
 		setTimeout(() =>
 				observer.observe(wrongTime, {characterData: false, attributes: false, childList: true, subtree: false}),
 			1000);
 
 		for (const span of document.querySelectorAll("#m_speed span"))
 			span.addEventListener("click", () => {
-				for (const element of document.querySelectorAll(".video-js"))
-					element.playbackRate = span.textContent;
+				for (const speedButton of document.querySelectorAll(".video-js"))
+					(speedButton as HTMLVideoElement).playbackRate = parseInt(span.textContent);
 				let selectedElement = document.querySelector(".maor_selected");
 				if (selectedElement) selectedElement.classList.remove("maor_selected");
 				span.classList.add("maor_selected");
 			});
 
-		document.getElementById("m_sound").style.display = "none";
+		(document.getElementById("m_sound") as HTMLAnchorElement).style.display = "none";
 
 		const timestampSpans = document.querySelectorAll("#m_timestamp span");
 		timestampSpans[0].addEventListener("click", () => copyTimestampedURL(false));
@@ -484,9 +487,9 @@
 		setupFolderDownloadButtons();
 	else if (window.location.href.includes("Viewer.aspx")) {
 		setupMenu();
-		const darkModeStyle = document.head.appendChild(document.createElement("style")).sheet;
+		const darkModeStyle = document.head.appendChild(document.createElement("style")).sheet as CSSStyleSheet;
 		darkModeStyle.insertRule(".player {background-color: #000 !important;}", 0);
-		document.getElementById("m_darkmode").addEventListener("change", () => {
+		(document.getElementById("m_darkmode") as HTMLInputElement).addEventListener("change", () => {
 			toggleDarkMode(darkModeStyle);
 			saveSetting("darkmode");
 		});
@@ -496,28 +499,28 @@
 		}, storage => {
 			if (chrome.runtime.lastError) console.error("TE_panopto: " + chrome.runtime.lastError.message);
 			if (storage.panopto_save) {
-				document.getElementById("m_save").checked = storage.panopto_save;
+				(document.getElementById("m_save") as HTMLInputElement).checked = storage.panopto_save;
 				if (storage.panopto_light) toggleDarkMode(darkModeStyle);
-				document.getElementById("m_darkmode").checked = storage.panopto_light;
+				(document.getElementById("m_darkmode") as HTMLInputElement).checked = storage.panopto_light;
 				const controlsCheckInterval = setInterval(() => {
 					if (document.getElementById("Faster")) {
 						clearInterval(controlsCheckInterval);
-						if (storage.panopto_hide && document.getElementById("toggleThumbnailsButton").style.display !== "none")
-							document.getElementById("toggleThumbnailsButton").click();
-						document.getElementById(storage.panopto_speed).click();
-						for (let speed of document.getElementsByClassName("play-speed"))
+						const thumbnailsButton = document.getElementById("toggleThumbnailsButton") as HTMLElement;
+						if (storage.panopto_hide && thumbnailsButton.style.display !== "none") thumbnailsButton.click();
+						(document.getElementById(storage.panopto_speed) as HTMLDivElement).click();
+						for (let speed of document.querySelectorAll(".play-speed"))
 							speed.addEventListener("click", () => {
 								saveSetting("speed");
 								const selectedElement = document.querySelector(".maor_selected");
 								if (selectedElement) selectedElement.classList.remove("maor_selected");
 							});
-						document.getElementById("toggleThumbnailsButton").addEventListener("click", () => saveSetting("showhide"));
+						thumbnailsButton.addEventListener("click", () => saveSetting("showhide"));
 					}
 				}, 2E3);
 			}
 		});
 
 		setupDetachableVideoPlayer();
-		setTimeout(() => document.getElementById("maor_menu").classList.remove("start"), 1500);
+		setTimeout(() => (document.getElementById("maor_menu") as HTMLDivElement).classList.remove("start"), 1500);
 	}
 })();

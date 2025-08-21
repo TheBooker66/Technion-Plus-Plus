@@ -1,16 +1,15 @@
-'use strict';
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
 import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
+import {HWAssignment} from "./utils";
 
 (function () {
-	function openMoodle(eventID, eventTimestamp) {
+	function openMoodle(eventID: number, eventTimestamp: number): () => Promise<chrome.tabs.Tab> {
 		return () => new Promise((resolve, reject) => {
-			const handleResponse = function (eventLinks) {
-					eventLinks = eventLinks.response.querySelectorAll(`.event[data-event-id='${eventID}'] a`);
+			const handleResponse = function (response: { response: any, responseURL: string }) {
+					const eventLinks = response.response.querySelectorAll(`.event[data-event-id='${eventID}'] a`);
 					if (eventLinks.length) {
-						void chrome.tabs.create({url: eventLinks[eventLinks.length - 1].getAttribute("href")});
-						resolve();
+						resolve(chrome.tabs.create({url: eventLinks[eventLinks.length - 1].getAttribute("href")}));
 					} else
 						reject(() => console.error("TE_cal_moodle: bad content"));
 				},
@@ -19,30 +18,30 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 		});
 	}
 
-	function initializeCalendarProperties(errorCallback) {
+	function initializeCalendarProperties(errorCallback: ({msg, errorEh}: { msg: string, errorEh: boolean }) => void) {
 		chrome.storage.local.get({calendar_prop: ""}, function (storage) {
 			if (chrome.runtime.lastError) {
 				console.error("TE_cal1: " + chrome.runtime.lastError.message);
 				errorCallback({
 					msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
-					is_error: true,
+					errorEh: true,
 				});
 			} else if ("" === storage.calendar_prop) {
 				errorCallback({
 					msg: "אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.",
-					is_error: true,
+					errorEh: true,
 				});
 				popup.XHR("https://moodle24.technion.ac.il/calendar/export.php", "document").then(res => {
-					const sessionKey = res.response.getElementsByName("sesskey")[0].value;
+					const sessionKey: string = res.response.querySelector("[name='sesskey']").value;
 					popup.XHR(res.responseURL, "document", "sesskey=" + sessionKey + "&_qf__core_calendar_export_form=1&events[exportevents]=all&period[timeperiod]=recentupcoming&generateurl=\u05d4\u05e9\u05d2+\u05d0\u05ea+\u05db\u05ea\u05d5\u05d1\u05ea+\u05d4-URL+\u05e9\u05dc+\u05dc\u05d5\u05d7+\u05d4\u05e9\u05e0\u05d4")
 						.then(exportResponse => {
-							exportResponse = "userid=" + exportResponse.response.getElementById("calendarexporturl").value.split("userid=")[1].split("&preset_what=all")[0];
-							chrome.storage.local.set({calendar_prop: exportResponse}, () => {
+							const exportResponse2: string = "userid=" + exportResponse.response.getElementById("calendarexporturl").value.split("userid=")[1].split("&preset_what=all")[0];
+							chrome.storage.local.set({calendar_prop: exportResponse2}, () => {
 								if (chrome.runtime.lastError) {
 									console.error("TE_cal2: " + chrome.runtime.lastError.message);
 									errorCallback({
 										msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
-										is_error: true,
+										errorEh: true,
 									});
 								} else window.location.reload();
 							});
@@ -52,21 +51,17 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 		});
 	}
 
-	function updateCalendar(maxEventID, seenEventsCount) {
+	function updateCalendar(maxEventID: number, seenEventsCount: number = 0) {
 		chrome.storage.local.set({cal_seen: seenEventsCount, calendar_max: maxEventID}, () => {
 			if (chrome.runtime.lastError)
 				console.error("TE_cal_ra: " + chrome.runtime.lastError.message);
 		});
 	}
 
-	const popup = new CommonPopup(document.title);
-	popup.title = "מטלות קרובות - מודל";
-	popup.css_list = ["calendar"];
+	const popup = new CommonPopup("מטלות קרובות - מודל", ["calendar"], document.title);
 	const calendar = new CommonCalendar(popup, "moodle", document.title);
-	popup.popupWrap();
-	calendar.calendarWrap();
 
-	calendar.progress(_ => new Promise((resolve, reject) => chrome.storage.local.get({
+	calendar.progress(() => new Promise((resolve, reject) => chrome.storage.local.get({
 		calendar_prop: "",
 		calendar_max: 0,
 		u_courses: {},
@@ -120,8 +115,8 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 				month: "2-digit",
 				year: "numeric",
 			};
-			let maxEventID = 0, finishedEvents = {},
-				newAssignmentsList = [], finishedAssignmentsList = [];
+			let maxEventID = 0, finishedEvents: { [key: string]: number } = {},
+				newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
 			for (let i = 1; i < cal.length; i++) {
 				const eventID = parseInt(cal[i].split("UID:")[1].split("@moodle")[0]);
 				maxEventID = eventID > maxEventID ? eventID : maxEventID;
@@ -146,11 +141,11 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 							continue;
 						eventTime = eventDate.toLocaleString("iw-IL", datetimeFormat);
 
-						const courseInfo = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
-						const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
+						const courseInfo: string = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
+						const courseNum = parseInt(courseInfo[0]?.replace(/[^0-9]/i, "").trim()),
 							semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
-						const course = storageData.u_courses.hasOwnProperty(courseNum.toString()) ?
-							storageData.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum]}` : "") : courseInfo;
+						const course = (storageData.u_courses.hasOwnProperty(courseNum.toString()) && semesterNum.toString() in semesters) ?
+							storageData.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "") : courseInfo;
 
 						let eventDescription = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]
 							.replace(/\\n/g, ' ').replace(/\\,/g, ',').trim();
@@ -161,14 +156,14 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 							finishedEh = true;
 							finishedEvents[eventID.toString()] = 0;
 						}
-						const event = {
-							header: eventTitle,
+						const event: HWAssignment = {
+							name: eventTitle,
 							description: eventDescription,
 							course: course,
-							final_date: eventTime,
-							is_new: eventID > storageData.calendar_max,
+							finalDate: eventTime,
+							newEh: eventID > storageData.calendar_max,
 							goToFunc: openMoodle(eventID, eventDate.getTime()),
-							event: eventID,
+							eventID: eventID,
 							timestamp: eventDate.getTime(),
 							sys: "moodle",
 						};

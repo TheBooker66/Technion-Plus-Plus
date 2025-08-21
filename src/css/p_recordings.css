@@ -22,10 +22,6 @@ a:hover {
     background-color: #f9f9fa;
 }
 
-#myblock {
-    min-height: 170px;
-}
-
 #results {
     max-height: 330px;
     overflow-y: auto;

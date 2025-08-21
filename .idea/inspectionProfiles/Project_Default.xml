@@ -418,7 +418,7 @@
       <scope name="Proprietary Icons" level="ERROR" enabled="false" />
     </inspection_tool>
     <inspection_tool class="CucumberTableInspection" enabled="true" level="WARNING" enabled_by_default="true">
-      <scope name="Libraries" level="WARNING" enabled="false" />
+      <scope name="Libraries" level="WARNING" enabled="false" editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES" />
       <scope name="Proprietary Icons" level="WARNING" enabled="false" editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES" />
     </inspection_tool>
     <inspection_tool class="CucumberUndefinedStep" enabled="true" level="WARNING" enabled_by_default="true">
@@ -921,13 +921,15 @@
       </scope>
       <option name="myValues">
         <value>
-          <list size="6">
+          <list size="8">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
             <item index="3" class="java.lang.String" itemvalue="noscript" />
             <item index="4" class="java.lang.String" itemvalue="embed" />
             <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="item" />
+            <item index="7" class="java.lang.String" itemvalue="guid" />
           </list>
         </value>
       </option>

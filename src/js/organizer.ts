@@ -1,30 +1,23 @@
-'use strict';
 import {toggle} from "./common_calendar.js";
+import {HWAssignment} from "./utils.js";
 
-const tabContents = document.querySelectorAll("#bodies > .body"),
-	tabHeaders = document.querySelectorAll("#tabs > .tab"),
-	form = document.querySelector("form"),
-	loadTemplate = (templateID, documentContext = document) => {
-		return document.importNode(documentContext.querySelector("template#" + templateID).content, true);
-	};
-let input_counters;
-
-function insertMessage(messageText, errorEh) {
-	const element = document.getElementById("error").appendChild(document.createElement("div"));
+function insertMessage(messageText: string, errorEh: boolean = true) {
+	const element = document.getElementById("error")!.appendChild(document.createElement("div"));
 	element.className = errorEh ? "error_bar" : "attention";
 	element.textContent = messageText;
 }
 
 function checkForEmpty() {
-	["new_assignments", "finished_assignments"].forEach(tab => {
-		tab = document.getElementById(tab);
+	["new_assignments", "finished_assignments"].forEach(tabID => {
+		const tab = document.getElementById(tabID) as HTMLDivElement;
 		tab.querySelectorAll("div.list_item:not(.hidden)").length === 0
 			? tab.classList.add("empty_list") : tab.classList.remove("empty_list");
 	});
 }
 
-function openAssignment(assignment, gotoFunction) {
-	const button = assignment.querySelector("a.button"), originalText = button.textContent;
+function openAssignment(assignment: HTMLDivElement, gotoFunction: () => Promise<chrome.tabs.Tab>) {
+	const button = assignment.querySelector("a.button") as HTMLAnchorElement;
+	const originalText = button.textContent;
 	button.textContent = "פותח...";
 	button.classList.add("small_spinner");
 	const resetButton = () => {
@@ -38,55 +31,59 @@ function openAssignment(assignment, gotoFunction) {
 	});
 }
 
-function insertAssignments(newAssignments, finishedAssignments) {
-	let courses = new Set;
-	const insertAssignment = (assignmentData, templateClone, targetListID) => {
-		templateClone = templateClone.querySelector(".list_item");
-		if (assignmentData.sys === "ua")
-			insertUserAssignment(assignmentData, templateClone, targetListID);
-		else {
-			if (assignmentData.is_new) templateClone.classList.add("starred");
-			if (assignmentData.sys === "cs") {
-				assignmentData.course = assignmentData.description;
-				assignmentData.description = "";
+function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: HWAssignment[]) {
+	let courses: Set<string> = new Set;
+	const insertAssignment =
+		(assignmentData: HWAssignment, template: DocumentFragment, targetListID: "new_assignments" | "finished_assignments") => {
+			const newAssigment = template.querySelector(".list_item") as HTMLDivElement;
+			if (assignmentData.sys === "ua")
+				insertUserAssignment(assignmentData, newAssigment, targetListID);
+			else {
+				if (assignmentData.newEh) newAssigment.classList.add("starred");
+				if (assignmentData.sys === "cs") {
+					assignmentData.course = assignmentData.description;
+					assignmentData.description = "";
+				}
+				const icons = {
+					webwork: ["webwork.svg", "וובוורק"],
+					moodle: ["moodle.svg", "מודל"],
+					cs: ["grpp.ico", 'מדמ"ח'],
+				};
+				courses.add(assignmentData.course);
+				(newAssigment.querySelector(".system") as HTMLImageElement).src = "../icons/" + icons[assignmentData.sys][0];
+				(newAssigment.querySelector(".system") as HTMLImageElement).title = "מטלת" + icons[assignmentData.sys][1];
+				newAssigment.querySelector(".assignment_header")!.textContent = assignmentData.name;
+				newAssigment.querySelector(".course_name")!.textContent += assignmentData.course;
+				newAssigment.dataset.course = "#" + assignmentData.course;
+				newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
+				newAssigment.querySelector(".end_time > span")!.textContent = assignmentData.finalDate;
+				const buttonElements = newAssigment.querySelectorAll("a.button");
+				buttonElements[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc));
+				buttonElements[1].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, newAssigment, 1));
+				buttonElements[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, newAssigment, 0));
+				newAssigment.querySelector(".assignment_header")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc));
+				document.getElementById(targetListID)!.appendChild(newAssigment);
 			}
-			const icons = {
-				webwork: ["webwork.svg", "וובוורק"],
-				moodle: ["moodle.svg", "מודל"],
-				cs: ["grpp.ico", 'מדמ"ח'],
-			};
-			courses.add(assignmentData.course);
-			templateClone.querySelector(".system").src = "../icons/" + icons[assignmentData.sys][0];
-			templateClone.querySelector(".system").title = "מטלת" + icons[assignmentData.sys][1];
-			templateClone.querySelector(".assignment_header").textContent = assignmentData.header;
-			templateClone.querySelector(".course_name").textContent += assignmentData.course;
-			templateClone.dataset.course = "#" + assignmentData.course;
-			templateClone.querySelector(".assignment_description").textContent = assignmentData.description;
-			templateClone.querySelector(".end_time > span").textContent = assignmentData.final_date;
-			const buttonElements = templateClone.querySelectorAll("a.button");
-			buttonElements[1].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, templateClone, 1));
-			buttonElements[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, templateClone, 0));
-			buttonElements[0].addEventListener("click", () => openAssignment(templateClone, assignmentData.goToFunc));
-			templateClone.querySelector(".assignment_header").addEventListener("click", () => openAssignment(templateClone, assignmentData.goToFunc));
-			document.getElementById(targetListID).appendChild(templateClone);
-		}
-	}, assignmentTemplate = loadTemplate("assignment"), userAgendaTemplate = loadTemplate("userAgenda");
-	const hw_sort = (a, b) => a.timestamp === b.timestamp ? a.header.localeCompare(b.header) : a.timestamp < b.timestamp ? -1 : a.timestamp > b.timestamp ? 1 : 0;
-	newAssignments.sort(hw_sort);
-	finishedAssignments.sort(hw_sort);
-	newAssignments.forEach(assignmentData => insertAssignment(assignmentData, "ua" === assignmentData.sys ? userAgendaTemplate.cloneNode(true) : assignmentTemplate.cloneNode(true), "new_assignments"));
-	finishedAssignments.forEach(assignmentData => insertAssignment(assignmentData, "ua" === assignmentData.sys ? userAgendaTemplate.cloneNode(true) : assignmentTemplate.cloneNode(true), "finished_assignments"));
-	const courseFilterElement = document.getElementById("course_filter");
+		};
+
+	const assignmentTemplate = loadTemplate("assignment"), userAgendaTemplate = loadTemplate("userAgenda"),
+		sortAssignments = (a: HWAssignment, b: HWAssignment): number => a.timestamp === b.timestamp ? a.name.localeCompare(b.name) : a.timestamp < b.timestamp ? -1 : a.timestamp > b.timestamp ? 1 : 0,
+		chooseTemplate = (assignmentData: HWAssignment): DocumentFragment => "ua" === assignmentData.sys ? userAgendaTemplate.cloneNode(true) as DocumentFragment : assignmentTemplate.cloneNode(true) as DocumentFragment;
+	newAssignments.sort(sortAssignments);
+	finishedAssignments.sort(sortAssignments);
+	newAssignments.forEach(assignmentData => insertAssignment(assignmentData, chooseTemplate(assignmentData), "new_assignments"));
+	finishedAssignments.forEach(assignmentData => insertAssignment(assignmentData, chooseTemplate(assignmentData), "finished_assignments"));
+	const courseFilterElement = document.getElementById("course_filter") as HTMLSelectElement;
 	Array.from(courses).forEach(courseName => {
 		let optionElement = courseFilterElement.appendChild(document.createElement("option"));
 		optionElement.value = courseName;
 		optionElement.textContent = courseName;
 	});
-	document.getElementById("spinner").style.display = "none";
+	document.getElementById("spinner")!.style.display = "none";
 	checkForEmpty();
 }
 
-function editUA(assignmentID) {
+function editUA(assignmentID: number) {
 	chrome.storage.local.get({user_agenda: {}}, storage => {
 		form.subject.value = storage.user_agenda[assignmentID].header;
 		form.notes.value = storage.user_agenda[assignmentID].description;
@@ -105,75 +102,77 @@ function editUA(assignmentID) {
 	});
 }
 
-function removeUA(assignmentID) {
+function removeUA(assignmentID: number) {
 	chrome.storage.local.get({user_agenda: {}}, storage => {
 		if (storage.user_agenda.hasOwnProperty(assignmentID))
 			if (window.confirm(`המטלה "${storage.user_agenda[assignmentID].header}" תימחק!`)) {
 				delete storage.user_agenda[assignmentID];
 				chrome.storage.local.set({user_agenda: storage.user_agenda}, () => {
-					document.getElementById(`U_${assignmentID}`).remove();
+					document.getElementById(`U_${assignmentID}`)?.remove();
 					checkForEmpty();
 				});
 			}
 	});
 }
 
-function insertUserAssignment(assignmentData, container, targetListID = null, insertAtBeginning = false) {
-	if ("div" !== container.nodeName.toLowerCase()) container = container.querySelector(".list_item");
-	container.id = `U_${assignmentData.id}`;
-	container.querySelector(".assignment_header").textContent = assignmentData.header;
+function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivElement, targetListID: "new_assignments" | "finished_assignments" | "" = "", insertAtBeginning: boolean = false) {
+	if (container.nodeName !== "DIV") container = container.querySelector(".list_item") as HTMLDivElement;
+	container.id = `U_${assignmentData.eventID}`;
+	container.querySelector(".assignment_header")!.textContent = assignmentData.name;
 	container.dataset.course = "#user-course";
 	let textareaHeight = 20 * (assignmentData.description.split("\n").length + 1),
-		textareaElement = container.querySelector(".assignment_description textarea");
+		textareaElement = container.querySelector(".assignment_description textarea") as HTMLTextAreaElement,
+		inputElement = container.querySelector(".end_time > span") as HTMLInputElement;
 	textareaElement.textContent = assignmentData.description;
 	textareaElement.style.height = textareaHeight + "px";
-	textareaHeight = container.querySelector(".end_time > span");
 	if (0 < assignmentData.timestamp) {
-		textareaHeight.parentNode.style.visibility = "visible";
-		textareaHeight.textContent = (new Date(assignmentData.timestamp)).toLocaleString("iw-IL", {
+		inputElement.parentElement!.style.visibility = "visible";
+		inputElement.textContent = (new Date(assignmentData.timestamp)).toLocaleString("iw-IL", {
 			weekday: "long",
 			day: "2-digit",
 			month: "2-digit",
 			year: "numeric",
 		});
-	} else textareaHeight.parentNode.style.visibility = "hidden";
+	} else inputElement.parentElement!.style.visibility = "hidden";
 	if (assignmentData.timestamp === -1) container.classList.add("system_message");
-	if (targetListID) {
-		targetListID = document.getElementById(targetListID);
-		container = insertAtBeginning ? targetListID.insertBefore(container, targetListID.children[0]) : targetListID.appendChild(container);
-		targetListID = container.querySelectorAll("a.button");
-		targetListID[0].addEventListener("click", () => editUA(assignmentData.id));
-		targetListID[1].addEventListener("click", () => removeUA(assignmentData.id));
-		targetListID[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, container, 1));
-		targetListID[3].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.event, container, 0));
-	}
+
+	if (targetListID === "") return;
+	const targetList = document.getElementById(targetListID) as HTMLDivElement;
+	container = insertAtBeginning ? targetList.insertBefore(container, targetList.children[0]) : targetList.appendChild(container);
+	const targetListButtons = container.querySelectorAll("a.button");
+	targetListButtons[0].addEventListener("click", () => editUA(assignmentData.eventID));
+	targetListButtons[1].addEventListener("click", () => removeUA(assignmentData.eventID));
+	targetListButtons[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, container, 1));
+	targetListButtons[3].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, container, 0));
 }
 
-const assignments_promises = {}, CALENDARS = 3; // moodle, webwork, cs
 
-export function addAssignmentsToList(calendarPromise, calendarType) {
-	assignments_promises[calendarType] = calendarPromise;
-	Object.keys(assignments_promises).length === CALENDARS && chrome.storage.local.get({
+export function addAssignmentsToList(
+	calendarPromise: () => Promise<{ new_list: HWAssignment[], finished_list: HWAssignment[] }>,
+	calendarType: "moodle" | "cs" | "webwork" | "ua") {
+	assignmentPromises[calendarType] = calendarPromise;
+	if (Object.keys(assignmentPromises).length !== CALENDARS) return;
+
+	chrome.storage.local.get({
 		moodle_cal: true,
 		cs_cal: false,
-		wwcal_switch: false,
+		ww_cal_switch: false,
 		quick_login: true,
 		enable_login: true,
 		user_agenda: {},
 	}, storage => {
-		const enabledCalendars = {};
-		enabledCalendars.moodle = storage.quick_login && storage.enable_login && storage.moodle_cal;
-		enabledCalendars.webwork = storage.quick_login && storage.enable_login && storage.wwcal_switch;
-		enabledCalendars.cs = storage.cs_cal;
-		let newAssignmentsList = [], finishedAssignmentsList = [], promisesList = [];
-		const userAgendaData = storage.user_agenda;
+		const userAgendaData = storage.user_agenda, enabledCalendars = {
+			"moodle": storage.quick_login && storage.enable_login && storage.moodle_cal,
+			"cs": storage.cs_cal,
+			"webwork": storage.quick_login && storage.enable_login && storage.ww_cal_switch,
+		};
+		let newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [], promisesList = [];
 		Object.keys(userAgendaData).forEach(agendaID => {
-			userAgendaData[agendaID].id = agendaID;
 			userAgendaData[agendaID].event = agendaID;
 			userAgendaData[agendaID].sys = "ua";
 			userAgendaData[agendaID].done ? newAssignmentsList.push(userAgendaData[agendaID]) : finishedAssignmentsList.push(userAgendaData[agendaID]);
 		});
-		for (let calendarType of Object.keys(assignments_promises)) enabledCalendars[calendarType] && promisesList.push(assignments_promises[calendarType]);
+		for (let type of Object.keys(assignmentPromises)) if (enabledCalendars[type as "moodle" | "cs" | "webwork"]) promisesList.push(assignmentPromises[type]);
 		let completedPromises = 0;
 		for (let calendarPromise of promisesList) {
 			calendarPromise().then(calendarData => {
@@ -191,6 +190,7 @@ export function addAssignmentsToList(calendarPromise, calendarType) {
 }
 
 function form_manual_events() {
+	const input_counters = form.querySelectorAll("span");
 	input_counters[0].textContent = form.subject.value.length;
 	input_counters[1].textContent = form.notes.value.length;
 	form.end_time.disabled = form.no_end.checked;
@@ -231,14 +231,13 @@ function form_submit() {
 		}
 		chrome.storage.local.set({user_agenda: agenda}, () => {
 			let assignmentElement;
-			agenda[finalAssignmentID].id = finalAssignmentID;
+			agenda[finalAssignmentID].event = finalAssignmentID;
 			if (isExistingAssignment) {
-				assignmentElement = document.querySelector(`#U_${finalAssignmentID}`);
+				assignmentElement = document.querySelector(`#U_${finalAssignmentID}`) as HTMLDivElement;
 				insertUserAssignment(agenda[finalAssignmentID], assignmentElement);
-				document.querySelector(".tab.current").click();
+				(document.querySelector(".tab .current") as HTMLDivElement)?.click();
 			} else {
-				assignmentElement = loadTemplate("userAgenda");
-				agenda[finalAssignmentID].event = finalAssignmentID;
+				assignmentElement = loadTemplate("userAgenda").cloneNode(true) as HTMLDivElement;
 				insertUserAssignment(agenda[finalAssignmentID], assignmentElement, "new_assignments", true);
 				checkForEmpty();
 				tabHeaders[0].click();
@@ -249,13 +248,13 @@ function form_submit() {
 }
 
 function setUpFilters() {
-	const filtersDiv = document.getElementById("filters_div"),
-		typeFiltersDiv = document.getElementById("type_filters_div"),
-		typeFilterToggle = document.getElementById("type_filter_toggle"),
-		typeFilters = document.querySelectorAll("#type_filters_div input"),
-		courseFiltersDiv = document.getElementById("course_filters_div"),
-		courseFilterToggle = document.getElementById("course_filter_toggle"),
-		courseFilters = document.querySelector("#course_filters_div select");
+	const filtersDiv = document.getElementById("filters_div") as HTMLDivElement,
+		typeFiltersDiv = document.getElementById("type_filters_div") as HTMLDivElement,
+		typeFilterToggle = document.getElementById("type_filter_toggle") as HTMLAnchorElement,
+		typeFilters = document.querySelectorAll("#type_filters_div input") as NodeListOf<HTMLInputElement>,
+		courseFiltersDiv = document.getElementById("course_filters_div") as HTMLDivElement,
+		courseFilterToggle = document.getElementById("course_filter_toggle") as HTMLAnchorElement,
+		courseFilters = document.querySelector("#course_filters_div select") as HTMLSelectElement;
 
 	typeFilterToggle.addEventListener("click", () => {
 		if (typeFilterToggle.textContent === "בטל סינון") {
@@ -286,11 +285,11 @@ function setUpFilters() {
 			}, storage => {
 				if (chrome.runtime.lastError) {
 					console.error("TE_cal: " + chrome.runtime.lastError.message);
-					insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.", true);
+					insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
 					return;
 				}
 				for (const type in storage.filter_toggles) {
-					storage.filter_toggles[type] = document.getElementById(type).checked;
+					storage.filter_toggles[type] = (document.getElementById(type) as HTMLInputElement).checked;
 				}
 				chrome.storage.local.set({filter_toggles: storage.filter_toggles}, () => {
 					if (chrome.runtime.lastError)
@@ -313,12 +312,12 @@ function setUpFilters() {
 	}, storage => {
 		if (chrome.runtime.lastError) {
 			console.error("TE_cal: " + chrome.runtime.lastError.message);
-			insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.", true);
+			insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
 			return;
 		}
 		let filtersEnabledEh = false;
 		for (const type in storage.filter_toggles) {
-			document.getElementById(type).checked = storage.filter_toggles[type];
+			(document.getElementById(type) as HTMLInputElement).checked = storage.filter_toggles[type];
 			if (!filtersEnabledEh && storage.filter_toggles[type]) {
 				filtersEnabledEh = true;
 				typeFilterToggle.textContent = "בטל סינון";
@@ -330,49 +329,61 @@ function setUpFilters() {
 }
 
 // Initial setup and data load
+const form = document.querySelector("form") as HTMLFormElement,
+	tabContents = document.querySelectorAll("#bodies > .body") as NodeListOf<HTMLDivElement>,
+	tabHeaders = document.querySelectorAll("#tabs > .tab") as NodeListOf<HTMLDivElement>,
+	loadTemplate = (templateID: string, documentContext: Document | Element = document) => {
+		return document.importNode((documentContext.querySelector(`template#${templateID}`) as HTMLTemplateElement)?.content, true);
+	},
+	assignmentPromises: {
+		[key: string]: () => Promise<{ new_list: HWAssignment[], finished_list: HWAssignment[] }>
+	} = {},
+	CALENDARS: number = 3; // moodle, webwork, cs
+
 if (document.title === "ארגונית++") {
 	form.addEventListener("submit", event => {
 		event.preventDefault();
 		form_submit();
 	});
-	const form_buttons = form.querySelectorAll("a.button");
+	const form_buttons = form.querySelectorAll("a.button") as NodeListOf<HTMLAnchorElement>;
 	form_buttons[0].addEventListener("click", () => form_submit());
 	form_buttons[1].addEventListener("click", () => {
 		form_reset_all();
-		let currentTab = document.querySelector(".tab.current");
+		let currentTab = document.querySelector(".tab.current") as HTMLDivElement;
 		currentTab === tabHeaders[2] ? tabHeaders[0].click() : currentTab.click();
 	});
 	tabHeaders[2].addEventListener("click", () => form_reset_all());
 
-	const need_refresh = document.querySelector("#need_refresh");
-	need_refresh.querySelector("a.button").addEventListener("click", () => window.location.reload());
+	const need_refresh = document.querySelector("#need_refresh") as HTMLDivElement;
+	need_refresh.querySelector("a.button")?.addEventListener("click", () => window.location.reload());
 	setInterval(() => chrome.storage.local.get({cal_seen: 0}, storage => {
 		if (0 !== storage.cal_seen) need_refresh.style.display = "block";
 	}), 6E4);
 
-	const typeFilterToggle = document.getElementById("type_filter_toggle"),
-		courseFilterToggle = document.getElementById("course_filter_toggle");
+	const filtersDiv = document.getElementById("filters_div") as HTMLDivElement,
+		typeFilterToggle = document.getElementById("type_filter_toggle") as HTMLAnchorElement,
+		courseFilterToggle = document.getElementById("course_filter_toggle") as HTMLAnchorElement;
 	for (let i = 0; i < tabHeaders.length; i++)
 		tabHeaders[i].addEventListener("click", () => {
 			for (let j = 0; j < tabHeaders.length; j++) {
 				tabHeaders[j].className = j === i ? "tab current" : "tab";
 				tabContents[j].style.display = j === i ? "block" : "none";
 				if (i === 2)
-					document.getElementById("filters_div").classList.add("hidden");
+					filtersDiv.classList.add("hidden");
 				else if (typeFilterToggle.textContent !== "סינון מטלות לפי סוג" || courseFilterToggle.textContent !== "סינון מטלות לפי קורס")
-					document.getElementById("filters_div").classList.remove("hidden");
+					filtersDiv.classList.remove("hidden");
 			}
 		});
 
 	window.addEventListener("contextmenu", event => event.preventDefault());
-	input_counters = form.querySelectorAll("span");
+	const input_counters = form.querySelectorAll("span");
 	form.subject.addEventListener("input", () => input_counters[0].textContent = form.subject.value.length);
 	form.notes.addEventListener("input", () => input_counters[1].textContent = form.notes.value.length);
 	form.no_end.addEventListener("input", () => form.end_time.disabled = form.no_end.checked);
 	setUpFilters();
 
 	chrome.storage.local.get({organizer_fullscreen: false, dark_mode: false}, async storage => {
-		const fullscreenCheckbox = document.getElementById("fullscreen");
+		const fullscreenCheckbox = document.getElementById("fullscreen") as HTMLInputElement;
 		if (storage.organizer_fullscreen) {
 			fullscreenCheckbox.checked = true;
 			await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"});
@@ -381,7 +392,7 @@ if (document.title === "ארגונית++") {
 			await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
 			await chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
 		});
-		storage.dark_mode ? document.querySelector("html").setAttribute("tplus", "dm") :
-			document.querySelector("html").removeAttribute("tplus");
+		storage.dark_mode ? document.querySelector("html")?.setAttribute("tplus", "dm") :
+			document.querySelector("html")?.removeAttribute("tplus");
 	});
 }

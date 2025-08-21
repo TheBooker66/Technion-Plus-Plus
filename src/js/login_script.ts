@@ -1,24 +1,26 @@
-'use strict';
-
 (function () {
 	// Duplicate of util.js due to the login script being executed in a different context
-	function reverseString(str) {
+
+	function reverseString(str: string): string {
 		return str.split('').reverse().join('');
 	}
 
-	function xorStrings(str1, str2) {
-		return str1.split('')
-			.map((char, i) => String.fromCharCode(str1.charCodeAt(i) ^ str2.charCodeAt(i))).join('');
-	} // End of duplicate
+	function xorStrings(str1: string, str2: string): string {
+		return str1.split('').map((_, i) =>
+			String.fromCharCode(str1.charCodeAt(i) ^ str2.charCodeAt(i)),
+		).join('');
+	}
 
-	function appendInfo(form, name, value) {
+	// End of duplicate
+
+	function appendInfo(form: HTMLFormElement, name: string, value: string) {
 		const input = form.appendChild(document.createElement("input"));
 		input.name = name;
 		input.value = value;
 		input.type = "hidden";
 	}
 
-	function login_moodle_url(storageData) {
+	function login_moodle_url(storageData: { [key: string]: string | boolean }) {
 		chrome.runtime.sendMessage({mess_t: "login_moodle_url", url: window.location.hostname}, url => {
 			url = url.split("?");
 			const params = new URLSearchParams(url[1]);
@@ -29,9 +31,10 @@
 		});
 	}
 
-	function microsoft(storageData) {
+	function microsoft(storageData: { [key: string]: string | boolean }) {
 		const handleMicrosoftLogin = () => {
-			const loginForm = document.forms["f1"], microsoftLoginButton = document.getElementById("idSIButton9");
+			const loginForm = document.forms["f1" as any],
+				microsoftLoginButton = document.getElementById("idSIButton9");
 			if (loginForm && !document.getElementById("passwordError") &&
 				(location.pathname.includes("/oauth2/authorize") || location.pathname.includes("/saml2"))) {
 				const SelectAccountPageEh = location.href.includes("select_account");
@@ -64,10 +67,10 @@
 			.observe(document.forms[0] ?? document.body, {childList: true, attributes: false, subtree: true});
 	}
 
-	function techwww(storageData) {
+	function techwww(storageData: { [key: string]: string | boolean }) {
 		const form = document.createElement("form");
-		appendInfo(form, "username", storageData.username_ext);
-		appendInfo(form, "password", storageData.password);
+		appendInfo(form, "username", storageData.username_ext.toString());
+		appendInfo(form, "password", storageData.password.toString());
 		appendInfo(form, "Current_language", "HEBREW");
 		form.setAttribute("action", "https://moodle.technion.ac.il/login/index.php");
 		form.setAttribute("target", "_self");
@@ -76,30 +79,30 @@
 		form.submit();
 	}
 
-	function moodle(storageData) {
-		if (document.getElementsByClassName("navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
+	function moodle(storageData: { [key: string]: string | boolean }) {
+		if (document.querySelectorAll(".navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
 		storageData.enable_external ? window.location.href = "https://techwww.technion.ac.il/tech_ident/" : login_moodle_url(storageData);
 	}
 
-	function cs(storageData) {
-		if (document.getElementsByTagName("form")[0].getElementsByClassName("red-text").length !== 0 ||
+	function cs(storageData: { [key: string]: string | boolean }) {
+		if (document.querySelector("form")!.querySelectorAll(".red-text").length !== 0 ||
 			document.referrer.includes("grades.cs.technion.ac.il")) return;
-		const username = document.getElementById("ID"),
-			password = document.getElementById("password");
+		const username = document.getElementById("ID") as HTMLInputElement | null,
+			password = document.getElementById("password") as HTMLInputElement | null;
 		if (!username || !password) return;
-		username.value = storageData.username;
-		password.value = storageData.password;
-		if (document.getElementsByTagName("form")[0].getElementsByClassName("white-button").length > 0)
-			document.getElementsByTagName("form")[0].submit();
-		else document.getElementsByTagName("form")[0].getElementsByClassName("submit-button")[0].click();
+		username.value = storageData.username.toString();
+		password.value = storageData.password.toString();
+		if (document.querySelector("form")!.querySelectorAll(".white-button").length > 0)
+			document.querySelector("form")!.submit();
+		else (document.querySelector("form")!.querySelector(".submit-button") as HTMLButtonElement).click();
 	}
 
-	function sap(storageData) {
+	function sap(storageData: { [key: string]: string | boolean }) {
 		if ((document.getElementById("certLogonForm") === null || document.referrer.includes("portalex"))
 			&& !document.getElementById("divChangeContent")) {
 			const form = document.createElement("form");
-			appendInfo(form, "j_username", storageData.username);
-			appendInfo(form, "j_password", storageData.password);
+			appendInfo(form, "j_username", storageData.username.toString());
+			appendInfo(form, "j_password", storageData.password.toString());
 			appendInfo(form, "_eventId_proceed", "המשך");
 			form.setAttribute("action", window.location.href);
 			form.setAttribute("method", "post");
@@ -109,19 +112,19 @@
 	}
 
 	function panopto() {
-		if (document.getElementById("loginButton") != null && window.location.href.includes("Pages/Home.aspx") === true)
+		if (document.getElementById("loginButton") != null && window.location.href.includes("Pages/Home.aspx"))
 			window.location.href = (-1 === window.location.href.indexOf("?") ? "?" : "&") + "instance=TechnionAuthentication";
 		if (document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton") != null
-			&& (document.getElementById("providerDropdown").value = "TechnionAuthentication"))
-			document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton").click();
+			&& ((document.getElementById("providerDropdown") as HTMLInputElement).value = "TechnionAuthentication"))
+			(document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton") as HTMLElement).click();
 	}
 
-	function grades(storageData) {
-		const username = document.getElementById("Usertxt"),
-			password = document.getElementById("Passwordtxt");
+	function grades(storageData: { [key: string]: string | boolean }) {
+		const username = document.getElementById("Usertxt") as HTMLInputElement | null,
+			password = document.getElementById("Passwordtxt") as HTMLInputElement | null;
 		if (!username || !password) return;
-		username.value = storageData.username;
-		password.value = storageData.password;
+		username.value = storageData.username.toString();
+		password.value = storageData.password.toString();
 		document.forms[0].submit();
 	}
 

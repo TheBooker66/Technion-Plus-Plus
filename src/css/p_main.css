@@ -32,7 +32,7 @@
     display: none;
 }
 
-.more_links a {
+.screens a {
     font-size: 12px;
     cursor: pointer;
     text-decoration: none;
@@ -42,27 +42,27 @@
     padding: 5px;
 }
 
-.more_links a:hover, .more_links .toggle_table:hover {
+.screens a:hover, .screens .toggle_table:hover {
     background-color: rgb(237, 237, 240, 0.5);
 }
 
-.more_links a:not(.hw):hover .img_container {
+.screens a:not(.hw):hover .img_container {
     background-color: var(--sec-norm);
 }
 
-.more_links a.major, .more_links a.collapse {
+.screens a.major, .screens a.collapse {
     background-image: url("../icons/main_popup_icons/arrowhead-left.svg");
     background-repeat: no-repeat;
     background-position: 8px center;
     background-size: 10px 10px;
 }
 
-.more_links a.major.hw:after {
+.screens a.major.hw:after {
     content: " - מטלות חדשות";
     display: inline;
 }
 
-.more_links a.major.hw:before, .more_links a.active:before {
+.screens a.major.hw:before, .screens a.active:before {
     position: absolute;
     background-color: #fff;
     margin: 12px 17px;
@@ -73,49 +73,49 @@
     content: '';
 }
 
-.more_links a.active:before {
+.screens a.active:before {
     border-color: #12bc00;
 }
 
-.more_links a.active, .more_links a.major.hw {
+.screens a.active, .screens a.major.hw {
     background-color: #efefef;
 }
 
-.more_links a.major.hw:nth-of-type(2) {
+.screens a.major.hw:nth-of-type(2) {
     background-color: #e0e0e0;
 }
 
-.more_links a.major.hw .img_container, .more_links a.active .img_container {
+.screens a.major.hw .img_container, .screens a.active .img_container {
     background-color: #2c2c2d;
 }
 
-.more_links a.major.hw:hover .img_container, .more_links a.active:hover .img_container {
+.screens a.major.hw:hover .img_container, .screens a.active:hover .img_container {
     background-color: #000;
 }
 
-.more_links a.major.hw img, .more_links a.active img {
+.screens a.major.hw img, .screens a.active img {
     filter: invert(1);
 }
 
-.more_links a.major.hw:hover, .more_links a.active:hover {
+.screens a.major.hw:hover, .screens a.active:hover {
     background-color: rgb(255, 233, 0, 0.8);
 }
 
-.more_links .collapse {
+.screens .collapse {
     background-image: url("../icons/plus.svg") !important;
 }
 
-.more_links .collapsed {
+.screens .collapsed {
     background-image: none;
     background-color: #f9f9fa;
     cursor: default;
 }
 
-.more_links .collapsed > div {
+.screens .collapsed > div {
     display: block !important;
 }
 
-.more_links img {
+.screens img {
     max-width: 12px;
     max-height: 12px;
     margin: 4px;
@@ -288,7 +288,7 @@
 /*
 * in use by checkbox-toggles (currently - there are none... but we had some!)
 */
-.more_links .toggle_table {
+.screens .toggle_table {
     border-top: 0;
     font-size: 12px;
     padding: 7px 2px 6px 4px;
