@@ -1,10 +1,9 @@
 import {addAssignmentsToList} from "./organizer.js";
 import {CommonPopup} from "./common_popup.js";
-import {HWAssignment} from "./utils.js";
 
 export class CommonCalendar {
 	private readonly common: CommonPopup;
-	private readonly system: "moodle" | "cs" | "webwork" | "ua";
+	private readonly system: HWSystem;
 	private readonly flags: { moodle: 1; cs: 2; webwork: 4 };
 	private readonly organiser: string;
 
@@ -97,7 +96,7 @@ function insertMessage(msg: string, errorEh: boolean) {
 	messageElement.textContent = msg;
 }
 
-export function toggle(sys: "moodle" | "cs" | "webwork" | "ua", event: number, item: HTMLDivElement, VorX: 0 | 1) {
+export function toggle(sys: HWSystem, event: number, item: HTMLDivElement, VorX: 0 | 1) {
 	if (sys === "ua") {
 		chrome.storage.local.get({user_agenda: {}}, storageData => {
 			if (chrome.runtime.lastError) console.error("TE_organize7: " + chrome.runtime.lastError.message);

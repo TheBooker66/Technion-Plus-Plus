@@ -14,8 +14,8 @@
 				let buttonCell = courseButtonTemplate.cloneNode(true) as DocumentFragment;
 				(buttonCell.querySelector("input") as HTMLInputElement).addEventListener("click", f => {
 					f.preventDefault();
-					document.forms["SubSub" as any]["RecreatePath"].value = `5-${i - 1}`;
-					document.forms["SubSub" as any].submit();
+					document.forms.namedItem("SubSub")!["RecreatePath"].value = `5-${i - 1}`;
+					document.forms.namedItem("SubSub")!.submit();
 				});
 				courseRows[i].appendChild(buttonCell);
 			}
@@ -51,7 +51,7 @@
 		}
 	}
 
-	if (document.forms["SubSub" as any]) {
+	if (document.forms.namedItem("SubSub")) {
 		const pathInputs = document.querySelectorAll("form input[name='RecreatePath']") as NodeListOf<HTMLInputElement>;
 		let recreatePathValue = "";
 		for (let i = 0; i < pathInputs.length; i++)

@@ -1,5 +1,4 @@
 import {CommonPopup} from './common_popup.js';
-import type {DownloadItem} from "./utils.js";
 
 (function () {
 	function updateTextContent(element: HTMLElement, newText: string) {

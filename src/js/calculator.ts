@@ -1,5 +1,3 @@
-import type {CalculatorCourse} from "./utils.js";
-
 const semesterOrder = {
 	"חורף": 1,
 	"אביב": 2,
@@ -132,7 +130,7 @@ function handleGradesListClick(event: PointerEvent) {
 	chrome.storage.local.get({grades: []}, storage => {
 		const allGrades = storage.grades;
 		const courseNum = (rowElement.querySelector("td:first-child") as HTMLTableCellElement).textContent;
-		const courseData = allGrades.find((course: CalculatorCourse) => course.num === parseInt(courseNum));
+		const courseData = allGrades.find((course: CalculatorCourse) => course.num === courseNum);
 
 		if (!courseData) {
 			console.error("Course not found in storage for num:", courseNum);
@@ -206,7 +204,7 @@ function handleIgnoreListClick(event: PointerEvent) {
 	chrome.storage.local.get({grades: []}, storage => {
 		const allGrades = storage.grades;
 		const courseNum = (rowElement.querySelector("td:first-child") as HTMLTableCellElement).textContent;
-		const courseData = allGrades.find((course: CalculatorCourse) => course.num === parseInt(courseNum));
+		const courseData = allGrades.find((course: CalculatorCourse) => course.num === courseNum);
 
 		if (!courseData) {
 			console.error("Course not found in storage for num:", courseNum);
@@ -232,7 +230,7 @@ function handleIgnoreListClick(event: PointerEvent) {
 				rowElement.remove();
 				document.getElementById("grades_list")?.querySelector(`#course_${courseNum}`)
 					?.closest("tr")?.remove();
-				const updatedGrades = allGrades.filter((course: CalculatorCourse) => course.num !== parseInt(courseNum));
+				const updatedGrades = allGrades.filter((course: CalculatorCourse) => course.num !== courseNum);
 				chrome.storage.local.set({grades: updatedGrades}, () => {
 					handleStorageError("delete_grade");
 				});
@@ -303,13 +301,13 @@ function setUpButtons() {
 		} = Object.fromEntries(formData) as { [key: string]: string };
 
 		const newCourse: CalculatorCourse = {
-			num: parseInt(num),
+			num: num.trim(),
 			name: name.trim(),
 			points: parseFloat(points),
 			binary: binaryEh === 'on',
 			grade: binaryEh === 'on' ? binary_grade.trim() : parseFloat(grade),
 			year: parseInt(year, 10),
-			semester: semester.trim() as "חורף" | "אביב" | "קיץ",
+			semester: semester.trim() as Semester,
 			perm_ignored: false,
 			selected: false,
 		};
@@ -339,7 +337,7 @@ function setUpButtons() {
 				const latestSemesterOrder = storage.grades
 					.filter((course: CalculatorCourse) => course.year === latestYear)
 					.reduce((maxOrder: number, course: CalculatorCourse) => Math.max(maxOrder, semesterOrder[course.semester]), 0);
-				const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[(key as "חורף" | "אביב" | "קיץ")] === latestSemesterOrder);
+				const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[(key as Semester)] === latestSemesterOrder);
 				if (newCourse.year === latestYear && newCourse.semester === latestSemester) {
 					newRow.classList.add("selected");
 					(newRow.querySelector("input[type='checkbox']") as HTMLInputElement).checked = true;
@@ -426,7 +424,7 @@ function setUpButtons() {
 				const reader = new FileReader();
 				reader.readAsText(file, 'UTF-8');
 				reader.onload = (event) => {
-					const lines = (event?.target?.result as string)?.split('\n').filter(line => line.trim() !== '');
+					const lines = (event?.target?.result as string)?.split('\n').filter(line => line.trim() !== '').slice(1);
 
 					chrome.storage.local.get({grades: []}, storage => {
 						const currentStoredGrades = storage.grades;
@@ -466,11 +464,11 @@ function setUpButtons() {
 							const gradeStr = parts[3].trim();
 							const binaryEh = Number.isNaN(parseFloat(gradeStr));
 							const csvCourse: CalculatorCourse = {
-								num: parseInt(parts[0]),
+								num: parts[0].trim(),
 								name: parts[1].trim(),
 								points: parseFloat(parts[2].trim()),
 								grade: binaryEh ? gradeStr : parseFloat(gradeStr),
-								semester: parts[4].trim() as "חורף" | "אביב" | "קיץ",
+								semester: parts[4].trim() as Semester,
 								year: parseInt(parts[5].trim(), 10),
 								binary: binaryEh,
 								perm_ignored: false,
@@ -527,11 +525,11 @@ function setUpButtons() {
 								const gradeStr = parts[4].trim();
 								const binaryEh = Number.isNaN(parseFloat(gradeStr));
 								const pdfCourse: CalculatorCourse = {
-									num: parseInt(parts[1]),
+									num: parts[1].trim(),
 									name: parts[2].trim(),
 									points: parts[3] ? parseFloat(parts[3].trim()) : 0,
 									grade: binaryEh ? gradeStr.trim() : parseFloat(gradeStr),
-									semester: parts[6].trim() as "חורף" | "אביב" | "קיץ",
+									semester: parts[6].trim() as Semester,
 									year: parseInt(parts[5].trim(), 10),
 									binary: binaryEh,
 									perm_ignored: false,
@@ -581,7 +579,7 @@ function renderAllCourses() {
 				.filter((course: CalculatorCourse) => course.year === latestYear)
 				.reduce((maxOrder: number, course: CalculatorCourse) => Math.max(maxOrder, semesterOrder[course.semester]), 0);
 		}
-		const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[key as "חורף" | "אביב" | "קיץ"] === latestSemesterOrder);
+		const latestSemester = Object.keys(semesterOrder).find(key => semesterOrder[key as Semester] === latestSemesterOrder);
 
 		const gradesToPersist = allGrades.map((course: CalculatorCourse) => {
 			course.selected = course.semester === latestSemester && course.year === latestYear;
@@ -600,7 +598,7 @@ function renderAllCourses() {
 				document.getElementById(listKey)!.querySelector('tbody')!.innerHTML = '';
 				const fragment = document.createDocumentFragment();
 				const sortedData: CalculatorCourse[] = ([...lists[listKey as "grades_list" | "ignore_list"]]).sort((a: CalculatorCourse, b: CalculatorCourse) =>
-					a.year - b.year || semesterOrder[a.semester] - semesterOrder[b.semester] || a.num - b.num,
+					a.year - b.year || semesterOrder[a.semester] - semesterOrder[b.semester] || parseInt(a.num) - parseInt(b.num),
 				);
 				sortedData.forEach((courseData: CalculatorCourse) => {
 					const rowElement = createCourseRowElement(courseData, listKey);

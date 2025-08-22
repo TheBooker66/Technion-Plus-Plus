@@ -215,6 +215,7 @@ b.assignment_header {
 }
 
 footer {
+    width: auto;
     grid-column-gap: 100px;
     grid-template-columns: max-content 1fr max-content;
 }

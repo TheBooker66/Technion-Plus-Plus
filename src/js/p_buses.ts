@@ -1,6 +1,5 @@
 import {CommonPopup} from "./common_popup.js";
 import {TE_shutBusesAlerts} from "../service_worker.js";
-import type {BusLine} from "./utils.js";
 
 (function () {
 	function createBusLineElement(lineDetails = ["", "", 0], parentContainer: HTMLDivElement) {
@@ -19,6 +18,7 @@ import type {BusLine} from "./utils.js";
 				setTimeout(() => element.classList.remove("blat"), 1E3);
 			} else {
 				if (arrivalTimeIndex > 0) {
+
 					void chrome.runtime.sendMessage({
 						mess_t: "silent_notification",
 						message: "ניתן ליצור התראה רק לאוטובוס הראשון המופיע ברשימה עבור קו ספציפי בכיוון ספציפי.\n",
@@ -42,14 +42,14 @@ import type {BusLine} from "./utils.js";
 		(document.getElementById("error") as HTMLDivElement).textContent = msg;
 	}
 
-	function fetchBusData(intervalID: number) {
+	function fetchBusData(interval: NodeJS.Timeout | number) {
 		const url = encodeURI("https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/"
 			+ (document.getElementById("station_select") as HTMLSelectElement).value + "/he/false");
 		chrome.storage.local.get({buses_alerts: []}, storageData => {
 			if (chrome.runtime.lastError) {
 				console.error("TE_bus_err: " + chrome.runtime.lastError.message);
 				displayError("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");
-				clearInterval(intervalID);
+				clearInterval(interval);
 				return;
 			}
 

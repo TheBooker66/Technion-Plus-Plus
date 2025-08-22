@@ -1,6 +1,5 @@
 import {CommonPopup} from "./common_popup.js";
 import {TE_updateVideosInfo} from "../service_worker.js";
-import type {RecordingCourse} from "./utils.js";
 
 (function () {
 	function stop_spinning() {
@@ -23,22 +22,22 @@ import type {RecordingCourse} from "./utils.js";
 		const courseTypes = ["הרצאה", "תרגול"];
 		const template = popup.loadTemplate("courses-list-item");
 		for (let i = 0; i < courseData.data.length; i++) {
-			let recordingDetails = [], panoptoEh = courseData.data[i].p,
+			let recordingDetails = [], panoptoEh = courseData.data[i]["p"],
 				listItem = (template.cloneNode(true) as HTMLElement).querySelector(".list_item") as HTMLAnchorElement;
-			listItem.setAttribute("href", panoptoEh ? `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${courseData.data[i].l}"` : `https://video.technion.ac.il/Courses/${courseData.data[i].l}.html`);
-			listItem.querySelector("span")!.textContent = courseData.data[i].vn ?? courseData.name;
-			0 < courseData.data[i].t && recordingDetails.push(courseTypes[courseData.data[i].t - 1]);
-			courseData.data[i].b && recordingDetails.push(courseData.data[i].b);
-			0 < recordingDetails.length && (listItem.querySelector("small")!.textContent = recordingDetails.join(", "));
+			listItem.setAttribute("href", panoptoEh ? `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${courseData.data[i]["l"]}"` : `https://video.technion.ac.il/Courses/${courseData.data[i]["l"]}.html`);
+			listItem.querySelector("span")!.textContent = courseData.data[i]["vn"] ?? courseData.name;
+			if (courseData.data[i]["t"] > 0) recordingDetails.push(courseTypes[courseData.data[i]["t"] - 1]);
+			if (courseData.data[i]["b"]) recordingDetails.push(courseData.data[i]["b"]);
+			if (recordingDetails.length > 0) (listItem.querySelector("small")!.textContent = recordingDetails.join(", "));
 			(listItem.querySelector(".recording_from") as HTMLImageElement).src = panoptoEh ? "../icons/panopto.ico" : "../icons/videoserver.ico";
 			resultsContainer.appendChild(listItem);
-			i < courseData.data.length - 1 && create_divider(resultsContainer);
+			if (courseData.data.length - 1 > i) create_divider(resultsContainer);
 		}
 		chrome.storage.local.get({videos_last: []}, storageData => {
 			const courseNumber = courseData.name.split(" - ")[0];
 			const lastSearches = storageData.videos_last.filter((courseNum: number) => courseNum !== parseInt(courseNumber));
 			lastSearches.push(courseNumber);
-			7 < lastSearches.length && lastSearches.splice(0, lastSearches.length - 7);
+			if (lastSearches.length > 7) lastSearches.splice(0, lastSearches.length - 7);
 			void chrome.storage.local.set({videos_last: lastSearches});
 		});
 	}

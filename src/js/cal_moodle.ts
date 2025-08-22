@@ -1,7 +1,6 @@
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
 import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
-import {HWAssignment} from "./utils";
 
 (function () {
 	function openMoodle(eventID: number, eventTimestamp: number): () => Promise<chrome.tabs.Tab> {
@@ -142,9 +141,9 @@ import {HWAssignment} from "./utils";
 						eventTime = eventDate.toLocaleString("iw-IL", datetimeFormat);
 
 						const courseInfo: string = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
-						const courseNum = parseInt(courseInfo[0]?.replace(/[^0-9]/i, "").trim()),
+						const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
 							semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
-						const course = (storageData.u_courses.hasOwnProperty(courseNum.toString()) && semesterNum.toString() in semesters) ?
+						const course = (storageData.u_courses.hasOwnProperty(courseNum) && semesterNum.toString() in semesters) ?
 							storageData.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "") : courseInfo;
 
 						let eventDescription = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]

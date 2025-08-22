@@ -935,7 +935,7 @@
       </option>
       <option name="myCustomValuesEnabled" value="true" />
     </inspection_tool>
-    <inspection_tool class="HtmlUnknownTarget" enabled="true" level="WARNING" enabled_by_default="true">
+    <inspection_tool class="HtmlUnknownTarget" enabled="true" level="GRAMMAR_ERROR" enabled_by_default="true" editorAttributes="GRAMMAR_ERROR">
       <scope name="Libraries" level="WARNING" enabled="false" />
       <scope name="Proprietary Icons" level="WARNING" enabled="false" />
     </inspection_tool>

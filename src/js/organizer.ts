@@ -1,5 +1,4 @@
 import {toggle} from "./common_calendar.js";
-import {HWAssignment} from "./utils.js";
 
 function insertMessage(messageText: string, errorEh: boolean = true) {
 	const element = document.getElementById("error")!.appendChild(document.createElement("div"));
@@ -149,7 +148,7 @@ function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivEl
 
 export function addAssignmentsToList(
 	calendarPromise: () => Promise<{ new_list: HWAssignment[], finished_list: HWAssignment[] }>,
-	calendarType: "moodle" | "cs" | "webwork" | "ua") {
+	calendarType: HWSystem) {
 	assignmentPromises[calendarType] = calendarPromise;
 	if (Object.keys(assignmentPromises).length !== CALENDARS) return;
 

@@ -1,4 +1,9 @@
 #region Initial Statements
+# Developer mode
+param(
+    [switch]$DevMode
+)
+
 # Define excluded file patterns
 $excludedFiles = @(
     "*webwork.svg"
@@ -9,32 +14,32 @@ $excludedFiles = @(
 # Define minifiable file extensions and commands
 $minifyActions = @{
     "js" = {
-        param([string]$InputPath, [string]$OutputPath)
-        npx uglifyjs "$InputPath" -o "$OutputPath" --compress --mangle
-        Write-Host "Minified js: $( $OutputPath )"
+        param([string]$Path)
+        npx uglifyjs "$Path" --compress --mangle | Set-Content "$Path"
+        Write-Host "Minified js: $( $Path )"
     }
     "html" = {
-        param([string]$InputPath, [string]$OutputPath)
-        npx html-minifier "$InputPath" -o "$OutputPath" --collapse-whitespace --remove-comments `
-            --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true
-        Write-Host "Minified html: $( $OutputPath )"
+        param([string]$Path)
+        npx html-minifier "$Path" --collapse-whitespace --remove-comments `
+            --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true | Set-Content "$Path"
+        Write-Host "Minified html: $( $Path )"
     }
     "css" = {
-        param([string]$InputPath, [string]$OutputPath)
-        npx clean-css-cli -o "$OutputPath" "$InputPath"
-        Write-Host "Minified css: $( $OutputPath )"
+        param([string]$Path)
+        npx clean-css-cli "$Path" | Set-Content "$Path"
+        Write-Host "Minified css: $( $Path )"
     }
     "svg" = {
-        param([string]$InputPath, [string]$OutputPath)
-        npx html-minifier "$InputPath" -o "$OutputPath" --collapse-whitespace --remove-comments --case-sensitive
-        Write-Host "Minified svg: $( $OutputPath )"
+        param([string]$Path)
+        npx html-minifier "$Path" --collapse-whitespace --remove-comments --case-sensitive | Set-Content "$Path"
+        Write-Host "Minified svg: $( $Path )"
     }
 }
 #endregion
 
-#region Prepare Output Folder
-# Set Output folder
-$outputfolder = Join-Path -Path (Get-Location).Path -ChildPath "minified"
+#region Delete Previous Output Folder
+# Define Output folder path
+$outputfolder = Join-Path -Path (Get-Location).Path -ChildPath "dist"
 
 # Delete previously minified folder if it exists
 if (Test-Path -Path $outputfolder -PathType Container)
@@ -42,65 +47,9 @@ if (Test-Path -Path $outputfolder -PathType Container)
     Remove-Item -Path $outputfolder -Recurse -Force
     Write-Host "Removed old minified folder."
 }
-#endregion
 
-#region File Processing
-# Get all files recursively from source folder
-$cwd = Join-Path -Path (Get-Location).Path -ChildPath "src"
-$files = Get-ChildItem -Path $cwd -Recurse | Select-Object -ExpandProperty FullName
-
-# Process each file
-foreach ($file in $files)
-{
-    # Determine output path using relative path from source folder
-    $relativePath = (Resolve-Path -Relative -Path $file).Replace(".\src\", "")
-    $outputPath = Join-Path -Path $outputfolder -ChildPath $relativePath
-
-    # Check if the file should be excluded
-    if ($excludedFiles | Where-Object { $file -like $_ })
-    {
-        if (Test-Path -Path $file -PathType Leaf)
-        {
-            Copy-Item -Path $file -Destination $outputPath
-            Write-Host "Copied excluded file: $( $outputPath )"
-            continue
-        }
-        else
-        {
-            Copy-Item -Path $file -Destination $outputPath -Container # Use -Container for folders explicitly
-            Write-Host "Copied excluded folder: $( $outputPath )"
-            continue
-        }
-    }
-
-    # Check if the file is an actual file
-    if (Test-Path -Path $file -PathType Leaf)
-    {
-        $extension = (Split-Path -Leaf $file).Split(".")[-1]
-        # Minify if file type is minifiable
-        if ($minifyActions.ContainsKey($extension))
-        {
-            & $minifyActions[$extension] -InputPath $file -OutputPath $outputPath
-        }
-        # Copy if file not minifiable
-        else
-        {
-            Copy-Item -Path $file -Destination $outputPath
-            Write-Host "Copied file: $( $outputPath )"
-        }
-    }
-    # Copy folders
-    else
-    {
-        Copy-Item -Path $file -Destination $outputPath -Container # Use -Container for folders explicitly
-        Write-Host "Copied folder: $( $outputPath )"
-    }
-}
-#endregion
-
-#region Zip Output
 # Define zip file path
-$zipFilePath = Join-Path -Path (Get-Location).Path -ChildPath "minified.zip"
+$zipFilePath = Join-Path -Path (Get-Location).Path -ChildPath "dist.zip"
 
 # Delete previously zipped file if it exists
 if (Test-Path -Path $zipFilePath)
@@ -108,8 +57,61 @@ if (Test-Path -Path $zipFilePath)
     Remove-Item -Path $zipFilePath -Force
     Write-Host "Removed old zip file."
 }
+#endregion
 
+#region Typescript Compilation
+# Compile the entire TypeScript project
+npx tsc --outDir $outputfolder
+Write-Host "Compiled TypeScript files."
+#endregion
+
+#region Copy Other Files
+# Use Robocopy to copy all other files, excluding .ts files, from the src directory to the output folder
+$sourcePath = Join-Path -Path (Get-Location).Path -ChildPath "src"
+robocopy $sourcePath $outputfolder /E /XF *.ts | Out-Null
+Write-Host "Copied other files to minified folder."
+#endregion
+
+# Check if developer mode is enabled
+if ($DevMode)
+{
+    Write-Host "Running in developer mode, skipping minification and ziping."
+    return
+}
+
+#region Minification
+# Get all files recursively in the minified folder
+$files = Get-ChildItem -Path $outputfolder -Recurse | Select-Object -ExpandProperty FullName
+
+# Minify all the files
+foreach ($file in $files)
+{
+    # Check if the file should be excluded
+    if ($excludedFiles | Where-Object { $file -like $_ })
+    {
+        Write-Host "Skipping excluded file: $( $file )"
+        continue
+    }
+
+    # Check if the file is an actual file
+    if (!(Test-Path -Path $file -PathType Leaf))
+    {
+        Write-Host "Skipping non-file item: $( $file )"
+        continue
+    }
+
+    # Check if the file is minifiable
+    $extension = (Split-Path -Leaf $file).Split(".")[-1]
+    if ( $minifyActions.ContainsKey($extension))
+    {
+        & $minifyActions[$extension] -Path $file
+    }
+}
+#endregion
+
+#region Zip Output
 # Zip the minified folder
 Compress-Archive -Path "$outputfolder\*" -DestinationPath $zipFilePath
 Write-Host "Created zip archive: $( $zipFilePath )"
+Write-Host "Finished! 🎉🎉🎉"
 #endregion

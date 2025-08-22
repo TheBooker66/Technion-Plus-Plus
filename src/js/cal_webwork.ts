@@ -1,6 +1,5 @@
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
-import {HWAssignment} from './utils.js';
 
 (function () {
 	const popup = new CommonPopup("מטלות קרובות - וובוורק", ["calendar"], document.title);

@@ -4,8 +4,8 @@
 # Minifier & Minified files
 /node_modules/
 package-lock.json
-/minified/
-minified.zip
+/dist/
+dist.zip
 
 # My testing
 urls.txt

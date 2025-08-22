@@ -15,7 +15,7 @@ import {reverseString, xorStrings} from './utils.js';
 		}
 	}
 
-	new CommonPopup("טכניון++", ["main"], document.title);
+	new CommonPopup("", ["main"], document.title);
 	const OS = navigator.userAgentData ?? "navigator.userAgentData is not supported!";
 	if (!OS.toString().includes("Android"))
 		chrome.action.getBadgeBackgroundColor({}, badgeColor => {
@@ -47,9 +47,9 @@ import {reverseString, xorStrings} from './utils.js';
 	});
 
 	const popup_window = {
-		type: "popup" as "popup" | "normal" | "panel",
+		type: "popup",
 		focused: true,
-		state: "normal" as "normal" | "minimized" | "maximized" | "fullscreen" | "locked-fullscreen",
+		state: "normal",
 		url: "html/organizer.html",
 		height: Math.min(window.screen.height - 40, 720),
 		width: Math.min(window.screen.width - 20, 1200),
@@ -61,7 +61,7 @@ import {reverseString, xorStrings} from './utils.js';
 	(document.getElementById("release_notes") as HTMLAnchorElement)
 		.addEventListener("click", () => chrome.tabs.create({url: "html/release_notes.html"}));
 	(document.getElementById("organizer") as HTMLAnchorElement)
-		.addEventListener("click", () => chrome.windows.create(popup_window));
+		.addEventListener("click", () => chrome.windows.create(popup_window as chrome.windows.CreateData));
 	(document.getElementById("calculator") as HTMLAnchorElement)
 		.addEventListener("click", () => chrome.tabs.create({url: "html/calculator.html"}));
 	for (let i = 0; i < toolLinks.length; i++) {

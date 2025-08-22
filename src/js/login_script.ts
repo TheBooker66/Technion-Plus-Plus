@@ -33,7 +33,7 @@
 
 	function microsoft(storageData: { [key: string]: string | boolean }) {
 		const handleMicrosoftLogin = () => {
-			const loginForm = document.forms["f1" as any],
+			const loginForm = document.forms.namedItem("f1"),
 				microsoftLoginButton = document.getElementById("idSIButton9");
 			if (loginForm && !document.getElementById("passwordError") &&
 				(location.pathname.includes("/oauth2/authorize") || location.pathname.includes("/saml2"))) {

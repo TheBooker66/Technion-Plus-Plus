@@ -5,9 +5,9 @@
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
-      <excludeFolder url="file://$MODULE_DIR$/minified" />
       <excludeFolder url="file://$MODULE_DIR$/src/lib" />
-      <excludePattern pattern="minified.zip" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludePattern pattern="dist.zip" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

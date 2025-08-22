@@ -1,6 +1,6 @@
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
-import {reverseString, xorStrings, HWAssignment} from './utils.js';
+import {reverseString, xorStrings} from './utils.js';
 
 (function () {
 	const popup = new CommonPopup("מטלות קרובות - מדמ\"ח", ["calendar"], document.title);

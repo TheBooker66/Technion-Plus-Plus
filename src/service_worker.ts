@@ -1,5 +1,5 @@
 /// <reference types="user-agent-data-types" />
-import {type BusLine, type DownloadItem, type RecordingCourse, reverseString, xorStrings} from "./js/utils.js";
+import {reverseString, xorStrings} from "./js/utils.js";
 
 const courseRegex = /(?<cname>.+)\s-\s(?<cnum>\d{6,8})/, semesterRegex = / - (?:קיץ|חורף|אביב)/;
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -568,10 +568,10 @@ export async function TE_updateVideosInfo(timestamp: number, callbacks: any = nu
 		const coursesList: string[][] = [], videosData: { [key: string]: RecordingCourse["data"] } = {};
 		for (const courseId in dbData.data) {
 			const courseInfo = dbData.data[courseId];
-			const courseEntry = [courseId, courseInfo.n];
-			if (courseInfo.a) courseEntry.push(courseInfo.a);
+			const courseEntry = [courseId, courseInfo["n"]];
+			if (courseInfo["a"]) courseEntry.push(courseInfo["a"]);
 			coursesList.push(courseEntry);
-			videosData[courseId] = courseInfo.data;
+			videosData[courseId] = courseInfo["data"];
 		}
 		console.log(`TE_back: found ${coursesList.length} courses for videos-db (${timestamp})`);
 		TE_setStorage({videos_courses: coursesList, videos_data: videosData, videos_update: timestamp}, "uc");
