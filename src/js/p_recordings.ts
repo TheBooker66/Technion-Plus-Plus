@@ -13,7 +13,7 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 		parentContainer.appendChild(div);
 	}
 
-	function displayCourseRecordings(courseData: { name: string, data: RecordingCourse["data"] }) {
+	function displayCourseRecordings(courseData: { name: string, data: RecordingCourse["v"] }) {
 		stop_spinning();
 		messageElement.textContent = "בחר הקלטה לצפייה.";
 		queryDisplay.textContent = "קורס: " + courseData.name;
@@ -42,7 +42,7 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 		});
 	}
 
-	function displayMultipleCourses(matchingCourses: { name: string, data: RecordingCourse["data"] }[]) {
+	function displayMultipleCourses(matchingCourses: { name: string, data: RecordingCourse["v"] }[]) {
 		stop_spinning();
 		messageElement.textContent = "נמצא יותר מקורס מתאים אחד.";
 		document.querySelector("h3")!.style.display = "block";
@@ -61,7 +61,7 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 		resultsContainer.appendChild(listFragment);
 	}
 
-	function processSearchResults(coursesList: string[][], videosData: { [p: string]: RecordingCourse["data"] },
+	function processSearchResults(coursesList: string[][], videosData: { [p: string]: RecordingCourse["v"] },
 	                              courseQuery: string) {
 		if (null == coursesList[0]) {
 			messageElement.textContent = "חלה שגיאה בניסיון להשיג את רשימת הקורסים, אנא נסה מאוחר יותר.";
@@ -70,7 +70,7 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 			return;
 		}
 		const searchRegex = new RegExp(courseQuery.replace(/ /g, ".*")),
-			resultsArray: { name: string, data: RecordingCourse["data"] }[] = [];
+			resultsArray: { name: string, data: RecordingCourse["v"] }[] = [];
 		let matchCount = 0;
 		for (const course of coursesList) {
 			let courseName = course.slice(0, 2).join(" - ");
@@ -93,15 +93,15 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 	}
 
 	async function fetchAndUpdateVideos(storageData: {
-		                                    [p: string]: string[][] | { [p: string]: RecordingCourse["data"] }
+		                                    [p: string]: string[][] | { [p: string]: RecordingCourse["v"] }
 	                                    },
 	                                    courseQuery: string) {
 		const callbacks = [
-			(coursesList: string[][], videosData: { [key: string]: RecordingCourse["data"] }) =>
+			(coursesList: string[][], videosData: { [key: string]: RecordingCourse["v"] }) =>
 				processSearchResults(coursesList, videosData, courseQuery),
 			() =>
 				processSearchResults(storageData.videos_courses as string[][],
-					storageData.videos_data as { [p: string]: RecordingCourse["data"] }, courseQuery),
+					storageData.videos_data as { [p: string]: RecordingCourse["v"] }, courseQuery),
 		];
 		await TE_updateVideosInfo(Date.now(), callbacks);
 	}

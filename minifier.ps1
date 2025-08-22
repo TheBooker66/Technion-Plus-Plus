@@ -59,12 +59,6 @@ if (Test-Path -Path $zipFilePath)
 }
 #endregion
 
-#region Typescript Compilation
-# Compile the entire TypeScript project
-npx tsc --outDir $outputfolder
-Write-Host "Compiled TypeScript files."
-#endregion
-
 #region Copy Other Files
 # Use Robocopy to copy all other files, excluding .ts files, from the src directory to the output folder
 $sourcePath = Join-Path -Path (Get-Location).Path -ChildPath "src"
@@ -72,12 +66,20 @@ robocopy $sourcePath $outputfolder /E /XF *.ts | Out-Null
 Write-Host "Copied other files to minified folder."
 #endregion
 
+#region Typescript Compilation
 # Check if developer mode is enabled
 if ($DevMode)
 {
+    # Compile the entire TypeScript project with watch mode
+    npx tsc --outDir $outputfolder --watch
     Write-Host "Running in developer mode, skipping minification and ziping."
     return
 }
+
+# Compile the entire TypeScript project regularly
+npx tsc --outDir $outputfolder
+Write-Host "Compiled TypeScript files."
+#endregion
 
 #region Minification
 # Get all files recursively in the minified folder
@@ -86,17 +88,17 @@ $files = Get-ChildItem -Path $outputfolder -Recurse | Select-Object -ExpandPrope
 # Minify all the files
 foreach ($file in $files)
 {
+    # Check if the file is an actual file
+    if (!(Test-Path -Path $file -PathType Leaf))
+    {
+        Write-Host "Skipping folder: $( $file )"
+        continue
+    }
+
     # Check if the file should be excluded
     if ($excludedFiles | Where-Object { $file -like $_ })
     {
         Write-Host "Skipping excluded file: $( $file )"
-        continue
-    }
-
-    # Check if the file is an actual file
-    if (!(Test-Path -Path $file -PathType Leaf))
-    {
-        Write-Host "Skipping non-file item: $( $file )"
         continue
     }
 

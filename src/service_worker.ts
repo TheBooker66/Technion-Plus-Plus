@@ -565,13 +565,13 @@ export async function TE_updateVideosInfo(timestamp: number, callbacks: any = nu
 			if (callbacks) callbacks[1]();
 		}
 
-		const coursesList: string[][] = [], videosData: { [key: string]: RecordingCourse["data"] } = {};
+		const coursesList: string[][] = [], videosData: { [key: string]: RecordingCourse["v"] } = {};
 		for (const courseId in dbData.data) {
 			const courseInfo = dbData.data[courseId];
 			const courseEntry = [courseId, courseInfo["n"]];
 			if (courseInfo["a"]) courseEntry.push(courseInfo["a"]);
 			coursesList.push(courseEntry);
-			videosData[courseId] = courseInfo["data"];
+			videosData[courseId] = courseInfo["v"];
 		}
 		console.log(`TE_back: found ${coursesList.length} courses for videos-db (${timestamp})`);
 		TE_setStorage({videos_courses: coursesList, videos_data: videosData, videos_update: timestamp}, "uc");

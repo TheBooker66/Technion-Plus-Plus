@@ -28,7 +28,7 @@ type CalculatorCourse = {
 
 type RecordingCourse = {
 	n: string, // Course name
-	data: { // Course data
+	v: { // Course data
 		vn: string, // Recording name
 		l: string, // Recording ID
 		p: number, // panoptoEh

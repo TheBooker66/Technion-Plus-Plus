@@ -130,7 +130,7 @@
 					videos_courses: [],
 				}, (storage: {
 					videos_courses: string[][],
-					videos_data: { [key: string]: RecordingCourse["data"] }
+					videos_data: { [key: string]: RecordingCourse["v"] }
 				}) => {
 					const short_course_num = course_num.substring(1, 4) + course_num.substring(5, 8);
 					let videoID = "";
