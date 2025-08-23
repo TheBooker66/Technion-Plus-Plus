@@ -108,11 +108,6 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 				"200": "חורף",
 				"201": "אביב",
 				"202": "קיץ",
-			}, datetimeFormat = {
-				weekday: "long",
-				day: "2-digit",
-				month: "2-digit",
-				year: "numeric",
 			};
 			let maxEventID = 0, finishedEvents: { [key: string]: number } = {},
 				newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
@@ -136,9 +131,11 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 						eventDate = eventDate.substring(0, 8)
 							.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTime.trim();
 						eventDate = new Date(eventDate);
-						if (eventDate.getTime() < now.getTime() - 864E5)
+						if (eventDate.getTime() < now.getTime() - 864E5) // 24 hours
 							continue;
-						eventTime = eventDate.toLocaleString("iw-IL", datetimeFormat);
+						eventTime = eventDate.toLocaleString("iw-IL", {
+							weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
+						});
 
 						const courseInfo: string = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
 						const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
@@ -146,7 +143,7 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 						const course = (storageData.u_courses.hasOwnProperty(courseNum) && semesterNum.toString() in semesters) ?
 							storageData.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "") : courseInfo;
 
-						let eventDescription = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]
+						let eventDescription: string = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]
 							.replace(/\\n/g, ' ').replace(/\\,/g, ',').trim();
 						eventDescription = 95 < eventDescription.length ? eventDescription.slice(0, 90) + "..." : eventDescription;
 
