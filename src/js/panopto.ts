@@ -438,7 +438,7 @@
 		const bigBossElement = document.getElementById("transportControls") as HTMLDivElement;
 		bigBossElement.appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
 		bigBossElement.appendChild(menu);
-		(document.getElementById("maor_koteret") as HTMLDivElement).style.backgroundImage = `url(${chrome.runtime.getURL("@/icons/technion_plus_plus/logo.svg").toString()})`;
+		(document.getElementById("maor_koteret") as HTMLDivElement).style.backgroundImage = `url(${chrome.runtime.getURL("../icons/technion_plus_plus/logo.svg").toString()})`;
 
 		setupVideoDownloadButtons();
 		snapshotHandler();

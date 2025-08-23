@@ -1,8 +1,9 @@
 (function () {
 	function show_histograms(src: HTMLDivElement, course: string) {
-		const expand = src.querySelectorAll(".TP_expand"),
-			iframe = src.querySelectorAll("iframe");
 		src.setAttribute("data-course", course);
+
+		const expand = src.querySelectorAll(".TP_expand") as NodeListOf<HTMLDivElement>,
+			iframe = src.querySelectorAll("iframe") as NodeListOf<HTMLIFrameElement>;
 		for (let i = 0; i < expand.length; i++)
 			expand[i].addEventListener("click", () => {
 				if ("false" === expand[i].getAttribute("data-expanded")) {
@@ -13,6 +14,7 @@
 					expand[i].setAttribute("data-expanded", "false");
 				}
 			});
+
 		const tpBlock = src.querySelector("#TP_infobox > div") as HTMLDivElement,
 			checkbox = src.querySelector("input[type='checkbox']") as HTMLInputElement,
 			toggleHists = (histsEh: boolean) => {
@@ -80,6 +82,14 @@
 </div>`, "text/html").body.firstChild as HTMLDivElement;
 		father.insertBefore(src, father.querySelector("#__xmlview1--objectPageLayout-0-1"));
 		show_histograms(src, course);
+
+		// Add the CSS because for some reason loading it normally fails
+		const styleLink = document.createElement('link') as HTMLLinkElement;
+		styleLink.rel = 'stylesheet';
+		styleLink.type = 'text/css';
+		styleLink.href = chrome.runtime.getURL("./css/sap.css");
+
+		document.head.appendChild(styleLink);
 	}
 
 	const observer = new MutationObserver(handlePageChange);

@@ -155,7 +155,7 @@
 					}
 				});
 			}
-			for (const element of document.querySelectorAll(".section .main .clearfix")) {
+			for (const element of document.querySelectorAll(".section.main.clearfix")) {
 				if (element.classList.contains("accesshide") || element.classList.contains("hidden")) continue;
 				create_download(
 					element.querySelector(".course-section-header") as HTMLElement,

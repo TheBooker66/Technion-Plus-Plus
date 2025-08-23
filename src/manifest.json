@@ -174,13 +174,14 @@
       ],
       "matches": [
         "https://portalex.technion.ac.il/irj/portal/external*",
-        "https://portalex.technion.ac.il/ovv*"
+        "https://portalex.technion.ac.il/ovv/*"
       ]
     }
   ],
   "web_accessible_resources": [
     {
       "resources": [
+        "css/colours.css",
         "icons/technion_plus_plus/logo.svg"
       ],
       "matches": [
@@ -202,6 +203,14 @@
       ],
       "matches": [
         "https://grades.technion.ac.il/*"
+      ]
+    },
+    {
+      "resources": [
+        "css/sap.css"
+      ],
+      "matches": [
+        "https://portalex.technion.ac.il/*"
       ]
     }
   ]

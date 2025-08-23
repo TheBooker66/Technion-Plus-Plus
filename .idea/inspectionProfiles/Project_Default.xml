@@ -1130,9 +1130,9 @@
       <scope name="Libraries" level="WARNING" enabled="false" />
       <scope name="Proprietary Icons" level="WARNING" enabled="false" />
     </inspection_tool>
-    <inspection_tool class="JSEqualityComparisonWithCoercion.TS" enabled="false" level="WARNING" enabled_by_default="false">
-      <scope name="Libraries" level="WARNING" enabled="false" />
-      <scope name="Proprietary Icons" level="WARNING" enabled="false" />
+    <inspection_tool class="JSEqualityComparisonWithCoercion.TS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Libraries" level="WARNING" enabled="true" />
+      <scope name="Proprietary Icons" level="WARNING" enabled="true" />
     </inspection_tool>
     <inspection_tool class="JSFileReferences" enabled="true" level="WARNING" enabled_by_default="true">
       <scope name="Libraries" level="WARNING" enabled="false" />

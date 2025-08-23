@@ -3,10 +3,10 @@
 		const courseRows = document.querySelectorAll("center > table + table > tbody > tr");
 		if (courseRows[1].getAttribute("bgcolor") !== "yellow") {
 			courseRows[0].appendChild(document.createElement("th")).textContent = "אתר הקורס";
-			// noinspection HtmlDeprecatedAttribute,HtmlRequiredAltAttribute,HtmlUnknownTarget
+			// noinspection HtmlUnknownTarget
 			const courseButtonTemplate = (new DOMParser).parseFromString(`<table>
-            <td align="center" style="vertical-align: middle">
-                <input type="image" src="/Images/StudImages/prev.gif" style="display: inline" />
+            <td style="text-align: center; vertical-align: middle;">
+                <input type="image" src="/Images/StudImages/prev.gif" style="display: inline"  alt="חץ לאתר הקורס"/>
             </td>
         </table>`, "text/html").querySelector("td") as HTMLTableCellElement;
 			courseRows[courseRows.length - 1].children[0].setAttribute("colspan", "4");

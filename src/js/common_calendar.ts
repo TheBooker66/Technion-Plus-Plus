@@ -30,7 +30,9 @@ export class CommonCalendar {
 	}
 
 	removeCalendarAlert(currentAlertFlag: number) {
+		// noinspection JSBitwiseOperatorUsage
 		if (this.organiser === "ארגונית++" || this.system === "ua") currentAlertFlag &= -12;
+		// noinspection JSBitwiseOperatorUsage
 		else currentAlertFlag &= ~this.flags[this.system];
 
 		if (!navigator.userAgent.includes("Android") && !currentAlertFlag)
