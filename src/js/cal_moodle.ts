@@ -165,6 +165,7 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 							eventID: eventID,
 							timestamp: eventDate.getTime(),
 							sys: "moodle",
+							done: finishedEh,
 						};
 						finishedEh ? finishedAssignmentsList.push(event) : newAssignmentsList.push(event);
 					}

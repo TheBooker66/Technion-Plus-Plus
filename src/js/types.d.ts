@@ -1,15 +1,17 @@
 type HWSystem = "moodle" | "cs" | "webwork" | "ua";
 
+// If a property is not present, it is due to the assignment being a user-added assignment ("ua")
 type HWAssignment = {
 	eventID: number,
 	name: string,
 	description: string,
-	course: string,
+	course?: string,
 	sys: HWSystem,
-	finalDate: string,
+	done: boolean,
 	timestamp: number,
-	newEh: boolean,
-	goToFunc: () => Promise<chrome.tabs.Tab>,
+	finalDate?: string,
+	newEh?: boolean,
+	goToFunc?: () => Promise<chrome.tabs.Tab>,
 };
 
 type Semester = "חורף" | "אביב" | "קיץ";
@@ -24,7 +26,7 @@ type CalculatorCourse = {
 	semester: Semester,
 	perm_ignored: boolean,
 	selected: boolean,
-}
+};
 
 type RecordingCourse = {
 	n: string, // Course name
@@ -33,10 +35,10 @@ type RecordingCourse = {
 		l: string, // Recording ID
 		p: number, // panoptoEh
 		t: number, // No clue
-		b: string // No clue
+		b: string, // No clue
 	}[],
 	a?: string, // Course Alias
-}
+};
 
 type BusLine = {
 	ID: number,
@@ -45,10 +47,13 @@ type BusLine = {
 	DestinationQuarterName: "חיפה אוניברסיטה",
 	MinutesToArrival: 0,
 	MinutesToArrivalList: number[],
-}
+};
 
 type DownloadItem = {
-	sys: number,
-	sub_pre: string,
-	list: { u: string, n: string }[],
-}
+	sys: number, // Panopto or the old video server
+	sub_pre: string, // No clue
+	list: {
+		u: string, // Video URL
+		n: string, // Video name
+	}[],
+};

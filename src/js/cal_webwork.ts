@@ -56,6 +56,7 @@ import {CommonCalendar} from './common_calendar.js';
 				eventID: parseInt(assignment[0]),
 				timestamp: assignment[1].ts,
 				sys: "webwork",
+				done: assignment[1].done,
 			};
 			assignment[1].done ? finishedAssignmentsList.push(assignmentObject) : newAssignmentsList.push(assignmentObject);
 			assignment[1].seen = true;

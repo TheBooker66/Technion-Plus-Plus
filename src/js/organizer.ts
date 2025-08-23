@@ -48,19 +48,19 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 					moodle: ["moodle.svg", "מודל"],
 					cs: ["grpp.ico", 'מדמ"ח'],
 				};
-				courses.add(assignmentData.course);
+				courses.add(assignmentData.course!);
 				(newAssigment.querySelector(".system") as HTMLImageElement).src = "../icons/" + icons[assignmentData.sys][0];
 				(newAssigment.querySelector(".system") as HTMLImageElement).title = "מטלת" + icons[assignmentData.sys][1];
-				newAssigment.querySelector(".assignment_header")!.textContent = assignmentData.name;
+				newAssigment.querySelector(".assignment_name")!.textContent = assignmentData.name;
 				newAssigment.querySelector(".course_name")!.textContent += assignmentData.course;
 				newAssigment.dataset.course = "#" + assignmentData.course;
 				newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
-				newAssigment.querySelector(".end_time > span")!.textContent = assignmentData.finalDate;
+				newAssigment.querySelector(".end_time > span")!.textContent = assignmentData.finalDate!;
 				const buttonElements = newAssigment.querySelectorAll("a.button");
-				buttonElements[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc));
+				buttonElements[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				buttonElements[1].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, newAssigment, 1));
 				buttonElements[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, newAssigment, 0));
-				newAssigment.querySelector(".assignment_header")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc));
+				newAssigment.querySelector(".assignment_name")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				document.getElementById(targetListID)!.appendChild(newAssigment);
 			}
 		};
@@ -84,12 +84,13 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 
 function editUA(assignmentID: number) {
 	chrome.storage.local.get({user_agenda: {}}, storage => {
-		form.subject.value = storage.user_agenda[assignmentID].header;
-		form.notes.value = storage.user_agenda[assignmentID].description;
+		const userAgenda: { [key: string]: HWAssignment } = storage.user_agenda;
+		form.subject.value = userAgenda[assignmentID].name;
+		form.notes.value = userAgenda[assignmentID].description;
 		form.edit.value = assignmentID;
-		if (0 < storage.user_agenda[assignmentID].timestamp) {
+		if (0 < userAgenda[assignmentID].timestamp) {
 			form.no_end.checked = false;
-			form.end_time.valueAsNumber = storage.user_agenda[assignmentID].timestamp;
+			form.end_time.valueAsNumber = userAgenda[assignmentID].timestamp;
 		} else {
 			form.no_end.checked = true;
 			form.end_time.value = "";
@@ -104,7 +105,7 @@ function editUA(assignmentID: number) {
 function removeUA(assignmentID: number) {
 	chrome.storage.local.get({user_agenda: {}}, storage => {
 		if (storage.user_agenda.hasOwnProperty(assignmentID))
-			if (window.confirm(`המטלה "${storage.user_agenda[assignmentID].header}" תימחק!`)) {
+			if (window.confirm(`המטלה "${storage.user_agenda[assignmentID].name}" תימחק!`)) {
 				delete storage.user_agenda[assignmentID];
 				chrome.storage.local.set({user_agenda: storage.user_agenda}, () => {
 					document.getElementById(`U_${assignmentID}`)?.remove();
@@ -117,7 +118,7 @@ function removeUA(assignmentID: number) {
 function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivElement, targetListID: "new_assignments" | "finished_assignments" | "" = "", insertAtBeginning: boolean = false) {
 	if (container.nodeName !== "DIV") container = container.querySelector(".list_item") as HTMLDivElement;
 	container.id = `U_${assignmentData.eventID}`;
-	container.querySelector(".assignment_header")!.textContent = assignmentData.name;
+	container.querySelector(".assignment_name")!.textContent = assignmentData.name;
 	container.dataset.course = "#user-course";
 	let textareaHeight = 20 * (assignmentData.description.split("\n").length + 1),
 		textareaElement = container.querySelector(".assignment_description textarea") as HTMLTextAreaElement,
@@ -160,14 +161,15 @@ export function addAssignmentsToList(
 		enable_login: true,
 		user_agenda: {},
 	}, storage => {
-		const userAgendaData = storage.user_agenda, enabledCalendars = {
-			"moodle": storage.quick_login && storage.enable_login && storage.moodle_cal,
-			"cs": storage.cs_cal,
-			"webwork": storage.quick_login && storage.enable_login && storage.ww_cal_switch,
-		};
+		const userAgendaData: { [key: string]: HWAssignment } = storage.user_agenda,
+			enabledCalendars = {
+				"moodle": storage.quick_login && storage.enable_login && storage.moodle_cal,
+				"cs": storage.cs_cal,
+				"webwork": storage.quick_login && storage.enable_login && storage.ww_cal_switch,
+			};
 		let newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [], promisesList = [];
 		Object.keys(userAgendaData).forEach(agendaID => {
-			userAgendaData[agendaID].event = agendaID;
+			userAgendaData[agendaID].eventID = parseInt(agendaID);
 			userAgendaData[agendaID].sys = "ua";
 			userAgendaData[agendaID].done ? newAssignmentsList.push(userAgendaData[agendaID]) : finishedAssignmentsList.push(userAgendaData[agendaID]);
 		});
@@ -215,29 +217,31 @@ function form_submit() {
 		return;
 	}
 	chrome.storage.local.get({user_agenda: {}}, storageData => {
-		let agenda = storageData.user_agenda, assignmentID = parseInt(form.edit.value),
-			isExistingAssignment = 0 < assignmentID ? agenda.hasOwnProperty(assignmentID) : false,
-			finalAssignmentID = isExistingAssignment ? assignmentID : Date.now();
-		agenda[finalAssignmentID] = {
-			header: form.subject.value.slice(0, 50),
+		let userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
+		const assignmentID = parseInt(form.edit.value);
+		const isExistingAssignment = 0 < assignmentID ? userAgenda.hasOwnProperty(assignmentID) : false;
+		const finalAssignmentID = isExistingAssignment ? assignmentID : Date.now();
+		userAgenda[finalAssignmentID] = {
+			eventID: finalAssignmentID,
+			name: form.subject.value.slice(0, 50),
 			description: form.notes.value.slice(0, 280),
+			sys: "ua",
 			timestamp: !form.no_end.checked && 0 < parseInt(form.end_time.valueAsNumber) ? parseInt(form.end_time.valueAsNumber) : 0,
-			done: isExistingAssignment ? agenda[finalAssignmentID].done : false,
+			done: isExistingAssignment ? userAgenda[finalAssignmentID].done : false,
 		};
-		if (50 < Object.keys(agenda).length) {
+		if (50 < Object.keys(userAgenda).length) {
 			alert("לא ניתן ליצור יותר מ־50 מטלות משתמש.");
 			return;
 		}
-		chrome.storage.local.set({user_agenda: agenda}, () => {
+		chrome.storage.local.set({user_agenda: userAgenda}, () => {
 			let assignmentElement;
-			agenda[finalAssignmentID].event = finalAssignmentID;
 			if (isExistingAssignment) {
 				assignmentElement = document.querySelector(`#U_${finalAssignmentID}`) as HTMLDivElement;
-				insertUserAssignment(agenda[finalAssignmentID], assignmentElement);
+				insertUserAssignment(userAgenda[finalAssignmentID], assignmentElement);
 				(document.querySelector(".tab .current") as HTMLDivElement)?.click();
 			} else {
 				assignmentElement = loadTemplate("userAgenda").cloneNode(true) as HTMLDivElement;
-				insertUserAssignment(agenda[finalAssignmentID], assignmentElement, "new_assignments", true);
+				insertUserAssignment(userAgenda[finalAssignmentID], assignmentElement, "new_assignments", true);
 				checkForEmpty();
 				tabHeaders[0].click();
 			}

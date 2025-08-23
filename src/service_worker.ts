@@ -620,16 +620,17 @@ export function TE_updateInfo() {
 
 		if (storage.cs_cal && now - storage.cs_cal_update > EIGHT_HOURS) TE_csCalendarCheck(storage.uidn_arr, storage.cs_pass, storage.cs_cal_seen);
 
-		chrome.storage.local.get({user_agenda: {}}, ({user_agenda}) => {
+		chrome.storage.local.get({user_agenda: {}}, storage => {
+			const userAgenda: { [key: string]: HWAssignment } = storage.user_agenda;
 			let hasChanged = false;
-			for (const key in user_agenda) {
-				const timestamp = user_agenda[key].timestamp;
+			for (const key in userAgenda) {
+				const timestamp = userAgenda[key].timestamp;
 				if (timestamp > 0 && now - timestamp > TWO_DAYS) {
-					delete user_agenda[key];
+					delete userAgenda[key];
 					hasChanged = true;
 				}
 			}
-			if (hasChanged) TE_setStorage({user_agenda});
+			if (hasChanged) TE_setStorage({user_agenda: userAgenda});
 		});
 	});
 }

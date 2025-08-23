@@ -137,12 +137,12 @@
     display: none;
 }
 
-b.assignment_header {
+b.assignment_name {
     cursor: pointer;
     font-weight: 700;
 }
 
-.starred b.assignment_header::after {
+.starred b.assignment_name::after {
     content: "חדש";
     color: var(--sec-light);
     font-size: 10px;

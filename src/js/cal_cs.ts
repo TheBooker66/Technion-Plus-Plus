@@ -99,6 +99,7 @@ import {reverseString, xorStrings} from './utils.js';
 					timestamp: eventDate.getTime(),
 					sys: "cs",
 					course: courseName,
+					done: finishedEh,
 				};
 				finishedEh ? finishedList.push(Assignment) : toDoList.push(Assignment);
 			}

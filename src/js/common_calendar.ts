@@ -43,7 +43,7 @@ export class CommonCalendar {
 			(assignmentData: HWAssignment, template: DocumentFragment, containerId: "new_assignments" | "finished_assignments") => {
 				const newAssigment = template.querySelector(".list_item") as HTMLDivElement;
 				if (assignmentData.newEh) newAssigment.classList.add("starred");
-				newAssigment.querySelector(".assignment_header")!.textContent = assignmentData.name;
+				newAssigment.querySelector(".assignment_name")!.textContent = assignmentData.name;
 				newAssigment.querySelector(".course_name")!.textContent += assignmentData.course;
 				newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
 				newAssigment.querySelector(".end_time")!.textContent += assignmentData.finalDate;
@@ -51,8 +51,8 @@ export class CommonCalendar {
 				actionButtons[1].addEventListener("click", () => toggle(this.system, assignmentData.eventID, newAssigment, 1));
 				actionButtons[2].addEventListener("click", () => toggle(this.system, assignmentData.eventID, newAssigment, 0));
 				actionButtons[0].title = "moodle" === this.system ? "עבור להגשה במודל" : "עבור לאתר הקורס";
-				actionButtons[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc));
-				newAssigment.querySelector(".assignment_header")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc));
+				actionButtons[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
+				newAssigment.querySelector(".assignment_name")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				document.getElementById(containerId)?.appendChild(newAssigment);
 			};
 		this.common.useTemplatesFile("calendar", (documentContext: Document) => {
@@ -101,7 +101,7 @@ export function toggle(sys: HWSystem, event: number, item: HTMLDivElement, VorX:
 		chrome.storage.local.get({user_agenda: {}}, storageData => {
 			if (chrome.runtime.lastError) console.error("TE_organize7: " + chrome.runtime.lastError.message);
 			else {
-				storageData.user_agenda[event].done = 1 - storageData.user_agenda[event].done;
+				storageData.user_agenda[event].done = !storageData.user_agenda[event].done;
 				void chrome.storage.local.set({user_agenda: storageData.user_agenda});
 			}
 		});

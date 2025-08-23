@@ -177,11 +177,11 @@ img.system {
     display: none;
 }
 
-b.assignment_header {
+b.assignment_name {
     cursor: pointer;
 }
 
-.starred b.assignment_header::after, .system_message b.assignment_header::after {
+.starred b.assignment_name::after, .system_message b.assignment_name::after {
     content: "חדש";
     font-size: 10px;
     margin-right: 1ch;
@@ -193,7 +193,7 @@ b.assignment_header {
     letter-spacing: 1px;
 }
 
-.system_message b.assignment_header::after {
+.system_message b.assignment_name::after {
     content: "הודעת מערכת";
     background-color: var(--status-danger);
 }
