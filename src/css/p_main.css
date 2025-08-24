@@ -132,7 +132,7 @@
     vertical-align: middle;
 }
 
-#print > div:not(#secondary_tabs) {
+#print > div:not(#print_tabs) {
     height: 90px;
 }
 

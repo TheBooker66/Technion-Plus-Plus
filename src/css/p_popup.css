@@ -319,7 +319,7 @@ input[type="checkbox"] {
 * secondary tabs
 * currently in use only in main popup
 */
-#secondary_tabs {
+#print_tabs {
     background-color: #f9f9fa;
     text-align: center;
     margin: 8px 0 0 0;
@@ -330,7 +330,7 @@ input[type="checkbox"] {
     column-gap: 4px;
 }
 
-#secondary_tabs .tab {
+#print_tabs .tab {
     cursor: pointer;
     color: rgb(12, 12, 13, 0.4);
     font-size: 12px;
@@ -339,11 +339,11 @@ input[type="checkbox"] {
     border-top: 2px solid transparent;
 }
 
-#secondary_tabs .tab:hover:not(.current) {
+#print_tabs .tab:hover:not(.current) {
     color: rgb(12, 12, 13, 0.75);
 }
 
-#secondary_tabs .current {
+#print_tabs .current {
     color: var(--prim-cool);
     cursor: default;
     font-weight: 600;

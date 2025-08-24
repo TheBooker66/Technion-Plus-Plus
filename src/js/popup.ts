@@ -2,7 +2,7 @@ import {CommonPopup} from './common_popup.js';
 import {reverseString, xorStrings} from './utils.js';
 
 (function () {
-	function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[], bool: boolean = false) {
+	function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[]) {
 		for (let i = 0; i < tabs.length; i++) {
 			tabs[i].addEventListener("click", () => {
 				if (tabs[i].classList.contains("current")) return;
@@ -10,7 +10,6 @@ import {reverseString, xorStrings} from './utils.js';
 					tabs[j].className = j === i ? "tab current" : "tab";
 					popup[j].style.display = j === i ? "block" : "none";
 				}
-				if (bool) apps.className = "collapse";
 			});
 		}
 	}
@@ -27,22 +26,19 @@ import {reverseString, xorStrings} from './utils.js';
 			});
 		});
 
-	const apps = document.getElementById("apps_menu") as HTMLDivElement,
-		appsLinks = document.getElementById("apps_links") as HTMLDivElement,
-		links = document.getElementById("tools_and_links") as HTMLDivElement,
-		print = document.getElementById("print") as HTMLDivElement;
-	apps.addEventListener("click", () => apps.className = "collapsed");
-	appsLinks.addEventListener("click", () => window.open("https://cis-shop.technion.ac.il/product-category/software/"));
-	[
-		{b: "gotoPrint", from: links, to: print},
-		{b: "gotoApps", from: links, to: appsLinks},
-		{b: "returnFromPrint", from: print, to: links},
-		{b: "returnFromApps", from: appsLinks, to: links},
-	].forEach(linkObject => {
-		document.getElementById(linkObject.b)!.addEventListener("click", () => {
+	const mainScreen = document.getElementById("tools_and_links") as HTMLDivElement,
+		printScreen = document.getElementById("print") as HTMLDivElement,
+		appsScreen = document.getElementById("apps") as HTMLDivElement;
+	const screenTransitions = [
+		{button: "gotoPrint", from: mainScreen, to: printScreen},
+		{button: "gotoApps", from: mainScreen, to: appsScreen},
+		{button: "returnFromPrint", from: printScreen, to: mainScreen},
+		{button: "returnFromApps", from: appsScreen, to: mainScreen},
+	];
+	screenTransitions.forEach(linkObject => {
+		document.getElementById(linkObject.button)!.addEventListener("click", () => {
 			linkObject.to.style.display = "block";
 			linkObject.from.style.display = "none";
-			apps.className = "collapse";
 		});
 	});
 
@@ -69,11 +65,11 @@ import {reverseString, xorStrings} from './utils.js';
 		toolLinks[i].addEventListener("click", () => window.location.href = "html/p_" + toolLinks[i].id + ".html");
 	}
 
-	const linksDiv = document.querySelectorAll("#tools_and_links > div") as NodeListOf<HTMLDivElement>,
-		tabsDiv = (document.getElementById("secondary_tabs") as HTMLDivElement).querySelectorAll("div"),
+	const mainScreensLinks = document.querySelectorAll("#tools_and_links > div") as NodeListOf<HTMLDivElement>,
+		printTabs = (document.getElementById("print_tabs") as HTMLDivElement).querySelectorAll("div"),
 		pages = [document.getElementById("single_page"), document.getElementById("double_page"), document.getElementById("quadruple_page")] as HTMLDivElement[];
-	makeTabsClicky(linksDiv[0].querySelectorAll(".tab"), Array.from(linksDiv).slice(1), true);
-	makeTabsClicky(tabsDiv, pages);
+	makeTabsClicky(mainScreensLinks[0].querySelectorAll(".tab"), Array.from(mainScreensLinks).slice(1));
+	makeTabsClicky(printTabs, pages);
 
 	((document.getElementById("cant_login") as HTMLDivElement).querySelector("u") as HTMLElement).addEventListener("click", () => {
 		chrome.runtime.openOptionsPage(() => {
@@ -123,7 +119,7 @@ import {reverseString, xorStrings} from './utils.js';
 
 		if (storageData.dl_current !== 0) (document.getElementById("downloads") as HTMLAnchorElement).classList.add("active");
 
-		const printerLinks = (document.getElementById("print") as HTMLDivElement).querySelectorAll("a"),
+		const printerLinks = printScreen.querySelectorAll("a"),
 			id: string = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1])) || "הקלד מספר זהות כאן",
 			gmailEh: boolean = storageData.gmail && !chrome.runtime.lastError;
 		for (let i = 0; i < printerLinks.length; i++) {
