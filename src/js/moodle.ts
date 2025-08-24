@@ -140,14 +140,14 @@
 							break;
 						}
 					if (videoID !== "" && storage.videos_data[videoID]) {
-						const data = storage.videos_data[videoID];
+						const data: RecordingCourse["v"] = storage.videos_data[videoID];
 						for (let j = 0; j < data.length; j++) {
-							let isPanopto = data[j]["p"], text = "";
+							let text = "";
 							text = 1 < data.length ? `וידאו #${j + 1} ` : "וידאו ";
 							text = 0 < data[j]["t"] ? ["הרצאה", "תרגול"][data[j]["t"] - 1] : text;
-							text += isPanopto ? "(פנופטו)" : "(שרת הוידאו הטכניוני)";
+							text += "(פנופטו)";
 							create_element("a", "maor_download", {
-								href: isPanopto ? `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${data[j]["l"]}"` : `https://video.technion.ac.il/Courses/${data[j]["l"]}.html`,
+								href: `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${data[j]["l"]}"`,
 								target: "_blank",
 								title: data[j]?.["vn"] ?? short_course_num,
 							}, text, buttons);

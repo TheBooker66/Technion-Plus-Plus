@@ -6,8 +6,6 @@ param(
 
 # Define excluded file patterns
 $excludedFiles = @(
-    "*webwork.svg"
-    "*paypal_logo.svg"
     "*lib\*"
 )
 

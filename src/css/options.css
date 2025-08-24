@@ -120,6 +120,10 @@ small, .description, .big-description {
     padding: 0 25px;
 }
 
+#cs_cal_div {
+    margin-right: 30px;
+}
+
 footer {
     position: fixed;
     right: 0;

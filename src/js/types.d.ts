@@ -33,8 +33,8 @@ type RecordingCourse = {
 	v: { // Course data
 		vn: string, // Recording name
 		l: string, // Recording ID
-		p: number, // panoptoEh
-		t: number, // No clue
+		p: number, // Panopto or the old Video Server (always Panopto)
+		t: number, // Lecture or Exercise
 		b: string, // No clue
 	}[],
 	a?: string, // Course Alias
@@ -50,8 +50,8 @@ type BusLine = {
 };
 
 type DownloadItem = {
-	sys: number, // Panopto or the old video server
-	sub_pre: string, // No clue
+	sys: number, // Moodle / Panopto / CS websites
+	sub_pre: string, // No clue, replated to WebCourse
 	list: {
 		u: string, // Video URL
 		n: string, // Video name

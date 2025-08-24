@@ -47,7 +47,7 @@ import {CommonPopup} from './common_popup.js';
 					let file = downloadEntry.list[i],
 						listItem = (popup.loadTemplate("dl_item").cloneNode(true) as HTMLElement).querySelector(".list_item") as HTMLDivElement;
 					(listItem.querySelector(".dl_name") as HTMLElement).textContent = file.n;
-					(listItem.querySelector(".dl_from") as HTMLImageElement).src = "../icons/" + ["moodle.svg", "panopto.ico", "grpp.ico", "grpp.ico"][downloadEntry.sys];
+					(listItem.querySelector(".dl_from") as HTMLImageElement).src = "../icons/" + ["moodle.svg", "panopto.svg", "cs.png", "cs.png"][downloadEntry.sys];
 					(listItem.querySelector(".remove") as HTMLImageElement).addEventListener("click", () => {
 						let fileIndex = downloadEntry.list.indexOf(file);
 						downloadEntry.list.splice(fileIndex, 1);

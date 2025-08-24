@@ -46,7 +46,7 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 				const icons = {
 					webwork: ["webwork.svg", "וובוורק"],
 					moodle: ["moodle.svg", "מודל"],
-					cs: ["grpp.ico", 'מדמ"ח'],
+					cs: ["cs.png", 'מדמ"ח'],
 				};
 				courses.add(assignmentData.course!);
 				(newAssigment.querySelector(".system") as HTMLImageElement).src = "../icons/" + icons[assignmentData.sys][0];

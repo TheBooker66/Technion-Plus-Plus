@@ -22,14 +22,14 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 		const courseTypes = ["הרצאה", "תרגול"];
 		const template = popup.loadTemplate("courses-list-item");
 		for (let i = 0; i < courseData.data.length; i++) {
-			let recordingDetails = [], panoptoEh = courseData.data[i]["p"],
+			let recordingDetails = [],
 				listItem = (template.cloneNode(true) as HTMLElement).querySelector(".list_item") as HTMLAnchorElement;
-			listItem.setAttribute("href", panoptoEh ? `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${courseData.data[i]["l"]}"` : `https://video.technion.ac.il/Courses/${courseData.data[i]["l"]}.html`);
+			listItem.setAttribute("href", `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${courseData.data[i]["l"]}"`);
 			listItem.querySelector("span")!.textContent = courseData.data[i]["vn"] ?? courseData.name;
 			if (courseData.data[i]["t"] > 0) recordingDetails.push(courseTypes[courseData.data[i]["t"] - 1]);
 			if (courseData.data[i]["b"]) recordingDetails.push(courseData.data[i]["b"]);
 			if (recordingDetails.length > 0) (listItem.querySelector("small")!.textContent = recordingDetails.join(", "));
-			(listItem.querySelector(".recording_from") as HTMLImageElement).src = panoptoEh ? "../icons/panopto.ico" : "../icons/videoserver.ico";
+			(listItem.querySelector(".recording_from") as HTMLImageElement).src = "../icons/panopto.svg";
 			resultsContainer.appendChild(listItem);
 			if (courseData.data.length - 1 > i) create_divider(resultsContainer);
 		}

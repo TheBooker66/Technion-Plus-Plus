@@ -20,7 +20,7 @@
 </header>
 <main>
     <h2>פרטי כניסה</h2>
-    <section class="container">
+    <section>
         <div>
             <label for="username">שם משתמש </label><label for="server">וסיומת אימייל </label>טכניוניים<br/>
             <span dir="ltr"><input type="text" id="username" placeholder="הכנס שם משתמש" maxlength="35"/> @
@@ -46,7 +46,7 @@
     </section>
 
     <h2>הגדרות כלליות</h2>
-    <section class="container">
+    <section>
         <div><label><input type="checkbox" id="quick_login"/> הפעל התחברות אוטומטית בכניסה לאתרי הטכניון</label></div>
         <div>
             <label><input type="checkbox" id="dark_mode"/>הפעל מצב חשוך ברחבי התוסף</label>
@@ -94,7 +94,7 @@
     </section>
 
     <h2>מטלות בית</h2>
-    <section class="container">
+    <section>
         <div>
             <label><input type="checkbox" id="allow_hw_alerts"/> הפעל התראות עבור מטלות בית חדשות</label>
             <span class="big-description">יופעלו התראות כאשר התוסף יזהה מטלות חדשות עבור המערכות עבורן תבחר להציג מטלות קרובות.</span>
@@ -108,23 +108,27 @@
             <span class="big-description">חובה להגדיר מספר זהות וסיסמת יומן <span dir="ltr">GR++</span>
                 לשם שימוש בתכונה זו. הפעלת התחברות אוטומטית אינה חובה עבור אפשרות זאת.</span>
         </div>
-        <div class="container" id="cs_cal_div">
-            <div><b>מטלות מדמ"ח - הוראות ייבוא</b></div>
-            <ol class="description">
-                <li>הכנס מספר זהות בתיבה המתאימה בחלק העליון של דף זה.</li>
-                <li>התחבר למערכת <span dir="ltr">GR++</span>, עבור לכרטיסיית "הגדרות" ושם לחץ על "עדכון אוטומטי".</li>
-                <li>
-                    עבור כל קורס שתרצה שיוצגו עבורו מטלות, סמן V בעמודה השלישית (עדכון תרגילי בית), לחץ על כפתור "בצע".
-                </li>
-                <li>מתחת לטבלה יופיע כפתור "העתק סיסמת יומן", לחץ עליו ולאחר מכן הדבק כאן את הסיסמה.</li>
-            </ol>
+        <div id="cs_cal_div">
+            <div>
+                <b>מטלות מדמ"ח - הוראות ייבוא</b>
+                <ol class="big-description">
+                    <li>הכנס מספר זהות בתיבה המתאימה בחלק העליון של דף זה.</li>
+                    <li>התחבר למערכת <span dir="ltr">GR++</span>, עבור לכרטיסיית "הגדרות" ושם לחץ על "עדכון אוטומטי".
+                    </li>
+                    <li>
+                        עבור כל קורס שתרצה שיוצגו עבורו מטלות, סמן V בעמודה השלישית (עדכון תרגילי בית), לחץ על כפתור
+                        "בצע".
+                    </li>
+                    <li>מתחת לטבלה יופיע כפתור "העתק סיסמת יומן", לחץ עליו ולאחר מכן הדבק כאן את הסיסמה.</li>
+                </ol>
+            </div>
             <div>
                 <label for="cs_pass"><b>סיסמת יומן <span dir="ltr">GR++</span></b></label><br/>
                 <input type="text" placeholder="הכנס סיסמת יומן כאן" maxlength="8" id="cs_pass"/>
             </div>
             <div>
                 <small><b><u>הערות</u></b></small>
-                <ul class="description">
+                <ul class="big-description">
                     <li>אם כפתור "העתק סיסמת יומן" לא מופיע, יש ללחוץ על כפתור "צור סיסמת יומן חדשה".</li>
                     <li>
                         לסיסמה שתיווצר יש תוקף של שנה בלבד, לאחר שנה תתבקש ליצור סיסמה חדשה
