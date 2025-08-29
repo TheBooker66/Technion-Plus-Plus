@@ -34,7 +34,7 @@ async function XHR(url: string, resType: string, body = "", reqType = false) {
 	if (resType === "json") {
 		responsePayload = JSON.parse(responseText);
 	} else if (resType === "document") {
-		await setupOffscreenDocument();
+		await TE_setupOffscreenDocument();
 		responsePayload = await chrome.runtime.sendMessage({mess_t: "DOMParser", data: responseText});
 		await chrome.offscreen.closeDocument();
 	} else { // "text"
@@ -48,41 +48,7 @@ async function XHR(url: string, resType: string, body = "", reqType = false) {
 	};
 }
 
-export async function TE_loginToMoodle(headRequestEh = false, storageData = {}, times = 0) {
-	try {
-		const response = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", headRequestEh);
-
-		if (!response.responseURL.includes("microsoft")) {
-			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
-			return response;
-		} else {
-			const loginDetails = await chrome.storage.local.get({
-				username: "", server: true, enable_login: false,
-			});
-
-			await setupOffscreenDocument();
-			const messageResponse = await chrome.runtime.sendMessage({
-				mess_t: "iframe", data: storageData, id: loginDetails, response: response, XHR: XHR,
-			});
-			await chrome.offscreen.closeDocument();
-
-			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
-			return messageResponse;
-		}
-	} catch (err: any) {
-		if (err.message.includes("Failed to fetch")) {
-			if (times > 30) {
-				console.error(`${err}, ${Date.now()}, Big OOF.`);
-				return;
-			}
-			void TE_loginToMoodle(headRequestEh, storageData, times + 1); // Fire-and-forget retry (kinda)
-		}
-		console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err}} at ${Date.now()}`);
-		throw err; // Re-throw the error to propagate it to the caller
-	}
-}
-
-async function TE_forcedAutoLoginNormal(headRequestEh: boolean) {
+async function TE_AutoLoginNormal(headRequestEh: boolean) {
 	try {
 		const initialResponse = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", headRequestEh);
 		if (!initialResponse.responseURL.includes("microsoft")) {
@@ -90,11 +56,11 @@ async function TE_forcedAutoLoginNormal(headRequestEh: boolean) {
 			return initialResponse;
 		}
 
-		const storage: { [key: string]: string | boolean } = await chrome.storage.local.get({
+		const loginDetails = await chrome.storage.local.get({
 			username: "", server: true, enable_login: false,
 		});
 
-		if (!storage.enable_login) {
+		if (!loginDetails.enable_login) {
 			console.error("No username/password");
 			return {response: "No username/password", responseURL: ""};
 		}
@@ -102,17 +68,15 @@ async function TE_forcedAutoLoginNormal(headRequestEh: boolean) {
 		const urlParts = initialResponse.responseURL.split("?");
 		const params = new URLSearchParams(urlParts[1]);
 		params.delete("prompt");
-		params.append("login_hint", `${storage.username}@${storage.server ? "campus." : ""}technion.ac.il`);
+		params.append("login_hint", `${loginDetails.username}@${loginDetails.server ? "campus." : ""}technion.ac.il`);
 
 		const tab = await chrome.tabs.create({
 			url: `${urlParts[0]}?${params.toString()}`, active: false,
 		});
-		const tabId = <number>tab.id;
+		const tabId = tab.id as number;
 
 		const MAX_RETRIES = 30, RETRY_DELAY = 500;
-		let retryCount = 0;
-
-		while (retryCount < MAX_RETRIES) {
+		for (let retryCount = 0; retryCount < MAX_RETRIES; retryCount++) {
 			const currentTab = await chrome.tabs.get(tabId);
 			if (currentTab.url === "https://moodle24.technion.ac.il/") {
 				void chrome.tabs.remove(tabId);
@@ -121,7 +85,6 @@ async function TE_forcedAutoLoginNormal(headRequestEh: boolean) {
 				return finalResponse;
 			}
 			await delay(RETRY_DELAY);
-			retryCount++;
 		}
 
 		void chrome.tabs.remove(tabId);
@@ -133,7 +96,7 @@ async function TE_forcedAutoLoginNormal(headRequestEh: boolean) {
 	}
 }
 
-async function TE_forcedAutoLoginExternal() {
+async function TE_AutoLoginExternal() {
 	try {
 		const moodlePage = await XHR("https://moodle24.technion.ac.il/", "document");
 		if (moodlePage.response[".usertext"]) {
@@ -144,7 +107,7 @@ async function TE_forcedAutoLoginExternal() {
 		const tab = await chrome.tabs.create({
 			url: "https://moodle24.technion.ac.il/", active: false,
 		});
-		const tabId = <number>tab.id;
+		const tabId = tab.id as number;
 
 		const MAX_RETRIES = 8, RETRY_DELAY = 1000;
 		let retryCount = 0;
@@ -173,10 +136,10 @@ async function TE_forcedAutoLoginExternal() {
 	}
 }
 
-export async function TE_forcedAutoLogin(headRequestEh: boolean) {
+export async function TE_AutoLogin(headRequestEh: boolean = false) {
 	const storage = await chrome.storage.local.get({enable_external: false});
-	if (storage.enable_external) return await TE_forcedAutoLoginExternal();
-	else return await TE_forcedAutoLoginNormal(headRequestEh);
+	if (storage.enable_external) return await TE_AutoLoginExternal();
+	else return await TE_AutoLoginNormal(headRequestEh);
 }
 
 
@@ -201,7 +164,7 @@ function TE_notification(message: string, silentEh: boolean, notificationId = ""
 			if (chrome.runtime.lastError) {
 				console.error("TE_bg_notification_err: " + chrome.runtime.lastError.message);
 			} else if (storage.alerts_sound) {
-				await setupOffscreenDocument();
+				await TE_setupOffscreenDocument();
 				await chrome.runtime.sendMessage({mess_t: "audio notification", volume: storage.notif_vol});
 				await chrome.offscreen.closeDocument();
 			}
@@ -599,23 +562,19 @@ export function TE_updateInfo() {
 
 		const loginEnabledEh = (storage.enable_external || storage.enable_login) && storage.quick_login,
 			moodleCheckDueEh = loginEnabledEh && storage.moodle_cal,
-			webworkCheckDueEh = loginEnabledEh && storage.ww_cal_switch && now - storage.ww_cal_update > EIGHT_HOURS;
+			webworkCheckDueEh = loginEnabledEh && storage.ww_cal_switch && (now - storage.ww_cal_update > EIGHT_HOURS);
 
-		if (webworkCheckDueEh || (moodleCheckDueEh && storage.calendar_prop === "")) {
-			TE_forcedAutoLogin(false).then(async moodleData => {
-				if (moodleCheckDueEh && storage.calendar_prop === "") {
+		if (webworkCheckDueEh || moodleCheckDueEh) {
+			TE_AutoLogin().then(async moodleData => {
+				if (moodleCheckDueEh) {
 					TE_getCoursesMoodle(moodleData);
 					await TE_checkCalendarProp(storage.calendar_prop);
+					await TE_alertMoodleCalendar(storage.cal_seen, storage.calendar_prop, storage.calendar_max, storage.filter_toggles);
 				}
 				if (webworkCheckDueEh) {
 					await TE_getWebwork(moodleData, storage.webwork_courses);
 				}
 			}).catch(err => console.error("TE_back: forced_login_err -- " + err));
-		} else if (moodleCheckDueEh && storage.calendar_prop !== "") {
-			TE_loginToMoodle(false, storage)
-				.then(TE_getCoursesMoodle)
-				.catch(err => console.error("TE_back: login_err -- " + err));
-			await TE_alertMoodleCalendar(storage.cal_seen, storage.calendar_prop, storage.calendar_max, storage.filter_toggles);
 		}
 
 		if (storage.cs_cal && now - storage.cs_cal_update > EIGHT_HOURS) TE_csCalendarCheck(storage.uidn_arr, storage.cs_pass, storage.cs_cal_seen);
@@ -710,16 +669,16 @@ function TE_checkBuses() {
 
 function TE_sendMessageToTabs(data: { mess_t: string, angle?: number | unknown }) {
 	chrome.tabs.query({}, tabs => {
-		const moodleTabs = tabs.filter(tab => (<string>tab.url).includes("moodle"));
+		const moodleTabs = tabs.filter(tab => (tab.url as string).includes("moodle"));
 		for (const tab of moodleTabs) {
-			chrome.tabs.sendMessage(<number>tab.id, data, {}, () => {
+			chrome.tabs.sendMessage(tab.id as number, data, {}, () => {
 				if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);
 			});
 		}
 	});
 }
 
-async function setupOffscreenDocument() {
+async function TE_setupOffscreenDocument() {
 	const offscreenUrl = chrome.runtime.getURL('html/offscreen.html');
 	const existingContexts = await chrome.runtime.getContexts({
 		contextTypes: ['OFFSCREEN_DOCUMENT'], documentUrls: [offscreenUrl],

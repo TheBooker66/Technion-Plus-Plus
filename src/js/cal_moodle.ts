@@ -1,19 +1,22 @@
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
-import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
+import {TE_AutoLogin} from "../service_worker.js";
 
 (function () {
 	function openMoodle(eventID: number, eventTimestamp: number): () => Promise<chrome.tabs.Tab> {
 		return () => new Promise((resolve, reject) => {
-			const handleResponse = function (response: { response: any, responseURL: string }) {
-					const eventLinks = response.response.querySelectorAll(`.event[data-event-id='${eventID}'] a`);
-					if (eventLinks.length) {
-						resolve(chrome.tabs.create({url: eventLinks[eventLinks.length - 1].getAttribute("href")}));
-					} else
-						reject(() => console.error("TE_cal_moodle: bad content"));
-				},
-				eventURL = "https://moodle24.technion.ac.il/calendar/view.php?view=day&course=1&time=" + eventTimestamp / 1E3 + "#event_" + eventID;
-			TE_forcedAutoLogin(true).then(() => popup.XHR(eventURL, "document").then(handleResponse).catch(reject)).catch(reject);
+			const eventURL = "https://moodle24.technion.ac.il/calendar/view.php?view=day&course=1&time=" + eventTimestamp / 1E3 + "#event_" + eventID;
+			TE_AutoLogin(true)
+				.then(() => popup.XHR(eventURL, "document")
+					.then((response: { response: any, responseURL: string }) => {
+						const eventLinks = response.response.querySelectorAll(`.event[data-event-id='${eventID}'] a`);
+						if (eventLinks.length)
+							resolve(chrome.tabs.create({url: eventLinks[eventLinks.length - 1].getAttribute("href")}));
+						else
+							reject(() => console.error("TE_cal_moodle: bad content"));
+					})
+					.catch(reject))
+				.catch(reject);
 		});
 	}
 
@@ -77,7 +80,7 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 			return;
 		}
 		if (storageData.calendar_prop === "") {
-			TE_loginToMoodle(true).then(() => initializeCalendarProperties(reject)).catch(_ => reject({
+			TE_AutoLogin(true).then(() => initializeCalendarProperties(reject)).catch(_ => reject({
 				msg: "לפני משיכת המטלות הראשונית מהמודל יש להכנס אל המודל ולוודא שההתחברות בוצעה באופן תקין.",
 				is_error: true,
 			}));
@@ -89,7 +92,7 @@ import {TE_forcedAutoLogin, TE_loginToMoodle} from "../service_worker.js";
 					if (chrome.runtime.lastError)
 						console.error("TE_cal_moodle: " + chrome.runtime.lastError.message);
 				});
-				TE_loginToMoodle(true).then(() => initializeCalendarProperties(reject)).catch(_ => reject({
+				TE_AutoLogin(true).then(() => initializeCalendarProperties(reject)).catch(_ => reject({
 					msg: "לא ניתן למשוך מטלות מהמודל. נסה שנית מאוחר יותר, אם התקלה נמשכת - צור קשר עם המפתח.",
 					is_error: true,
 				}));
