@@ -51,7 +51,7 @@ type BusLine = {
 
 type DownloadItem = {
 	sys: number, // Moodle / Panopto / CS websites
-	sub_pre: string, // No clue, replated to WebCourse
+	sub_pre: string, // No clue, it's related to WebCourse
 	list: {
 		u: string, // Video URL
 		n: string, // Video name

@@ -19,24 +19,19 @@ function calculateTableStats(tableSelector: string) {
 
 	for (let i = 0; i < gradeElements.length; i++) {
 		const points = parseFloat(pointsElements[i].value);
-		let grade: number | string;
+		totalPoints += points;
 
 		if (gradeElements[i].tagName === 'INPUT') {
-			grade = parseFloat(gradeElements[i].value);
-		} else {
-			grade = gradeElements[i].textContent;
-		}
-
-		if (Number.isNaN(grade)) {
-			totalPoints += points;
-			pointsWithPassingGrade += grade === "עובר" || grade === "פטור עם ניקוד" ? points : 0;
-		} else {
-			totalPoints += points;
-			pointsWithPassingGrade += 55 <= (grade as number) ? points : 0;
-			sum += points * (grade as number);
+			const grade = parseFloat(gradeElements[i].value);
+			pointsWithPassingGrade += 55 <= grade ? points : 0;
+			sum += points * grade;
 			pointsForAverage += points;
+		} else {
+			const grade = gradeElements[i].textContent;
+			pointsWithPassingGrade += grade === "עובר" || grade === "פטור עם ניקוד" ? points : 0;
 		}
 	}
+
 	return {
 		points: totalPoints,
 		points_passed: pointsWithPassingGrade,
@@ -61,7 +56,7 @@ function updateSelectedCoursesStats() {
 function updateAllStats() {
 	const allGradesStats = calculateTableStats("#grades_list"),
 		allPointsElements = document.querySelectorAll("#grades_list tr .points") as NodeListOf<HTMLInputElement>,
-		passingPointsElements = document.querySelectorAll("#grades_list tr:not(.failed) .points") as NodeListOf<HTMLInputElement>;
+		passingPointsElements = document.querySelectorAll("#grades_list tr .points :not(.failed)") as NodeListOf<HTMLInputElement>;
 	const totalPoints = Array.from(allPointsElements)
 			.reduce((sum, element) => sum + parseFloat(element.value), 0),
 		totalPassingPoints = Array.from(passingPointsElements)
@@ -92,11 +87,11 @@ function createCourseRowElement(courseData: CalculatorCourse, mainList: string) 
 	const gradeInput = cellElements[3].querySelector(".grade") as HTMLInputElement;
 	const editButton = cellElements[3].querySelector("button") as HTMLButtonElement;
 
-	if (Number.isNaN(courseData.grade)) {
+	if (Number.isNaN(Number(courseData.grade))) {
 		const gradeText = document.createElement("span");
 		gradeText.classList.add('grade');
-		gradeInput.replaceWith(gradeText);
 		gradeText.textContent = courseData.grade.toString();
+		gradeInput.replaceWith(gradeText);
 		rowElement.classList.toggle("failed", gradeText.textContent === "נכשל");
 		if (editButton) editButton.remove();
 	} else {
@@ -253,19 +248,19 @@ function validateCourseInput(course: CalculatorCourse): { isValid: boolean; mess
 	if (!course.name || course.name.length === 0) {
 		return {isValid: false, message: "שם הקורס אינו יכול להיות ריק."};
 	}
-	if (Number.isNaN(course.points) || parseInt(course.points.toString()) < 0) {
+	if (Number.isNaN(Number(course.points)) || parseInt(course.points.toString()) < 0) {
 		return {isValid: false, message: "נא לכתוב מספר נקודות זכות תקין (מספר חיובי)."};
 	}
-	if (!course.binary && (Number.isNaN(course.grade) || (parseInt(course.grade.toString())) < 0 || (parseInt(course.grade.toString())) > 100)) {
+	if (!course.binary && (Number.isNaN(Number(course.grade)) || (parseInt(course.grade.toString())) < 0 || (parseInt(course.grade.toString())) > 100)) {
 		return {isValid: false, message: "נא להזין ציון מספרי תקין בין 0 ל-100."};
 	}
 	if (course.binary && !["עובר", "נכשל", "פטור", "פטור עם ניקוד", "פטור ללא ניקוד"].includes(course.grade.toString())) {
 		return {isValid: false, message: "נא לבחור 'עובר' או 'נכשל' עבור ציון בינארי."};
 	}
-	if (course.year && (Number.isNaN(course.year) || course.year < 1912 || course.year > 65537)) {
+	if (course.year && (Number.isNaN(Number(course.year)) || course.year < 1912 || course.year > 65537)) {
 		return {isValid: false, message: "שנה לא תקינה."};
 	}
-	if (course.semester && !["חורף", "אביב", "קיץ"].includes(course.semester)) {
+	if (course.semester && !semesterOrder.hasOwnProperty(course.semester)) {
 		return {isValid: false, message: "סמסטר לא תקין."};
 	}
 	return {isValid: true, message: "Valid"};
