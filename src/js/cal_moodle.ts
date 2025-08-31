@@ -98,7 +98,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 				}));
 				return;
 			}
-			const cal = res.response.split("BEGIN:VEVENT");
+			const cal: string[] = res.response.split("BEGIN:VEVENT");
 			if (cal.length === 1) {
 				updateCalendar(0, calendar.removeCalendarAlert(storageData.cal_seen));
 				resolve({
@@ -107,7 +107,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 				});
 				return;
 			}
-			const now = new Date(), semesters = {
+			const ONE_DAY = 864E5, now = new Date(), semesters = {
 				"200": "חורף",
 				"201": "אביב",
 				"202": "קיץ",
@@ -117,6 +117,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 			for (let i = 1; i < cal.length; i++) {
 				const eventID = parseInt(cal[i].split("UID:")[1].split("@moodle")[0]);
 				maxEventID = eventID > maxEventID ? eventID : maxEventID;
+
 				if (cal[i].includes("CATEGORIES")) {
 					const eventTitle = cal[i].split("SUMMARY:")[1].split("\n")[0].trim();
 					if ((storageData.filter_toggles.appeals && eventTitle.includes("ערעור"))
@@ -127,24 +128,24 @@ import {TE_AutoLogin} from "../service_worker.js";
 
 					const titleWords = eventTitle.split(" ");
 					if ("opens" !== titleWords[titleWords.length - 1] && "opens)" !== titleWords[titleWords.length - 1]) {
-						let eventDate = cal[i].split("DTSTART")[1].split("\n")[0].replace(";VALUE=DATE:", "")
-								.replace(":", ""),
-							eventTime = !eventDate.includes("T") ? "21:55:00Z" :
-								eventDate.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3");
-						eventDate = eventDate.substring(0, 8)
-							.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTime.trim();
-						eventDate = new Date(eventDate);
-						if (eventDate.getTime() < now.getTime() - 864E5) // 24 hours
+						let eventDateStr: string = cal[i].split("DTSTART")[1].split("\n")[0]
+								.replace(";VALUE=DATE:", "").replace(":", ""),
+							eventTimeStr: string = !eventDateStr.includes("T") ? "21:55:00Z" :
+								eventDateStr.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3");
+						eventDateStr = eventDateStr.substring(0, 8)
+							.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTimeStr.trim();
+						const eventDate = new Date(eventDateStr);
+						if (eventDate.getTime() < now.getTime() - ONE_DAY)
 							continue;
-						eventTime = eventDate.toLocaleString("iw-IL", {
+						const eventTimeFinal = eventDate.toLocaleString("iw-IL", {
 							weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
 						});
 
-						const courseInfo: string = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
+						const courseInfo: string[] = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
 						const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
 							semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
 						const course = (storageData.u_courses.hasOwnProperty(courseNum) && semesterNum.toString() in semesters) ?
-							storageData.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "") : courseInfo;
+							storageData.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "") : courseInfo.toString();
 
 						let eventDescription: string = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]
 							.replace(/\\n/g, ' ').replace(/\\,/g, ',').trim();
@@ -159,7 +160,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 							name: eventTitle,
 							description: eventDescription,
 							course: course,
-							finalDate: eventTime,
+							finalDate: eventTimeFinal,
 							newEh: eventID > storageData.calendar_max,
 							goToFunc: openMoodle(eventID, eventDate.getTime()),
 							eventID: eventID,

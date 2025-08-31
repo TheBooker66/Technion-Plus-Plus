@@ -36,67 +36,77 @@ import {reverseString, xorStrings} from './utils.js';
 				resolve({new_list: [], finished_list: []});
 				return;
 			}
-			const currentTime = Date.now(), regexPatterns = {
+			const THIRTY_DAYS = 2592E6, currentTime = Date.now(),
+				DAYS = "ראשון שני שלישי רביעי חמישי שישי שבת".split(" "),
+				regexPatterns = {
+					summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
 				banned: /Exam|moed| - Late|הרצאה|תרגול/,
 				uid: /UID:([0-9.a-zA-Z-]+)/,
-				summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
+					time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
 				description: /DESCRIPTION;LANGUAGE=en-US:([^,]+)/,
 				url: /URL:(.+)/,
-				time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
 			};
 			let finishedItems: { [key: string]: string | boolean } = {}, seenItems: { [key: string]: string } = {},
 				toDoList: HWAssignment[] = [], finishedList: HWAssignment[] = [], courseName = "";
 			for (let i = 1; i < eventSections.length; i++) {
-				const eventSummary = (eventSections[i].match(regexPatterns.summary) as RegExpMatchArray)[1];
-				let parsedEvent = eventSummary.split("(")[0].trim();
-				if (regexPatterns.banned.test(parsedEvent)) continue;
+				const summary = eventSections[i].match(regexPatterns.summary)![1];
+				let trimmedSummary = summary.split("(")[0].trim();
+				if (regexPatterns.banned.test(trimmedSummary)) continue;
 
-				const eventID = (eventSections[i].match(regexPatterns.uid) as RegExpMatchArray)[1] || eventSummary,
-					timeMatchGroups = (eventSections[i].match(regexPatterns.time) as RegExpMatchArray).groups as {
-						[key: string]: string
-					},
-					eventDate = new Date(`${timeMatchGroups.Y}-${timeMatchGroups.M}-${timeMatchGroups.D}T${timeMatchGroups.TH || 23}:${timeMatchGroups.TM || 59}:00+03:00`);
-				if (eventID.includes(".PHW")) {
-					if (eventDate.getTime() > currentTime) {
-						let newEventUID = eventID.replace(".PHW", ".HW");
-						parsedEvent = parsedEvent.replace("פרסום של ", "");
-						seenItems.hasOwnProperty(courseName) && (seenItems[courseName] = seenItems[courseName].replace("[[" + parsedEvent + "]]", ""));
+				const eventUID = eventSections[i].match(regexPatterns.uid)?.[1] || summary;
+				if (eventUID === "icspasswordexpires" || eventUID === "icspasswordexpired"
+					|| eventUID === "icspasswordexpires1" || eventUID === "icspasswordexpired1") {
+					if (eventUID[eventUID.length - 1].toLowerCase() === "s"
+						|| eventUID[eventUID.length - 2].toLowerCase() === "s") {
+						reject({
+							msg: "סיסמת היומן של הצגת המטלות של מדמ\"ח תפוג בקרוב, אנא כנס להגדרות התוסף להוראות חידוש הסיסמה.",
+							is_error: false,
+						});
+						continue;
+					} else {
+						reject({
+							msg: "סיסמת היומן של הצגת המטלות של מדמ\"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!",
+							is_error: true,
+						});
+						break;
+					}
+				}
+
+				const timeMatch = eventSections[i].match(regexPatterns.time)!.groups as { [key: string]: string };
+				const dueDate = new Date(`${timeMatch.Y}-${timeMatch.M}-${timeMatch.D}T${timeMatch.TH || 23}:${timeMatch.TM || 59}:00+03:00`);
+				if (dueDate.getTime() < currentTime || dueDate.getTime() > currentTime + THIRTY_DAYS) continue;
+
+				if (eventUID.includes(".PHW")) {
+					if (dueDate.getTime() > currentTime) {
+						let newEventUID = eventUID.replace(".PHW", ".HW");
+						trimmedSummary = trimmedSummary.replace("פרסום של ", "");
+						seenItems.hasOwnProperty(courseName) && (seenItems[courseName] = seenItems[courseName].replace("[[" + trimmedSummary + "]]", ""));
 						toDoList = toDoList.filter(element => element.eventID !== parseInt(newEventUID));
 						finishedList = finishedList.filter(element => element.eventID !== parseInt(newEventUID));
 					}
 					continue;
 				}
-				if (eventDate.getTime() < currentTime || eventDate.getTime() > currentTime + 2592E6) continue;
 
-				if (eventID === "icspasswordexpires" || eventID === "icspasswordexpires1") {
-					if (eventID === "icspasswordexpires")
-						reject({
-							msg: "תוקף סיסמת הגישה ליומן המטלות של מדמ\"ח יפוג בשבוע הקרוב, הוראות לחידושה נמצאות בהגדרות התוסף.",
-							is_error: false,
-						});
-					continue;
-				}
-				const days = "ראשון שני שלישי רביעי חמישי שישי שבת".split(" ");
-				const formattedDate = "יום " + days[eventDate.getDay()] + ", " + timeMatchGroups.D + "." + timeMatchGroups.M + "." + timeMatchGroups.Y,
+				const formattedDate = "יום " + DAYS[dueDate.getDay()] + ", " + timeMatch.D + "." + timeMatch.M + "." + timeMatch.Y,
 					description = (eventSections[i].match(regexPatterns.description) as RegExpMatchArray)[1],
 					eventURL = (eventSections[i].match(regexPatterns.url) as RegExpMatchArray)[1],
-					finishedEh = storageData.cs_cal_finished.hasOwnProperty(eventID);
-				finishedItems[eventID] = !finishedEh;
+					finishedEh = storageData.cs_cal_finished.hasOwnProperty(eventUID);
+				finishedItems[eventUID] = !finishedEh;
 
-				courseName = eventSummary.split("(")[1].split(")")[0];
+				courseName = summary.split("(")[1].split(")")[0];
 				seenItems.hasOwnProperty(courseName) || (seenItems[courseName] = "");
-				seenItems[courseName] += "[[" + parsedEvent + "]]";
+				seenItems[courseName] += "[[" + trimmedSummary + "]]";
 
 				const newEventEh = !(storageData.cs_cal_seen.hasOwnProperty(courseName) &&
-					storageData.cs_cal_seen[courseName].includes("[[" + parsedEvent + "]]"));
+					storageData.cs_cal_seen[courseName].includes("[[" + trimmedSummary + "]]"));
 				const Assignment: HWAssignment = {
-					name: parsedEvent,
+					name: trimmedSummary,
 					description: description,
 					finalDate: formattedDate,
 					newEh: newEventEh,
 					goToFunc: () => new Promise(go => go(chrome.tabs.create({url: eventURL}))),
-					eventID: parseInt(eventID),
-					timestamp: eventDate.getTime(),
+					eventID: parseInt(eventUID),
+					timestamp: dueDate.getTime(),
 					sys: "cs",
 					course: courseName,
 					done: finishedEh,

@@ -10,7 +10,7 @@ function TE_setStorage(data: any, callerName = "unknown") {
 	});
 }
 
-async function XHR(url: string, resType: string, body = "", reqType = false) {
+async function XHR(url: string, resType: string, info: string[] = [], body = "", reqType = false) {
 	const options: RequestInit = {
 		method: reqType ? "HEAD" : "GET", headers: {},
 	};
@@ -28,19 +28,24 @@ async function XHR(url: string, resType: string, body = "", reqType = false) {
 		throw new Error(`HTTP error! status: ${response.status} – ${response.statusText}`);
 	}
 
-	const responseText = await response.text();
 	let responsePayload;
-
-	if (resType === "json") {
-		responsePayload = JSON.parse(responseText);
-	} else if (resType === "document") {
-		await TE_setupOffscreenDocument();
-		responsePayload = await chrome.runtime.sendMessage({mess_t: "DOMParser", data: responseText});
-		await chrome.offscreen.closeDocument();
-	} else { // "text"
-		responsePayload = responseText.toString();
+	switch (resType) {
+		case "json":
+			responsePayload = await response.json();
+			break;
+		case "document":
+			await TE_setupOffscreenDocument();
+			responsePayload = await chrome.runtime.sendMessage({
+				mess_t: "DOMParser", data: await response.text(), dataNeeded: info,
+			});
+			await chrome.offscreen.closeDocument();
+			break;
+		case "text":
+			responsePayload = await response.text();
+			break;
+		default:
+			throw new Error(`Invalid response type: ${resType}`);
 	}
-
 	console.assert(responsePayload !== undefined && responsePayload !== null, "XHR: response payload is null or undefined");
 
 	return {
@@ -50,28 +55,27 @@ async function XHR(url: string, resType: string, body = "", reqType = false) {
 
 async function TE_AutoLoginNormal(headRequestEh: boolean) {
 	try {
-		const initialResponse = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", headRequestEh);
+		const initialResponse = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", ["Courses", "CourseNames", "CourseLinks"], "", headRequestEh);
 		if (!initialResponse.responseURL.includes("microsoft")) {
-			console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
+			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
 			return initialResponse;
 		}
 
 		const loginDetails = await chrome.storage.local.get({
 			username: "", server: true, enable_login: false,
 		});
-
 		if (!loginDetails.enable_login) {
 			console.error("No username/password");
-			return {response: "No username/password", responseURL: ""};
+			return {response: "Error", responseURL: ""};
 		}
 
 		const urlParts = initialResponse.responseURL.split("?");
 		const params = new URLSearchParams(urlParts[1]);
 		params.delete("prompt");
 		params.append("login_hint", `${loginDetails.username}@${loginDetails.server ? "campus." : ""}technion.ac.il`);
-
+		const URL = `${urlParts[0]}?${params.toString()}`;
 		const tab = await chrome.tabs.create({
-			url: `${urlParts[0]}?${params.toString()}`, active: false,
+			url: URL, active: false,
 		});
 		const tabId = tab.id as number;
 
@@ -80,8 +84,8 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 			const currentTab = await chrome.tabs.get(tabId);
 			if (currentTab.url === "https://moodle24.technion.ac.il/") {
 				void chrome.tabs.remove(tabId);
-				const finalResponse = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", "", headRequestEh);
-				console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
+				const finalResponse = await XHR("https://moodle24.technion.ac.il/auth/oidc/", "document", ["Courses", "CourseNames", "CourseLinks"], "", headRequestEh);
+				console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
 				return finalResponse;
 			}
 			await delay(RETRY_DELAY);
@@ -89,19 +93,19 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 
 		void chrome.tabs.remove(tabId);
 		console.error("Could not login to moodle, possibly wrong username/password (normal).");
-		return {response: "Could not login to moodle, possibly wrong username/password (normal).", responseURL: ""};
+		return {response: "Error", responseURL: ""};
 	} catch (err: any) {
-		console.error(`TE_back_M_forced_login: could not connect to moodle. {reason: ${err.message}} at ${Date.now()}`);
-		return {response: "Could not login to moodle, possibly wrong username/password (normal).", responseURL: ""};
+		console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err.message}} at ${Date.now()}`);
+		return {response: "Error", responseURL: ""};
 	}
 }
 
 async function TE_AutoLoginExternal() {
 	try {
-		const moodlePage = await XHR("https://moodle24.technion.ac.il/", "document");
-		if (moodlePage.response[".usertext"]) {
-			console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
-			return moodlePage;
+		const initialResponse = await XHR("https://moodle24.technion.ac.il/", "document", ["Courses", "CourseNames", "UserText", "CourseLinks"]);
+		if (initialResponse.response["UserText"]) {
+			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
+			return initialResponse;
 		}
 
 		const tab = await chrome.tabs.create({
@@ -114,11 +118,11 @@ async function TE_AutoLoginExternal() {
 
 		while (retryCount < MAX_RETRIES) {
 			try {
-				const moodleResponse = await XHR("https://moodle24.technion.ac.il/", "document");
-				if (moodleResponse.response[".usertext"]) {
+				const finalResponse = await XHR("https://moodle24.technion.ac.il/", "document", ["Courses", "CourseNames", "UserText", "CourseLinks"]);
+				if (finalResponse.response["UserText"]) {
 					void chrome.tabs.remove(tabId);
-					console.log(`TE_forced_auto_login: connection was made! At ${Date.now()}`);
-					return moodleResponse;
+					console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
+					return finalResponse;
 				}
 			} catch (err) {
 				// If XHR fails, it might be a temporary network issue.
@@ -129,10 +133,10 @@ async function TE_AutoLoginExternal() {
 
 		void chrome.tabs.remove(tabId);
 		console.error("Could not login to moodle, possibly wrong username/password (external).");
-		return {response: "Could not login to moodle, possibly wrong username/password (external).", responseURL: ""};
+		return {response: "Error", responseURL: ""};
 	} catch (err: any) {
-		console.error(`TE_back_M_forced_login: could not connect to moodle. {reason: ${err.message}} at ${Date.now()}`);
-		return {response: "Could not login to moodle, possibly wrong username/password (external).", responseURL: ""};
+		console.error(`TE_back_M_login: could not connect to moodle. {reason: ${err.message}} at ${Date.now()}`);
+		return {response: "Error", responseURL: ""};
 	}
 }
 
@@ -189,7 +193,6 @@ function TE_alertNewHW(sourceIndex: number) {
 	const sourceInfo = [
 		{name: "מודל", flag: 1},
 		{name: 'מדמ"ח', flag: 2},
-		{name: "לא אמור לקרות", flag: 4},
 		{name: "WeBWorK", flag: 8},
 	][sourceIndex];
 
@@ -206,12 +209,12 @@ function TE_alertNewHW(sourceIndex: number) {
 }
 
 function TE_getCoursesMoodle(moodleData: { response: any }) {
-	if (!moodleData.response["coursevisible"] || moodleData.response["coursevisible"].length === 0) {
+	if (!moodleData.response["Courses"] || moodleData.response["Courses"].length === 0) {
 		console.error("TE_login: failed to fetch moodle courses.");
 		return;
 	}
 
-	const courses: { [key: string]: string } = {}, coursesResponse: string = moodleData.response["h3"];
+	const courses: { [key: string]: string } = {}, coursesResponse: string = moodleData.response["CourseNames"];
 	for (const courseHTML of coursesResponse) {
 		const match = courseHTML.replace(semesterRegex, "").match(courseRegex);
 		if (match) {
@@ -229,12 +232,12 @@ async function TE_checkCalendarProp(calendarProp: string) {
 	if (calendarProp !== "") return;
 
 	try {
-		const mainPageResponse = await XHR("https://moodle24.technion.ac.il/calendar/export.php", "document");
-		const sesskey = mainPageResponse.response["sesskey"];
-		const postBody = `sesskey=${sesskey}&_qf__core_calendar_export_form=1&events[exportevents]=all&period[timeperiod]=recentupcoming&generateurl=\u05d4\u05e9\u05d2+\u05d0\u05ea+\u05db\u05ea\u05d5\u05d1\u05ea+\u05d4-URL+\u05e9\u05dc+\u05dc\u05d5\u05d7+\u05d4\u05e9\u05e0\u05d4`;
+		const mainPageResponse = await XHR("https://moodle24.technion.ac.il/calendar/export.php", "document", ["SessionKey"]);
+		const SessionKey = mainPageResponse.response["SessionKey"];
+		const postBody = `sesskey=${SessionKey}&_qf__core_calendar_export_form=1&events[exportevents]=all&period[timeperiod]=recentupcoming&generateurl=\u05d4\u05e9\u05d2+\u05d0\u05ea+\u05db\u05ea\u05d5\u05d1\u05ea+\u05d4-URL+\u05e9\u05dc+\u05dc\u05d5\u05d7+\u05d4\u05e9\u05e0\u05d4`;
 
-		const exportResponse = await XHR(mainPageResponse.responseURL, "document", postBody);
-		const calendarUrl = exportResponse.response["calendarexporturl"];
+		const exportResponse = await XHR(mainPageResponse.responseURL, "document", ["CalendarURL"], postBody);
+		const calendarUrl = exportResponse.response["CalendarURL"];
 		const userProp = "userid=" + calendarUrl.split("userid=")[1].split("&preset_what=all")[0];
 		TE_setStorage({calendar_prop: userProp}, "cal2");
 	} catch (err) {
@@ -254,11 +257,11 @@ async function TE_alertMoodleCalendar(seenStatus: number, calendarProp: string, 
 
 	const calendarUrl = `https://moodle24.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&${calendarProp}`;
 	try {
-		const calendarData = await XHR(calendarUrl, "text");
-		const events = calendarData.response["BEGIN:VEVENT"];
+		const calendarData = await XHR(calendarUrl, "document", ["HWList"]);
+		const events: string[] = calendarData.response["HWList"];
 		let latestEventId = maxEventId;
 
-		if (!events || !Array.isArray(events) || events.length <= 1) {
+		if (events?.length <= 1) {
 			console.log("No Moodle calendar events found to process.");
 			return;
 		}
@@ -289,60 +292,73 @@ async function TE_alertMoodleCalendar(seenStatus: number, calendarProp: string, 
 }
 
 
-function TE_csCalendarCheck(
-	uidnArray: [string, string], webcoursePassword: string, seenStatus: { [key: string]: string[] }) {
-	const csPass = reverseString(xorStrings(uidnArray[0] + "", uidnArray[1]));
-	if (!csPass || !webcoursePassword) return;
+async function TE_csCalendarCheck(
+	uidArray: [string, string], csPassword: string, seenStatus: { [key: string]: string[] }) {
+	const UID = reverseString(xorStrings(uidArray[0] + "", uidArray[1]));
+	if (!UID || !csPassword) return;
 
-	const calendarUrl = `https://grades.cs.technion.ac.il/cal/${csPass}/${encodeURIComponent(webcoursePassword)}`;
-	XHR(calendarUrl, "text").then(calendarData => {
-		console.log("Checking GR++...");
-		const events = calendarData.response["BEGIN:VEVENT"];
-		if (events.length <= 1) return;
+	const calendarUrl = `https://grades.cs.technion.ac.il/cal/${UID}/${encodeURIComponent(csPassword)}`;
+	try {
+		const calendarData = await XHR(calendarUrl, "document", ["HWList"]);
+		const events: string[] = calendarData.response["HWList"];
+		if (events?.length <= 1) {
+			console.log("No cs calendar events found to process.");
+			return;
+		}
 
-		const now = Date.now(), newHwSet = new Set(), regexes = {
+		const THIRTY_DAYS = 2592E6, now = Date.now(), newHWSet = new Set(), regexes = {
+			summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
 			banned: /Exam|moed| - Late|\u05d4\u05e8\u05e6\u05d0\u05d4|\u05ea\u05e8\u05d2\u05d5\u05dc/,
-			summary: /SUMMARY;LANGUAGE=en-US:(.+)/, uid: /UID:([0-9.a-zA-Z-]+)/,
+			uid: /UID:([0-9.a-zA-Z-]+)/,
 			time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
 		};
 
 		for (let i = 1; i < events.length; i++) {
 			const eventText = events[i];
-			const summary = eventText.match(regexes.summary)[1];
+			const summary = eventText.match(regexes.summary)![1];
 			const trimmedSummary = summary.split("(")[0].trim();
-
 			if (regexes.banned.test(trimmedSummary)) continue;
 
-			const uid = eventText.match(regexes.uid)[1] || summary;
-			const timeMatch = eventText.match(regexes.time).groups;
-			const dueDate = new Date(`${timeMatch.Y}-${timeMatch.M}-${timeMatch.D}T${timeMatch.TH || 23}:${timeMatch.TM || 59}:00+03:00`).getTime();
-
-			if (dueDate < now || dueDate > now + 2592E6) continue;
-
-			if (uid === "icspasswordexpires") {
-				newHwSet.clear();
-				TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח תפוג בקרוב, אנא כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!', false);
-				break;
+			const eventUID = eventText.match(regexes.uid)?.[1] || summary;
+			if (eventUID === "icspasswordexpires" || eventUID === "icspasswordexpired") {
+				newHWSet.clear();
+				if (eventUID[eventUID.length - 1].toLowerCase() === "s") {
+					console.error("TE_cs_cal_err: CS password expires soon.");
+					TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח תפוג בקרוב, אנא כנס להגדרות התוסף להוראות חידוש הסיסמה.', true);
+					continue;
+				} else {
+					console.error("TE_cs_cal_err: CS password expired already.");
+					TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!', false);
+					break;
+				}
 			}
 
+			const timeMatch = eventText.match(regexes.time)!.groups as { [key: string]: string };
+			const dueDate = new Date(`${timeMatch.Y}-${timeMatch.M}-${timeMatch.D}T${timeMatch.TH || 23}:${timeMatch.TM || 59}:00+03:00`).getTime();
+			if (dueDate < now || dueDate > now + THIRTY_DAYS) continue;
 
-			if (uid.includes(".PHW")) newHwSet.delete(uid.replace(".PHW", ".HW")); else {
-				newHwSet.add(uid);
+			if (eventUID.includes(".PHW")) {
+				newHWSet.delete(eventUID.replace(".PHW", ".HW"));
+			} else {
+				newHWSet.add(eventUID);
 				const courseNum = summary.split("(")[1].split(")")[0];
 				if (seenStatus[courseNum]?.includes(`[[${trimmedSummary}]]`)) {
-					newHwSet.delete(uid);
+					newHWSet.delete(eventUID);
 				}
 			}
 		}
 
 		TE_setStorage({cs_cal_update: now}, "cal332122");
-		if (newHwSet.size > 0) TE_alertNewHW(1);
-	}).catch(err => console.error("TE_back_cal_cs_err: " + err));
+		if (newHWSet.size > 0) TE_alertNewHW(1);
+
+	} catch (err: any) {
+		console.error("TE_back_cal_cs_err: " + err);
+	}
 }
 
 async function TE_getWebwork(moodleData: { response: any, responseURL: string },
                              existingWebworkCourses: { [key: string]: { name: string, lti: string } }) {
-	if (!moodleData.response["coursevisible"] || moodleData.response["coursevisible"].length === 0) {
+	if (!moodleData.response["Courses"] || moodleData.response["Courses"].length === 0) {
 		console.error("TE_login: failed to fetch webwork courses.");
 		return;
 	}
@@ -351,8 +367,8 @@ async function TE_getWebwork(moodleData: { response: any, responseURL: string },
 		webworkRegex = /webwork|וובוורק|ווב-וורק/i, // The Next line is HARDCODED COURSE NUMBERS
 		mathCourseNums = "01040000 01040003 01040004 01040012 01040013 01040016 01040018 01040019 01040022 01040031 01040032 01040033 01040034 01040035 01040036 01040038 01040041 01040042 01040043 01040044 01040064 01040065 01040066 01040131 01040136 01040166 01040174 01040192 01040195 01040215 01040220 01040221 01040228 01040281 01040285 01040295".split(" ");
 
-	let courseHeadings = moodleData.response["h3"];
-	const courseUrlElements = moodleData.response["coursestyle2url"];
+	let courseHeadings = moodleData.response["CourseNames"];
+	const courseUrlElements = moodleData.response["CourseLinks"];
 
 	for (let i = 0; i < courseUrlElements.length; i++) {
 		const courseMatch = courseHeadings[i].replace(semesterRegex, "").match(courseRegex);
@@ -367,8 +383,8 @@ async function TE_getWebwork(moodleData: { response: any, responseURL: string },
 					continue;
 				}
 
-				const ltiIndexPage = await XHR(`https://moodle24.technion.ac.il/mod/lti/index.php?id=${courseID}`, "document");
-				const links = ltiIndexPage.response[".mod_index .lastcol a"];
+				const ltiIndexPage = await XHR(`https://moodle24.technion.ac.il/mod/lti/index.php?id=${courseID}`, "document", ["WebworkLinks"]);
+				const links = ltiIndexPage.response["WebworkLinks"];
 				let ltiId = "";
 				for (const link of links) {
 					if (webworkRegex.test(link.textContent)) {
@@ -389,8 +405,8 @@ async function TE_getWebwork(moodleData: { response: any, responseURL: string },
 async function TE_webworkStep(url: string, body = "") {
 	const webworkRegex = /webwork/i;
 	try {
-		const response = await XHR(url, "document", body);
-		const form = response.response["form"];
+		const response = await XHR(url, "document", ["WebworkForm"], body);
+		const form = response.response["WebworkForm"];
 		if (!form) return false;
 
 		const actionUrl = form.getAttribute("action"), formData = new FormData(form);
@@ -424,13 +440,13 @@ function TE_webworkScan() {
 			if (!step3) continue;
 
 			const finalBody = new URLSearchParams(step3[1]).toString();
-			const page = await XHR(step3[0], "document", finalBody);
+			const page = await XHR(step3[0], "document", ["WebworkMissions"], finalBody);
 			const assignments: {
 				[key: string]: { h: string, due: string, ts: number, seen: boolean, done: boolean }
-			} = {}, tableRows = page.response[".problem_set_table tr"];
+			} = {}, tableRows = page.response["WebworkMissions"];
 
 			for (let i = 1; i < tableRows.length; i++) {
-				const cells = tableRows[i]["td"];
+				const cells = tableRows[i];
 				if (statusRegex.test(cells[1].textContent)) continue;
 
 				const dateMatch = dateRegex.exec(cells[1].textContent)?.groups;
@@ -462,7 +478,7 @@ function TE_webworkScan() {
 		}
 
 		TE_setStorage({webwork_cal: newWebworkCal, ww_cal_update: Date.now()}, "wwcfail_1");
-		if (foundNewAssignment) TE_alertNewHW(3);
+		if (foundNewAssignment) TE_alertNewHW(2);
 	});
 }
 
@@ -565,7 +581,8 @@ export function TE_updateInfo() {
 			webworkCheckDueEh = loginEnabledEh && storage.ww_cal_switch && (now - storage.ww_cal_update > EIGHT_HOURS);
 
 		if (webworkCheckDueEh || moodleCheckDueEh) {
-			TE_AutoLogin().then(async moodleData => {
+			try {
+				const moodleData = await TE_AutoLogin();
 				if (moodleCheckDueEh) {
 					TE_getCoursesMoodle(moodleData);
 					await TE_checkCalendarProp(storage.calendar_prop);
@@ -574,10 +591,13 @@ export function TE_updateInfo() {
 				if (webworkCheckDueEh) {
 					await TE_getWebwork(moodleData, storage.webwork_courses);
 				}
-			}).catch(err => console.error("TE_back: forced_login_err -- " + err));
+			} catch (err) {
+				console.error("TE_back: forced_login_err -- " + err);
+			}
 		}
 
-		if (storage.cs_cal && now - storage.cs_cal_update > EIGHT_HOURS) TE_csCalendarCheck(storage.uidn_arr, storage.cs_pass, storage.cs_cal_seen);
+		if (storage.cs_cal && now - storage.cs_cal_update > 1)
+			await TE_csCalendarCheck(storage.uidn_arr, storage.cs_pass, storage.cs_cal_seen);
 
 		chrome.storage.local.get({user_agenda: {}}, storage => {
 			const userAgenda: { [key: string]: HWAssignment } = storage.user_agenda;
@@ -645,25 +665,27 @@ function TE_busAlertNow(arrivingBuses: BusLine[]) {
 
 function TE_checkBuses() {
 	console.log("TE_checkBuses");
-	chrome.storage.local.get({bus_station: 41205, bus_time: 10, buses_alerts: []}, (storage) => {
+	chrome.storage.local.get({bus_station: 41205, bus_time: 10, buses_alerts: []}, async (storage) => {
 		if (chrome.runtime.lastError) {
 			console.error("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message);
 			return;
 		}
 		if (storage.buses_alerts.length === 0) return;
 
-		XHR(`https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/${storage.bus_station}/he/false`, "json")
-			.then(response => {
-				const realtimeData: BusLine[] = response.response;
-				if (!Array.isArray(realtimeData)) {
-					TE_busAlertError();
-					return;
-				}
+		try {
+			const busData = await XHR(`https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/${storage.bus_station}/he/false`, "json");
+			const realtimeData: BusLine[] = busData.response;
+			if (!Array.isArray(realtimeData)) {
+				TE_busAlertError();
+				return;
+			}
 
-				const busesToAlert = realtimeData.filter(bus => storage.buses_alerts.includes(bus["Shilut"]) && bus["MinutesToArrival"] <= storage.bus_time);
+			const busesToAlert = realtimeData.filter(bus => storage.buses_alerts.includes(bus["Shilut"]) && bus["MinutesToArrival"] <= storage.bus_time);
 
-				if (busesToAlert.length > 0) TE_busAlertNow(busesToAlert);
-			}).catch(TE_busAlertError);
+			if (busesToAlert.length > 0) TE_busAlertNow(busesToAlert);
+		} catch (err) {
+			TE_busAlertError();
+		}
 	});
 }
 
@@ -697,7 +719,7 @@ function TE_startExtension() {
 	TE_setStorage({buses_alerts: [], dl_queue: [], dl_current: 0});
 }
 
-chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 	switch (message.mess_t) {
 		case "single_download":
 			chrome.downloads.download({url: message.link, filename: message.name, saveAs: false}, () => {
@@ -711,14 +733,14 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 			TE_toggleBusAlert(message.bus_kav);
 			break;
 		case "login_moodle_url":
-			fetch(`https://${message.url}/auth/oidc/`, {
+			sendResponse((await fetch(`https://${message.url}/auth/oidc/`, {
 				headers: {
 					accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 					"accept-language": "en-US,en;q=0.9", "cache-control": "no-cache", pragma: "no-cache",
 					"sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
 					"sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none",
 				}, body: null, method: "HEAD", mode: "cors", credentials: "include",
-			}).then(res => sendResponse(res.url)).catch(console.error);
+			})).url);
 			return true;
 		case "silent_notification":
 			TE_notification(message.message, true);
@@ -733,11 +755,11 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 			TE_sendMessageToTabs({mess_t: "TE_remoodle"});
 			break;
 		case "buses":
-			fetch(message.url)
-				.then(response => response.json()).then(data => sendResponse(data)).catch(console.error);
+			const data = await (await fetch(message.url)).json();
+			sendResponse(data);
 			return true;
 	}
-	return true;
+	return false;
 });
 
 chrome.downloads.onChanged.addListener((delta) => {

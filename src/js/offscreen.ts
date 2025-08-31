@@ -4,27 +4,50 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 			const audio = new Audio(chrome.runtime.getURL("../resources/notification.mp3"));
 			audio.volume = message.volume;
 			await audio.play();
-			sendResponse();
 			break;
 		case "DOMParser":
 			const doc = new DOMParser().parseFromString(message.data, "text/html");
-			const courseVisibleElements = Array.from(doc.querySelectorAll(".coursevisible")),
-				problemSetTableRows = Array.from(doc.querySelectorAll(".problem_set_table tr"));
+			const courseVisibleElements = Array.from(doc.querySelectorAll(".coursevisible"));
+			const actions = {
+				get Courses() {
+					return courseVisibleElements;
+				},
+				get CourseNames() {
+					return courseVisibleElements.map(e => e.querySelector("h3")!.textContent);
+				},
+				get CourseLinks() {
+					return courseVisibleElements.map(e => e.querySelector(".coursestyle2url")!.getAttribute("href"));
+				},
+				get WebworkForm() {
+					return doc.querySelector("form");
+				},
+				get WebworkMissions() {
+					return Array.from(doc.querySelectorAll(".problem_set_table tr")).map(t => t.querySelectorAll("td"));
+				},
+				get WebworkLinks() {
+					return doc.querySelectorAll(".mod_index .lastcol a");
+				},
+				get SessionKey() {
+					return (doc.querySelector("[name='sesskey']") as HTMLInputElement)?.value;
+				},
+				get UserText() {
+					return doc.querySelector(".usertext");
+				},
+				get CalendarURL() {
+					return (doc.getElementById("calendarexporturl") as HTMLInputElement)?.value;
+				},
+				get HWList() {
+					return doc.activeElement?.innerHTML.split("BEGIN:VEVENT") ?? [];
+				},
+			};
 
-			sendResponse({
-				"coursevisible": courseVisibleElements,
-				"h3": courseVisibleElements.map(e => e.querySelector("h3")?.textContent),
-				"sesskey": doc.querySelector("[name='sesskey']") ? (doc.querySelector("[name='sesskey']") as HTMLInputElement)?.value : "",
-				"calendarexporturl": doc.getElementById("calendarexporturl") ? (doc.getElementById("calendarexporturl") as HTMLInputElement)?.value : "",
-				"coursestyle2url": courseVisibleElements.map(e => e.querySelector(".coursestyle2url")?.getAttribute("href")),
-				".problem_set_table tr": problemSetTableRows,
-				"td": problemSetTableRows.map(t => t.querySelectorAll("td")),
-				".usertext": doc.querySelector(".usertext"),
-				".mod_index .lastcol a": doc.querySelectorAll(".mod_index .lastcol a"),
-				"form": doc.querySelector("form"),
-				"BEGIN:VEVENT": doc.activeElement?.innerHTML.split("BEGIN:VEVENT"),
-			});
-			break;
+			let returnObj: { [key: string]: any } = {};
+			for (const key of message.dataNeeded) {
+				if (actions[key as keyof typeof actions] !== undefined)
+					returnObj[key] = actions[key as keyof typeof actions];
+			}
+			sendResponse(returnObj);
+			return true;
 	}
-	return true;
+	return false;
 });
