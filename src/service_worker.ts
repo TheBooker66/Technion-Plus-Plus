@@ -719,7 +719,7 @@ function TE_startExtension() {
 	TE_setStorage({buses_alerts: [], dl_queue: [], dl_current: 0});
 }
 
-chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 	switch (message.mess_t) {
 		case "single_download":
 			chrome.downloads.download({url: message.link, filename: message.name, saveAs: false}, () => {
@@ -733,14 +733,14 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 			TE_toggleBusAlert(message.bus_kav);
 			break;
 		case "login_moodle_url":
-			sendResponse((await fetch(`https://${message.url}/auth/oidc/`, {
+			fetch(`https://${message.url}/auth/oidc/`, {
 				headers: {
 					accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 					"accept-language": "en-US,en;q=0.9", "cache-control": "no-cache", pragma: "no-cache",
 					"sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
 					"sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none",
 				}, body: null, method: "HEAD", mode: "cors", credentials: "include",
-			})).url);
+			}).then(res => sendResponse(res.url)).catch(console.error);
 			return true;
 		case "silent_notification":
 			TE_notification(message.message, true);
@@ -755,8 +755,8 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 			TE_sendMessageToTabs({mess_t: "TE_remoodle"});
 			break;
 		case "buses":
-			const data = await (await fetch(message.url)).json();
-			sendResponse(data);
+			fetch(message.url)
+				.then(response => response.json()).then(data => sendResponse(data)).catch(console.error);
 			return true;
 	}
 	return false;
