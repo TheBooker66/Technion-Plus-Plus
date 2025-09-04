@@ -56,7 +56,7 @@ function updateSelectedCoursesStats() {
 function updateAllStats() {
 	const allGradesStats = calculateTableStats("#grades_list"),
 		allPointsElements = document.querySelectorAll("#grades_list tr .points") as NodeListOf<HTMLInputElement>,
-		passingPointsElements = document.querySelectorAll("#grades_list tr .points :not(.failed)") as NodeListOf<HTMLInputElement>;
+		passingPointsElements = document.querySelectorAll("#grades_list tr:not(.failed) .points") as NodeListOf<HTMLInputElement>;
 	const totalPoints = Array.from(allPointsElements)
 			.reduce((sum, element) => sum + parseFloat(element.value), 0),
 		totalPassingPoints = Array.from(passingPointsElements)
@@ -114,13 +114,14 @@ function handleGradesListClick(event: PointerEvent) {
 	const rowElement = target.closest("tr");
 	if (!rowElement) return;
 	if (rowElement.parentElement?.tagName !== 'TBODY') return;
-	if (!target.matches("td button")) return;
 
 	if (target.matches("td input[type='checkbox'].select_course")) {
 		(target as HTMLInputElement).checked ? rowElement.classList.add("selected") : rowElement.classList.remove("selected");
 		updateSelectedCoursesStats();
 		return;
 	}
+
+	if (!target.matches("td button")) return;
 
 	chrome.storage.local.get({grades: []}, storage => {
 		const allGrades = storage.grades;
