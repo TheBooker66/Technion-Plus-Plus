@@ -3,7 +3,7 @@
 		if (0 >= fileLinks.length) return;
 		const downloadButton = document.createElement("a");
 		downloadButton.setAttribute("class", "maor_download");
-		downloadButton.addEventListener("click", () => {
+		downloadButton.addEventListener("click", async () => {
 			const pagePrefix = window.location.href.includes("ho_") ? decodeURIComponent(decodeURIComponent(window.location.href.split("ho_")[1].split(".html")[0])).replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "").trim() + "/" : "",
 				downloadChunk: { sys: number, sub_pre: string, list: { [key: string]: string }[] } = {
 					sys: 1, sub_pre: "", list: [],
@@ -28,7 +28,7 @@
 			}
 			downloadChunk.sub_pre = webcourseEh ? "" : decodeURIComponent(fileLinks[0][0]).split("?")[1].split("/WCFiles/")[0] + "/WCFiles/";
 			downloadChunk.sys = webcourseEh ? 3 : 2;
-			void chrome.runtime.sendMessage({mess_t: "multi_download", chunk: downloadChunk});
+			await chrome.runtime.sendMessage({mess_t: "multi_download", chunk: downloadChunk});
 		});
 		downloadButton.textContent = "הכל" === buttonText ? "הורדת כל הקבצים " : "הורדת קבצי " + buttonText + " ";
 		const spanElement = document.createElement("span");

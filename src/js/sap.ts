@@ -1,5 +1,5 @@
 (function () {
-	function show_histograms(src: HTMLDivElement, course: string) {
+	async function show_histograms(src: HTMLDivElement, course: string) {
 		src.setAttribute("data-course", course);
 
 		const expand = src.querySelectorAll(".TP_expand") as NodeListOf<HTMLDivElement>,
@@ -33,10 +33,11 @@
 			toggleHists(checkbox.checked);
 			await chrome.storage.local.set({sap_hist: checkbox.checked});
 		});
-		chrome.storage.local.get({sap_hist: false}, storageData => toggleHists(storageData.sap_hist));
+		const storageData = await chrome.storage.local.get({sap_hist: false});
+		toggleHists(storageData.sap_hist);
 	}
 
-	function handlePageChange() {
+	async function handlePageChange() {
 		// Check if the current page matches the general format
 		const father = document.querySelector(".sapUxAPObjectPageSectionContainer");
 		if (!father) return;
@@ -81,7 +82,7 @@
 </div>
 </div>`, "text/html").body.firstChild as HTMLDivElement;
 		father.insertBefore(src, father.querySelector("#__xmlview1--objectPageLayout-0-1"));
-		show_histograms(src, course);
+		await show_histograms(src, course);
 
 		// Add the CSS because for some reason loading it normally fails
 		const styleLink = document.createElement('link') as HTMLLinkElement;

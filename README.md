@@ -4,6 +4,8 @@
 
 ![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge) ![Chrome Web Store User Count](https://img.shields.io/chrome-web-store/users/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge) ![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/stars/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge)
 
+![Mozilla Add-on Version](https://img.shields.io/amo/v/technion-plus-plus?style=for-the-badge) ![Mozilla Add-on Users](https://img.shields.io/amo/users/technion-plus-plus?style=for-the-badge) ![Mozilla Add-on Rating](https://img.shields.io/amo/rating/technion-plus-plus?style=for-the-badge)
+
 <div dir="rtl">
 
 ## תוכן עניינים
@@ -42,7 +44,7 @@
 ## תיאור כללי וקישורים להוריד
 
 התוסף _Technion Plus Plus_ (ובקצרה _++Technion_ (ובעברית _טכניון++_ ובערבית _التخنيون++_)) הוא תוסף לדפדפנים על בסיס
-Chromium (למשל Google Chrome, Opera, Brave, Microsoft Edge, ועוד), ואולי בעתיד גם FireFox, שמטרתו היא לעשות סדר בבלגן,
+Chromium (למשל Google Chrome, Opera, Brave, Microsoft Edge, ועוד) וגם לדפדפן FireFox, שמטרתו היא לעשות סדר בבלגן,
 להוסיף תכונות משודרגות ולהפוך את השימוש במערכות הטכניון השונות לנוח ויעיל יותר.
 בין התכונות המשולבות בתוסף: התחברות אוטומטית למרבית מערכות הטכניון, רשימות ToDoList של מטלות בית לכל מערכות הטכניון עם
 התראות כשיוצאות מטלות חדשות, חיפוש וידאו ישירות מהתוסף ללא קשר לשרת בו הוא נמצא, הורדת תוכן קורסים מהפנופטו, המודל ואתרי
@@ -50,11 +52,10 @@ Chromium (למשל Google Chrome, Opera, Brave, Microsoft Edge, ועוד), וא�
 חשוב לציין שהתוסף הינו פרויקט עצמאי, לא חובה פקולטית ולא מוגש מטעם הטכניון. מוגש מטעם איתן "67" עמירן, ומבוסס על
 _טכניון+_ של מאור לוי.
 
-ניתן להתקין את התוסף (עבור דפדפנים מבוססי Chromium)
-מ[כאן](https://chromewebstore.google.com/detail/technion-plus-plus/pfhjnidbfndnjhpcpfecngcigdjebemk).
-קישור הורדה לדפדפנים מבוססי FireFox אולי יהיה זמין בעתיד (כרגע זה מעט בעייתי עקב הצורה בה הדפדפנים השונים מימשו תכונות
-שונות).
-
+ניתן להתקין את התוסף עבור דפדפנים מבוססי Chromium
+מ[כאן](https://chromewebstore.google.com/detail/technion-plus-plus/pfhjnidbfndnjhpcpfecngcigdjebemk)
+ועבור דפדפן FireFox
+מ[כאן](https://addons.mozilla.org/en-GB/firefox/addon/technion-plus-plus/)
 ## פ'יצרים – מה התוסף עושה?
 
 <img align="left" height="250em" src="/.github/assets/popup.png"  alt="החלונית הראשית של התוסף"/>

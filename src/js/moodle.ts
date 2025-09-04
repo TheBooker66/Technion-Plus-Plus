@@ -1,5 +1,5 @@
-(function () {
-	function main() {
+(async function () {
+	async function main() {
 		function create_element(elementType: string, elementClass: string, attributes: {
 			[key: string]: string
 		} = {}, elementText: string = "", parent: HTMLElement | null = null, prepend: boolean = false) {
@@ -17,7 +17,7 @@
 			}, linkText, parent, false);
 		}
 
-		function create_tp_buttons() {
+		async function create_tp_buttons() {
 			const section = create_element("section", "block block_material_download card mb-3 tplus_block", {}, "", document.getElementById("block-region-side-pre"), true) as HTMLElement;
 			const cardBody = create_element("div", "card-body", {}, "", section) as HTMLDivElement;
 			const cardTitle = create_element("h5", "card-title d-inline", {
@@ -41,22 +41,19 @@
 				max: "330",
 				step: "30",
 			}, "", colorSliderContainer) as HTMLInputElement;
-			chrome.storage.local.get({remoodle: false, remoodle_angle: 120}, storage => {
-				darkModeCheckbox.checked = storage.remoodle;
-				colorSlider.value = storage.remoodle_angle;
+			const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120});
+			darkModeCheckbox.checked = storageData.remoodle;
+			colorSlider.value = storageData.remoodle_angle;
+			darkModeCheckbox.addEventListener("change", async () => {
+				await chrome.storage.local.set({remoodle: darkModeCheckbox.checked});
+				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
+					await chrome.runtime.sendMessage({mess_t: "TE_remoodle"});
 			});
-			darkModeCheckbox.addEventListener("change", () => {
-				chrome.storage.local.set({remoodle: darkModeCheckbox.checked}, () => {
-					chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
-						chrome.runtime.sendMessage({mess_t: "TE_remoodle"});
-				});
-			});
-			colorSlider.addEventListener("change", () => {
+			colorSlider.addEventListener("change", async () => {
 				const newAngle = parseInt(colorSlider.value.toString());
-				chrome.storage.local.set({remoodle_angle: newAngle}, () => {
-					chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
-						chrome.runtime.sendMessage({mess_t: "TE_remoodle_reangle", angle: newAngle});
-				});
+				await chrome.storage.local.set({remoodle_angle: newAngle});
+				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
+					await chrome.runtime.sendMessage({mess_t: "TE_remoodle_reangle", angle: newAngle});
 			});
 			let colorGradientString = "";
 			for (let gradientStep = 0; gradientStep < 12; gradientStep++) {
@@ -78,11 +75,10 @@
 				if (!courseMatch?.groups) continue;
 				userCourses[courseMatch.groups.cnum.trim()] = courseMatch.groups.cname.trim();
 			}
-			if (Object.keys(userCourses).length > 0)
-				chrome.storage.local.set({u_courses: userCourses}, () => {
-					if (chrome.runtime.lastError)
-						console.error("TE_moodle_001_: " + chrome.runtime.lastError.message);
-				});
+			if (Object.keys(userCourses).length > 0) {
+				await chrome.storage.local.set({u_courses: userCourses});
+				if (chrome.runtime.lastError) console.error("TE_moodle_001_: " + chrome.runtime.lastError);
+			}
 
 			const coursesBySemester: [{ cname: string, clink: string }[], { cname: string, clink: string }[],
 				{ cname: string, clink: string }[]] = [[], [], []];
@@ -101,7 +97,7 @@
 				}) : coursesBySemester[2].push({cname: course, clink: courseLink});
 				create_download(downloadButtonContainer, parseInt(courseTiles[i].querySelector(".coursestyle2url")!.getAttribute("href")!.split("?id=")[1]), 0, "הורדת קבצי הקורס");
 			}
-			let buttons = create_tp_buttons();
+			let buttons = await create_tp_buttons();
 			const parentNode = buttons.parentNode as HTMLHeadingElement;
 			parentNode.removeChild(buttons);
 			document.getElementById("coursecontentcollapseid1")
@@ -112,7 +108,7 @@
 		} else {
 			const moodleNum = window.location.href.split("?id=")[1],
 				course = document.title.match(/(?<cname>.+)\s-\s(?<csemester>.+)\s-\s(?<cnum>[0-9]+)/),
-				buttons = create_tp_buttons();
+				buttons = await create_tp_buttons();
 			const course_num = course?.groups!.cnum.trim();
 			if (course_num) {
 				create_download(buttons, parseInt(moodleNum), 0, "הורדת כל הקבצים בקורס");
@@ -125,35 +121,29 @@
 					href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2024/${semester}/SM/${course_num}`,
 					target: "_blank",
 				}, "דף הקורס בסאפ", buttons);
-				chrome.storage.local.get({
-					videos_data: {},
-					videos_courses: [],
-				}, (storage: {
-					videos_courses: string[][],
-					videos_data: { [key: string]: RecordingCourse["v"] }
-				}) => {
-					const short_course_num = course_num.substring(1, 4) + course_num.substring(5, 8);
-					let videoID = "";
-					for (let i = 0; i < storage.videos_courses.length; i++)
-						if (storage.videos_courses[i].join(" ").includes(short_course_num)) {
-							videoID = storage.videos_courses[i][0];
-							break;
-						}
-					if (videoID !== "" && storage.videos_data[videoID]) {
-						const data: RecordingCourse["v"] = storage.videos_data[videoID];
-						for (let j = 0; j < data.length; j++) {
-							let text = "";
-							text = 1 < data.length ? `וידאו #${j + 1} ` : "וידאו ";
-							text = 0 < data[j]["t"] ? ["הרצאה", "תרגול"][data[j]["t"] - 1] : text;
-							text += "(פנופטו)";
-							create_element("a", "maor_download", {
-								href: `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${data[j]["l"]}"`,
-								target: "_blank",
-								title: data[j]?.["vn"] ?? short_course_num,
-							}, text, buttons);
-						}
+				const storageData: { videos_courses: string[][], videos_data: { [key: string]: RecordingCourse["v"] } }
+					= await chrome.storage.local.get({videos_data: {}, videos_courses: []});
+				const short_course_num = course_num.substring(1, 4) + course_num.substring(5, 8);
+				let videoID = "";
+				for (let i = 0; i < storageData.videos_courses.length; i++)
+					if (storageData.videos_courses[i].join(" ").includes(short_course_num)) {
+						videoID = storageData.videos_courses[i][0];
+						break;
 					}
-				});
+				if (videoID !== "" && storageData.videos_data[videoID]) {
+					const data: RecordingCourse["v"] = storageData.videos_data[videoID];
+					for (let j = 0; j < data.length; j++) {
+						let text = "";
+						text = 1 < data.length ? `וידאו #${j + 1} ` : "וידאו ";
+						text = 0 < data[j]["t"] ? ["הרצאה", "תרגול"][data[j]["t"] - 1] : text;
+						text += "(פנופטו)";
+						create_element("a", "maor_download", {
+							href: `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${data[j]["l"]}"`,
+							target: "_blank",
+							title: data[j]?.["vn"] ?? short_course_num,
+						}, text, buttons);
+					}
+				}
 			}
 			for (const element of document.querySelectorAll(".section.main.clearfix")) {
 				if (element.classList.contains("accesshide") || element.classList.contains("hidden")) continue;
@@ -179,11 +169,10 @@
 
 				window.open(url, '_blank');
 			}, true);
-
 		}
 	}
 
-	function colourPage() {
+	async function colourPage() {
 		if (window.location.href.includes("pluginfile.php")) return;
 		const themeProperties = (hueOffset: number) => [
 			["--a_color", "hsl(" + (80 + hueOffset) + ", 90%, 80%)"],
@@ -195,31 +184,28 @@
 			["--dark_bg", "hsl(" + (90 + hueOffset) + ", 100%, 10%)"],
 			["--calendar_today", "hsla(" + (70 + hueOffset) + ", 100%, 20%, 0.5)"],
 		];
-		chrome.storage.local.get({
-			remoodle: false,
-			remoodle_angle: 120,
-		}, storage => {
-			if (chrome.runtime.lastError) console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
-			else {
-				let darkModeEnabled = storage.remoodle;
-				const setDarkMode = (darkmodeEh: boolean) => {
-					const entirePage = document.querySelector("html") as HTMLHtmlElement;
-					darkmodeEh ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
-					const checkbox = document.getElementById("tp-darkmode") as HTMLInputElement;
-					if (checkbox) checkbox.checked = darkmodeEh;
-				};
-				themeProperties(storage.remoodle_angle)
-					.forEach(property => document.documentElement.style.setProperty(property[0], property[1]));
-				setDarkMode(darkModeEnabled);
-				chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
-					if (message.mess_t === "TE_remoodle") {
-						setDarkMode(!darkModeEnabled);
-						darkModeEnabled = !darkModeEnabled;
-					}
-					sendResponse();
-				});
-			}
-		});
+		const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120});
+		if (chrome.runtime.lastError) console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
+		else {
+			let darkModeEnabled = storageData.remoodle;
+			const setDarkMode = (darkmodeEh: boolean) => {
+				const entirePage = document.querySelector("html") as HTMLHtmlElement;
+				darkmodeEh ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
+				const checkbox = document.getElementById("tp-darkmode") as HTMLInputElement;
+				if (checkbox) checkbox.checked = darkmodeEh;
+			};
+			themeProperties(storageData.remoodle_angle)
+				.forEach(property => document.documentElement.style.setProperty(property[0], property[1]));
+			setDarkMode(darkModeEnabled);
+			chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+				if (message.mess_t === "TE_remoodle") {
+					setDarkMode(!darkModeEnabled);
+					darkModeEnabled = !darkModeEnabled;
+				}
+				sendResponse();
+			});
+		}
+
 		chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 			if (message.mess_t === "TE_remoodle_reangle") {
 				themeProperties(message.angle)
@@ -231,6 +217,6 @@
 		});
 	}
 
-	colourPage();
+	await colourPage();
 	window.addEventListener("load", main);
 })();

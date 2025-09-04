@@ -2,17 +2,18 @@ import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
 import {reverseString, xorStrings} from './utils.js';
 
-(function () {
+(async function () {
 	const popup = new CommonPopup("מטלות קרובות - מדמ\"ח", ["calendar"], document.title);
 	const calendar = new CommonCalendar(popup, "cs", document.title);
 
-	calendar.progress(() => new Promise((resolve, reject) => chrome.storage.local.get({
-		cs_cal_finished: {},
-		cs_cal_seen: {},
-		uidn_arr: ["", ""],
-		cs_pass: "",
-		cal_seen: 0,
-	}, function (storageData) {
+	await calendar.progress(() => new Promise(async (resolve, reject) => {
+		const storageData = await chrome.storage.local.get({
+			cs_cal_finished: {},
+			cs_cal_seen: {},
+			uidn_arr: ["", ""],
+			cs_pass: "",
+			cal_seen: 0,
+		});
 		if (chrome.runtime.lastError) {
 			console.error("TE_cs_cal: " + chrome.runtime.lastError.message);
 			reject({
@@ -21,6 +22,7 @@ import {reverseString, xorStrings} from './utils.js';
 			});
 			return;
 		}
+
 		const calendarPass = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
 		if (calendarPass.length === 0 || storageData.cs_pass === "") {
 			reject({
@@ -29,8 +31,10 @@ import {reverseString, xorStrings} from './utils.js';
 			});
 			return;
 		}
+
 		const calendarUrl = `https://grades.cs.technion.ac.il/cal/${calendarPass}/${encodeURIComponent(storageData.cs_pass)}`;
-		popup.XHR(calendarUrl, "text").then((responseData: { response: string, responseURL: string }) => {
+		try {
+			const responseData: { response: string, responseURL: string } = await popup.XHR(calendarUrl, "text");
 			const eventSections = responseData.response.split("BEGIN:VEVENT");
 			if (eventSections.length === 1) {
 				resolve({new_list: [], finished_list: []});
@@ -40,12 +44,12 @@ import {reverseString, xorStrings} from './utils.js';
 				DAYS = "ראשון שני שלישי רביעי חמישי שישי שבת".split(" "),
 				regexPatterns = {
 					summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
-				banned: /Exam|moed| - Late|הרצאה|תרגול/,
-				uid: /UID:([0-9.a-zA-Z-]+)/,
+					banned: /Exam|moed| - Late|הרצאה|תרגול/,
+					uid: /UID:([0-9.a-zA-Z-]+)/,
 					time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
-				description: /DESCRIPTION;LANGUAGE=en-US:([^,]+)/,
-				url: /URL:(.+)/,
-			};
+					description: /DESCRIPTION;LANGUAGE=en-US:([^,]+)/,
+					url: /URL:(.+)/,
+				};
 			let finishedItems: { [key: string]: string | boolean } = {}, seenItems: { [key: string]: string } = {},
 				toDoList: HWAssignment[] = [], finishedList: HWAssignment[] = [], courseName = "";
 			for (let i = 1; i < eventSections.length; i++) {
@@ -113,21 +117,21 @@ import {reverseString, xorStrings} from './utils.js';
 				};
 				finishedEh ? finishedList.push(Assignment) : toDoList.push(Assignment);
 			}
-			void chrome.storage.local.set({
+			await chrome.storage.local.set({
 				cs_cal_finished: finishedItems,
 				cs_cal_seen: seenItems,
-				cal_seen: calendar.removeCalendarAlert(storageData.cal_seen),
+				cal_seen: await calendar.removeCalendarAlert(storageData.cal_seen),
 				cs_cal_update: currentTime,
 			});
 			toDoList.sort((a, b) => a.timestamp - b.timestamp);
 			resolve({new_list: toDoList, finished_list: finishedList});
-		}).catch(errCode => {
+		} catch (errCode) {
 			const err_msg =
 				[
 					'אירעה שגיאה בניסיון לגשת אל שרת הפקולטה למדמ"ח, אנא נסה שנית מאוחר יותר.',
 					'השרת של הפקולטה למדמ"ח מסרב לקבל את סיסמת היומן שלך. הוראות לחידוש סיסמת יומן ה-GR++ נמצאות בהגדרות התוסף.',
 				];
 			reject({msg: errCode === 401 ? err_msg[1] : err_msg[0], is_error: true});
-		});
-	})));
+		}
+	}));
 })();

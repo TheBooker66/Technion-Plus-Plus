@@ -8,6 +8,7 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 		case "DOMParser":
 			const doc = new DOMParser().parseFromString(message.data, "text/html");
 			const courseVisibleElements = Array.from(doc.querySelectorAll(".coursevisible"));
+			// noinspection DuplicatedCode
 			const actions = {
 				get Courses() {
 					return courseVisibleElements;

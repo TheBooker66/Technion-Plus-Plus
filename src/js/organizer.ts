@@ -82,37 +82,34 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 	checkForEmpty();
 }
 
-function editUA(assignmentID: number) {
-	chrome.storage.local.get({user_agenda: {}}, storage => {
-		const userAgenda: { [key: string]: HWAssignment } = storage.user_agenda;
-		form.subject.value = userAgenda[assignmentID].name;
-		form.notes.value = userAgenda[assignmentID].description;
-		form.edit.value = assignmentID;
-		if (0 < userAgenda[assignmentID].timestamp) {
-			form.no_end.checked = false;
-			form.end_time.valueAsNumber = userAgenda[assignmentID].timestamp;
-		} else {
-			form.no_end.checked = true;
-			form.end_time.value = "";
-		}
+async function editUA(assignmentID: number) {
+	const storageData = await chrome.storage.local.get({user_agenda: {}});
+	const userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
+	form.subject.value = userAgenda[assignmentID].name;
+	form.notes.value = userAgenda[assignmentID].description;
+	form.edit.value = assignmentID;
+	if (0 < userAgenda[assignmentID].timestamp) {
+		form.no_end.checked = false;
+		form.end_time.valueAsNumber = userAgenda[assignmentID].timestamp;
+	} else {
+		form.no_end.checked = true;
+		form.end_time.value = "";
+	}
 
-		form_manual_events();
-		tabContents.forEach(optionElement => optionElement.style.display = "none");
-		tabContents[2].style.display = "block";
-	});
+	form_manual_events();
+	tabContents.forEach(optionElement => optionElement.style.display = "none");
+	tabContents[2].style.display = "block";
 }
 
-function removeUA(assignmentID: number) {
-	chrome.storage.local.get({user_agenda: {}}, storage => {
-		if (storage.user_agenda.hasOwnProperty(assignmentID))
-			if (window.confirm(`המטלה "${storage.user_agenda[assignmentID].name}" תימחק!`)) {
-				delete storage.user_agenda[assignmentID];
-				chrome.storage.local.set({user_agenda: storage.user_agenda}, () => {
-					document.getElementById(`U_${assignmentID}`)?.remove();
-					checkForEmpty();
-				});
-			}
-	});
+async function removeUA(assignmentID: number) {
+	const storageData = await chrome.storage.local.get({user_agenda: {}});
+	if (!storageData.user_agenda.hasOwnProperty(assignmentID)) return;
+	if (!window.confirm(`המטלה "${storageData.user_agenda[assignmentID].name}" תימחק!`)) return;
+
+	delete storageData.user_agenda[assignmentID];
+	await chrome.storage.local.set({user_agenda: storageData.user_agenda});
+	document.getElementById(`U_${assignmentID}`)?.remove();
+	checkForEmpty();
 }
 
 function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivElement, targetListID: "new_assignments" | "finished_assignments" | "" = "", insertAtBeginning: boolean = false) {
@@ -147,47 +144,46 @@ function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivEl
 }
 
 
-export function addAssignmentsToList(
+export async function addAssignmentsToList(
 	calendarPromise: () => Promise<{ new_list: HWAssignment[], finished_list: HWAssignment[] }>,
 	calendarType: HWSystem) {
 	assignmentPromises[calendarType] = calendarPromise;
 	if (Object.keys(assignmentPromises).length !== CALENDARS) return;
 
-	chrome.storage.local.get({
+	const storageData = await chrome.storage.local.get({
 		moodle_cal: true,
 		cs_cal: false,
 		ww_cal_switch: false,
 		quick_login: true,
 		enable_login: true,
 		user_agenda: {},
-	}, storage => {
-		const userAgendaData: { [key: string]: HWAssignment } = storage.user_agenda,
-			enabledCalendars = {
-				"moodle": storage.quick_login && storage.enable_login && storage.moodle_cal,
-				"cs": storage.cs_cal,
-				"webwork": storage.quick_login && storage.enable_login && storage.ww_cal_switch,
-			};
-		let newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [], promisesList = [];
-		Object.keys(userAgendaData).forEach(agendaID => {
-			userAgendaData[agendaID].eventID = parseInt(agendaID);
-			userAgendaData[agendaID].sys = "ua";
-			userAgendaData[agendaID].done ? newAssignmentsList.push(userAgendaData[agendaID]) : finishedAssignmentsList.push(userAgendaData[agendaID]);
-		});
-		for (let type of Object.keys(assignmentPromises)) if (enabledCalendars[type as "moodle" | "cs" | "webwork"]) promisesList.push(assignmentPromises[type]);
-		let completedPromises = 0;
-		for (let calendarPromise of promisesList) {
-			calendarPromise().then(calendarData => {
-				finishedAssignmentsList = finishedAssignmentsList.concat(calendarData.new_list);
-				newAssignmentsList = newAssignmentsList.concat(calendarData.finished_list);
-			}).catch(err => insertMessage(err.msg, err.is_error)).finally(() => {
-				if (++completedPromises === promisesList.length) insertAssignments(finishedAssignmentsList, newAssignmentsList);
-			});
-		}
-		if (promisesList.length === 0) {
-			insertAssignments(finishedAssignmentsList, newAssignmentsList);
-			insertMessage(`משיכת מטלות הבית עבור מודל, וובוורק ומדמ"ח כבויה. יש להגדיר הצגת מטלות בית עבור המערכות הרצויות בהגדרות התוסף.`, false);
-		}
 	});
+	const userAgendaData: { [key: string]: HWAssignment } = storageData.user_agenda,
+		enabledCalendars = {
+			"moodle": storageData.quick_login && storageData.enable_login && storageData.moodle_cal,
+			"cs": storageData.cs_cal,
+			"webwork": storageData.quick_login && storageData.enable_login && storageData.ww_cal_switch,
+		};
+	let newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [], promisesList = [];
+	Object.keys(userAgendaData).forEach(agendaID => {
+		userAgendaData[agendaID].eventID = parseInt(agendaID);
+		userAgendaData[agendaID].sys = "ua";
+		userAgendaData[agendaID].done ? newAssignmentsList.push(userAgendaData[agendaID]) : finishedAssignmentsList.push(userAgendaData[agendaID]);
+	});
+	for (let type of Object.keys(assignmentPromises)) if (enabledCalendars[type as "moodle" | "cs" | "webwork"]) promisesList.push(assignmentPromises[type]);
+	let completedPromises = 0;
+	for (let calendarPromise of promisesList) {
+		calendarPromise().then(calendarData => {
+			finishedAssignmentsList = finishedAssignmentsList.concat(calendarData.new_list);
+			newAssignmentsList = newAssignmentsList.concat(calendarData.finished_list);
+		}).catch(err => insertMessage(err.msg, err.is_error)).finally(() => {
+			if (++completedPromises === promisesList.length) insertAssignments(finishedAssignmentsList, newAssignmentsList);
+		});
+	}
+	if (promisesList.length === 0) {
+		insertAssignments(finishedAssignmentsList, newAssignmentsList);
+		insertMessage(`משיכת מטלות הבית עבור מודל, וובוורק ומדמ"ח כבויה. יש להגדיר הצגת מטלות בית עבור המערכות הרצויות בהגדרות התוסף.`, false);
+	}
 }
 
 function form_manual_events() {
@@ -203,7 +199,7 @@ function form_reset_all() {
 	form_manual_events();
 }
 
-function form_submit() {
+async function form_submit() {
 	if (form.subject.value.length === 0) {
 		alert("חובה למלא נושא למטלה");
 		return;
@@ -216,41 +212,39 @@ function form_submit() {
 		alert("תאריך הסיום שבחרת כבר עבר, נא לבחור תאריך סיום חדש");
 		return;
 	}
-	chrome.storage.local.get({user_agenda: {}}, storageData => {
-		let userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
-		const assignmentID = parseInt(form.edit.value);
-		const isExistingAssignment = 0 < assignmentID ? userAgenda.hasOwnProperty(assignmentID) : false;
-		const finalAssignmentID = isExistingAssignment ? assignmentID : Date.now();
-		userAgenda[finalAssignmentID] = {
-			eventID: finalAssignmentID,
-			name: form.subject.value.slice(0, 50),
-			description: form.notes.value.slice(0, 280),
-			sys: "ua",
-			timestamp: !form.no_end.checked && 0 < parseInt(form.end_time.valueAsNumber) ? parseInt(form.end_time.valueAsNumber) : 0,
-			done: isExistingAssignment ? userAgenda[finalAssignmentID].done : false,
-		};
-		if (50 < Object.keys(userAgenda).length) {
-			alert("לא ניתן ליצור יותר מ־50 מטלות משתמש.");
-			return;
-		}
-		chrome.storage.local.set({user_agenda: userAgenda}, () => {
-			let assignmentElement;
-			if (isExistingAssignment) {
-				assignmentElement = document.querySelector(`#U_${finalAssignmentID}`) as HTMLDivElement;
-				insertUserAssignment(userAgenda[finalAssignmentID], assignmentElement);
-				(document.querySelector(".tab .current") as HTMLDivElement)?.click();
-			} else {
-				assignmentElement = loadTemplate("userAgenda").cloneNode(true) as HTMLDivElement;
-				insertUserAssignment(userAgenda[finalAssignmentID], assignmentElement, "new_assignments", true);
-				checkForEmpty();
-				tabHeaders[0].click();
-			}
-			form_reset_all();
-		});
-	});
+	const storageData = await chrome.storage.local.get({user_agenda: {}});
+	let userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
+	const assignmentID = parseInt(form.edit.value);
+	const isExistingAssignment = 0 < assignmentID ? userAgenda.hasOwnProperty(assignmentID) : false;
+	const finalAssignmentID = isExistingAssignment ? assignmentID : Date.now();
+	userAgenda[finalAssignmentID] = {
+		eventID: finalAssignmentID,
+		name: form.subject.value.slice(0, 50),
+		description: form.notes.value.slice(0, 280),
+		sys: "ua",
+		timestamp: !form.no_end.checked && 0 < parseInt(form.end_time.valueAsNumber) ? parseInt(form.end_time.valueAsNumber) : 0,
+		done: isExistingAssignment ? userAgenda[finalAssignmentID].done : false,
+	};
+	if (50 < Object.keys(userAgenda).length) {
+		alert("לא ניתן ליצור יותר מ־50 מטלות משתמש.");
+		return;
+	}
+	await chrome.storage.local.set({user_agenda: userAgenda});
+	let assignmentElement;
+	if (isExistingAssignment) {
+		assignmentElement = document.querySelector(`#U_${finalAssignmentID}`) as HTMLDivElement;
+		insertUserAssignment(userAgenda[finalAssignmentID], assignmentElement);
+		(document.querySelector(".tab .current") as HTMLDivElement)?.click();
+	} else {
+		assignmentElement = loadTemplate("userAgenda").cloneNode(true) as HTMLDivElement;
+		insertUserAssignment(userAgenda[finalAssignmentID], assignmentElement, "new_assignments", true);
+		checkForEmpty();
+		tabHeaders[0].click();
+	}
+	form_reset_all();
 }
 
-function setUpFilters() {
+async function setUpFilters() {
 	const filtersDiv = document.getElementById("filters_div") as HTMLDivElement,
 		typeFiltersDiv = document.getElementById("type_filters_div") as HTMLDivElement,
 		typeFilterToggle = document.getElementById("type_filter_toggle") as HTMLAnchorElement,
@@ -282,24 +276,21 @@ function setUpFilters() {
 	});
 
 	for (let i = 0; i < typeFilters.length; i++) {
-		typeFilters[i].addEventListener("change", () => {
-			chrome.storage.local.get({
+		typeFilters[i].addEventListener("change", async () => {
+			const storageData = await chrome.storage.local.get({
 				filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
-			}, storage => {
-				if (chrome.runtime.lastError) {
-					console.error("TE_cal: " + chrome.runtime.lastError.message);
-					insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
-					return;
-				}
-				for (const type in storage.filter_toggles) {
-					storage.filter_toggles[type] = (document.getElementById(type) as HTMLInputElement).checked;
-				}
-				chrome.storage.local.set({filter_toggles: storage.filter_toggles}, () => {
-					if (chrome.runtime.lastError)
-						console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);
-					else location.reload();
-				});
 			});
+			if (chrome.runtime.lastError) {
+				console.error("TE_cal: " + chrome.runtime.lastError.message);
+				insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
+				return;
+			}
+			for (const type in storageData.filter_toggles) {
+				storageData.filter_toggles[type] = (document.getElementById(type) as HTMLInputElement).checked;
+			}
+			await chrome.storage.local.set({filter_toggles: storageData.filter_toggles});
+			if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError);
+			else location.reload();
 		});
 	}
 	courseFilters.addEventListener("change", () => {
@@ -310,25 +301,24 @@ function setUpFilters() {
 		checkForEmpty();
 	});
 
-	chrome.storage.local.get({
+	const storageData = await chrome.storage.local.get({
 		filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
-	}, storage => {
-		if (chrome.runtime.lastError) {
-			console.error("TE_cal: " + chrome.runtime.lastError.message);
-			insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
-			return;
-		}
-		let filtersEnabledEh = false;
-		for (const type in storage.filter_toggles) {
-			(document.getElementById(type) as HTMLInputElement).checked = storage.filter_toggles[type];
-			if (!filtersEnabledEh && storage.filter_toggles[type]) {
-				filtersEnabledEh = true;
-				typeFilterToggle.textContent = "בטל סינון";
-				typeFiltersDiv.classList.remove("hidden");
-				filtersDiv.classList.remove("hidden");
-			}
-		}
 	});
+	if (chrome.runtime.lastError) {
+		console.error("TE_cal: " + chrome.runtime.lastError.message);
+		insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
+		return;
+	}
+	let filtersEnabledEh = false;
+	for (const type in storageData.filter_toggles) {
+		(document.getElementById(type) as HTMLInputElement).checked = storageData.filter_toggles[type];
+		if (!filtersEnabledEh && storageData.filter_toggles[type]) {
+			filtersEnabledEh = true;
+			typeFilterToggle.textContent = "בטל סינון";
+			typeFiltersDiv.classList.remove("hidden");
+			filtersDiv.classList.remove("hidden");
+		}
+	}
 }
 
 // Initial setup and data load
@@ -344,9 +334,9 @@ const form = document.querySelector("form") as HTMLFormElement,
 	CALENDARS: number = 3; // moodle, webwork, cs
 
 if (document.title === "ארגונית++") {
-	form.addEventListener("submit", event => {
+	form.addEventListener("submit", async event => {
 		event.preventDefault();
-		form_submit();
+		await form_submit();
 	});
 	const form_buttons = form.querySelectorAll("a.button") as NodeListOf<HTMLAnchorElement>;
 	form_buttons[0].addEventListener("click", () => form_submit());
@@ -359,9 +349,10 @@ if (document.title === "ארגונית++") {
 
 	const need_refresh = document.querySelector("#need_refresh") as HTMLDivElement;
 	need_refresh.querySelector("a.button")?.addEventListener("click", () => window.location.reload());
-	setInterval(() => chrome.storage.local.get({cal_seen: 0}, storage => {
-		if (0 !== storage.cal_seen) need_refresh.style.display = "block";
-	}), 6E4);
+	setInterval(async () => {
+		const storageData = await chrome.storage.local.get({cal_seen: 0});
+		if (storageData.cal_seen !== 0) need_refresh.style.display = "block";
+	}, 6E4);
 
 	const filtersDiv = document.getElementById("filters_div") as HTMLDivElement,
 		typeFilterToggle = document.getElementById("type_filter_toggle") as HTMLAnchorElement,
@@ -383,19 +374,18 @@ if (document.title === "ארגונית++") {
 	form.subject.addEventListener("input", () => input_counters[0].textContent = form.subject.value.length);
 	form.notes.addEventListener("input", () => input_counters[1].textContent = form.notes.value.length);
 	form.no_end.addEventListener("input", () => form.end_time.disabled = form.no_end.checked);
-	setUpFilters();
+	await setUpFilters();
 
-	chrome.storage.local.get({organizer_fullscreen: false, dark_mode: false}, async storage => {
-		const fullscreenCheckbox = document.getElementById("fullscreen") as HTMLInputElement;
-		if (storage.organizer_fullscreen) {
-			fullscreenCheckbox.checked = true;
-			await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"});
-		}
-		fullscreenCheckbox.addEventListener("change", async _ => {
-			await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
-			await chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
-		});
-		storage.dark_mode ? document.querySelector("html")?.setAttribute("tplus", "dm") :
-			document.querySelector("html")?.removeAttribute("tplus");
+	const storageData = await chrome.storage.local.get({organizer_fullscreen: false, dark_mode: false});
+	const fullscreenCheckbox = document.getElementById("fullscreen") as HTMLInputElement;
+	if (storageData.organizer_fullscreen) {
+		fullscreenCheckbox.checked = true;
+		await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"});
+	}
+	fullscreenCheckbox.addEventListener("change", async _ => {
+		await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
+		await chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
 	});
+	storageData.dark_mode ? document.querySelector("html")?.setAttribute("tplus", "dm") :
+		document.querySelector("html")?.removeAttribute("tplus");
 }

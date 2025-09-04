@@ -1,16 +1,17 @@
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
 
-(function () {
+(async function () {
 	const popup = new CommonPopup("מטלות קרובות - וובוורק", ["calendar"], document.title);
 	const calendar = new CommonCalendar(popup, "webwork", document.title);
 
-	calendar.progress(() => new Promise((resolve, reject) => chrome.storage.local.get({
-		webwork_cal: {},
-		cal_seen: 0,
-		ww_cal_update: 0,
-		webwork_courses: {},
-	}, function (storageData) {
+	await calendar.progress(() => new Promise(async (resolve, reject) => {
+		const storageData = await chrome.storage.local.get({
+			webwork_cal: {},
+			cal_seen: 0,
+			ww_cal_update: 0,
+			webwork_courses: {},
+		});
 		if (chrome.runtime.lastError) {
 			console.error("TE_ww_cal: " + chrome.runtime.lastError.message);
 			reject({
@@ -61,9 +62,10 @@ import {CommonCalendar} from './common_calendar.js';
 			assignment[1].done ? finishedAssignmentsList.push(assignmentObject) : newAssignmentsList.push(assignmentObject);
 			assignment[1].seen = true;
 		}
-		void chrome.storage.local.set({
-			cal_seen: calendar.removeCalendarAlert(storageData.cal_seen), webwork_cal: webworkCalendarData,
+		await chrome.storage.local.set({
+			cal_seen: await calendar.removeCalendarAlert(storageData.cal_seen),
+			webwork_cal: webworkCalendarData,
 		});
 		resolve({new_list: newAssignmentsList, finished_list: finishedAssignmentsList});
-	})));
+	}));
 })();

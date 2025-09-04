@@ -1,4 +1,4 @@
-(function () {
+(async function () {
 	// Duplicate of util.js due to the login script being executed in a different context
 
 	function reverseString(str: string): string {
@@ -20,15 +20,17 @@
 		input.type = "hidden";
 	}
 
-	function login_moodle_url(storageData: { [key: string]: string | boolean }) {
-		chrome.runtime.sendMessage({mess_t: "login_moodle_url", url: window.location.hostname}, url => {
-			url = url.split("?");
-			const params = new URLSearchParams(url[1]);
-			params.delete("prompt");
-			params.delete("login_hint");
-			params.append("login_hint", storageData.username + "@" + (storageData.server ? "campus." : "") + "technion.ac.il");
-			location.href = url[0] + "?" + params.toString();
+	async function login_moodle_url(storageData: { [key: string]: string | boolean }) {
+		const url: string = await chrome.runtime.sendMessage({
+			mess_t: "login_moodle_url", url: window.location.hostname,
 		});
+		const urlParts = url.split("?");
+		const params = new URLSearchParams(urlParts[1]);
+		params.delete("prompt");
+		params.delete("login_hint");
+		params.append("login_hint", storageData.username + "@" + (storageData.server ? "campus." : "") + "technion.ac.il");
+		location.href = urlParts[0] + "?" + params.toString();
+
 	}
 
 	function microsoft(storageData: { [key: string]: string | boolean }) {
@@ -120,8 +122,8 @@
 	}
 
 	function grades(storageData: { [key: string]: string | boolean }) {
-		const username = document.getElementById("Usertxt") as HTMLInputElement | null,
-			password = document.getElementById("Passwordtxt") as HTMLInputElement | null;
+		const username = document.getElementById("Usertxt") as HTMLInputElement,
+			password = document.getElementById("Passwordtxt") as HTMLInputElement;
 		if (!username || !password) return;
 		username.value = storageData.username.toString();
 		password.value = storageData.password.toString();
@@ -130,38 +132,37 @@
 
 	if (chrome.extension.inIncognitoContext) return;
 	if (window.location.protocol !== "https:") return;
-	chrome.storage.local.get({
+	const storageData = await chrome.storage.local.get({
 		username: "", server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
 		quick_login: true, enable_login: false, enable_external: false,
-	}, function (storage) {
-		if (chrome.runtime.lastError) {
-			console.error("TE_login: " + chrome.runtime.lastError.message);
-			return;
-		}
-		if (!storage.quick_login) return;
-
-		const website = window.location.hostname;
-		if (storage.enable_login && !storage.enable_external) {
-			storage.password = reverseString(xorStrings(storage.term + storage.phrase, storage.maor_p));
-			if (/moodle[0-9]*.technion.ac.il/.test(website))
-				moodle(storage);
-			else if (website === "panoptotech.cloud.panopto.eu") {
-				panopto();
-			} else if (website === "portalex.technion.ac.il") {
-				sap(storage);
-			} else if (website === "grades.cs.technion.ac.il" || website === "webcourse.cs.technion.ac.il") {
-				cs(storage);
-			} else if (website === "techwww.technion.ac.il" || website === "students.technion.ac.il") {
-				login_moodle_url(storage);
-			} else if (website === "login.microsoftonline.com") {
-				microsoft(storage);
-			} else if (website === "grades.technion.ac.il") {
-				grades(storage);
-			}
-		} else if (storage.enable_external) {
-			storage.username_ext = reverseString(xorStrings(storage.uidn_arr[0] + "", storage.uidn_arr[1]));
-			if (/moodle[0-9]+.technion.ac.il/.test(website)) moodle(storage);
-			else if (website === "techwww.technion.ac.il") techwww(storage);
-		}
 	});
+	if (chrome.runtime.lastError) {
+		console.error("TE_login: " + chrome.runtime.lastError.message);
+		return;
+	}
+	if (!storageData.quick_login) return;
+
+	const website = window.location.hostname;
+	if (storageData.enable_login && !storageData.enable_external) {
+		storageData.password = reverseString(xorStrings(storageData.term + storageData.phrase, storageData.maor_p));
+		if (/moodle[0-9]*.technion.ac.il/.test(website))
+			moodle(storageData);
+		else if (website === "panoptotech.cloud.panopto.eu") {
+			panopto();
+		} else if (website === "portalex.technion.ac.il") {
+			sap(storageData);
+		} else if (website === "grades.cs.technion.ac.il" || website === "webcourse.cs.technion.ac.il") {
+			cs(storageData);
+		} else if (website === "techwww.technion.ac.il" || website === "students.technion.ac.il") {
+			await login_moodle_url(storageData);
+		} else if (website === "login.microsoftonline.com") {
+			microsoft(storageData);
+		} else if (website === "grades.technion.ac.il") {
+			grades(storageData);
+		}
+	} else if (storageData.enable_external) {
+		storageData.username_ext = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
+		if (/moodle[0-9]+.technion.ac.il/.test(website)) moodle(storageData);
+		else if (website === "techwww.technion.ac.il") techwww(storageData);
+	}
 })();

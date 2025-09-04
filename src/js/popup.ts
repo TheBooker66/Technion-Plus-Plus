@@ -1,7 +1,7 @@
 import {CommonPopup} from './common_popup.js';
 import {reverseString, xorStrings} from './utils.js';
 
-(function () {
+(async function () {
 	function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[]) {
 		for (let i = 0; i < tabs.length; i++) {
 			tabs[i].addEventListener("click", () => {
@@ -18,9 +18,9 @@ import {reverseString, xorStrings} from './utils.js';
 	const OS = navigator.userAgentData ?? "navigator.userAgentData is not supported!";
 	if (!OS.toString().includes("Android"))
 		chrome.action.getBadgeBackgroundColor({}, badgeColor => {
-			chrome.action.getBadgeText({}, badgeText => {
+			chrome.action.getBadgeText({}, async badgeText => {
 				if (215 === badgeColor[0] && 0 === badgeColor[1] && 34 === badgeColor[2] && "!" === badgeText) {
-					void chrome.action.setBadgeText({text: ""});
+					await chrome.action.setBadgeText({text: ""});
 					(document.getElementById("bus_error") as HTMLDivElement).style.display = "block";
 				}
 			});
@@ -71,105 +71,98 @@ import {reverseString, xorStrings} from './utils.js';
 	makeTabsClicky(mainScreensLinks[0].querySelectorAll(".tab"), Array.from(mainScreensLinks).slice(1));
 	makeTabsClicky(printTabs, pages);
 
-	((document.getElementById("cant_login") as HTMLDivElement).querySelector("u") as HTMLElement).addEventListener("click", () => {
-		chrome.runtime.openOptionsPage(() => {
-			if (chrome.runtime.lastError)
-				console.error("TE_p: " + chrome.runtime.lastError.message);
-		});
+	((document.getElementById("cant_login") as HTMLDivElement).querySelector("u") as HTMLElement).addEventListener("click", async () => {
+		await chrome.runtime.openOptionsPage();
+		if (chrome.runtime.lastError) console.error("TE_p: " + chrome.runtime.lastError.message);
+
 	});
 
 	const quick_login_toggle = document.getElementById("quick_login_toggle") as HTMLInputElement,
 		mute_alerts_toggle = document.getElementById("mute_alerts_toggle") as HTMLInputElement;
-	quick_login_toggle.addEventListener("change", () => {
-		chrome.storage.local.set({quick_login: quick_login_toggle.checked}, () => {
-			if (chrome.runtime.lastError)
-				console.error("TE_popup_login: " + chrome.runtime.lastError.message);
-		});
+	quick_login_toggle.addEventListener("change", async () => {
+		await chrome.storage.local.set({quick_login: quick_login_toggle.checked});
+		if (chrome.runtime.lastError) console.error("TE_popup_login: " + chrome.runtime.lastError.message);
 	});
-	mute_alerts_toggle.addEventListener("change", () => {
-		chrome.storage.local.set({alerts_sound: mute_alerts_toggle.checked}, () => {
-			if (chrome.runtime.lastError)
-				console.error("TE_popup_mute_alerts: " + chrome.runtime.lastError.message);
-		});
+	mute_alerts_toggle.addEventListener("change", async () => {
+		await chrome.storage.local.set({alerts_sound: mute_alerts_toggle.checked});
+		if (chrome.runtime.lastError) console.error("TE_popup_mute_alerts: " + chrome.runtime.lastError.message);
 	});
 
-	chrome.storage.local.get({
+	const storageData = await chrome.storage.local.get({
 		enable_login: false, quick_login: true, alerts_sound: true, gmail: true,
 		moodle_cal: true, remoodle: false, remoodle_angle: 120, cal_seen: 0,
 		cs_cal: false, uidn_arr: ["", ""], ww_cal_switch: false,
 		dl_current: 0, username: "", server: true, custom_name: "", custom_link: "",
-	}, function (storageData) {
-		quick_login_toggle.checked = storageData.quick_login;
-		mute_alerts_toggle.checked = storageData.alerts_sound;
-		(document.getElementById("cant_login") as HTMLDivElement).style.display =
-			storageData.enable_login ? "none" : "block";
-		(document.getElementById("cal_moodle") as HTMLAnchorElement).style.display =
-			storageData.enable_login && storageData.moodle_cal && storageData.quick_login ? "block" : "none";
-		(document.getElementById("cal_cs") as HTMLAnchorElement).style.display =
-			storageData.cs_cal ? "block" : "none";
-		(document.getElementById("cal_webwork") as HTMLAnchorElement).style.display =
-			storageData.enable_login && storageData.quick_login && storageData.ww_cal_switch ? "block" : "none";
+	});
+	quick_login_toggle.checked = storageData.quick_login;
+	mute_alerts_toggle.checked = storageData.alerts_sound;
+	(document.getElementById("cant_login") as HTMLDivElement).style.display =
+		storageData.enable_login ? "none" : "block";
+	(document.getElementById("cal_moodle") as HTMLAnchorElement).style.display =
+		storageData.enable_login && storageData.moodle_cal && storageData.quick_login ? "block" : "none";
+	(document.getElementById("cal_cs") as HTMLAnchorElement).style.display =
+		storageData.cs_cal ? "block" : "none";
+	(document.getElementById("cal_webwork") as HTMLAnchorElement).style.display =
+		storageData.enable_login && storageData.quick_login && storageData.ww_cal_switch ? "block" : "none";
 
-		const calendarIDs = ["cal_moodle", "cal_cs", "cal_webwork"];
-		for (let i = 0; i < calendarIDs.length; i++) {
-			// noinspection JSBitwiseOperatorUsage
-			if (storageData.cal_seen & Math.pow(2, i))
-				(document.getElementById(calendarIDs[i]) as HTMLDivElement).className = "major hw";
-		}
+	const calendarIDs = ["cal_moodle", "cal_cs", "cal_webwork"];
+	for (let i = 0; i < calendarIDs.length; i++) {
+		// noinspection JSBitwiseOperatorUsage
+		if (storageData.cal_seen & Math.pow(2, i))
+			(document.getElementById(calendarIDs[i]) as HTMLDivElement).className = "major hw";
+	}
 
-		if (storageData.dl_current !== 0) (document.getElementById("downloads") as HTMLAnchorElement).classList.add("active");
+	if (storageData.dl_current !== 0) (document.getElementById("downloads") as HTMLAnchorElement).classList.add("active");
 
-		const printerLinks = printScreen.querySelectorAll("a"),
-			id: string = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1])) || "הקלד מספר זהות כאן",
-			gmailEh: boolean = storageData.gmail && !chrome.runtime.lastError;
-		for (let i = 0; i < printerLinks.length; i++) {
-			const emailURL = gmailEh
-				? `https://mail.google.com/mail/u/0/?view=cm&to=print.${printerLinks[i].id}@campus.technion.ac.il&su=${id}&fs=1&tf=1`
-				: `mailto:print.${printerLinks[i].id}@campus.technion.ac.il?subject=${id}`;
-			printerLinks[i].setAttribute("href", emailURL);
-			if (id !== "הקלד מספר זהות כאן" && id !== "") continue;
-			printerLinks[i].addEventListener("click", () => {
-				chrome.runtime.sendMessage({
-					mess_t: "silent_notification",
-					message: 'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.',
-				}, () => {
-					if (chrome.runtime.lastError)
-						console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
-				});
-			});
-		}
-
-		const studentsLink = document.getElementById("UGS_Link") as HTMLAnchorElement,
-			customLink = document.getElementById("custom_link") as HTMLAnchorElement;
-		studentsLink.addEventListener("click", async () => {
-			const loadingInterval = setInterval(() => {
-				studentsLink.textContent = 7 > studentsLink.textContent.length ? studentsLink.textContent + "." : "טוען";
-			}, 500);
-			const authURL = await fetch("https://students.technion.ac.il/auth/oidc/", {method: "HEAD"})
-				.then(response => response.url)
-				.catch(_ => "https://students.technion.ac.il/auth/oidc/");
-			let newAuthURL = "";
-			if (storageData.enable_login && storageData.quick_login && authURL.includes("?")) {
-				let urlParts = authURL.split("?");
-				const urlParams = new URLSearchParams(urlParts[1]);
-				urlParams.delete("prompt");
-				urlParams.append("login_hint", storageData.username + "@" + (storageData.server ? "campus." : "") + "technion.ac.il");
-				newAuthURL = urlParts[0] + "?" + urlParams.toString();
-			}
-			chrome.tabs.create({url: newAuthURL || authURL}, () => {
-				clearInterval(loadingInterval);
-				studentsLink.textContent = "Students";
+	const printerLinks = printScreen.querySelectorAll("a"),
+		id: string = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1])) || "הקלד מספר זהות כאן",
+		gmailEh: boolean = storageData.gmail && !chrome.runtime.lastError;
+	for (let i = 0; i < printerLinks.length; i++) {
+		const emailURL = gmailEh
+			? `https://mail.google.com/mail/u/0/?view=cm&to=print.${printerLinks[i].id}@campus.technion.ac.il&su=${id}&fs=1&tf=1`
+			: `mailto:print.${printerLinks[i].id}@campus.technion.ac.il?subject=${id}`;
+		printerLinks[i].setAttribute("href", emailURL);
+		if (id !== "הקלד מספר זהות כאן" && id !== "") continue;
+		printerLinks[i].addEventListener("click", () => {
+			chrome.runtime.sendMessage({
+				mess_t: "silent_notification",
+				message: 'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.',
+			}, () => {
+				if (chrome.runtime.lastError)
+					console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
 			});
 		});
+	}
 
-		if (storageData.custom_name && storageData.custom_link) {
-			customLink.textContent = storageData.custom_name;
-			customLink.title = "קישור אישי שלכם! מעניין מה הוספתם...";
-			customLink.setAttribute("href", storageData.custom_link);
-		} else {
-			customLink.textContent = "פנופטו";
-			customLink.title = "מאגר קורסים מצולמים";
-			customLink.setAttribute("href", "https://panoptotech.cloud.panopto.eu");
+	const studentsLink = document.getElementById("UGS_Link") as HTMLAnchorElement,
+		customLink = document.getElementById("custom_link") as HTMLAnchorElement;
+	studentsLink.addEventListener("click", async () => {
+		const loadingInterval = setInterval(() => {
+			studentsLink.textContent = 7 > studentsLink.textContent.length ? studentsLink.textContent + "." : "טוען";
+		}, 500);
+		let authURL;
+		try {
+			authURL = (await fetch("https://students.technion.ac.il/auth/oidc/", {method: "HEAD"})).url;
+		} catch {
+			authURL = "https://students.technion.ac.il/auth/oidc/";
 		}
+		if (!(storageData.enable_login && storageData.quick_login && authURL.includes("?"))) return;
+		let urlParts = authURL.split("?");
+		const urlParams = new URLSearchParams(urlParts[1]);
+		urlParams.delete("prompt");
+		urlParams.append("login_hint", storageData.username + "@" + (storageData.server ? "campus." : "") + "technion.ac.il");
+		await chrome.tabs.create({url: (urlParts[0] + "?" + urlParams.toString()) || authURL});
+		clearInterval(loadingInterval);
+		studentsLink.textContent = "Students";
 	});
+
+	if (storageData.custom_name && storageData.custom_link) {
+		customLink.textContent = storageData.custom_name;
+		customLink.title = "קישור אישי שלכם! מעניין מה הוספתם...";
+		customLink.setAttribute("href", storageData.custom_link);
+	} else {
+		customLink.textContent = "פנופטו";
+		customLink.title = "מאגר קורסים מצולמים";
+		customLink.setAttribute("href", "https://panoptotech.cloud.panopto.eu");
+	}
 })();

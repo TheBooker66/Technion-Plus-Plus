@@ -29,18 +29,18 @@ export class CommonCalendar {
 		}
 	}
 
-	removeCalendarAlert(currentAlertFlag: number) {
+	async removeCalendarAlert(currentAlertFlag: number) {
 		// noinspection JSBitwiseOperatorUsage
 		if (this.organiser === "ארגונית++" || this.system === "ua") currentAlertFlag &= -12;
 		// noinspection JSBitwiseOperatorUsage
 		else currentAlertFlag &= ~this.flags[this.system];
 
 		if (!navigator.userAgent.includes("Android") && !currentAlertFlag)
-			void chrome.action.setBadgeText({text: ""});
+			await chrome.action.setBadgeText({text: ""});
 		return currentAlertFlag;
 	}
 
-	insertAssignments(newAssignmentsList: HWAssignment[], finishedAssignmentsList: HWAssignment[]) {
+	async insertAssignments(newAssignmentsList: HWAssignment[], finishedAssignmentsList: HWAssignment[]) {
 		const createAssignmentElement =
 			(assignmentData: HWAssignment, template: DocumentFragment, containerId: "new_assignments" | "finished_assignments") => {
 				const newAssigment = template.querySelector(".list_item") as HTMLDivElement;
@@ -57,7 +57,7 @@ export class CommonCalendar {
 				newAssigment.querySelector(".assignment_name")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				document.getElementById(containerId)?.appendChild(newAssigment);
 			};
-		this.common.useTemplatesFile("calendar", (documentContext: Document) => {
+		await this.common.useTemplatesFile("calendar", (documentContext: Document) => {
 			const assignmentTemplate = this.common.loadTemplate("assignment", documentContext);
 			newAssignmentsList.forEach(assignment =>
 				createAssignmentElement(assignment, assignmentTemplate.cloneNode(true) as DocumentFragment, "new_assignments"));
@@ -68,9 +68,9 @@ export class CommonCalendar {
 		});
 	}
 
-	progress(promiseCreator: () => Promise<{ new_list: HWAssignment[], finished_list: HWAssignment[] }>) {
+	async progress(promiseCreator: () => Promise<{ new_list: HWAssignment[], finished_list: HWAssignment[] }>) {
 		if (this.organiser === "ארגונית++")
-			addAssignmentsToList(promiseCreator, this.system);
+			await addAssignmentsToList(promiseCreator, this.system);
 		else promiseCreator()
 			.then(result => this.insertAssignments(result.new_list, result.finished_list))
 			.catch((err: any) => insertMessage(err.msg, err.is_error));
@@ -98,30 +98,28 @@ function insertMessage(msg: string, errorEh: boolean) {
 	messageElement.textContent = msg;
 }
 
-export function toggle(sys: HWSystem, event: number, item: HTMLDivElement, VorX: 0 | 1) {
+export async function toggle(sys: HWSystem, event: number, item: HTMLDivElement, VorX: 0 | 1) {
 	if (sys === "ua") {
-		chrome.storage.local.get({user_agenda: {}}, storageData => {
-			if (chrome.runtime.lastError) console.error("TE_organize7: " + chrome.runtime.lastError.message);
-			else {
-				storageData.user_agenda[event].done = !storageData.user_agenda[event].done;
-				void chrome.storage.local.set({user_agenda: storageData.user_agenda});
-			}
-		});
+		const storageData = await chrome.storage.local.get({user_agenda: {}});
+		if (chrome.runtime.lastError) console.error("TE_organize7: " + chrome.runtime.lastError.message);
+		else {
+			storageData.user_agenda[event].done = !storageData.user_agenda[event].done;
+			await chrome.storage.local.set({user_agenda: storageData.user_agenda});
+		}
 	} else {
 		let calendar = {
 			moodle: "cal_finished",
 			cs: "cs_cal_finished",
 			webwork: "webwork_cal",
 		}[sys];
-		chrome.storage.local.get(calendar, storageData => {
-			if (chrome.runtime.lastError)
-				console.error("TE_cal7: " + chrome.runtime.lastError.message);
-			else {
-				if (storageData[calendar].hasOwnProperty(event.toString())) delete storageData[calendar][event.toString()];
-				else storageData[calendar][event.toString()] = 0;
-				void chrome.storage.local.set({[calendar]: storageData[calendar]});
-			}
-		});
+		const storageData = await chrome.storage.local.get(calendar);
+		if (chrome.runtime.lastError)
+			console.error("TE_cal7: " + chrome.runtime.lastError.message);
+		else {
+			if (storageData[calendar].hasOwnProperty(event.toString())) delete storageData[calendar][event.toString()];
+			else storageData[calendar][event.toString()] = 0;
+			await chrome.storage.local.set({[calendar]: storageData[calendar]});
+		}
 	}
 	[document.getElementById("new_assignments"), document.getElementById("finished_assignments")][VorX]?.appendChild(item);
 	checkForEmpty();

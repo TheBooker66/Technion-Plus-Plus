@@ -1,7 +1,7 @@
 import {CommonPopup} from "./common_popup.js";
 import {TE_updateVideosInfo} from "../service_worker.js";
 
-(function () {
+(async function () {
 	function stop_spinning() {
 		(document.getElementById("spinner") as HTMLDivElement).style.display = "none";
 		(document.getElementById("small_spinner") as HTMLSpanElement).style.display = "none";
@@ -13,7 +13,7 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 		parentContainer.appendChild(div);
 	}
 
-	function displayCourseRecordings(courseData: { name: string, data: RecordingCourse["v"] }) {
+	async function displayCourseRecordings(courseData: { name: string, data: RecordingCourse["v"] }) {
 		stop_spinning();
 		messageElement.textContent = "בחר הקלטה לצפייה.";
 		queryDisplay.textContent = "קורס: " + courseData.name;
@@ -33,13 +33,12 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 			resultsContainer.appendChild(listItem);
 			if (courseData.data.length - 1 > i) create_divider(resultsContainer);
 		}
-		chrome.storage.local.get({videos_last: []}, storageData => {
-			const courseNumber = courseData.name.split(" - ")[0];
-			const lastSearches = storageData.videos_last.filter((courseNum: number) => courseNum !== parseInt(courseNumber));
-			lastSearches.push(courseNumber);
-			if (lastSearches.length > 7) lastSearches.splice(0, lastSearches.length - 7);
-			void chrome.storage.local.set({videos_last: lastSearches});
-		});
+		const storageData = await chrome.storage.local.get({videos_last: []});
+		const courseNumber = courseData.name.split(" - ")[0];
+		const lastSearches = storageData.videos_last.filter((courseNum: number) => courseNum !== parseInt(courseNumber));
+		lastSearches.push(courseNumber);
+		if (lastSearches.length > 7) lastSearches.splice(0, lastSearches.length - 7);
+		await chrome.storage.local.set({videos_last: lastSearches});
 	}
 
 	function displayMultipleCourses(matchingCourses: { name: string, data: RecordingCourse["v"] }[]) {
@@ -51,9 +50,9 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 			const courseLink = document.createElement("a");
 			courseLink.className = "list_item";
 			courseLink.textContent = matchingCourses[i].name;
-			courseLink.addEventListener("click", () => {
+			courseLink.addEventListener("click", async () => {
 				(document.getElementById("small_spinner") as HTMLSpanElement).style.display = "block";
-				displayCourseRecordings(matchingCourses[i]);
+				await displayCourseRecordings(matchingCourses[i]);
 			});
 			listFragment.appendChild(courseLink);
 			if (i < matchingCourses.length - 1) create_divider(listFragment);
@@ -89,13 +88,10 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 			return;
 		}
 		matchCount === 1 ? displayCourseRecordings(resultsArray[0]) : displayMultipleCourses(resultsArray);
-
 	}
 
-	async function fetchAndUpdateVideos(storageData: {
-		                                    [p: string]: string[][] | { [p: string]: RecordingCourse["v"] }
-	                                    },
-	                                    courseQuery: string) {
+	async function fetchAndUpdateVideos(
+		storageData: { [p: string]: string[][] | { [p: string]: RecordingCourse["v"] } }, courseQuery: string) {
 		const callbacks = [
 			(coursesList: string[][], videosData: { [key: string]: RecordingCourse["v"] }) =>
 				processSearchResults(coursesList, videosData, courseQuery),
@@ -131,12 +127,11 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 			queryDisplay.style.display = "none";
 		} else {
 			queryDisplay.textContent += '"' + courseQuery + '"';
-			chrome.storage.local.get({videos_data: {}, videos_courses: [], videos_update: 0}, async storageData => {
-				if (storageData.videos_update < (new Date).getTime() - 6048E5 || chrome.runtime.lastError)
-					await fetchAndUpdateVideos(storageData, courseQuery as string);
-				else
-					processSearchResults(storageData.videos_courses, storageData.videos_data, courseQuery as string);
-			});
+			const storageData = await chrome.storage.local.get({videos_data: {}, videos_courses: [], videos_update: 0});
+			if (storageData.videos_update < (new Date).getTime() - 6048E5 || chrome.runtime.lastError)
+				await fetchAndUpdateVideos(storageData, courseQuery as string);
+			else
+				processSearchResults(storageData.videos_courses, storageData.videos_data, courseQuery as string);
 		}
 	} else {
 		(document.getElementById("search_block") as HTMLDivElement).style.display = "none";
@@ -144,26 +139,25 @@ import {TE_updateVideosInfo} from "../service_worker.js";
 		(document.querySelector(".main-content > h3") as HTMLHeadingElement).style.display = "none";
 		(document.getElementById("block") as HTMLDivElement).insertBefore(document.getElementById("myform") as HTMLFormElement, document.getElementById("last_searches"));
 		(document.querySelector("#myform input") as HTMLInputElement).focus();
-		chrome.storage.local.get({videos_last: [], videos_courses: []}, storageData => {
-			const lastSearchesContainer = document.getElementById("last_list") as HTMLDivElement;
-			if (storageData.videos_last.length === 0) {
-				lastSearchesContainer.textContent = "לא נמצאו חיפושים קודמים...";
-				lastSearchesContainer.style.padding = "8px";
-				return;
-			}
+		const storageData = await chrome.storage.local.get({videos_last: [], videos_courses: []});
+		const lastSearchesContainer = document.getElementById("last_list") as HTMLDivElement;
+		if (storageData.videos_last.length === 0) {
+			lastSearchesContainer.textContent = "לא נמצאו חיפושים קודמים...";
+			lastSearchesContainer.style.padding = "8px";
+			return;
+		}
 
-			storageData.videos_last.reverse().forEach((video: string) => {
-				const matchingCourse = storageData.videos_courses.filter((item: string) => item[0] === video)[0],
-					courseLink = document.createElement("a");
-				courseLink.className = "list_item";
-				courseLink.textContent = matchingCourse.slice(0, 2).join(" - ");
-				courseLink.addEventListener("click", () => {
-					location.href += "?course=" + matchingCourse[0];
-				});
-				lastSearchesContainer.appendChild(courseLink);
-				create_divider(lastSearchesContainer);
+		storageData.videos_last.reverse().forEach((video: string) => {
+			const matchingCourse = storageData.videos_courses.filter((item: string) => item[0] === video)[0],
+				courseLink = document.createElement("a");
+			courseLink.className = "list_item";
+			courseLink.textContent = matchingCourse.slice(0, 2).join(" - ");
+			courseLink.addEventListener("click", () => {
+				location.href += "?course=" + matchingCourse[0];
 			});
-			(document.querySelector(".divider:last-of-type") as HTMLDivElement).remove();
+			lastSearchesContainer.appendChild(courseLink);
+			create_divider(lastSearchesContainer);
 		});
+		(document.querySelector(".divider:last-of-type") as HTMLDivElement).remove();
 	}
 })();

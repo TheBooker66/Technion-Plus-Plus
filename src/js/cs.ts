@@ -31,14 +31,14 @@
 			icsDiv = document.querySelector("div.ics") as HTMLDivElement;
 		copyButton.className = "maor_download";
 		copyButton.textContent = "העתק סיסמת יומן";
-		copyButton.addEventListener("click", () => {
-			navigator.clipboard.writeText(password).then(() => {
+		copyButton.addEventListener("click", async () => {
+			try {
+				await navigator.clipboard.writeText(password);
 				copyButton.textContent = "הסיסמה הועתקה בהצלחה!";
-			}).catch(err => {
-					copyButton.textContent = "שגיאה בהעתקה";
-					console.error(err);
-				},
-			);
+			} catch (err) {
+				copyButton.textContent = "התרחשה שגיאה בהעתקה.";
+				console.error(err);
+			}
 		});
 		icsDiv.insertBefore(copyButton, icsDiv.childNodes[0]);
 	}
