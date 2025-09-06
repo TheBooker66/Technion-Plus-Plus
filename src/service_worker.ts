@@ -557,7 +557,7 @@ async function TE_nextDownload() {
 				storageData.dl_current = downloadId;
 				await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
 				setTimeout(async () => {
-					await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
+					await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-128.png"});
 					setTimeout(async () => {
 						await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
 					}, 250);
@@ -809,7 +809,7 @@ chrome.downloads.onChanged.addListener(async (delta) => {
 		await TE_setStorage({
 			dl_current: storageData.dl_current, dl_queue: storageData.dl_queue,
 		});
-		await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
+		await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-128.png"});
 		await TE_nextDownload();
 	};
 

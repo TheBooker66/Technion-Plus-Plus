@@ -510,7 +510,12 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
     color: #eee;
 }
 
-[tplus=dm] #tp_colorswitcher {
+[tplus=dm] .custom-control-input:checked ~ .custom-control-label::before {
+    border-color: var(--navbar_bottom);
+    background-color: var(--navbar_bottom);
+}
+
+[tplus=dm] #tp_colour_switcher {
     display: flex !important;
 }
 
@@ -576,9 +581,4 @@ nav.navbar.navbar-dark.bg-dark, nav.navbar.navbar-dark.bg-primary {
 [tplus=dm] .content-item-container.selected {
     background-color: var(--navbar_bg);
     border-color: var(--navbar_bg);
-}
-
-[tplus=dm] .custom-control-input:checked ~ .custom-control-label::before {
-    border-color: var(--navbar_bottom);
-    background-color: var(--navbar_bottom);
 }

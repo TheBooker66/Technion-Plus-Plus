@@ -88,40 +88,32 @@ a.maor_download_light:hover {
     box-sizing: content-box;
 }
 
+.tplus_block label {
+    margin-bottom: 0;
+}
+
 .tplus_block .switch input {
     display: none;
 }
 
-.tplus_block .switch input + label {
-    display: flex;
-    padding-right: 0;
-    padding-left: 3.95rem;
+.tplus_block .switch input:not(:checked) ~ #tp_darkmode_label::after {
+    transform: translateY(2%);
 }
 
 .tplus_block .switch input:checked + label::before {
     background-color: var(--dark_bg);
 }
 
-.tplus_block .switch input + label::before, .tplus_block .switch input + label::after {
-    right: initial !important;
-    left: 0;
+.tplus_block .switch input:checked ~ #tp_darkmode_label::after {
+    transform: translate(-.9375rem, 2%);
 }
 
-.tplus_block .switch input + label::after {
-    right: initial !important;
-    left: 2px;
-}
-
-.tplus_block .switch input:not(:checked) + label::after {
-    margin-left: 1.725rem;
-}
-
-#tp_colorswitcher {
+#tp_colour_switcher {
     display: none;
     align-items: center;
 }
 
-#tp_colorswitcher input[type=range] {
+#tp_colour_switcher input[type=range] {
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
@@ -133,11 +125,11 @@ a.maor_download_light:hover {
     opacity: 0.8;
 }
 
-#tp_colorswitcher input[type=range]:hover, #tp_colorswitcher input[type=range]:focus {
+#tp_colour_switcher input[type=range]:hover, #tp_colour_switcher input[type=range]:focus {
     opacity: 1;
 }
 
-#tp_colorswitcher input[type=range]::-webkit-slider-thumb {
+#tp_colour_switcher input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     background-color: var(--navbar_bg);
@@ -147,7 +139,7 @@ a.maor_download_light:hover {
     border-radius: 100%;
 }
 
-#tp_colorswitcher input[type=range]::-moz-range-thumb {
+#tp_colour_switcher input[type=range]::-moz-range-thumb {
     appearance: none;
     background-color: var(--navbar_bg);
     border: 2px solid #ccc;
@@ -156,12 +148,12 @@ a.maor_download_light:hover {
     border-radius: 100%;
 }
 
-#tp_colorswitcher input[type=range]::-webkit-slider-thumb:active {
+#tp_colour_switcher input[type=range]::-webkit-slider-thumb:active {
     background-color: transparent;
     border-color: #fff;
 }
 
-#tp_colorswitcher input[type=range]::-moz-range-thumb:active {
+#tp_colour_switcher input[type=range]::-moz-range-thumb:active {
     background-color: transparent;
     border-color: #fff;
 }

@@ -32,8 +32,10 @@ import {CommonCalendar} from './common_calendar.js';
 
 		let date = new Date(storageData.ww_cal_update),
 			fixDate = (num: number) => 9 < num ? num : "0" + num;
-		document.getElementById("lastcheck")!.style.display = "block";
-		document.getElementById("lastcheck")!.textContent += storageData.ww_cal_update ? date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ", בשעה " + fixDate(date.getHours()) + ":" + fixDate(date.getMinutes()) : "לא ידוע";
+		document.getElementById("last_check")!.style.display = "block";
+		document.getElementById("last_check")!.textContent += storageData.ww_cal_update ?
+			` ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}, בשעה ${fixDate(date.getHours())}:${fixDate(date.getMinutes())}.`
+			: "לא ידוע";
 
 		let webworkCalendarData = storageData.webwork_cal,
 			sortedAssignments: [string, { h: string, due: string, ts: number, seen: boolean, done: boolean }][] = [],

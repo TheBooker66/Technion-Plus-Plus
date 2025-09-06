@@ -1,56 +1,73 @@
 (async function () {
 	async function main() {
-		function create_element(elementType: string, elementClass: string, attributes: {
-			[key: string]: string
-		} = {}, elementText: string = "", parent: HTMLElement | null = null, prepend: boolean = false) {
+		function create_element(elementType: string, parent: HTMLElement, classes: string,
+		                        attributes: { [p: string]: string } = {}, text: string = "",
+		                        prepend: boolean = false) {
 			const element = document.createElement(elementType);
-			element.textContent = elementText;
-			element.className = elementClass;
+			if (classes) element.className = classes;
 			for (const attribute in attributes) element.setAttribute(attribute, attributes[attribute]);
+			if (text) element.textContent = text;
 			if (parent) prepend ? parent.insertBefore(element, parent.childNodes[0]) : parent.appendChild(element);
 			return element;
 		}
 
 		function create_download(parent: HTMLElement, courseID: number, isLight: number, linkText: string) {
-			return create_element("a", isLight ? "maor_download_light" : "maor_download", {
+			return create_element("a", parent, isLight ? "maor_download_light" : "maor_download", {
 				href: `https://${window.location.hostname}/blocks/material_download/download_materialien.php?courseid=${courseID}"&ccsectid=${isLight}`,
-			}, linkText, parent, false);
+			}, linkText);
 		}
 
 		async function create_tp_buttons() {
-			const section = create_element("section", "block block_material_download card mb-3 tplus_block", {}, "", document.getElementById("block-region-side-pre"), true) as HTMLElement;
-			const cardBody = create_element("div", "card-body", {}, "", section) as HTMLDivElement;
-			const cardTitle = create_element("h5", "card-title d-inline", {
+			const section = create_element("section", document.getElementById("block-region-side-pre")!, "block block_material_download card mb-3 tplus_block", {}, "", true) as HTMLElement;
+			const cardBody = create_element("div", section, "card-body") as HTMLDivElement;
+
+			const cardTitle = create_element("h5", cardBody, "card-title d-inline", {
 				dir: "ltr",
-				style: "background-image: url(" + chrome.runtime.getURL("../icons/technion_plus_plus/logo.svg") + ");",
-			}, "Technion", cardBody) as HTMLHeadingElement;
-			create_element("sup", "", {}, "++", cardTitle);
-			const actionsContainer = create_element("div", "card-text mt-3", {style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(128,128,128,.3);"}, "", cardBody) as HTMLDivElement;
-			const darkModeContainer = create_element("div", "card-text mt-3 tplus_main_actions", {}, "", cardBody) as HTMLDivElement;
-			const darkModeSwitchContainer = create_element("div", "custom-control custom-switch", {style: "text-align: right"}, "", darkModeContainer) as HTMLDivElement;
-			const darkModeCheckbox = create_element("input", "custom-control-input", {
-				id: "tp-darkmode",
+				style: `background-image: url(${chrome.runtime.getURL("../icons/technion_plus_plus/logo.svg")});`,
+			}, "Technion") as HTMLHeadingElement;
+			create_element("sup", cardTitle, "", {}, "++");
+			const main = create_element("div", cardBody, "card-text mt-3", {
+				style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(128,128,128,.3);",
+			}) as HTMLDivElement;
+
+			const actionsContainer = create_element("div", cardBody, "card-text mt-3 tplus_main_actions") as HTMLDivElement;
+			const darkModeContainer = create_element("div", actionsContainer, "custom-control custom-switch", {
+				id: "tp_darkmode_switch",
+				style: "text-align: right",
+			}) as HTMLDivElement;
+			const darkModeCheckbox = create_element("input", darkModeContainer, "custom-control-input", {
+				id: "tp_darkmode_input",
 				type: "checkbox",
-			}, "", darkModeSwitchContainer) as HTMLInputElement;
-			create_element("label", "custom-control-label", {"for": "tp-darkmode"}, "מצב לילה", darkModeSwitchContainer);
-			const colorSliderContainer = create_element("div", "", {id: "tp_colorswitcher"}, "", darkModeContainer) as HTMLDivElement;
-			create_element("div", "", {style: "text-align: right; width: 8rem"}, "צבע משני", colorSliderContainer);
-			const colorSlider = create_element("input", "", {
+			}) as HTMLInputElement;
+			create_element("label", darkModeContainer, "custom-control-label", {
+				id: "tp_darkmode_label",
+				for: "tp_darkmode_input",
+			}, "מצב לילה");
+			const colourSliderContainer = create_element("div", actionsContainer, "", {
+				id: "tp_colour_switcher",
+			}) as HTMLDivElement;
+			create_element("label", colourSliderContainer, "", {
+				for: "tp_colour_slider",
+				style: "text-align: right; width: 8rem",
+			}, "צבע משני");
+			const colourSlider = create_element("input", colourSliderContainer, "", {
+				id: "tp_colour_slider",
 				type: "range",
 				min: "0",
 				max: "330",
 				step: "30",
-			}, "", colorSliderContainer) as HTMLInputElement;
+			}) as HTMLInputElement;
+
 			const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120});
 			darkModeCheckbox.checked = storageData.remoodle;
-			colorSlider.value = storageData.remoodle_angle;
+			colourSlider.value = storageData.remoodle_angle;
 			darkModeCheckbox.addEventListener("change", async () => {
 				await chrome.storage.local.set({remoodle: darkModeCheckbox.checked});
 				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
 					await chrome.runtime.sendMessage({mess_t: "TE_remoodle"});
 			});
-			colorSlider.addEventListener("change", async () => {
-				const newAngle = parseInt(colorSlider.value.toString());
+			colourSlider.addEventListener("change", async () => {
+				const newAngle = parseInt(colourSlider.value);
 				await chrome.storage.local.set({remoodle_angle: newAngle});
 				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
 					await chrome.runtime.sendMessage({mess_t: "TE_remoodle_reangle", angle: newAngle});
@@ -60,8 +77,8 @@
 				colorGradientString += `hsl(${82 + 30 * gradientStep}, 100%, 25%) ${100 * gradientStep / 12}% ${100 * (gradientStep + 1) / 12}%`;
 				if (11 > gradientStep) colorGradientString += ", ";
 			}
-			colorSlider.style.backgroundImage = "linear-gradient(to left, " + colorGradientString + ") !important";
-			return actionsContainer;
+			colourSlider.style.backgroundImage = "linear-gradient(to left, " + colorGradientString + ") !important";
+			return main;
 		}
 
 		if (".ac.il/" === window.location.href.split("technion")[1]) { // Moodle main page
@@ -97,7 +114,7 @@
 				}) : coursesBySemester[2].push({cname: course, clink: courseLink});
 				create_download(downloadButtonContainer, parseInt(courseTiles[i].querySelector(".coursestyle2url")!.getAttribute("href")!.split("?id=")[1]), 0, "הורדת קבצי הקורס");
 			}
-			let buttons = await create_tp_buttons();
+			const buttons = await create_tp_buttons();
 			const parentNode = buttons.parentNode as HTMLHeadingElement;
 			parentNode.removeChild(buttons);
 			document.getElementById("coursecontentcollapseid1")
@@ -117,10 +134,10 @@
 					"אביב": "201",
 					"קיץ": "202",
 				}[course?.groups?.csemester as string] ?? "200";
-				create_element("a", "maor_download", {
+				create_element("a", buttons, "maor_download", {
 					href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2024/${semester}/SM/${course_num}`,
 					target: "_blank",
-				}, "דף הקורס בסאפ", buttons);
+				}, "דף הקורס בסאפ");
 				const storageData: { videos_courses: string[][], videos_data: { [key: string]: RecordingCourse["v"] } }
 					= await chrome.storage.local.get({videos_data: {}, videos_courses: []});
 				const short_course_num = course_num.substring(1, 4) + course_num.substring(5, 8);
@@ -137,11 +154,11 @@
 						text = 1 < data.length ? `וידאו #${j + 1} ` : "וידאו ";
 						text = 0 < data[j]["t"] ? ["הרצאה", "תרגול"][data[j]["t"] - 1] : text;
 						text += "(פנופטו)";
-						create_element("a", "maor_download", {
+						create_element("a", buttons, "maor_download", {
 							href: `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${data[j]["l"]}"`,
 							target: "_blank",
 							title: data[j]?.["vn"] ?? short_course_num,
-						}, text, buttons);
+						}, text);
 					}
 				}
 			}
@@ -191,7 +208,7 @@
 			const setDarkMode = (darkmodeEh: boolean) => {
 				const entirePage = document.querySelector("html") as HTMLHtmlElement;
 				darkmodeEh ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
-				const checkbox = document.getElementById("tp-darkmode") as HTMLInputElement;
+				const checkbox = document.getElementById("tp_darkmode_input") as HTMLInputElement;
 				if (checkbox) checkbox.checked = darkmodeEh;
 			};
 			themeProperties(storageData.remoodle_angle)
@@ -210,7 +227,7 @@
 			if (message.mess_t === "TE_remoodle_reangle") {
 				themeProperties(message.angle)
 					.forEach(property => document.documentElement.style.setProperty(property [0], property [1]));
-				const colorSlider = document.querySelector("#tp_colorswitcher input[type=range]") as HTMLInputElement;
+				const colorSlider = document.querySelector("#tp_colour_switcher input[type=range]") as HTMLInputElement;
 				if (colorSlider) colorSlider.value = message.angle;
 			}
 			sendResponse();

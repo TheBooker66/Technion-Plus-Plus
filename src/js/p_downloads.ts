@@ -96,6 +96,6 @@ import {CommonPopup} from './common_popup.js';
 		const storageData = await chrome.storage.local.get({dl_current: 0});
 		await chrome.storage.local.set({dl_current: 0, dl_queue: []});
 		if (storageData.dl_current !== 0) await chrome.downloads.cancel(storageData.dl_current);
-		await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-16.png"});
+		await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-128.png"});
 	});
 })();
