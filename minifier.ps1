@@ -18,8 +18,8 @@ $minifyActions = @{
     }
     "html" = {
         param([string]$Path)
-        npx html-minifier "$Path" --collapse-whitespace --remove-comments `
-            --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true | Set-Content "$Path"
+        npx html-minifier "$Path" --collapse-whitespace --conservative-collapse `
+                                  --remove-comments --minify-css true --minify-js true | Set-Content "$Path"
         Write-Host "Minified html: $( $Path )"
     }
     "css" = {
