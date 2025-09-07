@@ -552,6 +552,11 @@ async function TE_getWebwork(moodleData: { response: any, responseURL: string },
 	await TE_webworkScan();
 }
 
+async function TE_single_download(link: string, name: string) {
+	await chrome.downloads.download({url: link, filename: name, saveAs: false});
+	if (chrome.runtime.lastError) console.error("TE_bg_dl: " + chrome.runtime.lastError.message);
+}
+
 async function TE_doDownloads(chunk: DownloadItem) {
 	const storageData = await chrome.storage.local.get({dl_queue: []});
 	storageData.dl_queue.push(chunk);
@@ -780,46 +785,29 @@ async function TE_startExtension() {
 	await TE_setStorage({buses_alerts: [], dl_queue: [], dl_current: 0});
 }
 
-chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message) => {
 	switch (message.mess_t) {
 		case "single_download":
-			chrome.downloads.download({url: message.link, filename: message.name, saveAs: false}, () => {
-				if (chrome.runtime.lastError) console.error("TE_bg_dl: " + chrome.runtime.lastError.message);
-			});
+			await TE_single_download(message.link, message.name);
 			break;
 		case "multi_download":
 			await TE_doDownloads(message.chunk);
 			break;
-		case "bus_alert":
-			await TE_toggleBusAlert(message.bus_kav);
-			break;
-		case "login_moodle_url":
-			sendResponse((await fetch(`https://${message.url}/auth/oidc/`, {
-				headers: {
-					accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-					"accept-language": "en-US,en;q=0.9", "cache-control": "no-cache", pragma: "no-cache",
-					"sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
-					"sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none",
-				}, body: null, method: "HEAD", mode: "cors", credentials: "include",
-			})).url);
-			return true;
 		case "silent_notification":
 			await TE_notification(message.message, true);
 			break;
 		case "loud_notification":
 			await TE_notification(message.message, false);
 			break;
-		case "TE_remoodle_reangle":
-			await TE_sendMessageToTabs({mess_t: "TE_remoodle_reangle", angle: message.angle});
+		case "TE_moodle_colour":
+			await TE_sendMessageToTabs({mess_t: "TE_moodle_colour", angle: message.angle});
 			break;
-		case "TE_remoodle":
-			await TE_sendMessageToTabs({mess_t: "TE_remoodle"});
+		case "TE_moodle_darkmode":
+			await TE_sendMessageToTabs({mess_t: "TE_moodle_darkmode"});
 			break;
-		case "buses":
-			sendResponse(await (await fetch(message.url)).json());
-			return true;
+		default:
+			break;
 	}
-	return false;
 });
 
 chrome.downloads.onChanged.addListener(async (delta) => {

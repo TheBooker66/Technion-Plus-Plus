@@ -20,17 +20,8 @@
 		input.type = "hidden";
 	}
 
-	async function login_moodle_url(storageData: { [key: string]: string | boolean }) {
-		const url: string = await chrome.runtime.sendMessage({
-			mess_t: "login_moodle_url", url: window.location.hostname,
-		});
-		const urlParts = url.split("?");
-		const params = new URLSearchParams(urlParts[1]);
-		params.delete("prompt");
-		params.delete("login_hint");
-		params.append("login_hint", storageData.username + "@" + (storageData.server ? "campus." : "") + "technion.ac.il");
-		location.href = urlParts[0] + "?" + params.toString();
-
+	function students() {
+		(document.querySelector(".btn.btn-secondary.btn-block") as HTMLAnchorElement)?.click();
 	}
 
 	function microsoft(storageData: { [key: string]: string | boolean }) {
@@ -83,7 +74,8 @@
 
 	function moodle(storageData: { [key: string]: string | boolean }) {
 		if (document.querySelectorAll(".navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
-		storageData.enable_external ? window.location.href = "https://techwww.technion.ac.il/tech_ident/" : login_moodle_url(storageData);
+		if (storageData.enable_external) window.location.href = "https://techwww.technion.ac.il/tech_ident/";
+		else window.location.href = "https://moodle24.technion.ac.il/auth/oidc/";
 	}
 
 	function cs(storageData: { [key: string]: string | boolean }) {
@@ -153,8 +145,8 @@
 			sap(storageData);
 		} else if (website === "grades.cs.technion.ac.il" || website === "webcourse.cs.technion.ac.il") {
 			cs(storageData);
-		} else if (website === "techwww.technion.ac.il" || website === "students.technion.ac.il") {
-			await login_moodle_url(storageData);
+		} else if (website === "students.technion.ac.il") {
+			students();
 		} else if (website === "login.microsoftonline.com") {
 			microsoft(storageData);
 		} else if (website === "grades.technion.ac.il") {

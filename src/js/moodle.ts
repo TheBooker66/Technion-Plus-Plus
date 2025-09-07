@@ -64,13 +64,13 @@
 			darkModeCheckbox.addEventListener("change", async () => {
 				await chrome.storage.local.set({remoodle: darkModeCheckbox.checked});
 				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
-					await chrome.runtime.sendMessage({mess_t: "TE_remoodle"});
+					await chrome.runtime.sendMessage({mess_t: "TE_moodle_darkmode"});
 			});
 			colourSlider.addEventListener("change", async () => {
 				const newAngle = parseInt(colourSlider.value);
 				await chrome.storage.local.set({remoodle_angle: newAngle});
 				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
-					await chrome.runtime.sendMessage({mess_t: "TE_remoodle_reangle", angle: newAngle});
+					await chrome.runtime.sendMessage({mess_t: "TE_moodle_colour", angle: newAngle});
 			});
 			let colorGradientString = "";
 			for (let gradientStep = 0; gradientStep < 12; gradientStep++) {
@@ -202,35 +202,34 @@
 			["--calendar_today", "hsla(" + (70 + hueOffset) + ", 100%, 20%, 0.5)"],
 		];
 		const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120});
-		if (chrome.runtime.lastError) console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
-		else {
-			let darkModeEnabled = storageData.remoodle;
-			const setDarkMode = (darkmodeEh: boolean) => {
-				const entirePage = document.querySelector("html") as HTMLHtmlElement;
-				darkmodeEh ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
-				const checkbox = document.getElementById("tp_darkmode_input") as HTMLInputElement;
-				if (checkbox) checkbox.checked = darkmodeEh;
-			};
-			themeProperties(storageData.remoodle_angle)
-				.forEach(property => document.documentElement.style.setProperty(property[0], property[1]));
-			setDarkMode(darkModeEnabled);
-			chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
-				if (message.mess_t === "TE_remoodle") {
-					setDarkMode(!darkModeEnabled);
-					darkModeEnabled = !darkModeEnabled;
-				}
-				sendResponse();
-			});
+		if (chrome.runtime.lastError) {
+			console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
+			return;
 		}
 
-		chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
-			if (message.mess_t === "TE_remoodle_reangle") {
-				themeProperties(message.angle)
-					.forEach(property => document.documentElement.style.setProperty(property [0], property [1]));
-				const colorSlider = document.querySelector("#tp_colour_switcher input[type=range]") as HTMLInputElement;
-				if (colorSlider) colorSlider.value = message.angle;
+		let darkModeEnabled: boolean = storageData.remoodle;
+		const setDarkMode = (darkmodeEh: boolean) => {
+			const entirePage = document.querySelector("html") as HTMLHtmlElement;
+			darkmodeEh ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
+			const checkbox = document.getElementById("tp_darkmode_input") as HTMLInputElement;
+			if (checkbox) checkbox.checked = darkmodeEh;
+		};
+		themeProperties(storageData.remoodle_angle)
+			.forEach(property => document.documentElement.style.setProperty(property[0], property[1]));
+		setDarkMode(darkModeEnabled);
+		chrome.runtime.onMessage.addListener(message => {
+			switch (message.mess_t) {
+				case "TE_moodle_darkmode":
+					setDarkMode(!darkModeEnabled);
+					darkModeEnabled = !darkModeEnabled;
+					break;
+				case "TE_moodle_colour":
+					themeProperties(message.angle)
+						.forEach(property => document.documentElement.style.setProperty(property[0], property[1]));
+					const colorSlider = document.querySelector("#tp_colour_switcher input[type=range]") as HTMLInputElement;
+					if (colorSlider) colorSlider.value = message.angle;
+					break;
 			}
-			sendResponse();
 		});
 	}
 

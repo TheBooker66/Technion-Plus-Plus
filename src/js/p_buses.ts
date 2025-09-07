@@ -1,5 +1,5 @@
 import {CommonPopup} from "./common_popup.js";
-import {TE_shutBusesAlerts} from "../service_worker.js";
+import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 
 (async function () {
 	function createBusLineElement(lineDetails = ["", "", 0], parentContainer: HTMLDivElement) {
@@ -25,10 +25,7 @@ import {TE_shutBusesAlerts} from "../service_worker.js";
 					element.classList.add("blat");
 					setTimeout(() => element.classList.remove("blat"), 1E3);
 				} else {
-					await chrome.runtime.sendMessage({
-						mess_t: "bus_alert",
-						bus_kav: busData["Shilut"],
-					});
+					await TE_toggleBusAlert(busData["Shilut"]);
 					element.classList.contains("chosen") ? element.className = "drow" : element.classList.add("chosen");
 				}
 			}
@@ -52,7 +49,7 @@ import {TE_shutBusesAlerts} from "../service_worker.js";
 			return;
 		}
 
-		const apiResponse: BusLine[] = await chrome.runtime.sendMessage({mess_t: "buses", url: url});
+		const apiResponse: BusLine[] = await (await fetch(url)).json();
 		const busTable = document.getElementById("bus_table") as HTMLDivElement;
 		if (apiResponse.length === 0)
 			createBusLineElement(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""], busTable);

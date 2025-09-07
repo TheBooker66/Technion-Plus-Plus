@@ -141,7 +141,7 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		} catch {
 			authURL = "https://students.technion.ac.il/auth/oidc/";
 		}
-		if (!(storageData.enable_login && storageData.quick_login && authURL.includes("?"))) return;
+		if (!storageData.enable_login || !storageData.quick_login) return;
 		let urlParts = authURL.split("?");
 		const urlParams = new URLSearchParams(urlParts[1]);
 		urlParams.delete("prompt");
