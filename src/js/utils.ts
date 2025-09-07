@@ -8,4 +8,13 @@ function xorStrings(str1: string, str2: string): string {
 	).join('');
 }
 
-export {reverseString, xorStrings};
+function resetBadge() {
+	chrome.action.getBadgeBackgroundColor({}, (badgeColours) => {
+		chrome.action.getBadgeText({}, async (badgeText) => {
+			if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34 && badgeText === "!")
+				await chrome.action.setBadgeText({text: ""});
+		});
+	});
+}
+
+export {reverseString, xorStrings, resetBadge};

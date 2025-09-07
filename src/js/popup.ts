@@ -1,5 +1,5 @@
 import {CommonPopup} from './common_popup.js';
-import {reverseString, xorStrings} from './utils.js';
+import {resetBadge, reverseString, xorStrings} from './utils.js';
 
 (async function () {
 	function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[]) {
@@ -15,16 +15,11 @@ import {reverseString, xorStrings} from './utils.js';
 	}
 
 	new CommonPopup("", ["main"], document.title);
-	const OS = navigator.userAgentData ?? "navigator.userAgentData is not supported!";
-	if (!OS.toString().includes("Android"))
-		chrome.action.getBadgeBackgroundColor({}, badgeColor => {
-			chrome.action.getBadgeText({}, async badgeText => {
-				if (215 === badgeColor[0] && 0 === badgeColor[1] && 34 === badgeColor[2] && "!" === badgeText) {
-					await chrome.action.setBadgeText({text: ""});
-					(document.getElementById("bus_error") as HTMLDivElement).style.display = "block";
-				}
-			});
-		});
+	chrome.action.getBadgeBackgroundColor({}, (badgeColours) => {
+		if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34)
+			(document.getElementById("bus_error") as HTMLDivElement).style.display = "block";
+	});
+	resetBadge();
 
 	const mainScreen = document.getElementById("tools_and_links") as HTMLDivElement,
 		printScreen = document.getElementById("print") as HTMLDivElement,

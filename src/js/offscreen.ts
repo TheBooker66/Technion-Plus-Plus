@@ -10,32 +10,63 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 			const courseVisibleElements = Array.from(doc.querySelectorAll(".coursevisible"));
 			// noinspection DuplicatedCode
 			const actions = {
-				get Courses() {
-					return courseVisibleElements;
-				},
 				get CourseNames() {
-					return courseVisibleElements.map(e => e.querySelector("h3")!.textContent);
+					return courseVisibleElements.map(name => name.querySelector("h3")!.textContent);
 				},
 				get CourseLinks() {
-					return courseVisibleElements.map(e => e.querySelector(".coursestyle2url")!.getAttribute("href"));
+					return courseVisibleElements.map(name => name.querySelector(".coursestyle2url")!.getAttribute("href"));
 				},
 				get WebworkForm() {
-					return doc.querySelector("form");
+					const form = doc.querySelector("form");
+					if (!form) return null;
+
+					const formData: { [key: string]: string } = {};
+					const elements = form.elements;
+					for (let i = 0; i < elements.length; i++) {
+						const element = elements[i] as HTMLFormElement;
+						if (element.name) {
+							if (element.type === 'checkbox' || element.type === 'radio') {
+								if (element.checked) {
+									formData[element.name] = element.value;
+								}
+							} else {
+								formData[element.name] = element.value;
+							}
+						}
+					}
+
+					return {
+						action: form.action,
+						data: formData,
+					};
 				},
 				get WebworkMissions() {
-					return Array.from(doc.querySelectorAll(".problem_set_table tr")).map(t => t.querySelectorAll("td"));
+					const missionsContainer = doc.getElementById("set-list-container");
+					if (!missionsContainer) return [];
+					const missions = missionsContainer.querySelectorAll("li > div.ms-3.me-auto");
+					return Array.from(missions).map(mission => {
+						return {
+							name: mission.querySelector("div > a.fw-bold.set-id-tooltip")?.textContent.trim() ??
+								mission.querySelector("div > span.set-id-tooltip")?.textContent.trim() ?? "מטלה ללא שם",
+							due: mission.querySelector("div.font-sm")?.textContent.trim() ?? "אין תאריך הגשה",
+						};
+					});
 				},
 				get WebworkLinks() {
-					return doc.querySelectorAll(".mod_index .lastcol a");
+					const elements = doc.querySelectorAll(".mod_index .lastcol a") as NodeListOf<HTMLAnchorElement>;
+					return Array.from(elements).map(link => ({
+						text: link.textContent,
+						href: link.href,
+					}));
 				},
 				get SessionKey() {
 					return (doc.querySelector("[name='sesskey']") as HTMLInputElement)?.value;
 				},
-				get UserText() {
-					return doc.querySelector(".usertext");
-				},
 				get CalendarURL() {
 					return (doc.getElementById("calendarexporturl") as HTMLInputElement)?.value;
+				},
+				get UserText() {
+					return doc.querySelector(".usertext")?.textContent;
 				},
 				get HWList() {
 					return doc.activeElement?.innerHTML.split("BEGIN:VEVENT") ?? [];

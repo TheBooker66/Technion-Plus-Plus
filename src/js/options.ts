@@ -1,4 +1,4 @@
-import {reverseString, xorStrings} from './utils.js';
+import {resetBadge, reverseString, xorStrings} from './utils.js';
 import {TE_updateInfo} from '../service_worker.js';
 
 function encryptDecrypt(inputStr: string) {
@@ -68,16 +68,14 @@ async function main() {
 	darkMode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
 
 	if (moodle && loginEh && login) await TE_updateInfo();
-	else chrome.action.getBadgeBackgroundColor({}, colors => {
-		chrome.action.getBadgeText({}, badgeText => {
-			if (164 === colors[0] && 127 === colors[1] && 0 === colors[2] && "!" === badgeText)
-				chrome.action.setBadgeText({text: ""}, () => {
-				});
-		});
-	});
+	else resetBadge();
 }
 
-(document.getElementById("save") as HTMLDivElement).addEventListener("click", main);
+document.getElementById("save")!.addEventListener("click", async () => await main());
+document.addEventListener("keypress", async event => {
+	if (event.key === "Enter") await main();
+});
+
 (document.getElementById("try_vol") as HTMLAnchorElement).addEventListener("click", async () => {
 	const elem = document.createElement("audio");
 	elem.setAttribute("preload", "auto");
@@ -153,8 +151,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 			(document.getElementById("storageVol") as HTMLSpanElement).textContent += ` ${bytes.toFixed(3)}kB`;
 		});
 	else (document.getElementById("storageVol") as HTMLSpanElement).textContent += " אירעה שגיאה! נא לדווח עליה.";
-
-	document.addEventListener("keypress", event => {
-		if (event.key === "Enter") main();
-	});
 });

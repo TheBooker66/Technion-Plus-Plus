@@ -1,4 +1,5 @@
 import {addAssignmentsToList} from "./organizer.js";
+import {resetBadge} from "./utils.js";
 import {CommonPopup} from "./common_popup.js";
 
 export class CommonCalendar {
@@ -7,11 +8,11 @@ export class CommonCalendar {
 	private readonly flags: { moodle: 1; cs: 2; webwork: 4 };
 	private readonly organiser: string;
 
-	constructor(popup: CommonPopup, system: "moodle" | "cs" | "webwork", organiser: string) {
+	constructor(popup: CommonPopup, system: "moodle" | "cs" | "webwork", context: string) {
 		this.common = popup;
 		this.system = system;
 		this.flags = {moodle: 1, cs: 2, webwork: 4};
-		this.organiser = organiser;
+		this.organiser = context;
 
 		if (this.organiser === "ארגונית++") return;
 
@@ -35,8 +36,7 @@ export class CommonCalendar {
 		// noinspection JSBitwiseOperatorUsage
 		else currentAlertFlag &= ~this.flags[this.system];
 
-		if (!navigator.userAgent.includes("Android") && !currentAlertFlag)
-			await chrome.action.setBadgeText({text: ""});
+		if (!currentAlertFlag) resetBadge();
 		return currentAlertFlag;
 	}
 
