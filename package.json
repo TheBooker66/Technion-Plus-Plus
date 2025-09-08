@@ -6,6 +6,7 @@
     "clean-css": "^5.3.3",
     "clean-css-cli": "^5.6.3",
     "html-minifier": "^4.0.0",
+    "pdfjs-dist": "^5.4.149",
     "typescript": "^5.9.2",
     "uglify-js": "^3.19.3",
     "user-agent-data-types": "^0.4.2"

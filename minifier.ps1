@@ -62,6 +62,27 @@ if (Test-Path -Path $zipFilePath)
 $sourcePath = Join-Path -Path (Get-Location).Path -ChildPath "src"
 robocopy $sourcePath $outputfolder /E /XF *.ts | Out-Null
 Write-Host "Copied other files to minified folder."
+
+# Library files location
+$libDestPath = Join-Path -Path $outputfolder -ChildPath "lib"
+New-Item -ItemType Directory -Path $libDestPath -Force | Out-Null
+
+# Copy the pdfjs library files (pdf.min.mjs and pdf.worker.min.mjs)
+$pdfjsSourcePath = Join-Path -Path (Get-Location).Path -ChildPath "node_modules/pdfjs-dist/build"
+$pdfjsDestPath = Join-Path -Path $libDestPath -ChildPath "pdfjs"
+New-Item -ItemType Directory -Path $pdfjsDestPath -Force | Out-Null
+Copy-Item -Path (Join-Path -Path $pdfjsSourcePath -ChildPath "pdf.min.mjs") `
+          -Destination (Join-Path -Path $pdfjsDestPath -ChildPath "pdf.min.mjs") -Force
+Copy-Item -Path (Join-Path -Path $pdfjsSourcePath -ChildPath "pdf.worker.min.mjs") `
+          -Destination (Join-Path -Path $pdfjsDestPath -ChildPath "pdf.worker.min.mjs") -Force
+Write-Host "Copied pdfjs library files."
+
+# Download CheeseFork file (share-histograms.js)
+$cheeseforkSourceUrl = "https://raw.githubusercontent.com/michael-maltsev/cheese-fork/refs/heads/gh-pages/share-histograms.js"
+$cheeseforkDestPath = Join-Path -Path $libDestPath -ChildPath "cheesefork"
+New-Item -ItemType Directory -Path $cheeseforkDestPath -Force | Out-Null
+Invoke-WebRequest -Uri $cheeseforkSourceUrl -OutFile (Join-Path -Path $cheeseforkDestPath -ChildPath "share-histograms.js") -UseBasicParsing
+Write-Host "Downloaded Cheesefork library file."
 #endregion
 
 #region Typescript Compilation

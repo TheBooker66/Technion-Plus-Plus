@@ -472,66 +472,65 @@
 						await commitToStorage(currentStoredGrades);
 					};
 				} else if (file.name.endsWith(".pdf")) {
-					const pdfjsPath = "lib/pdfjs/";
-					import(chrome.runtime.getURL(pdfjsPath + "pdf.mjs")).then(pdfjs => {
-						pdfjs.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL(pdfjsPath + "pdf.worker.mjs");
+					const reader = new FileReader();
+					reader.readAsArrayBuffer(file);
+					reader.onload = async (event) => {
+						const pdfjsPath = "lib/pdfjs/";
+						const pdfjs = await import(chrome.runtime.getURL(pdfjsPath + "pdf.min.mjs"));
+						pdfjs.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL(pdfjsPath + "pdf.worker.min.mjs");
 
-						const reader = new FileReader();
-						reader.readAsArrayBuffer(file);
-						reader.onload = async (event) => {
-							const pdf = await pdfjs.getDocument(new Uint8Array(event?.target?.result as ArrayBuffer)).promise;
-							let text = "";
-							for (let i = 1; i <= pdf.numPages; i++) {
-								const page = await pdf.getPage(i);
-								const content = await page.getTextContent();
-								text += content.items.map((item: { str: string }) => item.str).join(" ") + "\n";
+						const pdf = await pdfjs.getDocument(new Uint8Array(event?.target?.result as ArrayBuffer)).promise;
+						let text = "";
+						for (let i = 1; i <= pdf.numPages; i++) {
+							const page = await pdf.getPage(i);
+							const content = await page.getTextContent();
+							text += content.items.map((item: { str: string }) => item.str).join(" ") + "\n";
+						}
+						const lines = text
+							// Add a line break before any sequence of 6 or more digits not preceded by a line break
+							.replace(/([^\n])(\d{6,})/g, '$1\n$2')
+							.replace(/([^\n])(נקודות מצטברות)/g, '$1\n$2')
+							.replace(/([^\n])(\d+(?:.\d+)?\s*נקודות רישום:)/g, '$1\n$2')
+							// Split the text into lines
+							.split("\n")
+							.map(line => line.trim())
+							// Filter out empty lines
+							.filter(line => line.length > 0);
+						// Remove the last part of the last line
+						lines[lines.length - 1] = lines[lines.length - 1].substring(0, lines[lines.length - 1].indexOf('סוף תעודת הציונים')).trim();
+
+						const coursePattern = /^(\d{6}|\d{8}) ([\w\s\p{P}\u0590-\u05FF]+?) (1?\d(?:\.\d)? |20(?:\.0)? |)(\d{1,3}|עובר|לא עובר|פטור ללא ניקוד|פטור עם ניקוד|פטור) \d{4}-(\d{4}) (חורף|אביב|קיץ) ([\u0590-\u05FF]{3}"[\u0590-\u05FF]+)$/u;
+						const storageData = await chrome.storage.local.get({grades: []});
+						const currentStoredGrades: CalculatorCourse[] = storageData.grades;
+
+						lines.forEach(line => {
+							const parts = coursePattern.exec(line);
+
+							if (!parts) {
+								console.warn("Skipping malformed row (regex didn't match) during PDF import:", line);
+								return;
 							}
-							const lines = text
-								// Add a line break before any sequence of 6 or more digits not preceded by a line break
-								.replace(/([^\n])(\d{6,})/g, '$1\n$2')
-								.replace(/([^\n])(נקודות מצטברות)/g, '$1\n$2')
-								.replace(/([^\n])(\d+(?:.\d+)?\s*נקודות רישום:)/g, '$1\n$2')
-								// Split the text into lines
-								.split("\n")
-								.map(line => line.trim())
-								// Filter out empty lines
-								.filter(line => line.length > 0);
-							// Remove the last part of the last line
-							lines[lines.length - 1] = lines[lines.length - 1].substring(0, lines[lines.length - 1].indexOf('סוף תעודת הציונים')).trim();
 
-							const coursePattern = /^(\d{6}|\d{8}) ([\w\s\p{P}\u0590-\u05FF]+?) (1?\d(?:\.\d)? |20(?:\.0)? |)(\d{1,3}|עובר|לא עובר|פטור ללא ניקוד|פטור עם ניקוד|פטור) \d{4}-(\d{4}) (חורף|אביב|קיץ) ([\u0590-\u05FF]{3}"[\u0590-\u05FF]+)$/u;
-							const storageData = await chrome.storage.local.get({grades: []});
-							const currentStoredGrades: CalculatorCourse[] = storageData.grades;
+							const gradeStr = parts[4].trim();
+							const binaryEh = Number.isNaN(parseFloat(gradeStr));
+							const pdfCourse: CalculatorCourse = {
+								num: parts[1].trim(),
+								name: parts[2].trim(),
+								points: parts[3] ? parseFloat(parts[3].trim()) : 0,
+								grade: binaryEh ? gradeStr.trim() : parseFloat(gradeStr),
+								semester: parts[6].trim() as Semester,
+								year: parseInt(parts[5].trim(), 10),
+								binary: binaryEh,
+								perm_ignored: false,
+								selected: false,
+							};
 
-							lines.forEach(line => {
-								const parts = coursePattern.exec(line);
+							if (smallValidate(currentStoredGrades, newCourses, pdfCourse, line))
+								newCourses.push(pdfCourse);
+						});
 
-								if (!parts) {
-									console.warn("Skipping malformed row (regex didn't match) during PDF import:", line);
-									return;
-								}
-
-								const gradeStr = parts[4].trim();
-								const binaryEh = Number.isNaN(parseFloat(gradeStr));
-								const pdfCourse: CalculatorCourse = {
-									num: parts[1].trim(),
-									name: parts[2].trim(),
-									points: parts[3] ? parseFloat(parts[3].trim()) : 0,
-									grade: binaryEh ? gradeStr.trim() : parseFloat(gradeStr),
-									semester: parts[6].trim() as Semester,
-									year: parseInt(parts[5].trim(), 10),
-									binary: binaryEh,
-									perm_ignored: false,
-									selected: false,
-								};
-
-								if (smallValidate(currentStoredGrades, newCourses, pdfCourse, line))
-									newCourses.push(pdfCourse);
-							});
-
-							await commitToStorage(currentStoredGrades);
-						};
-					}).catch(err => console.error("Error loading PDF.js library:", err));
+						await commitToStorage(currentStoredGrades);
+					};
 				} else {
 					alert("נא לבחור קובץ csv, Excel או pdf.");
 				}

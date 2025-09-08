@@ -392,16 +392,11 @@ async function TE_csCalendarCheck(
 			if (regexes.banned.test(trimmedSummary)) continue;
 
 			const eventUID = eventText.match(regexes.uid)?.[1] || summary;
-			if (eventUID === "icspasswordexpires" || eventUID === "icspasswordexpired") {
+			if (eventUID === "icspasswordexpired") {
 				newHWSet.clear();
-				if (eventUID[eventUID.length - 1].toLowerCase() === "s") {
-					await TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח תפוג בקרוב, אנא כנס להגדרות התוסף להוראות חידוש הסיסמה.', true);
-					continue;
-				} else {
-					console.error("TE_cs_cal_err: CS password expired already.");
-					await TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!', false);
-					break;
-				}
+				console.error("TE_cs_cal_err: CS password expired.");
+				await TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!', false);
+				break;
 			}
 
 			const timeMatch = eventText.match(regexes.time)!.groups as { [key: string]: string };

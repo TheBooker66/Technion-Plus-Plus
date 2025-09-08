@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="Libraries" pattern="file[Technion Plus Plus]:src/lib//*" />
-</component>

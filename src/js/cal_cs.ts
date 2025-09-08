@@ -58,22 +58,12 @@ import {reverseString, xorStrings} from './utils.js';
 				if (regexPatterns.banned.test(trimmedSummary)) continue;
 
 				const eventUID = eventSections[i].match(regexPatterns.uid)?.[1] || summary;
-				if (eventUID === "icspasswordexpires" || eventUID === "icspasswordexpired"
-					|| eventUID === "icspasswordexpires1" || eventUID === "icspasswordexpired1") {
-					if (eventUID[eventUID.length - 1].toLowerCase() === "s"
-						|| eventUID[eventUID.length - 2].toLowerCase() === "s") {
-						reject({
-							msg: "סיסמת היומן של הצגת המטלות של מדמ\"ח תפוג בקרוב, אנא כנס להגדרות התוסף להוראות חידוש הסיסמה.",
-							is_error: false,
-						});
-						continue;
-					} else {
-						reject({
-							msg: "סיסמת היומן של הצגת המטלות של מדמ\"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!",
-							is_error: true,
-						});
-						break;
-					}
+				if (eventUID === "icspasswordexpired" || eventUID === "icspasswordexpired1") {
+					reject({
+						msg: "סיסמת היומן של הצגת המטלות של מדמ\"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!",
+						is_error: true,
+					});
+					break;
 				}
 
 				const timeMatch = eventSections[i].match(regexPatterns.time)!.groups as { [key: string]: string };
