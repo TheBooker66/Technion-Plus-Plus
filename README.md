@@ -4,7 +4,7 @@
 
 ![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge) ![Chrome Web Store User Count](https://img.shields.io/chrome-web-store/users/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge) ![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/stars/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge)
 
-![Mozilla Add-on Version](https://img.shields.io/amo/v/technion-plus-plus?style=for-the-badge) ![Mozilla Add-on Users](https://img.shields.io/amo/users/technion-plus-plus?style=for-the-badge) ![Mozilla Add-on Rating](https://img.shields.io/amo/rating/technion-plus-plus?style=for-the-badge)
+![Mozilla Add-on Version](https://img.shields.io/amo/v/technion-plus-plus?style=for-the-badge) ![Mozilla Add-on Users](https://img.shields.io/amo/users/technion-plus-plus?style=for-the-badge) ![Mozilla Add-on Rating](https://img.shields.io/amo/stars/technion-plus-plus?style=for-the-badge)
 
 <div dir="rtl">
 
