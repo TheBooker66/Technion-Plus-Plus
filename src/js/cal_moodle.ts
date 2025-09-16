@@ -29,7 +29,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 		errorEh: boolean
 	}) => void) {
 		try {
-			const storageData = await chrome.storage.local.get({calendar_prop: ""});
+			const storageData = await chrome.storage.local.get({moodle_cal_prop: ""});
 
 			if (chrome.runtime.lastError) {
 				console.error("TE_cal1: " + chrome.runtime.lastError.message);
@@ -39,7 +39,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 				});
 			}
 
-			if (storageData.calendar_prop === "") {
+			if (storageData.moodle_cal_prop === "") {
 				errorCallback({
 					msg: "אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.",
 					errorEh: true,
@@ -53,7 +53,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 
 				const exportResponse2: string = "userid=" + exportResponse.response.getElementById("calendarexporturl").value.split("userid=")[1].split("&preset_what=all")[0];
 
-				await chrome.storage.local.set({calendar_prop: exportResponse2});
+				await chrome.storage.local.set({moodle_cal_prop: exportResponse2});
 				if (chrome.runtime.lastError) {
 					console.error("TE_cal2: " + chrome.runtime.lastError);
 					errorCallback({
@@ -67,139 +67,133 @@ import {TE_AutoLogin} from "../service_worker.js";
 		}
 	}
 
-	async function updateCalendar(maxEventID: number, seenEventsCount: number = 0) {
-		await chrome.storage.local.set({cal_seen: seenEventsCount, calendar_max: maxEventID});
-		if (chrome.runtime.lastError)
-			console.error("TE_cal_ra: " + chrome.runtime.lastError.message);
-
-	}
-
 	const popup = new CommonPopup("מטלות קרובות - מודל", ["calendar"], document.title);
 	const calendar = new CommonCalendar(popup, "moodle", document.title);
 
-	await calendar.progress(() => {
-		return new Promise(async (resolve, reject) => {
-			const storageData = await chrome.storage.local.get({
-				calendar_prop: "",
-				calendar_max: 0,
-				u_courses: {},
-				cal_finished: {},
-				cal_seen: 0,
-				filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
+	await calendar.progress(() => new Promise(async (resolve, reject) => {
+		const storageData = await chrome.storage.local.get({
+			cal_seen: 0,
+			moodle_cal_finished: [],
+			moodle_cal_prop: "",
+			moodle_cal_max: 0,
+			moodle_cal_courses: {},
+			filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
+		});
+		if (chrome.runtime.lastError) {
+			console.error("TE_cal: " + chrome.runtime.lastError.message);
+			reject({
+				msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
+				is_error: true,
 			});
-			if (chrome.runtime.lastError) {
-				console.error("TE_cal: " + chrome.runtime.lastError.message);
-				reject({
-					msg: "שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסה שנית.",
-					is_error: true,
-				});
-				return;
-			}
+			return;
+		}
 
-			if (storageData.calendar_prop === "") {
+		if (storageData.moodle_cal_prop === "") {
+			TE_AutoLogin(true).then(() => initializeCalendarProperties(reject)).catch(_ => reject({
+				msg: "לפני משיכת המטלות הראשונית מהמודל יש להכנס אל המודל ולוודא שההתחברות בוצעה באופן תקין.",
+				is_error: true,
+			}));
+			return;
+		}
+
+		const calendarData = await popup.XHR("https://moodle24.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&" + storageData.moodle_cal_prop, "text");
+		try {
+			if ("Invalid authentication" === calendarData.response.trim()) {
+				await chrome.storage.local.set({moodle_cal_prop: ""});
+				if (chrome.runtime.lastError) console.error("TE_cal_moodle: " + chrome.runtime.lastError);
 				TE_AutoLogin(true).then(() => initializeCalendarProperties(reject)).catch(_ => reject({
-					msg: "לפני משיכת המטלות הראשונית מהמודל יש להכנס אל המודל ולוודא שההתחברות בוצעה באופן תקין.",
+					msg: "לא ניתן למשוך מטלות מהמודל. נסה שנית מאוחר יותר, אם התקלה נמשכת - צור קשר עם המפתח.",
 					is_error: true,
 				}));
 				return;
 			}
-
-			const calendarData = await popup.XHR("https://moodle24.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&" + storageData.calendar_prop, "text");
-			try {
-				if ("Invalid authentication" === calendarData.response.trim()) {
-					await chrome.storage.local.set({calendar_prop: ""});
-					if (chrome.runtime.lastError) console.error("TE_cal_moodle: " + chrome.runtime.lastError);
-					TE_AutoLogin(true).then(() => initializeCalendarProperties(reject)).catch(_ => reject({
-						msg: "לא ניתן למשוך מטלות מהמודל. נסה שנית מאוחר יותר, אם התקלה נמשכת - צור קשר עם המפתח.",
-						is_error: true,
-					}));
-					return;
-				}
-				const cal: string[] = calendarData.response.split("BEGIN:VEVENT");
-				if (cal.length === 1) {
-					await updateCalendar(0, await calendar.removeCalendarAlert(storageData.cal_seen));
-					resolve({
-						new_list: [],
-						finished_list: [],
-					});
-					return;
-				}
-				const ONE_DAY = 864E5, now = new Date(), semesters = {
-					"200": "חורף",
-					"201": "אביב",
-					"202": "קיץ",
-				};
-				let maxEventID = 0, finishedEvents: { [key: string]: number } = {},
-					newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
-				for (let i = 1; i < cal.length; i++) {
-					const eventID = parseInt(cal[i].split("UID:")[1].split("@moodle")[0]);
-					maxEventID = eventID > maxEventID ? eventID : maxEventID;
-
-					if (cal[i].includes("CATEGORIES")) {
-						const eventTitle = cal[i].split("SUMMARY:")[1].split("\n")[0].trim();
-						if ((storageData.filter_toggles.appeals && eventTitle.includes("ערעור"))
-							|| (storageData.filter_toggles.zooms && (eventTitle.includes("זום") || eventTitle.includes("Zoom") || eventTitle.includes("zoom") || eventTitle.includes("הרצא") || eventTitle.includes("תרגול")))
-							|| (storageData.filter_toggles.attendance && (eventTitle.includes("נוכחות") || eventTitle.includes("Attendance") || eventTitle.includes("attendance")))
-							|| (storageData.filter_toggles.reserveDuty && eventTitle.includes("מילואים")))
-							continue;
-
-						const titleWords = eventTitle.split(" ");
-						if ("opens" !== titleWords[titleWords.length - 1] && "opens)" !== titleWords[titleWords.length - 1]) {
-							let eventDateStr: string = cal[i].split("DTSTART")[1].split("\n")[0]
-									.replace(";VALUE=DATE:", "").replace(":", ""),
-								eventTimeStr: string = !eventDateStr.includes("T") ? "21:55:00Z" :
-									eventDateStr.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3");
-							eventDateStr = eventDateStr.substring(0, 8)
-								.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTimeStr.trim();
-							const eventDate = new Date(eventDateStr);
-							if (eventDate.getTime() < now.getTime() - ONE_DAY)
-								continue;
-							const eventTimeFinal = eventDate.toLocaleString("iw-IL", {
-								weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
-							});
-
-							const courseInfo: string[] = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
-							const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
-								semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
-							const course = (storageData.u_courses.hasOwnProperty(courseNum) && semesterNum.toString() in semesters) ?
-								storageData.u_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "") : courseInfo.toString();
-
-							let eventDescription: string = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]
-								.replace(/\\n/g, ' ').replace(/\\,/g, ',').trim();
-							eventDescription = 95 < eventDescription.length ? eventDescription.slice(0, 90) + "..." : eventDescription;
-
-							let finishedEh = false;
-							if (storageData.cal_finished.hasOwnProperty(eventID.toString())) {
-								finishedEh = true;
-								finishedEvents[eventID.toString()] = 0;
-							}
-							const event: HWAssignment = {
-								name: eventTitle,
-								description: eventDescription,
-								course: course,
-								finalDate: eventTimeFinal,
-								newEh: eventID > storageData.calendar_max,
-								goToFunc: openMoodle(eventID, eventDate.getTime()),
-								eventID: eventID,
-								timestamp: eventDate.getTime(),
-								sys: "moodle",
-								done: finishedEh,
-							};
-							finishedEh ? finishedAssignmentsList.push(event) : newAssignmentsList.push(event);
-						}
-					}
-				}
-				await chrome.storage.local.set({cal_finished: finishedEvents});
-				if (chrome.runtime.lastError) console.error("TE_cal_moodle: " + chrome.runtime.lastError);
-				await updateCalendar(maxEventID, await calendar.removeCalendarAlert(storageData.cal_seen));
-				resolve({new_list: newAssignmentsList, finished_list: finishedAssignmentsList});
-			} catch (err) {
-				console.error(err);
-				reject({
-					msg: "אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.",
-					is_error: true,
+			const cal: string[] = calendarData.response.split("BEGIN:VEVENT");
+			if (cal.length === 1) {
+				await chrome.storage.local.set({
+					cal_seen: await calendar.removeCalendarAlert(storageData.cal_seen), moodle_cal_max: 0,
 				});
+				resolve({
+					new_list: [],
+					finished_list: [],
+				});
+				return;
 			}
-		});
-	});
+			const ONE_DAY = 864E5, now = new Date(), semesters = {
+				"200": "חורף",
+				"201": "אביב",
+				"202": "קיץ",
+			};
+			let maxEventID = 0, finishedEvents: string[] = [],
+				newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
+			for (let i = 1; i < cal.length; i++) {
+				const eventID = parseInt(cal[i].split("UID:")[1].split("@moodle")[0]);
+				maxEventID = eventID > maxEventID ? eventID : maxEventID;
+
+				if (!cal[i].includes("CATEGORIES")) continue;
+
+				const eventTitle = cal[i].split("SUMMARY:")[1].split("\n")[0].trim();
+				if ((storageData.filter_toggles.appeals && eventTitle.includes("ערעור"))
+					|| (storageData.filter_toggles.zooms && (eventTitle.includes("זום") || eventTitle.includes("Zoom") || eventTitle.includes("zoom") || eventTitle.includes("הרצא") || eventTitle.includes("תרגול")))
+					|| (storageData.filter_toggles.attendance && (eventTitle.includes("נוכחות") || eventTitle.includes("Attendance") || eventTitle.includes("attendance")))
+					|| (storageData.filter_toggles.reserveDuty && eventTitle.includes("מילואים")))
+					continue;
+
+				const titleWords = eventTitle.split(" ");
+				if (!("opens" !== titleWords[titleWords.length - 1] && "opens)" !== titleWords[titleWords.length - 1])) continue;
+
+				let eventDateStr: string = cal[i].split("DTSTART")[1].split("\n")[0]
+						.replace(";VALUE=DATE:", "").replace(":", ""),
+					eventTimeStr: string = !eventDateStr.includes("T") ? "21:55:00Z" :
+						eventDateStr.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3");
+				eventDateStr = eventDateStr.substring(0, 8)
+					.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTimeStr.trim();
+				const eventDate = new Date(eventDateStr);
+				if (eventDate.getTime() < now.getTime() - ONE_DAY) continue;
+
+				const eventTimeFinal = eventDate.toLocaleString("he-IL", {
+					weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
+				});
+
+				const courseInfo: string[] = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
+				const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
+					semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
+				const course = (storageData.moodle_cal_courses.hasOwnProperty(courseNum) && semesterNum.toString() in semesters) ?
+					storageData.moodle_cal_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "") : courseInfo.toString();
+
+				let eventDescription: string = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]
+					.replace(/\\n/g, ' ').replace(/\\,/g, ',').trim();
+				eventDescription = 95 < eventDescription.length ? eventDescription.slice(0, 90) + "..." : eventDescription;
+
+				const finishedEh = (storageData.moodle_cal_finished as Array<string>).includes(eventID.toString());
+				if (finishedEh) finishedEvents.push(eventID.toString());
+
+				const event: HWAssignment = {
+					name: eventTitle,
+					description: eventDescription,
+					course: course,
+					finalDate: eventTimeFinal,
+					newEh: eventID > storageData.moodle_cal_max,
+					goToFunc: openMoodle(eventID, eventDate.getTime()),
+					eventID: eventID,
+					timestamp: eventDate.getTime(),
+					sys: "moodle",
+					done: finishedEh,
+				};
+				finishedEh ? finishedAssignmentsList.push(event) : newAssignmentsList.push(event);
+			}
+			await chrome.storage.local.set({
+				cal_seen: await calendar.removeCalendarAlert(storageData.cal_seen),
+				moodle_cal_finished: finishedEvents,
+				moodle_cal_max: maxEventID,
+			});
+			if (chrome.runtime.lastError) console.error("TE_cal_moodle: " + chrome.runtime.lastError);
+			resolve({new_list: newAssignmentsList, finished_list: finishedAssignmentsList});
+		} catch (err) {
+			console.error(err);
+			reject({
+				msg: "אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.",
+				is_error: true,
+			});
+		}
+	}));
 })();

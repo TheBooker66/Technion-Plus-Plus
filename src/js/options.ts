@@ -38,10 +38,10 @@ async function main() {
 		external = (document.getElementById("external_user") as HTMLInputElement).checked,
 		hw_alerts = (document.getElementById("allow_hw_alerts") as HTMLInputElement).checked,
 		notif_vol = (document.getElementById("notification_volume") as HTMLSelectElement).value,
-		moodle = (document.getElementById("moodle_cal") as HTMLInputElement).checked,
-		cs = (document.getElementById("cs_cal") as HTMLInputElement).checked,
-		cs_pass = (document.getElementById("cs_pass") as HTMLInputElement).value,
-		webwork = (document.getElementById("ww_cal_switch") as HTMLInputElement).checked,
+		moodle = (document.getElementById("moodle_cal_enabled") as HTMLInputElement).checked,
+		cs = (document.getElementById("cs_cal_enabled") as HTMLInputElement).checked,
+		cs_cal_pass = (document.getElementById("cs_cal_pass") as HTMLInputElement).value,
+		webwork = (document.getElementById("webwork_cal_enabled") as HTMLInputElement).checked,
 		darkMode = (document.getElementById("dark_mode") as HTMLInputElement).checked,
 		customName = (document.getElementById("custom_name") as HTMLInputElement).value,
 		customLink = (document.getElementById("custom_link") as HTMLInputElement).value,
@@ -49,11 +49,11 @@ async function main() {
 	const loginEh = "" !== username && "" !== password,
 		externalEh = external && "" !== password && "" !== idn;
 	await chrome.storage.local.set({
-		username: username, server: campus, phrase: encryptedSubstring, term: encryptedString,
+		username: username, email_server: campus, phrase: encryptedSubstring, term: encryptedString,
 		maor_p: encryptionResult, uidn_arr: encryptDecrypt(reverseString(idn)), gmail: email,
 		enable_login: loginEh, quick_login: login, allow_timings: timings, panopto_save: panopto,
-		external_u: external, enable_external: externalEh, hw_alerts: hw_alerts,
-		moodle_cal: moodle, cs_cal: cs, cs_pass: cs_pass, ww_cal_switch: webwork, ww_cal_update: 0,
+		external_user: external, external_enable: externalEh, hw_alerts: hw_alerts,
+		moodle_cal_enabled: moodle, cs_cal_enabled: cs, cs_cal_pass: cs_cal_pass, webwork_cal_enabled: webwork,
 		notif_vol: notif_vol, dark_mode: darkMode, custom_name: customName, custom_link: customLink,
 	});
 	if (chrome.runtime.lastError) {
@@ -68,7 +68,7 @@ async function main() {
 	darkMode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
 
 	if (moodle && loginEh && login) await TE_updateInfo();
-	else resetBadge();
+	else await resetBadge();
 }
 
 document.getElementById("save")!.addEventListener("click", async () => await main());
@@ -88,16 +88,17 @@ document.addEventListener("keypress", async event => {
 	(document.getElementById("try_vol") as HTMLAnchorElement).textContent =
 		`נסה (${100 * parseFloat((document.getElementById("notification_volume") as HTMLInputElement).value)}%)`;
 });
-(document.getElementById("cs_cal") as HTMLInputElement).addEventListener("change", () => {
+(document.getElementById("cs_cal_enabled") as HTMLInputElement).addEventListener("change", () => {
 	const element = document.getElementById("cs_cal_div") as HTMLDivElement;
 	element.style.marginRight = "20px !important";
-	element.style.display = (document.getElementById("cs_cal") as HTMLInputElement).checked ? "block" : "none";
+	element.style.display = (document.getElementById("cs_cal_enabled") as HTMLInputElement).checked ? "block" : "none";
 });
 document.addEventListener("DOMContentLoaded", async () => {
 	const storageData = await chrome.storage.local.get({
-		username: "", server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""], gmail: true,
-		quick_login: true, allow_timings: false, panopto_save: true, external_u: false, hw_alerts: true,
-		moodle_cal: true, cs_cal: false, cs_pass: "", ww_cal_switch: false, ww_cal_update: 0, webwork_courses: {},
+		username: "", email_server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""], gmail: true,
+		quick_login: true, allow_timings: false, panopto_save: true, external_user: false, hw_alerts: true,
+		moodle_cal_enabled: true, cs_cal_enabled: false, cs_cal_pass: "",
+		webwork_cal_enabled: false, webwork_cal_courses: {},
 		notif_vol: 1, dark_mode: false, custom_name: "", custom_link: "",
 	});
 	if (chrome.runtime.lastError) {
@@ -107,11 +108,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 		const decryptedPassword = reverseString(xorStrings(storageData.term + storageData.phrase, storageData.maor_p)),
 			decryptedID = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
 		(document.getElementById("username") as HTMLInputElement).value = storageData.username;
-		(document.getElementById("campus") as HTMLOptionElement).selected = storageData.server;
-		(document.getElementById("technion") as HTMLOptionElement).selected = !storageData.server;
+		(document.getElementById("campus") as HTMLOptionElement).selected = storageData.email_server;
+		(document.getElementById("technion") as HTMLOptionElement).selected = !storageData.email_server;
 		(document.getElementById("password") as HTMLInputElement).value = decryptedPassword;
 		(document.getElementById("quick_login") as HTMLInputElement).checked = storageData.quick_login;
-		(document.getElementById("moodle_cal") as HTMLInputElement).checked = storageData.moodle_cal;
+		(document.getElementById("moodle_cal_enabled") as HTMLInputElement).checked = storageData.moodle_cal_enabled;
 		(document.getElementById("gmail_select") as HTMLInputElement).checked = storageData.gmail;
 		(document.getElementById("outlook_select") as HTMLInputElement).checked = !storageData.gmail;
 		(document.getElementById("allow_timings") as HTMLInputElement).checked = storageData.allow_timings;
@@ -119,12 +120,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 		(document.getElementById("notification_volume") as HTMLInputElement).value = storageData.notif_vol;
 		(document.getElementById("try_vol") as HTMLElement).textContent = `נסה (${100 * storageData.notif_vol}%)`;
 		(document.getElementById("idn") as HTMLInputElement).value = decryptedID;
-		(document.getElementById("cs_pass") as HTMLInputElement).value = storageData.cs_pass;
-		(document.getElementById("cs_cal") as HTMLInputElement).checked = storageData.cs_cal;
+		(document.getElementById("cs_cal_pass") as HTMLInputElement).value = storageData.cs_cal_pass;
+		(document.getElementById("cs_cal_enabled") as HTMLInputElement).checked = storageData.cs_cal_enabled;
 		(document.getElementById("cs_cal_div") as HTMLElement).style.marginRight = "20px !important";
-		(document.getElementById("cs_cal_div") as HTMLElement).style.display = storageData.cs_cal ? "block" : "none";
-		(document.getElementById("ww_cal_switch") as HTMLInputElement).checked = storageData.ww_cal_switch;
-		(document.getElementById("external_user") as HTMLInputElement).checked = storageData.external_u;
+		(document.getElementById("cs_cal_div") as HTMLElement).style.display = storageData.cs_cal_enabled ? "block" : "none";
+		(document.getElementById("webwork_cal_enabled") as HTMLInputElement).checked = storageData.webwork_cal_enabled;
+		(document.getElementById("external_user") as HTMLInputElement).checked = storageData.external_user;
 		(document.getElementById("allow_hw_alerts") as HTMLInputElement).checked = storageData.hw_alerts;
 		(document.getElementById("dark_mode") as HTMLInputElement).checked = storageData.dark_mode;
 		(document.getElementById("custom_name") as HTMLInputElement).value = storageData.custom_name;
@@ -133,11 +134,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 		const entirePage = document.querySelector("html") as HTMLHtmlElement;
 		storageData.dark_mode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
 
-		if (storageData.ww_cal_switch) {
+		if (storageData.webwork_cal_enabled) {
 			const webworkCoursesElement = document.getElementById("ww_current") as HTMLSpanElement,
 				webworkCourseNames = [];
 			webworkCoursesElement.style.display = "block";
-			for (let course of Object.values(storageData.webwork_courses))
+			for (let course of Object.values(storageData.webwork_cal_courses))
 				webworkCourseNames.push((course as { lti: string, name: string }).name);
 			if (0 < webworkCourseNames.length)
 				webworkCoursesElement.querySelector("span")!.textContent = webworkCourseNames.join(", ");

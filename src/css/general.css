@@ -39,6 +39,11 @@ header .mod_name img {
     margin: 0 0 0 0.5ch
 }
 
+.TP_name {
+    direction: ltr;
+    display: inline-block;
+}
+
 /* BODY */
 
 body {
@@ -68,6 +73,10 @@ footer {
     display: grid;
     width: 100%;
     padding: 16px calc(1.5vmax + 8px);
+}
+
+footer .TP_name {
+    font-weight: bold;
 }
 
 ul, ol {

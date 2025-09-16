@@ -19,7 +19,7 @@
     --button-default-hover-border: #6c757d;
 }
 
-.wrapper {
+body {
     padding: 0;
     margin: 0;
     z-index: 0;
@@ -29,7 +29,7 @@
     min-width: 1180px;
 }
 
-.section, #stats h3, .wrapper h2 {
+.section, #stats h3, body h2 {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: var(--border-radius-base);
 }
@@ -38,7 +38,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.wrapper h2 {
+body h2 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -61,12 +61,12 @@ table, #add_grade_form, #buttons {
     border-radius: var(--border-radius-base) var(--border-radius-base) 0 0;
 }
 
-.wrapper .grades thead th:first-of-type {
+body .grades thead th:first-of-type {
     border-radius: 0 var(--border-radius-base) var(--border-radius-base) 0 !important;
     width: 6ch;
 }
 
-.wrapper .grades thead th:last-of-type {
+body .grades thead th:last-of-type {
     border-radius: var(--border-radius-base) 0 0 var(--border-radius-base) !important;
 }
 
@@ -81,16 +81,16 @@ table td, table th, .grades td, .grades th {
     width: auto;
 }
 
-.wrapper tbody tr, .wrapper .grades tbody tr {
+body tbody tr, body .grades tbody tr {
     background-color: rgba(0, 0, 0, 0.02);
     border-bottom: 1px dotted var(--table-border-dotted);
 }
 
-.wrapper tbody tr:nth-of-type(even), .wrapper .grades tbody tr:nth-of-type(even) {
+body tbody tr:nth-of-type(even), body .grades tbody tr:nth-of-type(even) {
     background-color: transparent;
 }
 
-.wrapper tbody tr:last-of-type, .wrapper .grades tbody tr:last-of-type {
+body tbody tr:last-of-type, body .grades tbody tr:last-of-type {
     border-bottom: 0;
 }
 
@@ -103,7 +103,7 @@ table td, table th, .grades td, .grades th {
     font-size: 0;
 }
 
-.wrapper .grades tbody tr:hover {
+body .grades tbody tr:hover {
     background-color: var(--table-row-hover-bg);
 }
 
@@ -138,14 +138,14 @@ table td, table th, .grades td, .grades th {
     grid-column-gap: 20px;
 }
 
-.wrapper h2, .wrapper h3 {
+body h2, body h3 {
     border-radius: var(--border-radius-base);
     margin: 0;
     padding: 6px;
     text-align: center;
 }
 
-.wrapper h2 {
+body h2 {
     background-color: var(--prim-cool);
     color: white;
     margin-bottom: 10px;
@@ -153,7 +153,7 @@ table td, table th, .grades td, .grades th {
     font-weight: 500;
 }
 
-.wrapper h3 {
+body h3 {
     background-color: var(--sec-light);
     color: black;
     font-size: 16px;
@@ -164,7 +164,7 @@ table td, table th, .grades td, .grades th {
     margin: 0 10px;
 }
 
-.wrapper input {
+body input {
     font-size: 15px;
     font-family: 'Segoe UI', arial, sans-serif;
     margin: 5px 2px;
@@ -176,7 +176,7 @@ table td, table th, .grades td, .grades th {
     color: var(--main-text);
 }
 
-.wrapper input:focus, .wrapper select:focus {
+body input:focus, body select:focus {
     outline: none;
     border-color: var(--prim-cooler);
     box-shadow: 0 0 0 2px rgba(6, 62, 111, 0.3);
@@ -257,7 +257,7 @@ input[type=checkbox]:hover, input[type=checkbox]:focus, #add_grade_form input:no
     color: var(--status-danger);
 }
 
-.wrapper .failed, .wrapper form.failed * {
+body .failed, body form.failed * {
     color: var(--status-danger);
     border-color: var(--status-danger);
     transition: color 0.5s linear, border-color 0.5s linear;
@@ -265,7 +265,7 @@ input[type=checkbox]:hover, input[type=checkbox]:focus, #add_grade_form input:no
 
 footer {
     text-align: right;
-    font-weight: 600;
+    font-family: 'Segoe UI', arial, sans-serif;
     position: relative;
     border-radius: 0 !important;
     box-sizing: border-box;
@@ -279,6 +279,7 @@ a {
 }
 
 #disclaimer {
+    font-weight: 500;
     text-align: center;
 }
 
@@ -290,7 +291,7 @@ a {
     display: inline-block;
 }
 
-.wrapper tr.animate td {
+body tr.animate td {
     animation: rowinsert 1.2s linear 0s;
 }
 
@@ -453,11 +454,11 @@ select {
     background-image: url("../icons/arrowhead-down-white.svg");
 }
 
-[tplus=dm] .wrapper tbody tr, [tplus=dm] .wrapper .grades tbody tr {
+[tplus=dm] body tbody tr, [tplus=dm] body .grades tbody tr {
     background-color: rgba(255, 255, 255, 0.02);
 }
 
-[tplus=dm] .wrapper tbody tr:nth-of-type(2n), [tplus=dm] .wrapper .grades tbody tr:nth-of-type(2n) {
+[tplus=dm] body tbody tr:nth-of-type(2n), [tplus=dm] body .grades tbody tr:nth-of-type(2n) {
     background-color: transparent;
 }
 
@@ -469,7 +470,7 @@ select {
     box-shadow: 0 3px 8px rgba(255, 255, 255, 0.05), 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
-[tplus=dm] .wrapper h2 {
+[tplus=dm] body h2 {
     box-shadow: 0 3px 8px rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 

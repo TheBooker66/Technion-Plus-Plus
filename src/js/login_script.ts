@@ -45,7 +45,7 @@
 
 						urlParameters.delete("prompt");
 						urlParameters.delete("login_hint");
-						urlParameters.append("login_hint", `${storageData.username}@${storageData.server ? "campus." : ""}technion.ac.il`);
+						urlParameters.append("login_hint", `${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il`);
 						location.href = `${urlParts[0]}?${urlParameters.toString()}`;
 					}
 				}
@@ -74,7 +74,7 @@
 
 	function moodle(storageData: { [key: string]: string | boolean }) {
 		if (document.querySelectorAll(".navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
-		if (storageData.enable_external) window.location.href = "https://techwww.technion.ac.il/tech_ident/";
+		if (storageData.external_enable) window.location.href = "https://techwww.technion.ac.il/tech_ident/";
 		else window.location.href = "https://moodle24.technion.ac.il/auth/oidc/";
 	}
 
@@ -125,8 +125,8 @@
 	if (chrome.extension.inIncognitoContext) return;
 	if (window.location.protocol !== "https:") return;
 	const storageData = await chrome.storage.local.get({
-		username: "", server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
-		quick_login: true, enable_login: false, enable_external: false,
+		username: "", email_server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
+		quick_login: true, enable_login: false, external_enable: false,
 	});
 	if (chrome.runtime.lastError) {
 		console.error("TE_login: " + chrome.runtime.lastError.message);
@@ -135,7 +135,7 @@
 	if (!storageData.quick_login) return;
 
 	const website = window.location.hostname;
-	if (storageData.enable_login && !storageData.enable_external) {
+	if (storageData.enable_login && !storageData.external_enable) {
 		storageData.password = reverseString(xorStrings(storageData.term + storageData.phrase, storageData.maor_p));
 		if (/moodle[0-9]*.technion.ac.il/.test(website))
 			moodle(storageData);
@@ -152,7 +152,7 @@
 		} else if (website === "grades.technion.ac.il") {
 			grades(storageData);
 		}
-	} else if (storageData.enable_external) {
+	} else if (storageData.external_enable) {
 		storageData.username_ext = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
 		if (/moodle[0-9]+.technion.ac.il/.test(website)) moodle(storageData);
 		else if (website === "techwww.technion.ac.il") techwww(storageData);

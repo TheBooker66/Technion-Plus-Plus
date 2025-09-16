@@ -8,11 +8,11 @@ import {reverseString, xorStrings} from './utils.js';
 
 	await calendar.progress(() => new Promise(async (resolve, reject) => {
 		const storageData = await chrome.storage.local.get({
-			cs_cal_finished: {},
-			cs_cal_seen: {},
-			uidn_arr: ["", ""],
-			cs_pass: "",
 			cal_seen: 0,
+			cs_cal_finished: [],
+			cs_cal_seen: {},
+			cs_cal_pass: "",
+			uidn_arr: ["", ""],
 		});
 		if (chrome.runtime.lastError) {
 			console.error("TE_cs_cal: " + chrome.runtime.lastError.message);
@@ -24,7 +24,7 @@ import {reverseString, xorStrings} from './utils.js';
 		}
 
 		const calendarPass = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
-		if (calendarPass.length === 0 || storageData.cs_pass === "") {
+		if (calendarPass.length === 0 || storageData.cs_cal_pass === "") {
 			reject({
 				msg: "לא הגדרת מספר זהות/סיסמת יומן; יש למלא פרטים אלו בהגדרות התוסף.",
 				is_error: true,
@@ -32,7 +32,7 @@ import {reverseString, xorStrings} from './utils.js';
 			return;
 		}
 
-		const calendarUrl = `https://grades.cs.technion.ac.il/cal/${calendarPass}/${encodeURIComponent(storageData.cs_pass)}`;
+		const calendarUrl = `https://grades.cs.technion.ac.il/cal/${calendarPass}/${encodeURIComponent(storageData.cs_cal_pass)}`;
 		try {
 			const responseData: { response: string, responseURL: string } = await popup.XHR(calendarUrl, "text");
 			const eventSections = responseData.response.split("BEGIN:VEVENT");
@@ -50,7 +50,7 @@ import {reverseString, xorStrings} from './utils.js';
 					description: /DESCRIPTION;LANGUAGE=en-US:([^,]+)/,
 					url: /URL:(.+)/,
 				};
-			let finishedItems: { [key: string]: string | boolean } = {}, seenItems: { [key: string]: string } = {},
+			let finishedItems: string[] = [], seenItems: { [key: string]: string } = {},
 				toDoList: HWAssignment[] = [], finishedList: HWAssignment[] = [], courseName = "";
 			for (let i = 1; i < eventSections.length; i++) {
 				const summary = eventSections[i].match(regexPatterns.summary)![1];
@@ -80,12 +80,10 @@ import {reverseString, xorStrings} from './utils.js';
 					}
 					continue;
 				}
+				const formattedDate = "יום " + DAYS[dueDate.getDay()] + ", " + timeMatch.D + "." + timeMatch.M + "." + timeMatch.Y;
 
-				const formattedDate = "יום " + DAYS[dueDate.getDay()] + ", " + timeMatch.D + "." + timeMatch.M + "." + timeMatch.Y,
-					description = (eventSections[i].match(regexPatterns.description) as RegExpMatchArray)[1],
-					eventURL = (eventSections[i].match(regexPatterns.url) as RegExpMatchArray)[1],
-					finishedEh = storageData.cs_cal_finished.hasOwnProperty(eventUID);
-				finishedItems[eventUID] = !finishedEh;
+				const description = (eventSections[i].match(regexPatterns.description) as RegExpMatchArray)[1],
+					eventURL = (eventSections[i].match(regexPatterns.url) as RegExpMatchArray)[1];
 
 				courseName = summary.split("(")[1].split(")")[0];
 				seenItems.hasOwnProperty(courseName) || (seenItems[courseName] = "");
@@ -93,6 +91,10 @@ import {reverseString, xorStrings} from './utils.js';
 
 				const newEventEh = !(storageData.cs_cal_seen.hasOwnProperty(courseName) &&
 					storageData.cs_cal_seen[courseName].includes("[[" + trimmedSummary + "]]"));
+
+				const finishedEh = (storageData.cs_cal_finished as Array<string>).includes(eventUID);
+				if (finishedEh) finishedItems.push(eventUID);
+
 				const Assignment: HWAssignment = {
 					name: trimmedSummary,
 					description: description,
@@ -108,9 +110,9 @@ import {reverseString, xorStrings} from './utils.js';
 				finishedEh ? finishedList.push(Assignment) : toDoList.push(Assignment);
 			}
 			await chrome.storage.local.set({
+				cal_seen: await calendar.removeCalendarAlert(storageData.cal_seen),
 				cs_cal_finished: finishedItems,
 				cs_cal_seen: seenItems,
-				cal_seen: await calendar.removeCalendarAlert(storageData.cal_seen),
 				cs_cal_update: currentTime,
 			});
 			toDoList.sort((a, b) => a.timestamp - b.timestamp);

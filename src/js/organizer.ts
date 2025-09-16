@@ -24,7 +24,7 @@ function openAssignment(assignment: HTMLDivElement, gotoFunction: () => Promise<
 		button.textContent = originalText;
 	};
 	gotoFunction().then(resetButton).catch(_ => {
-		assignment.style.background = "rgb(215, 0, 34, 0.8)" + "!important";
+		assignment.style.background = "var(--status-danger) !important;";
 		setTimeout(() => assignment.style.background = "", 1E3);
 		resetButton();
 	});
@@ -124,11 +124,8 @@ function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivEl
 	textareaElement.style.height = textareaHeight + "px";
 	if (0 < assignmentData.timestamp) {
 		inputElement.parentElement!.style.visibility = "visible";
-		inputElement.textContent = (new Date(assignmentData.timestamp)).toLocaleString("iw-IL", {
-			weekday: "long",
-			day: "2-digit",
-			month: "2-digit",
-			year: "numeric",
+		inputElement.textContent = (new Date(assignmentData.timestamp)).toLocaleString("he-IL", {
+			weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
 		});
 	} else inputElement.parentElement!.style.visibility = "hidden";
 	if (assignmentData.timestamp === -1) container.classList.add("system_message");
@@ -151,18 +148,14 @@ export async function addAssignmentsToList(
 	if (Object.keys(assignmentPromises).length !== CALENDARS) return;
 
 	const storageData = await chrome.storage.local.get({
-		moodle_cal: true,
-		cs_cal: false,
-		ww_cal_switch: false,
-		quick_login: true,
-		enable_login: true,
-		user_agenda: {},
+		quick_login: true, enable_login: true, user_agenda: {},
+		moodle_cal_enabled: true, cs_cal_enabled: false, webwork_cal_enabled: false,
 	});
 	const userAgendaData: { [key: string]: HWAssignment } = storageData.user_agenda,
 		enabledCalendars = {
-			"moodle": storageData.quick_login && storageData.enable_login && storageData.moodle_cal,
-			"cs": storageData.cs_cal,
-			"webwork": storageData.quick_login && storageData.enable_login && storageData.ww_cal_switch,
+			"moodle": storageData.quick_login && storageData.enable_login && storageData.moodle_cal_enabled,
+			"cs": storageData.cs_cal_enabled,
+			"webwork": storageData.quick_login && storageData.enable_login && storageData.webwork_cal_enabled,
 		};
 	let newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [], promisesList = [];
 	Object.keys(userAgendaData).forEach(agendaID => {

@@ -15,11 +15,10 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 	}
 
 	new CommonPopup("", ["main"], document.title);
-	chrome.action.getBadgeBackgroundColor({}, (badgeColours) => {
-		if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34)
-			(document.getElementById("bus_error") as HTMLDivElement).style.display = "block";
-	});
-	resetBadge();
+	const badgeColours = await chrome.action.getBadgeBackgroundColor({});
+	if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34) // Error colours
+		(document.getElementById("bus_error") as HTMLDivElement).style.display = "block";
+	await resetBadge();
 
 	const mainScreen = document.getElementById("tools_and_links") as HTMLDivElement,
 		printScreen = document.getElementById("print") as HTMLDivElement,
@@ -85,20 +84,20 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 
 	const storageData = await chrome.storage.local.get({
 		enable_login: false, quick_login: true, alerts_sound: true, gmail: true,
-		moodle_cal: true, remoodle: false, remoodle_angle: 120, cal_seen: 0,
-		cs_cal: false, uidn_arr: ["", ""], ww_cal_switch: false,
-		dl_current: 0, username: "", server: true, custom_name: "", custom_link: "",
+		moodle_cal_enabled: true, remoodle: false, remoodle_angle: 120, cal_seen: 0,
+		cs_cal_enabled: false, uidn_arr: ["", ""], webwork_cal_enabled: false,
+		dl_current: 0, username: "", email_server: true, custom_name: "", custom_link: "",
 	});
 	quick_login_toggle.checked = storageData.quick_login;
 	mute_alerts_toggle.checked = storageData.alerts_sound;
 	(document.getElementById("cant_login") as HTMLDivElement).style.display =
 		storageData.enable_login ? "none" : "block";
 	(document.getElementById("cal_moodle") as HTMLAnchorElement).style.display =
-		storageData.enable_login && storageData.moodle_cal && storageData.quick_login ? "block" : "none";
+		storageData.enable_login && storageData.moodle_cal_enabled && storageData.quick_login ? "block" : "none";
 	(document.getElementById("cal_cs") as HTMLAnchorElement).style.display =
-		storageData.cs_cal ? "block" : "none";
+		storageData.cs_cal_enabled ? "block" : "none";
 	(document.getElementById("cal_webwork") as HTMLAnchorElement).style.display =
-		storageData.enable_login && storageData.quick_login && storageData.ww_cal_switch ? "block" : "none";
+		storageData.enable_login && storageData.quick_login && storageData.webwork_cal_enabled ? "block" : "none";
 
 	const calendarIDs = ["cal_moodle", "cal_cs", "cal_webwork"];
 	for (let i = 0; i < calendarIDs.length; i++) {
@@ -145,7 +144,7 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		let urlParts = authURL.split("?");
 		const urlParams = new URLSearchParams(urlParts[1]);
 		urlParams.delete("prompt");
-		urlParams.append("login_hint", storageData.username + "@" + (storageData.server ? "campus." : "") + "technion.ac.il");
+		urlParams.append("login_hint", storageData.username + "@" + (storageData.email_server ? "campus." : "") + "technion.ac.il");
 		await chrome.tabs.create({url: (urlParts[0] + "?" + urlParams.toString()) || authURL});
 		clearInterval(loadingInterval);
 		studentsLink.textContent = "Students";

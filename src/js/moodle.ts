@@ -93,7 +93,7 @@
 				userCourses[courseMatch.groups.cnum.trim()] = courseMatch.groups.cname.trim();
 			}
 			if (Object.keys(userCourses).length > 0) {
-				await chrome.storage.local.set({u_courses: userCourses});
+				await chrome.storage.local.set({moodle_cal_courses: userCourses});
 				if (chrome.runtime.lastError) console.error("TE_moodle_001_: " + chrome.runtime.lastError);
 			}
 

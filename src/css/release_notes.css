@@ -8,17 +8,7 @@ body {
     color: #0c0c0c;
 }
 
-.tpclass {
-    direction: ltr;
-    display: inline-block;
-}
-
-.wrapper {
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-#header {
+header {
     font-size: 24px;
     color: #fff;
     height: 48px;
@@ -30,20 +20,23 @@ body {
     border-bottom: 1px solid #000;
 }
 
+#header_content, main {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.TP_name {
+    direction: ltr;
+    display: inline-block;
+}
+
 #logo {
     line-height: 34px;
     float: left;
 }
 
-#header img {
+#logo img {
     vertical-align: middle;
-}
-
-hr {
-    border: 0;
-    border-bottom: 1px solid rgb(0, 0, 0, 0.2);
-    margin: 30px auto;
-    width: 80%;
 }
 
 a {
@@ -53,9 +46,10 @@ a {
 
 a:hover {
     color: var(--prim-dark);
+    cursor: pointer;
 }
 
-.divTable {
+section {
     display: table;
     background: #fff;
     padding: 20px;
@@ -65,11 +59,7 @@ a:hover {
     border: 1px solid rgb(0, 0, 0, 0.15);
 }
 
-.tableRow {
-    display: table-row;
-}
-
-.section {
+.section_name {
     display: table-cell;
     width: 180px;
     text-align: center;
@@ -78,25 +68,25 @@ a:hover {
     padding: 0;
 }
 
-.section img {
+.section_name img {
     width: 24px;
     height: 24px;
     vertical-align: middle;
 }
 
-.section span {
+.section_name span {
     vertical-align: middle;
     display: inline-block;
 }
 
-.info {
+.section_info {
     display: table-cell;
     font-size: 13px;
     vertical-align: top;
     padding: 0 10px 0 0;
 }
 
-.info ul {
+.section_info ul {
     margin-top: 10px;
     margin-bottom: 25px;
     list-style-type: circle;

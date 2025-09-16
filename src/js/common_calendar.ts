@@ -36,7 +36,7 @@ export class CommonCalendar {
 		// noinspection JSBitwiseOperatorUsage
 		else currentAlertFlag &= ~this.flags[this.system];
 
-		if (!currentAlertFlag) resetBadge();
+		if (!currentAlertFlag) await resetBadge();
 		return currentAlertFlag;
 	}
 
@@ -107,21 +107,31 @@ export async function toggle(sys: HWSystem, event: number, item: HTMLDivElement,
 			await chrome.storage.local.set({user_agenda: storageData.user_agenda});
 		}
 	} else {
-		let calendar = {
-			moodle: "cal_finished",
+		let calendar_name = {
+			moodle: "moodle_cal_finished",
 			cs: "cs_cal_finished",
-			webwork: "webwork_cal",
+			webwork: "webwork_cal_events",
 		}[sys];
-		const storageData = await chrome.storage.local.get(calendar);
+		const storageData = await chrome.storage.local.get(calendar_name);
 		if (chrome.runtime.lastError)
 			console.error("TE_cal7: " + chrome.runtime.lastError.message);
 		else {
-			if (storageData[calendar].hasOwnProperty(event.toString())) delete storageData[calendar][event.toString()];
-			else storageData[calendar][event.toString()] = 0;
-			await chrome.storage.local.set({[calendar]: storageData[calendar]});
+			let calendar;
+			if (sys === "webwork") {
+				calendar = storageData[calendar_name] as { [key: string]: { done: boolean } };
+				calendar[event.toString()].done = !calendar[event.toString()].done;
+			}
+			else {
+				calendar = storageData[calendar_name] as Array<string>;
+				if (calendar.includes(event.toString()))
+					calendar.splice(storageData[calendar_name].indexOf(event.toString()), 1);
+				else calendar.push(event.toString());
+			}
+			await chrome.storage.local.set({[calendar_name]: calendar});
 		}
 	}
-	[document.getElementById("new_assignments"), document.getElementById("finished_assignments")][VorX]?.appendChild(item);
+	const assignmentLists = [document.getElementById("new_assignments"), document.getElementById("finished_assignments")];
+	assignmentLists[VorX]?.appendChild(item);
 	checkForEmpty();
 }
 
@@ -130,8 +140,8 @@ function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => Prom
 	spinner.style.display = "none";
 	spinner.parentElement?.classList.add("small_spinner");
 	openFunction().catch(() => {
-		assignmentItem.style.borderRadius = "3px";
-		assignmentItem.style.backgroundColor = "rgb(215, 0, 34, 0.8)" + "!important";
+		assignmentItem.style.borderRadius = "3px;";
+		assignmentItem.style.backgroundColor = "var(--status-danger) !important;";
 		setTimeout(() => assignmentItem.style.backgroundColor = "", 1E3);
 	}).finally(() => {
 		spinner.style.display = "block";

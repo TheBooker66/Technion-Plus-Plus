@@ -22,7 +22,7 @@
 }
 
 .drow.blat {
-    background-color: rgb(215, 0, 34, 0.8) !important;
+    background-color: var(--status-danger) !important;
     transition: all .25s linear;
 }
 

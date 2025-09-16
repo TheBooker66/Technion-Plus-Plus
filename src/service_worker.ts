@@ -1,4 +1,3 @@
-/// <reference types="user-agent-data-types" />
 import {reverseString, xorStrings} from "./js/utils.js";
 
 const courseRegex = /(?<cname>.+)\s-\s(?<cnum>\d{6,8})/, semesterRegex = / - (?:קיץ|חורף|אביב)/;
@@ -137,7 +136,7 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 		}
 
 		const loginDetails = await chrome.storage.local.get({
-			username: "", server: true, enable_login: false,
+			username: "", email_server: true, enable_login: false,
 		});
 		if (!loginDetails.enable_login) {
 			console.error("No username/password");
@@ -147,7 +146,7 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 		const urlParts = initialResponse.responseURL.split("?");
 		const params = new URLSearchParams(urlParts[1]);
 		params.delete("prompt");
-		params.append("login_hint", `${loginDetails.username}@${loginDetails.server ? "campus." : ""}technion.ac.il`);
+		params.append("login_hint", `${loginDetails.username}@${loginDetails.email_server ? "campus." : ""}technion.ac.il`);
 		const URL = `${urlParts[0]}?${params.toString()}`;
 		const tab = await chrome.tabs.create({url: URL, active: false});
 		const tabId = tab.id as number;
@@ -212,8 +211,8 @@ async function TE_AutoLoginExternal() {
 }
 
 export async function TE_AutoLogin(headRequestEh: boolean = false) {
-	const storageData = await chrome.storage.local.get({enable_external: false});
-	if (storageData.enable_external) return await TE_AutoLoginExternal();
+	const storageData = await chrome.storage.local.get({external_enable: false});
+	if (storageData.external_enable) return await TE_AutoLoginExternal();
 	else return await TE_AutoLoginNormal(headRequestEh);
 }
 
@@ -251,25 +250,23 @@ async function TE_notification(message: string, silentEh: boolean, notificationI
 	}
 }
 
-function TE_reBadge(errorEh: boolean) {
-	chrome.action.getBadgeBackgroundColor({}, (badgeColours) => {
-		chrome.action.getBadgeText({}, async (badgeText) => {
-			if (!(badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34 && badgeText === "!")) {
-				await chrome.action.setBadgeBackgroundColor({color: errorEh ? [215, 0, 34, 185] : [164, 127, 0, 185]});
-				await chrome.action.setBadgeText({text: "!"});
-			}
-		});
-	});
+async function TE_setBadge(errorEh: boolean) {
+	const badgeColours = await chrome.action.getBadgeBackgroundColor({});
+	const badgeText = await chrome.action.getBadgeText({});
+	if (!(badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34 && badgeText === "!")) { // Error colours
+		await chrome.action.setBadgeBackgroundColor({color: errorEh ? [215, 0, 34, 185] : [164, 127, 0, 185]});
+		await chrome.action.setBadgeText({text: "!"});
+	}
 }
 
 async function TE_alertNewHW(sourceIndex: number) {
 	const sourceInfo = [
 		{name: "מודל", flag: 1},
 		{name: 'מדמ"ח', flag: 2},
-		{name: "בוובוורק", flag: 8},
+		{name: "וובוורק", flag: 4},
 	][sourceIndex];
 
-	TE_reBadge(false);
+	await TE_setBadge(false);
 
 	const storageData = await chrome.storage.local.get({cal_seen: 0, hw_alerts: true});
 	if (chrome.runtime.lastError) {
@@ -296,7 +293,7 @@ async function TE_getCoursesMoodle(moodleData: { response: any }) {
 	}
 
 	if (Object.keys(courses).length > 0) {
-		await TE_setStorage({u_courses: courses}, "chk_get_cname");
+		await TE_setStorage({moodle_cal_courses: courses}, "chk_get_cname");
 	}
 }
 
@@ -311,7 +308,7 @@ async function TE_checkCalendarProp(calendarProp: string) {
 		const exportResponse = await XHR(mainPageResponse.responseURL, "document", ["CalendarURL"], postBody);
 		const calendarUrl = exportResponse.response["CalendarURL"];
 		const userProp = "userid=" + calendarUrl.split("userid=")[1].split("&preset_what=all")[0];
-		await TE_setStorage({calendar_prop: userProp}, "cal2");
+		await TE_setStorage({moodle_cal_prop: userProp}, "cal2");
 	} catch (err) {
 		console.error("TE_back_prop_err: " + err);
 	}
@@ -322,7 +319,7 @@ async function TE_alertMoodleCalendar(seenStatus: number, calendarProp: string, 
 	"appeals": boolean, "zooms": boolean, "attendance": boolean, "reserveDuty": boolean
 }) {
 	if (seenStatus & 1) { // Moodle has been checked
-		TE_reBadge(false);
+		await TE_setBadge(false);
 		return;
 	}
 	if (calendarProp === "0") return;
@@ -446,7 +443,7 @@ async function TE_webworkStep(url: string | FormData, body = "") {
 }
 
 async function TE_webworkScan() {
-	const storageData = await chrome.storage.local.get({webwork_courses: {}, webwork_cal: {}});
+	const storageData = await chrome.storage.local.get({webwork_cal_courses: {}, webwork_cal_events: {}});
 	const newWebworkCal = {}, ignoreRegex = /^ייפתח|^סגור|^Answers available for review./,
 		dateRegex = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4}) @ (?<hour>\d{2}):(?<minute>\d{2})/;
 	let foundNewAssignment = false;
@@ -456,7 +453,7 @@ async function TE_webworkScan() {
 		name: string,
 	}
 
-	for (const courseData of Object.values(storageData.webwork_courses)) {
+	for (const courseData of Object.values(storageData.webwork_cal_courses)) {
 		let step1 = await TE_webworkStep(`https://moodle24.technion.ac.il/mod/lti/launch.php?id=${(courseData as WebworkCourse).lti}`);
 		if (!step1) continue;
 
@@ -473,15 +470,16 @@ async function TE_webworkScan() {
 		const assignments: { [key: string]: { h: string, due: string, ts: number, seen: boolean, done: boolean } } = {},
 			missions: { name: string, due: string }[] = page.response["WebworkMissions"];
 
-		for (const mission of missions) {
+		for (let i = 0; i < missions.length; i++) {
+			const mission = missions[i];
 			if (ignoreRegex.test(mission.due)) continue;
 			const hwName = mission.name;
-			const assignmentId = `${(courseData as WebworkCourse).lti}_${hwName}`;
+			const assignmentId = (courseData as WebworkCourse).lti.toString() + "000" + i.toString();
 
 			let seen = false, done = false;
-			if (storageData.webwork_cal[assignmentId]) {
-				seen = storageData.webwork_cal[assignmentId].seen;
-				done = storageData.webwork_cal[assignmentId].done;
+			if (storageData.webwork_cal_events[assignmentId]) {
+				seen = storageData.webwork_cal_events[assignmentId].seen;
+				done = storageData.webwork_cal_events[assignmentId].done;
 			} else {
 				foundNewAssignment = true;
 			}
@@ -503,7 +501,7 @@ async function TE_webworkScan() {
 		Object.assign(newWebworkCal, assignments);
 	}
 
-	await TE_setStorage({webwork_cal: newWebworkCal, ww_cal_update: Date.now()}, "wwcfail_1");
+	await TE_setStorage({webwork_cal_events: newWebworkCal, webwork_cal_update: Date.now()}, "wwcfail_1");
 	if (foundNewAssignment) await TE_alertNewHW(2);
 }
 
@@ -543,7 +541,7 @@ async function TE_getWebwork(moodleData: { response: any, responseURL: string },
 		}
 	}
 
-	await TE_setStorage({webwork_courses: newWebworkCourses}, "webworkCourses");
+	await TE_setStorage({webwork_cal_courses: newWebworkCourses}, "webworkCourses");
 	await TE_webworkScan();
 }
 
@@ -631,10 +629,12 @@ export async function TE_updateVideosInfo(timestamp: number, callbacks: any = nu
 
 export async function TE_updateInfo() {
 	const storageData = await chrome.storage.local.get({
-		uidn_arr: ["", ""], quick_login: true, enable_login: false, enable_external: false, calendar_prop: "",
-		calendar_max: 0, moodle_cal: true, cal_seen: 0, cs_cal: false, cs_cal_seen: {}, cs_cal_update: 0, cs_pass: "",
-		ww_cal_switch: false, ww_cal_update: 0, webwork_courses: {}, user_agenda: {}, videos_update: 0,
+		uidn_arr: ["", ""], quick_login: true, enable_login: false, external_enable: false,
+		cal_seen: 0, moodle_cal_enabled: true, moodle_cal_prop: "", moodle_cal_max: 0,
 		filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
+		cs_cal_enabled: false, cs_cal_update: 0, cs_cal_pass: "", cs_cal_seen: {},
+		webwork_cal_enabled: false, webwork_cal_update: 0, webwork_cal_courses: {},
+		user_agenda: {}, videos_update: 0,
 	});
 	if (chrome.runtime.lastError) {
 		console.error("TE_bg_Alarm: " + chrome.runtime.lastError.message);
@@ -644,28 +644,28 @@ export async function TE_updateInfo() {
 	const THIRTY_DAYS = 2592E5, EIGHT_HOURS = 288E5, TWO_DAYS = 1728E5, now = Date.now();
 	if (storageData.videos_update < now - THIRTY_DAYS) await TE_updateVideosInfo(now);
 
-	const loginEnabledEh: boolean = (storageData.enable_external || storageData.enable_login) && storageData.quick_login,
-		moodleCheckDueEh: boolean = loginEnabledEh && storageData.moodle_cal,
-		webworkCheckDueEh: boolean = loginEnabledEh && storageData.ww_cal_switch && (now - storageData.ww_cal_update > EIGHT_HOURS);
+	const loginEnabledEh: boolean = (storageData.external_enable || storageData.enable_login) && storageData.quick_login,
+		moodleCheckDueEh: boolean = loginEnabledEh && storageData.moodle_cal_enabled,
+		webworkCheckDueEh: boolean = loginEnabledEh && storageData.webwork_cal_enabled && (now - storageData.webwork_cal_update > EIGHT_HOURS);
 
 	if (moodleCheckDueEh || webworkCheckDueEh) {
 		try {
 			const moodleData = await TE_AutoLogin();
 			if (moodleCheckDueEh) {
 				await TE_getCoursesMoodle(moodleData);
-				await TE_checkCalendarProp(storageData.calendar_prop);
-				await TE_alertMoodleCalendar(storageData.cal_seen, storageData.calendar_prop, storageData.calendar_max, storageData.filter_toggles);
+				await TE_checkCalendarProp(storageData.moodle_cal_prop);
+				await TE_alertMoodleCalendar(storageData.cal_seen, storageData.moodle_cal_prop, storageData.moodle_cal_max, storageData.filter_toggles);
 			}
 			if (webworkCheckDueEh) {
-				await TE_getWebwork(moodleData, storageData.webwork_courses);
+				await TE_getWebwork(moodleData, storageData.webwork_cal_courses);
 			}
 		} catch (err) {
 			console.error("TE_back: forced_login_err -- " + err);
 		}
 	}
 
-	if (storageData.cs_cal && now - storageData.cs_cal_update > 1)
-		await TE_csCalendarCheck(storageData.uidn_arr, storageData.cs_pass, storageData.cs_cal_seen);
+	if (storageData.cs_cal_enabled && now - storageData.cs_cal_update > 1)
+		await TE_csCalendarCheck(storageData.uidn_arr, storageData.cs_cal_pass, storageData.cs_cal_seen);
 
 	const userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
 	let hasChanged = false;
@@ -680,29 +680,29 @@ export async function TE_updateInfo() {
 }
 
 export async function TE_toggleBusAlert(busLine: string) {
-	const storageData = await chrome.storage.local.get({buses_alerts: []});
+	const storageData = await chrome.storage.local.get({bus_alerts: []});
 	if (chrome.runtime.lastError) {
 		console.error("TE_back_bus_err: " + chrome.runtime.lastError.message);
 		return;
 	}
-	if (storageData.buses_alerts.length === 0)
+	if (storageData.bus_alerts.length === 0)
 		await chrome.alarms.create("TE_buses_start", {
 			delayInMinutes: 1, periodInMinutes: 1,
 		});
 
-	const alertIndex = storageData.buses_alerts.indexOf(busLine);
+	const alertIndex = storageData.bus_alerts.indexOf(busLine);
 	if (alertIndex !== -1) {
-		storageData.buses_alerts.splice(alertIndex, 1);
-		if (storageData.buses_alerts.length === 0) await TE_shutBusesAlerts();
-	} else storageData.buses_alerts.push(busLine);
+		storageData.bus_alerts.splice(alertIndex, 1);
+		if (storageData.bus_alerts.length === 0) await TE_shutBusesAlerts();
+	} else storageData.bus_alerts.push(busLine);
 
-	await TE_setStorage({buses_alerts: storageData.buses_alerts}, "toggleBus");
+	await TE_setStorage({bus_alerts: storageData.bus_alerts}, "toggleBus");
 	await TE_checkBuses();
 }
 
 export async function TE_shutBusesAlerts() {
 	console.log("TE_shutBusesAlerts");
-	await TE_setStorage({buses_alerts: []}, "shutBuses");
+	await TE_setStorage({bus_alerts: []}, "shutBuses");
 	await chrome.alarms.clear("TE_buses_start");
 }
 
@@ -718,22 +718,22 @@ async function TE_busAlertNow(arrivingBuses: BusLine[]) {
 	}
 	await TE_notification(messageBody, false);
 
-	const storageData = await chrome.storage.local.get({buses_alerts: []});
+	const storageData = await chrome.storage.local.get({bus_alerts: []});
 	const alertedLines = arrivingBuses.map(bus => bus["Shilut"]);
-	storageData.buses_alerts = storageData.buses_alerts.filter((line: string) => !alertedLines.includes(line));
-	await TE_setStorage({buses_alerts: storageData.buses_alerts}, "removeAlertedBuses");
+	storageData.bus_alerts = storageData.bus_alerts.filter((line: string) => !alertedLines.includes(line));
+	await TE_setStorage({bus_alerts: storageData.bus_alerts}, "removeAlertedBuses");
 
-	if (storageData.buses_alerts.length === 0) await TE_shutBusesAlerts();
+	if (storageData.bus_alerts.length === 0) await TE_shutBusesAlerts();
 }
 
 async function TE_checkBuses() {
 	console.log("TE_checkBuses");
-	const storageData = await chrome.storage.local.get({bus_station: 41205, bus_time: 10, buses_alerts: []});
+	const storageData = await chrome.storage.local.get({bus_station: 41205, bus_time: 10, bus_alerts: []});
 	if (chrome.runtime.lastError) {
 		console.error("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message);
 		return;
 	}
-	if (storageData.buses_alerts.length === 0) return;
+	if (storageData.bus_alerts.length === 0) return;
 
 	try {
 		const busData = await XHR(`https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/${storageData.bus_station}/he/false`, "json");
@@ -743,7 +743,7 @@ async function TE_checkBuses() {
 			return;
 		}
 
-		const busesToAlert = realtimeData.filter(bus => storageData.buses_alerts.includes(bus["Shilut"]) && bus["MinutesToArrival"] <= storageData.bus_time);
+		const busesToAlert = realtimeData.filter(bus => storageData.bus_alerts.includes(bus["Shilut"]) && bus["MinutesToArrival"] <= storageData.bus_time);
 
 		if (busesToAlert.length > 0) await TE_busAlertNow(busesToAlert);
 	} catch (err) {
@@ -777,7 +777,7 @@ async function TE_setupOffscreenDocument() {
 
 async function TE_startExtension() {
 	await chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
-	await TE_setStorage({buses_alerts: [], dl_queue: [], dl_current: 0});
+	await TE_setStorage({bus_alerts: [], dl_queue: [], dl_current: 0});
 }
 
 chrome.runtime.onMessage.addListener(async (message) => {

@@ -2,29 +2,27 @@
 <html dir="rtl" lang="he">
 <head>
     <meta charset="utf-8">
-    <title>Technion++ - הגדרות</title>
+    <title>הגדרות</title>
     <link rel="stylesheet" href="css/general.css" type="text/css">
     <link rel="stylesheet" href="./css/options.css" type="text/css">
 </head>
 <body>
 <header>
     <div class="mod_name">
-        <div>
-            <img src="./icons/preferences.svg" alt="גלגל שיניים"/>
-            הגדרות
-        </div>
+        <img src="./icons/preferences.svg" alt="גלגל שיניים"/> הגדרות
     </div>
-    <div>
-        <img src="./icons/technion_plus_plus/logo.svg" alt="טכניון++"/> Technion<sup>++</sup>
-    </div>
+    <span>
+        <span class="TP_name">Technion<sup>++</sup></span>
+        <img src="./icons/technion_plus_plus/logo.svg" alt="טכניון++"/>
+    </span>
 </header>
 <main>
-    <h2>פרטי כניסה</h2>
     <section>
+        <h2>פרטי כניסה</h2>
         <div>
-            <label for="username">שם משתמש </label><label for="server">וסיומת אימייל </label>טכניוניים<br/>
+            <label for="username">שם משתמש </label><label for="email_server">וסיומת אימייל </label>טכניוניים<br/>
             <span dir="ltr"><input type="text" id="username" placeholder="הכנס שם משתמש" maxlength="35"/> @
-		    <select id="server">
+		    <select id="email_server">
 			    <option id="campus">campus.technion.ac.il</option>
 			    <option id="technion">technion.ac.il</option>
 		    </select>
@@ -45,8 +43,8 @@
         </div>
     </section>
 
-    <h2>הגדרות כלליות</h2>
     <section>
+        <h2>הגדרות כלליות</h2>
         <div><label><input type="checkbox" id="quick_login"/> הפעל התחברות אוטומטית בכניסה לאתרי הטכניון</label></div>
         <div>
             <label><input type="checkbox" id="dark_mode"/>הפעל מצב חשוך ברחבי התוסף</label>
@@ -60,7 +58,7 @@
         <div>
             <label>
                 קישור מותאם אישית <small>(מוצג בראש ה־popup של התוסף)</small><br/>
-                <input type="text" id="custom_name" placeholder="הכנס שם אתר" maxlength="22"/>
+                <input type="text" id="custom_name" style="direction: rtl" placeholder="הכנס שם אתר" maxlength="22"/>
                 <input type="url" id="custom_link" placeholder="הכנס כתובת אתר"/>
             </label><br/>
             <span class="description">
@@ -93,18 +91,19 @@
         </div>
     </section>
 
-    <h2>מטלות בית</h2>
     <section>
+        <h2>מטלות בית</h2>
         <div>
             <label><input type="checkbox" id="allow_hw_alerts"/> הפעל התראות עבור מטלות בית חדשות</label>
             <span class="big-description">יופעלו התראות כאשר התוסף יזהה מטלות חדשות עבור המערכות עבורן תבחר להציג מטלות קרובות.</span>
         </div>
         <div>
-            <label><input type="checkbox" id="moodle_cal"/> הצג מטלות קרובות מהמודל</label>
+            <label><input type="checkbox" id="moodle_cal_enabled"/> הצג מטלות קרובות מהמודל</label>
             <span class="big-description">חובה להפעיל התחברות אוטומטית.</span>
         </div>
         <div>
-            <label><input type="checkbox" id="cs_cal"/> הצג מטלות קרובות של הפקולטה למדמ"ח (GR++/Webcourse)</label>
+            <label><input type="checkbox" id="cs_cal_enabled"/> הצג מטלות קרובות של הפקולטה למדמ"ח
+                (GR++/Webcourse)</label>
             <span class="big-description">חובה להגדיר מספר זהות וסיסמת יומן <span dir="ltr">GR++</span>
                 לשם שימוש בתכונה זו. הפעלת התחברות אוטומטית אינה חובה עבור אפשרות זאת.</span>
         </div>
@@ -123,8 +122,8 @@
                 </ol>
             </div>
             <div>
-                <label for="cs_pass"><b>סיסמת יומן <span dir="ltr">GR++</span></b></label><br/>
-                <input type="text" placeholder="הכנס סיסמת יומן כאן" maxlength="8" id="cs_pass"/>
+                <label for="cs_cal_pass"><b>סיסמת יומן <span dir="ltr">GR++</span></b></label><br/>
+                <input type="text" placeholder="הכנס סיסמת יומן כאן" maxlength="8" id="cs_cal_pass"/>
             </div>
             <div>
                 <small><b><u>הערות</u></b></small>
@@ -139,15 +138,15 @@
             </div>
         </div>
         <div>
-            <label><input type="checkbox" id="ww_cal_switch"/> הצג מטלות קרובות של WeBWorK</label>
+            <label><input type="checkbox" id="webwork_cal_enabled"/> הצג מטלות קרובות של WeBWorK</label>
             <span class="big-description">חובה להפעיל התחברות אוטומטית.</span>
             <span class="big-description" style="display: none;" id="ww_current">
                 קורסים שנמצאו: <span>לא נמצאו קורסים</span>.</span>
         </div>
     </section>
 
-    <h2>מידע טכני על התוסף</h2>
     <section>
+        <h2>מידע טכני על התוסף</h2>
         <span id="ext_version">גרסה מותקנת:</span><br/>
         <span id="storageVol">שטח אחסון בשימוש:</span>
     </section>
@@ -157,7 +156,6 @@
     <div id="status"></div>
     <div style="text-align: left"><input type="button" id="save" value="שמור שינויים" class="submit"/></div>
 </footer>
-
 <script type="module" src="js/options.js"></script>
 </body>
 </html>

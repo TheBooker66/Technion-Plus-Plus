@@ -8,7 +8,7 @@ html, body {
     overflow: hidden;
 }
 
-.wrapper {
+body {
     padding: 0;
     margin: 0;
     z-index: 0;
@@ -88,6 +88,12 @@ main {
 #tabs img {
     max-width: 18px;
     max-height: 18px;
+}
+
+#assignments_container {
+    padding: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .small_spinner:before, #spinner:before {

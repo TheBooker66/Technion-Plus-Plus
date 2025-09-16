@@ -7,235 +7,232 @@
     <link rel="stylesheet" href="../css/calculator.css" type="text/css">
 </head>
 <body>
-<div class="wrapper">
-    <header>
-        <div class="mod_name">
-            <div>
-                <img src="../icons/calculator.svg" alt="מחשבון"/>מחשבון ממוצע ציונים אקדמי
-            </div>
+<header>
+    <span class="mod_name">
+        <img src="../icons/calculator.svg" alt="מחשבון"/>מחשבון ממוצע ציונים אקדמי
+    </span>
+    <span>
+        <span class="TP_name">Technion<sup>++</sup></span>
+        <img src="../icons/technion_plus_plus/logo.svg" alt="טכניון++"/>
+    </span>
+</header>
+<main>
+    <section id="stats" class="maor_grid">
+        <h3>ממוצע ציונים מחושב: <span id="avg_grade"></span></h3>
+        <h3>סך נקודות עוברות: <span id="total_points"></span></h3>
+        <h3>ממוצע הצלחות מחושב: <span id="success_rate"></span><span>%</span></h3>
+    </section>
+
+    <div class="maor_grid">
+        <div id="right">
+            <h2>ציונים</h2>
+            <section>
+                <h3>ציונים שנכנסו לממוצע</h3>
+                <table class="grades" id="grades_list">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>קורס</th>
+                        <th>נקודות</th>
+                        <th>ציון</th>
+                        <th>סמסטר</th>
+                        <th>שנה</th>
+                        <th class="operator">התעלם</th>
+                        <th class="operator">סמן</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h3>ציונים שלא נכנסו לממוצע</h3>
+                <table class="grades" id="ignore_list">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>קורס</th>
+                        <th>נקודות</th>
+                        <th>ציון</th>
+                        <th>סמסטר</th>
+                        <th>שנה</th>
+                        <th class="operator">שחזר</th>
+                        <th class="operator">מחק</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
         </div>
-        <div>
-            <img src="../icons/technion_plus_plus/logo.svg" alt="טכניון++"/> Technion<sup>++</sup>
-        </div>
-    </header>
-    <main>
-        <section id="stats" class="maor_grid">
-            <h3>ממוצע ציונים מחושב: <span id="avg_grade"></span></h3>
-            <h3>סך נקודות עוברות: <span id="total_points"></span></h3>
-            <h3>ממוצע הצלחות מחושב: <span id="success_rate"></span><span>%</span></h3>
-        </section>
+        <div id="left">
+            <h2>אפשרויות והוספת קורסים</h2>
+            <section>
+                <h3>קורסים מסומנים</h3>
+                <table id="selected_tbl">
+                    <tbody>
+                    <tr class="table_row">
+                        <td style="width: 20ch">סה"כ סומנו</td>
+                        <td>0</td>
+                    </tr>
+                    <tr class="table_row">
+                        <td>ממוצע</td>
+                        <td>0</td>
+                    </tr>
+                    <tr class="table_row">
+                        <td>סה"כ נקודות</td>
+                        <td>0</td>
+                    </tr>
+                    <tr class="table_row">
+                        <td>נקודות עם ציון עובר</td>
+                        <td>0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
 
-        <div class="maor_grid">
-            <div id="right">
-                <h2>ציונים</h2>
-                <section>
-                    <h3>ציונים שנכנסו לממוצע</h3>
-                    <table class="grades" id="grades_list">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>קורס</th>
-                            <th>נקודות</th>
-                            <th>ציון</th>
-                            <th>סמסטר</th>
-                            <th>שנה</th>
-                            <th class="operator">התעלם</th>
-                            <th class="operator">סמן</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </section>
-
-                <section>
-                    <h3>ציונים שלא נכנסו לממוצע</h3>
-                    <table class="grades" id="ignore_list">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>קורס</th>
-                            <th>נקודות</th>
-                            <th>ציון</th>
-                            <th>סמסטר</th>
-                            <th>שנה</th>
-                            <th class="operator">שחזר</th>
-                            <th class="operator">מחק</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </section>
-            </div>
-            <div id="left">
-                <h2>אפשרויות והוספת קורסים</h2>
-                <section>
-                    <h3>קורסים מסומנים</h3>
-                    <table id="selected_tbl">
-                        <tbody>
-                        <tr class="table_row">
-                            <td style="width: 20ch">סה"כ סומנו</td>
-                            <td>0</td>
-                        </tr>
-                        <tr class="table_row">
-                            <td>ממוצע</td>
-                            <td>0</td>
-                        </tr>
-                        <tr class="table_row">
-                            <td>סה"כ נקודות</td>
-                            <td>0</td>
-                        </tr>
-                        <tr class="table_row">
-                            <td>נקודות עם ציון עובר</td>
-                            <td>0</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </section>
-
-                <section>
-                    <h3>הוספת ציון</h3>
-                    <form id="add_grade_form">
-                        <div class="labels">
-                            <label for="num">מספר קורס</label>
-                            <label for="name">שם הקורס</label>
-                            <label for="points">נק"ז</label>
-                            <label for="binaryEh">בינארי</label>
-                            <label for="grade" id="grade_label">ציון</label>
-                            <label for="binary_grade" id="binary_grade_label" hidden="hidden">עברתם?</label>
-                            <label for="year">שנה</label>
-                            <label for="semester">סמסטר</label>
-                        </div>
-                        <div class="inputs">
-                            <input type="text" id="num" name="num" maxlength="8" placeholder="0XXX0XXX">
-                            <input type="text" id="name" name="name" placeholder="אלגברה 3ג'">
-                            <input type="number" id="points" name="points" placeholder="6.26" min="0" max="20"
-                                   step="0.5">
-                            <input type="checkbox" id="binaryEh" name="binaryEh">
-                            <input type="number" id="grade" name="grade" placeholder="100 :)" min="0" max="100"
-                                   step="0.1">
-                            <select id="binary_grade" name="binary_grade" hidden="hidden">
-                                <option id="passed">עובר</option>
-                                <option id="failed">נכשל</option>
-                            </select>
-                            <input type="number" id="year" name="year" min="1912" max="65537" step="1" value="2025"/>
-                            <select id="semester" name="semester">
-                                <option id="winter">חורף</option>
-                                <option id="spring">אביב</option>
-                                <option id="summer">קיץ</option>
-                            </select>
-                        </div>
-                        <input type="submit" value="הוסף!" class="submit-button">
-                    </form>
-                </section>
-
-                <section>
-                    <h3>כל מיני כפתורים</h3>
-                    <div id="buttons">
-                        <input id="export" type="button"
-                               value="ייצוא ציונים שנכנסו לממוצע לקובץ csv (אפשר לפתוח ב־Excel)"/>
-                        <input id="import" type="button"
-                               value="ייבוא ציונים מקובץ csv (שייצאתם בעבר) או מקובץ pdf (תדפיס הציונים הרשמי)"/>
-                        <input id="delete_grades" type="button" value="מחיקת כל הציונים מזיכרון התוסף"/>
+            <section>
+                <h3>הוספת ציון</h3>
+                <form id="add_grade_form">
+                    <div class="labels">
+                        <label for="num">מספר קורס</label>
+                        <label for="name">שם הקורס</label>
+                        <label for="points">נק"ז</label>
+                        <label for="binaryEh">בינארי</label>
+                        <label for="grade" id="grade_label">ציון</label>
+                        <label for="binary_grade" id="binary_grade_label" hidden="hidden">עברתם?</label>
+                        <label for="year">שנה</label>
+                        <label for="semester">סמסטר</label>
                     </div>
-                </section>
-            </div>
+                    <div class="inputs">
+                        <input type="text" id="num" name="num" maxlength="8" placeholder="0XXX0XXX">
+                        <input type="text" id="name" name="name" placeholder="אלגברה 3ג'">
+                        <input type="number" id="points" name="points" placeholder="6.26" min="0" max="20"
+                               step="0.5">
+                        <input type="checkbox" id="binaryEh" name="binaryEh">
+                        <input type="number" id="grade" name="grade" placeholder="100 :)" min="0" max="100"
+                               step="0.1">
+                        <select id="binary_grade" name="binary_grade" hidden="hidden">
+                            <option id="passed">עובר</option>
+                            <option id="failed">נכשל</option>
+                        </select>
+                        <input type="number" id="year" name="year" min="1912" max="65537" step="1" value="2025"/>
+                        <select id="semester" name="semester">
+                            <option id="winter">חורף</option>
+                            <option id="spring">אביב</option>
+                            <option id="summer">קיץ</option>
+                        </select>
+                    </div>
+                    <input type="submit" value="הוסף!" class="submit-button">
+                </form>
+            </section>
+
+            <section>
+                <h3>כל מיני כפתורים</h3>
+                <div id="buttons">
+                    <input id="export" type="button"
+                           value="ייצוא ציונים שנכנסו לממוצע לקובץ csv (אפשר לפתוח ב־Excel)"/>
+                    <input id="import" type="button"
+                           value="ייבוא ציונים מקובץ csv (שייצאתם בעבר) או מקובץ pdf (תדפיס הציונים הרשמי)"/>
+                    <input id="delete_grades" type="button" value="מחיקת כל הציונים מזיכרון התוסף"/>
+                </div>
+            </section>
         </div>
-        <div id="explanation">
-            <h2>הסבר על המחשבון</h2>
-            <p>
-                <b>אופן פעולה:</b>
-                המחשבון ידני לגמרי, ויודע רק את הציונים שאתם מכניסים לו ידנית,
-                או מייבאים מתדפיס הציונים הרשמי או מקובץ שייצאתם ממנו קודם לכן.
-                מצד שני, הוא כן מסוגל לזכור ציונים בין חישוב אחד למשנהו,
-                כלומר אפשר לסגור את המחשבון וכל הציונים יוותרו באחסון במחשב שלכם.<br/>
-                בעתיד, אם וכאשר שהטכניון יוסיפו API לגישה לציונים,
-                המחשבון יהיה מסוגל לגשת ישירות לציונים שלכם, כפי שחושבו על ידי הטכניון,
-                בלי צורך בפעולות ידניות כמו ייצוא תדפיס הציונים.
-            </p>
-            <p>
-                <b>ממוצע ציונים מחושב / נקודות מחושבות / ממוצע הצלחות מחושב:</b>
-                שדות אלו מחושבים בהתאם לשינויים שמבוצעים על ידי המשתמש (עריכה/התעלמות/הוספת קורס).<br/>
-                החישוב מדייק במעט יותר מהחישוב של מערכות הטכניון, למעט במקרים של קורסים מכילים ומוכלים שאותם
-                המחשבון לא יודע לזהות. ניתן לטפל במקרים כאלו בעזרת האפשרות להתעלמות קבועה.
-            </p>
-            <p>
-                <b>שיפור:</b>
-                ניתן לערוך ציונים באופן זמני, על מנת לראות את ההשפעה של חזרה על קורס על הממוצע.
-                שינוי הציון יציג למשתמש את השינויים בממוצע האקדמי, בנקודות שייצברו ובממוצע ההצלחות שיתקבל
-                כתוצאה מחזרה על הקורס וקבלת הציון החדש.<br/>
-                הציון הישן יועבר לרשימה "ציונים שלא נכנסו לממוצע" כדי לייצג חישוב מדויק של ממוצע ההצלחות שיתקבל.
-                השינוי הנ"ל הינו חד־פעמי ולא יישמר לכניסה הבאה למחשבון, וניתן גם לבטל אותו על ידי מחיקת
-                הציון הזמני או על ידי לחיצה על כפתור "שחזר" ליד הציון הישן ברשימת הציונים שלא נכנסו לממוצע.
-            </p>
-            <p>
-                <b>התעלם:</b>
-                הממוצע האקדמי והנקודות הנצברות יחושבו מחדש ללא הציון הנבחר. התעלמות זו היא חד־פעמית ובכניסה הבאה
-                למחשבון הציון יחזור למקומו המקורי. ניתן גם להחזיר את הציון באופן מיידי על ידי לחיצה על כפתור "שחזר".
-            </p>
-            <p>
-                <b>התעלם תמיד:</b>
-                הממוצע האקדמי והנקודות הנצברות יחושבו מחדש ללא הציון הנבחר, ובחירה זו תישמר גם לכניסות הבאות למחשבון.
-                כמקודם, ניתן להחזיר את הציון באופן מיידי על ידי לחיצה על כפתור "שחזר" ליד הציון ברשימת הציונים שלא נכנסו
-                לממוצע.
-            </p>
-            <p>
-                <b>שחזר:</b>
-                ביטול ההתעלמות מהציון והכללה שלו בממוצע המחושב ובנקודות המחושבות
-                (גם אם יש ציון נוסף של אותו קורס שבו יש התחשבות!).
-            </p>
-            <p>
-                <b>מחק:</b>
-                מחיקת ציון מסוים מהתוסף – הציון יהיה כלא היה.
-            </p>
-            <p>
-                <b>הוספת ציון:</b>
-                הוספת ציון חדש לרשימת הציונים שנכנסו לממוצע וחישוב ממוצע אקדמי, נקודות נצברות וממוצע הצלחות
-                בהתאם.
-            </p>
-            <p>
-                <b>קורסים מסומנים:</b>
-                ביצוע חישובים רק עבור קבוצת הקורסים שסומנו ב־✓.
-                המחשבון מסמן אוטומטית קורסים מהסמסטר הפעיל האחרון ביותר (או מנסה), אך ניתן גם להוסיף קורסים ידנית.
-            </p>
-            <p>
-                <b>ייצוא וייבוא:</b>
-                שני הכפתורים האלו דיי מסבירים את עצמם.
-                הראשון מביניהם מאפשר לייצא את כל הציונים שנכנסו לממוצע לקובץ
-                csv שניתן לפתוח ב־Excel או בכל תוכנה אחרת התומכת בקבצי csv,
-                והשני מאפשר לייבא ציונים מקובץ csv או מקובץ pdf, כלומר מתדפיס הציונים הרשמי של הטכניון.
-                יש לציין כי ניתן לייבא ציונים מתדפיס ציונים רק אם הוא בעברית.
-                כלומר, ניתן לייבא ציונים מתדפיס הציונים מהסאפ (קלי קלות!), לערוך אותם בתוסף,
-                לייצא אותם לקובץ csv, לערוך אותם בתוכנה חיצונית (כמו Excel), לשלוח לחברים או לסבא שלכם,
-                שיהיה גאה בכם, למה לא, יש לכם ציונים מצוינים, ואז לייבא את הקובץ חזרה לתוסף, וכל זה רק עם שני כפתורים.
-            </p>
-            <p>
-                <b>מחיקת כל הציונים מזיכרון התוסף:</b>
-                אם נעשיתם פרנואידים לגבי הציונים שלכם, או סתם רוצים להתחיל מחדש, ניתן למחוק את כל הציונים בקלות על ידי
-                לחיצה על הכפתור האדום הגדול.
-            </p>
-        </div>
-    </main>
-    <footer>
-        <div>
-            <b>אודות</b><br/>
-            התוסף <b dir="ltr">Technion<sup>++</sup></b> מפותח על ידי <b>איתן "67" עמירן</b><br/>
-            <small>( לא מוגש מטעם הטכניון )</small>
-        </div>
-        <div>
-            <b id="links">קישורים</b><br/>
-            <ul>
-                <li><a id="goToSettings">הגדרות <b dir="ltr">Technion<sup>++</sup></b></a></li>
-                <li><a id="mailtome">פניה אל מפתח התוסף בדוא"ל</a></li>
-            </ul>
-        </div>
-        <div id="disclaimer">
-            <div>מחשבון ממוצע ציונים אקדמי – <sup>++</sup>Technion</div>
-            <div style="font-size: 0.8em">לא מהווה מסמך רשמי • לא מוגש מטעם הטכניון</div>
-        </div>
-    </footer>
-</div>
+    </div>
+    <section id="explanation">
+        <h2>הסבר על המחשבון</h2>
+        <p>
+            <b>אופן פעולה:</b>
+            המחשבון ידני לגמרי, ויודע רק את הציונים שאתם מכניסים לו ידנית,
+            או מייבאים מתדפיס הציונים הרשמי או מקובץ שייצאתם ממנו קודם לכן.
+            מצד שני, הוא כן מסוגל לזכור ציונים בין חישוב אחד למשנהו,
+            כלומר אפשר לסגור את המחשבון וכל הציונים יוותרו באחסון במחשב שלכם.<br/>
+            בעתיד, אם וכאשר שהטכניון יוסיפו API לגישה לציונים,
+            המחשבון יהיה מסוגל לגשת ישירות לציונים שלכם, כפי שחושבו על ידי הטכניון,
+            בלי צורך בפעולות ידניות כמו ייצוא תדפיס הציונים.
+        </p>
+        <p>
+            <b>ממוצע ציונים מחושב / נקודות מחושבות / ממוצע הצלחות מחושב:</b>
+            שדות אלו מחושבים בהתאם לשינויים שמבוצעים על ידי המשתמש (עריכה/התעלמות/הוספת קורס).<br/>
+            החישוב מדייק במעט יותר מהחישוב של מערכות הטכניון, למעט במקרים של קורסים מכילים ומוכלים שאותם
+            המחשבון לא יודע לזהות. ניתן לטפל במקרים כאלו בעזרת האפשרות להתעלמות קבועה.
+        </p>
+        <p>
+            <b>שיפור:</b>
+            ניתן לערוך ציונים באופן זמני, על מנת לראות את ההשפעה של חזרה על קורס על הממוצע.
+            שינוי הציון יציג למשתמש את השינויים בממוצע האקדמי, בנקודות שייצברו ובממוצע ההצלחות שיתקבל
+            כתוצאה מחזרה על הקורס וקבלת הציון החדש.<br/>
+            הציון הישן יועבר לרשימה "ציונים שלא נכנסו לממוצע" כדי לייצג חישוב מדויק של ממוצע ההצלחות שיתקבל.
+            השינוי הנ"ל הינו חד־פעמי ולא יישמר לכניסה הבאה למחשבון, וניתן גם לבטל אותו על ידי מחיקת
+            הציון הזמני או על ידי לחיצה על כפתור "שחזר" ליד הציון הישן ברשימת הציונים שלא נכנסו לממוצע.
+        </p>
+        <p>
+            <b>התעלם:</b>
+            הממוצע האקדמי והנקודות הנצברות יחושבו מחדש ללא הציון הנבחר. התעלמות זו היא חד־פעמית ובכניסה הבאה
+            למחשבון הציון יחזור למקומו המקורי. ניתן גם להחזיר את הציון באופן מיידי על ידי לחיצה על כפתור "שחזר".
+        </p>
+        <p>
+            <b>התעלם תמיד:</b>
+            הממוצע האקדמי והנקודות הנצברות יחושבו מחדש ללא הציון הנבחר, ובחירה זו תישמר גם לכניסות הבאות למחשבון.
+            כמקודם, ניתן להחזיר את הציון באופן מיידי על ידי לחיצה על כפתור "שחזר" ליד הציון ברשימת הציונים שלא נכנסו
+            לממוצע.
+        </p>
+        <p>
+            <b>שחזר:</b>
+            ביטול ההתעלמות מהציון והכללה שלו בממוצע המחושב ובנקודות המחושבות
+            (גם אם יש ציון נוסף של אותו קורס שבו יש התחשבות!).
+        </p>
+        <p>
+            <b>מחק:</b>
+            מחיקת ציון מסוים מהתוסף – הציון יהיה כלא היה.
+        </p>
+        <p>
+            <b>הוספת ציון:</b>
+            הוספת ציון חדש לרשימת הציונים שנכנסו לממוצע וחישוב ממוצע אקדמי, נקודות נצברות וממוצע הצלחות
+            בהתאם.
+        </p>
+        <p>
+            <b>קורסים מסומנים:</b>
+            ביצוע חישובים רק עבור קבוצת הקורסים שסומנו ב־✓.
+            המחשבון מסמן אוטומטית קורסים מהסמסטר הפעיל האחרון ביותר (או מנסה), אך ניתן גם להוסיף קורסים ידנית.
+        </p>
+        <p>
+            <b>ייצוא וייבוא:</b>
+            שני הכפתורים האלו דיי מסבירים את עצמם.
+            הראשון מביניהם מאפשר לייצא את כל הציונים שנכנסו לממוצע לקובץ
+            csv שניתן לפתוח ב־Excel או בכל תוכנה אחרת התומכת בקבצי csv,
+            והשני מאפשר לייבא ציונים מקובץ csv או מקובץ pdf, כלומר מתדפיס הציונים הרשמי של הטכניון.
+            יש לציין כי ניתן לייבא ציונים מתדפיס ציונים רק אם הוא בעברית.
+            כלומר, ניתן לייבא ציונים מתדפיס הציונים מהסאפ (קלי קלות!), לערוך אותם בתוסף,
+            לייצא אותם לקובץ csv, לערוך אותם בתוכנה חיצונית (כמו Excel), לשלוח לחברים או לסבא שלכם,
+            שיהיה גאה בכם, למה לא, יש לכם ציונים מצוינים, ואז לייבא את הקובץ חזרה לתוסף, וכל זה רק עם שני כפתורים.
+        </p>
+        <p>
+            <b>מחיקת כל הציונים מזיכרון התוסף:</b>
+            אם נעשיתם פרנואידים לגבי הציונים שלכם, או סתם רוצים להתחיל מחדש, ניתן למחוק את כל הציונים בקלות על ידי
+            לחיצה על הכפתור האדום הגדול.
+        </p>
+    </section>
+</main>
+<footer>
+    <div>
+        <b>אודות</b><br/>
+        התוסף <span class="TP_name">Technion<sup>++</sup></span> מפותח על ידי <b>איתן "67" עמירן</b><br/>
+        <small>( לא מוגש מטעם הטכניון )</small>
+    </div>
+    <div>
+        <b id="links">קישורים</b><br/>
+        <ul>
+            <li><a id="goToSettings">הגדרות <span class="TP_name">Technion<sup>++</sup></span></a></li>
+            <li><a id="mailtome">פניה אל מפתח התוסף בדוא"ל</a></li>
+        </ul>
+    </div>
+    <div id="disclaimer">
+        <div>מחשבון ממוצע ציונים אקדמי – <span class="TP_name">Technion<sup>++</sup></span></div>
+        <div style="font-size: 0.8em">לא מהווה מסמך רשמי • לא מוגש מטעם הטכניון</div>
+    </div>
+</footer>
 
 <template id="grades_list_template">
     <tr>
@@ -281,7 +278,6 @@
         </td>
     </tr>
 </template>
-
 <script src="../js/calculator.js"></script>
 <script src="../js/footer.js"></script>
 </body>

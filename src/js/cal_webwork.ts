@@ -7,10 +7,10 @@ import {CommonCalendar} from './common_calendar.js';
 
 	await calendar.progress(() => new Promise(async (resolve, reject) => {
 		const storageData = await chrome.storage.local.get({
-			webwork_cal: {},
 			cal_seen: 0,
-			ww_cal_update: 0,
-			webwork_courses: {},
+			webwork_cal_events: {},
+			webwork_cal_courses: {},
+			webwork_cal_update: 0,
 		});
 		if (chrome.runtime.lastError) {
 			console.error("TE_ww_cal: " + chrome.runtime.lastError.message);
@@ -27,19 +27,20 @@ import {CommonCalendar} from './common_calendar.js';
 		}
 
 		const courseMap: { [key: string]: string } = {};
-		for (let course of Object.values(storageData.webwork_courses))
+		for (let course of Object.values(storageData.webwork_cal_courses))
 			courseMap[(course as WebworkCourse).lti] = (course as WebworkCourse).name;
 
-		let date = new Date(storageData.ww_cal_update),
-			fixDate = (num: number) => 9 < num ? num : "0" + num;
+		const date = new Date(storageData.webwork_cal_update);
 		document.getElementById("last_check")!.style.display = "block";
-		document.getElementById("last_check")!.textContent += storageData.ww_cal_update ?
-			` ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}, בשעה ${fixDate(date.getHours())}:${fixDate(date.getMinutes())}.`
-			: "לא ידוע";
+		document.getElementById("last_check")!.textContent += storageData.webwork_cal_update ?
+			` ${date.toLocaleDateString('he-IL', {
+				year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
+			})}.` : " לא ידוע";
 
-		let webworkCalendarData = storageData.webwork_cal,
+		let webworkCalendarData = storageData.webwork_cal_events,
 			sortedAssignments: [string, { h: string, due: string, ts: number, seen: boolean, done: boolean }][] = [],
 			newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
+		console.log(webworkCalendarData);
 		Object.keys(webworkCalendarData).forEach(assignment => {
 			sortedAssignments.push([assignment, webworkCalendarData[assignment]]);
 		});
@@ -48,7 +49,7 @@ import {CommonCalendar} from './common_calendar.js';
 		});
 		for (let i = 0; i < sortedAssignments.length; i++) {
 			const assignment = sortedAssignments[i];
-			const courseLTI = assignment[0].split("_")[0];
+			const courseLTI = assignment[0].substring(0, assignment[0].indexOf("000"));
 			const assignmentObject: HWAssignment = {
 				name: assignment[1].h,
 				description: "",
@@ -66,7 +67,7 @@ import {CommonCalendar} from './common_calendar.js';
 		}
 		await chrome.storage.local.set({
 			cal_seen: await calendar.removeCalendarAlert(storageData.cal_seen),
-			webwork_cal: webworkCalendarData,
+			webwork_cal_events: webworkCalendarData,
 		});
 		resolve({new_list: newAssignmentsList, finished_list: finishedAssignmentsList});
 	}));

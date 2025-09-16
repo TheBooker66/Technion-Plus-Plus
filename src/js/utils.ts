@@ -8,13 +8,11 @@ function xorStrings(str1: string, str2: string): string {
 	).join('');
 }
 
-function resetBadge() {
-	chrome.action.getBadgeBackgroundColor({}, (badgeColours) => {
-		chrome.action.getBadgeText({}, async (badgeText) => {
-			if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34 && badgeText === "!")
-				await chrome.action.setBadgeText({text: ""});
-		});
-	});
+async function resetBadge() {
+	const badgeColours = await chrome.action.getBadgeBackgroundColor({}),
+		badgeText = await chrome.action.getBadgeText({});
+	if (badgeColours[0] === 164 && badgeColours[1] === 127 && badgeColours[2] === 0 && badgeText === "!") // Warning colours
+		await chrome.action.setBadgeText({text: ""});
 }
 
 export {reverseString, xorStrings, resetBadge};
