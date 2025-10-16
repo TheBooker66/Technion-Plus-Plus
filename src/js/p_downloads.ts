@@ -1,4 +1,4 @@
-import {CommonPopup} from './common_popup.js';
+import {CommonPopup} from './common_popup';
 
 (async function () {
 	function updateTextContent(element: HTMLElement, newText: string) {

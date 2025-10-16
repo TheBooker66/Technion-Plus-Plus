@@ -1,4 +1,4 @@
-import {reverseString, xorStrings} from "./js/utils.js";
+import {reverseString, xorStrings} from "./utils";
 
 const courseRegex = /(?<cname>.+)\s-\s(?<cnum>\d{6,8})/, semesterRegex = / - (?:קיץ|חורף|אביב)/;
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

@@ -1,6 +1,6 @@
-import {addAssignmentsToList} from "./organizer.js";
-import {resetBadge} from "./utils.js";
-import {CommonPopup} from "./common_popup.js";
+import {addAssignmentsToList} from "./organizer";
+import {resetBadge} from "./utils";
+import {CommonPopup} from "./common_popup";
 
 export class CommonCalendar {
 	private readonly common: CommonPopup;

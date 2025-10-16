@@ -1,5 +1,5 @@
-import {resetBadge, reverseString, xorStrings} from './utils.js';
-import {TE_updateInfo} from '../service_worker.js';
+import {resetBadge, reverseString, xorStrings} from './utils';
+import {TE_updateInfo} from './service_worker';
 
 function encryptDecrypt(inputStr: string) {
 	const originalChars = inputStr.split(""), randomChars = [];

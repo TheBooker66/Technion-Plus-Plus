@@ -20,9 +20,9 @@
   },
   "minimum_chrome_version": "121.0",
   "background": {
-    "service_worker": "service_worker.js",
+    "service_worker": "js/service_worker.js",
     "scripts": [
-      "service_worker.js"
+      "js/service_worker.js"
     ],
     "type": "module"
   },
@@ -33,11 +33,11 @@
       "48": "icons/technion_plus_plus/icon-48.png",
       "128": "icons/technion_plus_plus/icon-128.png"
     },
-    "default_popup": "popup.html",
+    "default_popup": "html/popup.html",
     "default_title": "Technion++"
   },
   "options_ui": {
-    "page": "options.html",
+    "page": "html/options.html",
     "open_in_tab": true
   },
   "permissions": [

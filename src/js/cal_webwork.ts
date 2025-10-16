@@ -1,5 +1,5 @@
-import {CommonPopup} from './common_popup.js';
-import {CommonCalendar} from './common_calendar.js';
+import {CommonPopup} from './common_popup';
+import {CommonCalendar} from './common_calendar';
 
 (async function () {
 	const popup = new CommonPopup("מטלות קרובות - וובוורק", ["calendar"], document.title);

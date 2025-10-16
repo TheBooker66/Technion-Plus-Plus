@@ -1,5 +1,5 @@
-import {CommonPopup} from './common_popup.js';
-import {resetBadge, reverseString, xorStrings} from './utils.js';
+import {CommonPopup} from './common_popup';
+import {resetBadge, reverseString, xorStrings} from './utils';
 
 (async function () {
 	function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[]) {
@@ -40,7 +40,7 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		type: "popup",
 		focused: true,
 		state: "normal",
-		url: "html/organizer.html",
+		url: "../html/organizer.html",
 		height: Math.min(window.screen.height - 40, 720),
 		width: Math.min(window.screen.width - 20, 1200),
 		top: 0,
@@ -49,14 +49,14 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 	popup_window.top = (window.screen.height - popup_window.height) / 2;
 	popup_window.left = (window.screen.width - popup_window.width) / 2;
 	(document.getElementById("release_notes") as HTMLAnchorElement)
-		.addEventListener("click", () => chrome.tabs.create({url: "html/release_notes.html"}));
+		.addEventListener("click", () => chrome.tabs.create({url: "../html/release_notes.html"}));
 	(document.getElementById("organizer") as HTMLAnchorElement)
 		.addEventListener("click", () => chrome.windows.create(popup_window as chrome.windows.CreateData));
 	(document.getElementById("calculator") as HTMLAnchorElement)
-		.addEventListener("click", () => chrome.tabs.create({url: "html/calculator.html"}));
+		.addEventListener("click", () => chrome.tabs.create({url: "../html/calculator.html"}));
 	for (let i = 0; i < toolLinks.length; i++) {
 		if ([0, 4, 5, 7].includes(i)) continue; // 0 - release notes, 4 - Organiser, 5 - calculator, 7 - printer
-		toolLinks[i].addEventListener("click", () => window.location.href = "html/p_" + toolLinks[i].id + ".html");
+		toolLinks[i].addEventListener("click", () => window.location.href = "../html/p_" + toolLinks[i].id + ".html");
 	}
 
 	const mainScreensLinks = document.querySelectorAll("#tools_and_links > div") as NodeListOf<HTMLDivElement>,

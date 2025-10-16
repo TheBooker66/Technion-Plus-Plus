@@ -1,4 +1,4 @@
-import {toggle} from "./common_calendar.js";
+import {toggle} from "./common_calendar";
 
 function insertMessage(messageText: string, errorEh: boolean = true) {
 	const element = document.getElementById("error")!.appendChild(document.createElement("div"));

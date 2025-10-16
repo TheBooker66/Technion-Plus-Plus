@@ -16,7 +16,7 @@
         	<i class="far fa-hand-point-${button_data.grad_dir[lang]} fa-fw"></i> ${button_data.button[lang]}
         </a><br />
         <small style="margin: 4px;">
-            (${button_data.info[lang]} 
+            (${button_data.info[lang]}
             <a href="https://cheesefork.cf/share-histograms.html" target="_blank">${button_data.info_link[lang]}</a>.)
         </small>
     </div>`, "text/html").body.firstChild as HTMLDivElement;

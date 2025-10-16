@@ -475,16 +475,15 @@
 					const reader = new FileReader();
 					reader.readAsArrayBuffer(file);
 					reader.onload = async (event) => {
-						const pdfjsPath = "lib/pdfjs/";
-						const pdfjs = await import(chrome.runtime.getURL(pdfjsPath + "pdf.min.mjs"));
-						pdfjs.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL(pdfjsPath + "pdf.worker.min.mjs");
+						const pdfjs = await import("pdfjs-dist");
+						pdfjs.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL("lib/pdfjs/pdf.worker.min.mjs");
 
 						const pdf = await pdfjs.getDocument(new Uint8Array(event?.target?.result as ArrayBuffer)).promise;
 						let text = "";
 						for (let i = 1; i <= pdf.numPages; i++) {
 							const page = await pdf.getPage(i);
 							const content = await page.getTextContent();
-							text += content.items.map((item: { str: string }) => item.str).join(" ") + "\n";
+							text += content.items.map((item: any): string => (item && typeof item.str === "string") ? item.str : "").join(" ") + "\n";
 						}
 						const lines = text
 							// Add a line break before any sequence of 6 or more digits not preceded by a line break

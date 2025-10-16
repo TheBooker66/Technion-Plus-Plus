@@ -88,7 +88,7 @@
 		const styleLink = document.createElement('link') as HTMLLinkElement;
 		styleLink.rel = 'stylesheet';
 		styleLink.type = 'text/css';
-		styleLink.href = chrome.runtime.getURL("./css/sap.css");
+		styleLink.href = chrome.runtime.getURL("../css/sap.css");
 
 		document.head.appendChild(styleLink);
 	}
