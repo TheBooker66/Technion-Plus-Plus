@@ -1,4 +1,4 @@
-(async function () {
+(async function () { //PANOPTO UPDATE. Fixes the entirety of issue #7.
 	async function setupListDownloadButtons(downloadAllButton: HTMLAnchorElement, downloadSelectedButton: HTMLAnchorElement) {
 		downloadAllButton.setAttribute("class", "hidden-command-button");
 		downloadSelectedButton.setAttribute("class", "hidden-command-button");
@@ -467,8 +467,9 @@
 		if (document.pictureInPictureEnabled && !(document.querySelector(".video-js") as HTMLVideoElement).disablePictureInPicture) {
 			const floatyButton = document.getElementById("m_float") as HTMLAnchorElement;
 			floatyButton.classList.remove("maor_hidden");
-			floatyButton.addEventListener("click", () => {
-				if (!document.pictureInPictureElement) void (document.querySelector(".video-js") as HTMLVideoElement).requestPictureInPicture();
+			floatyButton.addEventListener("click", async () => {
+				if (!document.pictureInPictureElement)
+					await (document.querySelector(".video-js") as HTMLVideoElement).requestPictureInPicture();
 			});
 		}
 

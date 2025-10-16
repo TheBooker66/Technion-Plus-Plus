@@ -55,10 +55,10 @@ minify_svg() {
 
 # --- Delete Previous Output Folder ---
 
-# Delete previously minified folder if it exists
+# Delete previously built files if they exist
 if [ -d "$OUTPUT_FOLDER" ]; then
-    rm -rf "$OUTPUT_FOLDER"
-    echo "Removed old minified folder."
+    rm -rf "${OUTPUT_FOLDER:?The output folder must be set}"/*
+    echo "Removed old minified folder's contents."
 fi
 
 # Delete previously zipped file if it exists
@@ -66,9 +66,6 @@ if [ -f "$ZIP_FILE" ]; then
     rm -f "$ZIP_FILE"
     echo "Removed old zip file."
 fi
-
-# Create the output folder
-mkdir -p "$OUTPUT_FOLDER"
 
 
 # --- Copy Other Files ---
@@ -104,7 +101,7 @@ echo "Downloaded Cheesefork library file."
 if [ "$DEV_MODE" -eq 1 ]; then
     # Compile the entire TypeScript project with watch mode
     npx tsc --outDir "$OUTPUT_FOLDER" --watch
-    echo "Running in developer mode, skipping minification and ziping."
+    echo "Running in developer mode, skipping minification and zipping."
     exit 0
 fi
 

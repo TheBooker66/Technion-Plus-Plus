@@ -10,12 +10,12 @@
     "48": "icons/technion_plus_plus/icon-48.png",
     "128": "icons/technion_plus_plus/icon-128.png"
   },
-  "version": "4.0.2",
+  "version": "4.1.0",
   "manifest_version": 3,
   "browser_specific_settings": {
     "gecko": {
       "id": "ethan.amiran@gmail.com",
-      "strict_min_version": "127.0"
+      "strict_min_version": "144.0"
     }
   },
   "minimum_chrome_version": "121.0",

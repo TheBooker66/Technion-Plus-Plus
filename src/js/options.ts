@@ -145,11 +145,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 	}
 
-	(document.getElementById("ext_version") as HTMLSpanElement).textContent += ` ${chrome.runtime.getManifest().version}`;
-	if (typeof chrome.storage.local.getBytesInUse === "function")
-		chrome.storage.local.getBytesInUse(null, bytes => {
-			bytes /= 1000;
-			(document.getElementById("storageVol") as HTMLSpanElement).textContent += ` ${bytes.toFixed(3)}kB`;
-		});
-	else (document.getElementById("storageVol") as HTMLSpanElement).textContent += " אירעה שגיאה! נא לדווח עליה.";
+	const extensionSize = (await chrome.storage.local.getBytesInUse(null) / 1000).toFixed(3),
+		extensionVersion = chrome.runtime.getManifest().version;
+	(document.getElementById("ext_version") as HTMLSpanElement).textContent += ` ${extensionVersion}`;
+	(document.getElementById("storageVol") as HTMLSpanElement).textContent += ` ${extensionSize}kB`;
 });

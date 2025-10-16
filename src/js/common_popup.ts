@@ -5,7 +5,7 @@ export class CommonPopup {
 		this.title = title;
 		if (organiser === "ארגונית++") return;
 
-		this.useTemplatesFile("popup", (documentContext: Document) => {
+		void this.useTemplatesFile("popup", (documentContext: Document) => {
 			for (let i = 0; i < css_list.length; i++) {
 				const linkTemplate = this.loadTemplate("head-stylesheets", documentContext);
 				const element = linkTemplate.querySelector("link");
@@ -24,7 +24,7 @@ export class CommonPopup {
 			}
 
 			this.buttonsSetup();
-		}).then();
+		});
 	}
 
 	useTemplatesFile = async (templateFileName: string, callback: (documentContext: Document) => void) => {

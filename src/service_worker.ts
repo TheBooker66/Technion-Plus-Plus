@@ -755,9 +755,8 @@ async function TE_sendMessageToTabs(data: { mess_t: string, angle?: number | unk
 	const tabs = await chrome.tabs.query({});
 	const moodleTabs = tabs.filter(tab => (tab.url as string).includes("moodle"));
 	for (const tab of moodleTabs) {
-		chrome.tabs.sendMessage(tab.id as number, data, {}, () => {
-			if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);
-		});
+		await chrome.tabs.sendMessage(tab.id as number, data);
+		if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);
 	}
 }
 

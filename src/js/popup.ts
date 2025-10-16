@@ -117,14 +117,14 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 			: `mailto:print.${printerLinks[i].id}@campus.technion.ac.il?subject=${id}`;
 		printerLinks[i].setAttribute("href", emailURL);
 		if (id !== "הקלד מספר זהות כאן" && id !== "") continue;
-		printerLinks[i].addEventListener("click", () => {
-			chrome.runtime.sendMessage({
+		printerLinks[i].addEventListener("click", async () => {
+			await chrome.runtime.sendMessage({
 				mess_t: "silent_notification",
 				message: 'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.',
-			}, () => {
-				if (chrome.runtime.lastError)
-					console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
 			});
+			if (chrome.runtime.lastError)
+				console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
+
 		});
 	}
 
