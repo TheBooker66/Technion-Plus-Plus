@@ -56,7 +56,7 @@ import {CommonCalendar} from './common_calendar.js';
 				course: courseMap[courseLTI],
 				finalDate: assignment[1].due,
 				newEh: !assignment[1].seen,
-				goToFunc: () => chrome.tabs.create({url: `https://moodle24.technion.ac.il/mod/lti/launch.php?id=${courseLTI}`}),
+				goToFunc: () => chrome.tabs.create({url: `https://moodle25.technion.ac.il/mod/lti/launch.php?id=${courseLTI}`}),
 				eventID: parseInt(assignment[0]),
 				timestamp: assignment[1].ts,
 				sys: "webwork",

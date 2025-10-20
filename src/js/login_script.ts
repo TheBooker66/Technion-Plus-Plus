@@ -72,10 +72,13 @@
 		form.submit();
 	}
 
-	function moodle(storageData: { [key: string]: string | boolean }) {
+	function moodle(storageData: { [key: string]: string | boolean }, website: string) {
 		if (document.querySelectorAll(".navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
 		if (storageData.external_enable) window.location.href = "https://techwww.technion.ac.il/tech_ident/";
-		else window.location.href = "https://moodle24.technion.ac.il/auth/oidc/";
+		else {
+			const specificMoodleNumber = website.match(/moodle([0-9]+)\.technion\.ac\.il/)![0];
+			window.location.href = `https://moodle${specificMoodleNumber}.technion.ac.il/auth/oidc/`;
+		}
 	}
 
 	function cs(storageData: { [key: string]: string | boolean }) {
@@ -138,7 +141,7 @@
 	if (storageData.enable_login && !storageData.external_enable) {
 		storageData.password = reverseString(xorStrings(storageData.term + storageData.phrase, storageData.maor_p));
 		if (/moodle[0-9]*.technion.ac.il/.test(website))
-			moodle(storageData);
+			moodle(storageData, website);
 		else if (website === "panoptotech.cloud.panopto.eu") {
 			panopto();
 		} else if (website === "portalex.technion.ac.il") {
@@ -154,7 +157,7 @@
 		}
 	} else if (storageData.external_enable) {
 		storageData.username_ext = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
-		if (/moodle[0-9]+.technion.ac.il/.test(website)) moodle(storageData);
+		if (/moodle[0-9]+.technion.ac.il/.test(website)) moodle(storageData, website);
 		else if (website === "techwww.technion.ac.il") techwww(storageData);
 	}
 })();

@@ -6,7 +6,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 	function openMoodle(eventID: number, eventTimestamp: number): () => Promise<chrome.tabs.Tab> {
 		return async () => {
 			try {
-				const eventURL = `https://moodle24.technion.ac.il/calendar/view.php?view=day&course=1&time=${eventTimestamp / 1E3}#event_${eventID}`;
+				const eventURL = `https://moodle25.technion.ac.il/calendar/view.php?view=day&course=1&time=${eventTimestamp / 1E3}#event_${eventID}`;
 				await TE_AutoLogin(true);
 				const response = await popup.XHR(eventURL, "document");
 				const eventLinks = response.response.querySelectorAll(`.event[data-event-id='${eventID}'] a`);
@@ -45,7 +45,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 					errorEh: true,
 				});
 
-				const res = await popup.XHR("https://moodle24.technion.ac.il/calendar/export.php", "document");
+				const res = await popup.XHR("https://moodle25.technion.ac.il/calendar/export.php", "document");
 
 				const sessionKey: string = res.response.querySelector("[name='sesskey']").value;
 
@@ -96,7 +96,7 @@ import {TE_AutoLogin} from "../service_worker.js";
 			return;
 		}
 
-		const calendarData = await popup.XHR("https://moodle24.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&" + storageData.moodle_cal_prop, "text");
+		const calendarData = await popup.XHR("https://moodle25.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&" + storageData.moodle_cal_prop, "text");
 		try {
 			if ("Invalid authentication" === calendarData.response.trim()) {
 				await chrome.storage.local.set({moodle_cal_prop: ""});

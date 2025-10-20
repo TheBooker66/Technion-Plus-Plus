@@ -14,7 +14,7 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 					return courseVisibleElements.map(name => name.querySelector("h3")!.textContent);
 				},
 				get CourseLinks() {
-					return courseVisibleElements.map(name => name.querySelector(".coursestyle2url")!.getAttribute("href"));
+					return courseVisibleElements.map(name => name.querySelector(".coursestyle2btn")!.getAttribute("href"));
 				},
 				get WebworkForm() {
 					const form = doc.querySelector("form");

@@ -65,7 +65,7 @@ a.tplus_download_light:hover {
     color: #eee;
 }
 
-#coursecontentcollapseid1 .tplus_block h5.card-title {
+#coursecontentcollapseid2 .tplus_block h5.card-title {
     padding: 10px 0 0 40px;
     border: 0;
     border-radius: 8px;
@@ -160,7 +160,7 @@ a.tplus_download_light:hover {
     border-color: #fff;
 }
 
-#coursecontentcollapseid1 .tplus_block {
+#coursecontentcollapseid2 .tplus_block {
     margin-top: 8px;
     border-radius: 8px;
 }
@@ -177,13 +177,13 @@ a.tplus_download_light:hover {
     margin: 8px auto;
 }
 
-#coursecontentcollapseid1 .tplus_main_actions {
+#coursecontentcollapseid2 .tplus_main_actions {
     display: flex;
     gap: 8px;
     text-align: right;
 }
 
-#coursecontentcollapseid1 .tplus_main_actions > div {
+#coursecontentcollapseid2 .tplus_main_actions > div {
     background-color: #fff1;
     padding: 8px;
     border-radius: 8px;
@@ -191,6 +191,6 @@ a.tplus_download_light:hover {
     flex: 0 1 100%;
 }
 
-#coursecontentcollapseid1 .tplus_main_actions > div.custom-switch {
+#coursecontentcollapseid2 .tplus_main_actions > div.custom-switch {
     padding-right: calc(2.6875rem + 8px);
 }

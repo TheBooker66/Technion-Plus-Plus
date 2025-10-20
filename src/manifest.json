@@ -92,6 +92,10 @@
         "https://moodle24.technion.ac.il/my/",
         "https://moodle24.technion.ac.il/*.php?*",
         "https://moodle24.technion.ac.il/login/index.php",
+        "https://moodle25.technion.ac.il/",
+        "https://moodle25.technion.ac.il/my/",
+        "https://moodle25.technion.ac.il/*.php?*",
+        "https://moodle25.technion.ac.il/login/index.php",
         "https://grades.technion.ac.il/*",
         "https://grades.cs.technion.ac.il/",
         "https://grades.cs.technion.ac.il/grades.cgi",
@@ -160,7 +164,8 @@
         "https://moodle2222.technion.ac.il/*",
         "https://moodle2223.technion.ac.il/*",
         "https://moodle2324.technion.ac.il/*",
-        "https://moodle24.technion.ac.il/*"
+        "https://moodle24.technion.ac.il/*",
+        "https://moodle25.technion.ac.il/*"
       ],
       "run_at": "document_start"
     },

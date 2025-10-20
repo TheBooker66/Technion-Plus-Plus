@@ -99,12 +99,13 @@
 
 			const coursesBySemester: [{ cname: string, clink: string }[], { cname: string, clink: string }[],
 				{ cname: string, clink: string }[]] = [[], [], []];
+			const courseContainers = document.querySelectorAll(".course-card");
 			if (0 < courseTiles.length) for (let i = 0; i < courseTiles.length; i++) {
 				const downloadButtonContainer = document.createElement("div");
 				downloadButtonContainer.style.cssFloat = "left";
-				document.querySelectorAll(".tilecontainer")[i].appendChild(downloadButtonContainer);
+				courseContainers[i].insertBefore(downloadButtonContainer, courseContainers[i].querySelector("a.btn.btn-primary.coursestyle2btn"));
 				let course = courseTiles[i].querySelector("h3")!.textContent,
-					courseLink = courseTiles[i].querySelector(".coursestyle2url")!.getAttribute("href") as string;
+					courseLink = courseTiles[i].querySelector(".coursestyle2btn")!.getAttribute("href") as string;
 				course.includes("חורף") ? coursesBySemester[0].push({
 					cname: course.replace(" - חורף", ""),
 					clink: courseLink,
@@ -112,13 +113,13 @@
 					cname: course.replace(" - אביב", ""),
 					clink: courseLink,
 				}) : coursesBySemester[2].push({cname: course, clink: courseLink});
-				create_download(downloadButtonContainer, parseInt(courseTiles[i].querySelector(".coursestyle2url")!.getAttribute("href")!.split("?id=")[1]), 0, "הורדת קבצי הקורס");
+				create_download(downloadButtonContainer, parseInt(courseTiles[i].querySelector(".coursestyle2btn")!.getAttribute("href")!.split("?id=")[1]), 0, "הורדת קבצי הקורס");
 			}
 			const buttons = await create_tp_buttons();
 			const parentNode = buttons.parentNode as HTMLHeadingElement;
 			parentNode.removeChild(buttons);
-			document.getElementById("coursecontentcollapseid1")
-				?.insertBefore(parentNode.parentNode as Node, document.getElementById("coursecontentcollapseid1")!.childNodes[0]);
+			document.getElementById("coursecontentcollapseid2")
+				?.insertBefore(parentNode.parentNode as Node, document.getElementById("coursecontentcollapseid2")!.childNodes[0]);
 			parentNode.style.padding = "8px";
 			(parentNode.querySelector(".tplus_main_actions")!.appendChild(parentNode.querySelector("h5") as Node) as HTMLElement).style.flex = "0 0 200px";
 			parentNode.querySelector(".tplus_main_actions")?.classList.remove("mt-3");
