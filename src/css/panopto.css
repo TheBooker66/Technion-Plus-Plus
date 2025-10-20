@@ -12,8 +12,8 @@
 }
 
 /* actions */
-a.maor_panopto_action {
-    background-color: rgb(246, 198, 54) !important;
+a.tplus_panopto_action {
+    background-color: var(--sec-light) !important;
     color: #0c0c0d !important;
     border: 0 !important;
     cursor: pointer !important;
@@ -24,8 +24,8 @@ a.maor_panopto_action {
     font-size: 0.9rem !important;
 }
 
-a.maor_panopto_action:hover {
-    background-color: rgb(238, 154, 65) !important;
+a.tplus_panopto_action:hover {
+    background-color: var(--sec-norm) !important;
 }
 
 /*
@@ -34,31 +34,31 @@ a.maor_panopto_action:hover {
 *	=====================================
 */
 
-.maor_menu_divider {
+.tplus_menu_divider {
     width: 1px;
 }
 
-.maor_menu_divider::after {
+.tplus_menu_divider::after {
     border-left: 1px solid #ccc;
     height: 75%;
     content: "";
     display: block;
 }
 
-#maor_menu_container {
+#tplus_menu_container {
     width: var(--menu-width);
     filter: none !important;
     padding: 7px;
     box-sizing: content-box;
 }
 
-#maor_koteret {
+#tplus_koteret {
     text-align: center;
     direction: ltr;
     padding: 4px 4px 4px 30px;
     display: block;
     border-radius: 4px;
-    background-color: #16253D;
+    background-color: var(--prim-dark);
     bottom: 0;
     position: absolute;
     width: 100%;
@@ -72,16 +72,16 @@ a.maor_panopto_action:hover {
     background-size: 20px;
 }
 
-#maor_menu:hover #maor_koteret {
+#tplus_menu:hover #tplus_koteret {
     position: absolute;
     border-radius: 0 0 4px 4px;
 }
 
-#maor_menu {
+#tplus_menu {
     position: absolute;
     bottom: 7px;
     display: block;
-    background-color: #061123;
+    background-color: var(--prim-kot);
     padding: 0;
     transition: all ease .5s;
     width: var(--menu-width);
@@ -97,16 +97,16 @@ a.maor_panopto_action:hover {
     -webkit-user-select: none;
 }
 
-#maor_menu, #maor_menu * {
+#tplus_menu, #tplus_menu * {
     box-sizing: border-box;
     filter: none !important;
 }
 
-#maor_menu:hover, #maor_menu.start {
+#tplus_menu:hover, #tplus_menu.start {
     min-height: 100px;
 }
 
-#maor_menu #maor_content {
+#tplus_menu #tplus_content {
     padding: 0;
     display: block;
     transition: all ease 0.1s;
@@ -117,14 +117,14 @@ a.maor_panopto_action:hover {
     text-align: right;
 }
 
-#maor_menu:hover #maor_content, #maor_menu.start #maor_content {
+#tplus_menu:hover #tplus_content, #tplus_menu.start #tplus_content {
     opacity: 1;
     max-height: 800px;
     padding: 4px 4px 40px;
     transition: all ease 0.5s 0.1s;
 }
 
-#maor_content a {
+#tplus_content a {
     cursor: pointer;
     display: block;
     color: #f9f9fa;
@@ -138,13 +138,13 @@ a.maor_panopto_action:hover {
     background-position-y: center;
 }
 
-#maor_content a:hover {
-    background-color: #043766;
+#tplus_content a:hover {
+    background-color: var(--prim-cool);
 }
 
-#maor_content a > div, #m_vid_list {
+#tplus_content a > div, #m_vid_list {
     position: fixed;
-    background-color: rgb(22, 37, 61);
+    background-color: var(--prim-dark);
     padding: 2px;
     border: 1px solid #000;
     display: none;
@@ -160,7 +160,7 @@ a.maor_panopto_action:hover {
 }
 
 /* overlay */
-#maor_overlay {
+#tplus_overlay {
     z-index: 2;
     position: absolute;
     top: 0;
@@ -172,16 +172,16 @@ a.maor_panopto_action:hover {
     border-radius: 4px;
 }
 
-#maor_menu.overlaid #maor_overlay {
+#tplus_menu.overlaid #tplus_overlay {
     display: block;
 }
 
-#maor_menu.overlaid a {
+#tplus_menu.overlaid a {
     filter: blur(1px) !important;
 }
 
 /* speeds and snapshots */
-#m_vid_list.maor_persist {
+#m_vid_list.tplus_persist {
     display: flex;
     align-items: center;
     margin: 0 var(--speed-width) 0 0;
@@ -195,34 +195,39 @@ a.maor_panopto_action:hover {
     cursor: pointer;
 }
 
-#maor_content a#m_speed:hover > div {
+#tplus_content a#m_speed:hover > div {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
 }
 
-#maor_content a#m_timestamp:hover > div {
+#tplus_content a#m_speed:hover > div > div {
+    grid-column: 1 / span 4;
+}
+
+#tplus_content a#m_speed > div > span::after {
+    content: "x";
+}
+
+#tplus_content a#m_timestamp:hover > div {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 }
 
-#maor_content a#m_speed > div > span::after {
-    content: "x";
-}
-
-#maor_content a:hover > div > span, #m_vid_list.maor_persist > span, #m_vid_list.maor_persist > div {
+#tplus_content a:hover > div > span, #m_vid_list.tplus_persist > span, #m_vid_list.tplus_persist > div {
     padding: 8px;
     border-radius: 4px;
 }
 
-#maor_content a:hover > div > span:hover, .maor_selected, #m_vid_list.maor_persist > span:hover {
-    background-color: #043766;
+#tplus_content a:hover > div > span:hover, #tplus_content a:hover > div > div:hover,
+.tplus_selected, #m_vid_list.tplus_persist > span:hover {
+    background-color: var(--prim-cool);
 }
 
-.maor_selected {
+.tplus_selected {
     color: #f9f9fa;
 }
 
-#maor_content canvas {
+#tplus_content canvas {
     height: 28px;
     display: block;
     cursor: pointer;
@@ -230,11 +235,11 @@ a.maor_panopto_action:hover {
 }
 
 /* darkmode and settings */
-#maor_content label a {
+#tplus_content label a {
     display: flex;
 }
 
-#maor_content label input[type=checkbox] {
+#tplus_content label input[type=checkbox] {
     cursor: pointer;
     align-self: flex-end;
     margin-right: auto;
@@ -242,75 +247,47 @@ a.maor_panopto_action:hover {
 
 /*
 ===================================
-sounds control panel
+floating speed control panel
 ===================================
 */
 
-#maor_sound {
-    color: #f9f9fa;
-    width: 400px;
-    border: 1px solid #000;
+#tplus_floating_speed_controller {
+    position: fixed;
+    top: 50px;
+    left: 50px;
+    z-index: 9999;
+    background-color: var(--prim-dark);
+    padding: 10px;
     border-radius: 4px;
-    background-color: #043766;
-    box-shadow: 4px 4px 8px #4444;
-    position: absolute;
-    z-index: 2;
-    direction: rtl;
-    font-size: 10px;
-    font-family: 'Segoe UI', arial, sans-serif !important;
-    bottom: 60px;
-    right: 30px;
-    opacity: 0.95;
-    text-align: right;
-    user-select: none;
-    display: none;
+    border: 1px solid black;
+    box-shadow: 0 4px 5px 0 rgb(0, 0, 0, 0.14), 0 1px 10px 0 rgb(0, 0, 0, 0.12), 0 2px 4px -1px rgb(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Segoe UI', arial, sans-serif;
 }
 
-#maor_sound > div.m_header, #maor_sound b, #maor_sound select {
-    font-size: 11px
-}
-
-#maor_sound > div.m_header {
-    background-color: #16253D;
-    border-bottom: 1px solid #0004;
-    padding: 8px;
-    border-radius: 3px;
-    font-weight: 700;
-}
-
-#maor_sound > div.m_header > sup {
-    color: #ff0039;
-    font-style: italic;
-    background-color: #0003;
-    padding: 1px 2px;
-    border-radius: 3px;
-}
-
-#maor_sound > div.m_header > span {
-    float: left;
-    border: 1px solid #000;
-    padding: 0.3em 0.5em;
+#tplus_floating_speed_controller input {
+    width: 65px;
+    padding: 6px;
+    border: 1px solid var(--prim-cool);
     border-radius: 4px;
-    background-color: #ff0039;
-    font-size: 0.9em;
-    cursor: pointer;
+    text-align: center;
+    background-color: var(--sec-light) !important;
+    color: #0c0c0d;
+    font-size: 14px;
 }
 
-#maor_sound > div.m_header > span:hover {
-    background-color: var(--status-danger);
+#tplus_floating_speed_controller input:hover {
+    background-color: var(--sec-norm) !important;
 }
 
-#maor_sound > div.m_grid {
-    display: grid;
-    grid-template-columns: 1fr 70px;
-    gap: 12px 8px;
-    padding: 8px;
+#tplus_floating_speed_controller input[type="number"]::-webkit-outer-spin-button,
+#tplus_floating_speed_controller input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-#maor_sound > div.m_grid > div:nth-of-type(2n) {
-    text-align: left;
-}
-
-#maor_sound select {
-    width: 60px
+#tplus_floating_speed_controller input[type="number"] {
+    -moz-appearance: textfield;
 }

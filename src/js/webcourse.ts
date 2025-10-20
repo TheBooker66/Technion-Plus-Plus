@@ -2,7 +2,7 @@
 	function createDownloadButton(fileLinks: string[][], parentContainer: HTMLDivElement, buttonText: string, index: number) {
 		if (0 >= fileLinks.length) return;
 		const downloadButton = document.createElement("a");
-		downloadButton.setAttribute("class", "maor_download");
+		downloadButton.setAttribute("class", "tplus_download");
 		downloadButton.addEventListener("click", async () => {
 			const pagePrefix = window.location.href.includes("ho_") ? decodeURIComponent(decodeURIComponent(window.location.href.split("ho_")[1].split(".html")[0])).replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "").trim() + "/" : "",
 				downloadChunk: { sys: number, sub_pre: string, list: { [key: string]: string }[] } = {
@@ -14,7 +14,7 @@
 			courseTitle = courseTitle.replace(/\./g, " ").replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "");
 			const webcourseEh = window.location.hostname.includes("webcourse");
 			for (let i = 0; i < fileLinks.length; i++) {
-				const subdirectory = (document.getElementById("maor_sub_" + index) as HTMLInputElement).checked ? fileLinks[i][1].replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "").trim() + "/" : "";
+				const subdirectory = (document.getElementById("tplus_sub_" + index) as HTMLInputElement).checked ? fileLinks[i][1].replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "").trim() + "/" : "";
 				let downloadItem: { [key: string]: string } = {};
 				if (webcourseEh) {
 					const urlParts = fileLinks[i][0].split("/");
@@ -70,7 +70,7 @@
 			const fieldset = document.createElement("fieldset"),
 				downloadButtonsContainer = document.createElement("div");
 			fieldset.appendChild(document.createElement("legend")).textContent = "Technion";
-			downloadButtonsContainer.className = "maor_flex";
+			downloadButtonsContainer.className = "tplus_flex";
 			if (allLinks.length > pdfLinks.length && allLinks.length > pptLinks.length && allLinks.length > docLinks.length && allLinks.length > zipLinks.length)
 				createDownloadButton(allLinks, downloadButtonsContainer, "הכל", i);
 			createDownloadButton(pdfLinks, downloadButtonsContainer, "PDF", i);
@@ -81,9 +81,9 @@
 				checkboxDiv = document.createElement("div"),
 				checkboxInput = document.createElement("input"),
 				checkboxText = document.createElement("span");
-			checkboxLabel.className = "maor_download";
+			checkboxLabel.className = "tplus_download";
 			checkboxInput.setAttribute("type", "checkbox");
-			checkboxInput.id = "maor_sub_" + i;
+			checkboxInput.id = "tplus_sub_" + i;
 			checkboxText.textContent = "הורד כל כותרת לתיקיה נפרדת";
 			checkboxDiv.appendChild(checkboxInput);
 			checkboxDiv.appendChild(checkboxText);
@@ -91,6 +91,6 @@
 			downloadButtonsContainer.appendChild(checkboxLabel);
 			fieldset.appendChild(downloadButtonsContainer);
 			(ticketContainers[i].insertBefore(document.createElement("div").appendChild(fieldset).parentNode as Node, ticketContainers[i].firstChild) as HTMLElement)
-				.className = "maor_fieldset";
+				.className = "tplus_fieldset";
 		}
 })();

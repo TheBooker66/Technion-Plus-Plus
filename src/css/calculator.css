@@ -119,13 +119,7 @@ body .grades tbody tr:hover {
     background-color: var(--sec-darker);
 }
 
-.maor_attention {
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 10px;
-}
-
-.maor_grid {
+.stats_grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-column-gap: 60px;

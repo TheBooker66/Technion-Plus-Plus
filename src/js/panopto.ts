@@ -1,4 +1,6 @@
-(async function () { //PANOPTO UPDATE. Fixes the entirety of issue #7.
+let speed = 1.0;
+
+(async function () {
 	async function setupListDownloadButtons(downloadAllButton: HTMLAnchorElement, downloadSelectedButton: HTMLAnchorElement) {
 		downloadAllButton.setAttribute("class", "hidden-command-button");
 		downloadSelectedButton.setAttribute("class", "hidden-command-button");
@@ -10,8 +12,8 @@
 
 		downloadAllButton.style.marginRight = "8px";
 		downloadSelectedButton.style.marginRight = "8px";
-		downloadAllButton.setAttribute("class", "maor_panopto_action css-fehuet");
-		downloadSelectedButton.setAttribute("class", "maor_panopto_action css-fehuet");
+		downloadAllButton.setAttribute("class", "tplus_panopto_action css-fehuet");
+		downloadSelectedButton.setAttribute("class", "tplus_panopto_action css-fehuet");
 		const pollingInterval = setInterval(() => {
 			if ((document.getElementById("loadingMessage") as HTMLElement).style.display === "none" &&
 				document.querySelectorAll(".thumbnail-link").length > 0 &&
@@ -20,10 +22,10 @@
 				const tableRows = (document.getElementById("listViewContainer") as HTMLTableElement).querySelectorAll("tr");
 				for (let i = 0; i < tableRows.length - 1; i++) {
 					const titleElement = tableRows[i].querySelector(".item-title") as HTMLElement;
-					if (titleElement.querySelectorAll(".maor_download").length !== 0) continue;
+					if (titleElement.querySelectorAll(".tplus_download").length !== 0) continue;
 
 					const downloadLink = document.createElement("a");
-					downloadLink.setAttribute("class", "maor_download");
+					downloadLink.setAttribute("class", "tplus_download");
 					downloadLink.textContent = "הורדה";
 					downloadLink.addEventListener("click", async () => {
 						await chrome.runtime.sendMessage({
@@ -38,10 +40,10 @@
 
 					const checkboxLabel = document.createElement("label"),
 						checkbox = document.createElement("input");
-					checkboxLabel.setAttribute("class", "maor_download");
+					checkboxLabel.setAttribute("class", "tplus_download");
 					checkboxLabel.textContent = "בחר";
 					checkbox.setAttribute("type", "checkbox");
-					checkbox.className = "maor_check";
+					checkbox.className = "tplus_check";
 					checkboxLabel.appendChild(checkbox);
 					titleElement.appendChild(checkboxLabel);
 				}
@@ -54,7 +56,7 @@
 
 		const downloadAllLink = document.createElement("a") as HTMLAnchorElement,
 			downloadSelectedLink = document.createElement("a") as HTMLAnchorElement,
-			actionHeaderDiv = document.querySelector("#actionHeader > div") as HTMLDivElement;
+			actionHeaderDiv = document.querySelectorAll("#actionHeader > div")[1] as HTMLDivElement;
 
 		downloadAllLink.textContent = "הורד את כל הקורס";
 		downloadAllLink.addEventListener("click", async () => {
@@ -92,7 +94,7 @@
 					.replace(/[0-9]{4,}[swi]: /, "").replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "") + "/",
 				downloadChunk: DownloadItem = {sys: 1, sub_pre: "", list: []};
 			for (let i = 0; i < listRows.length; i++) {
-				if (!(listRows[i].querySelector(".maor_check") as HTMLInputElement).checked) continue;
+				if (!(listRows[i].querySelector(".tplus_check") as HTMLInputElement).checked) continue;
 				let downloadItem = {
 					u: listRows[i].id + ".mp4",
 					n: courseTitle + listRows[i].querySelector("a.detail-title")?.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4",
@@ -130,9 +132,9 @@
 			const response = await fetch(downloads[downloadType as "3" | "4"].url, {method: "head", mode: "no-cors"});
 			if (response.status !== 0) return;
 
-			(document.getElementById("m_cant_download") as HTMLDivElement).classList.add("maor_hidden");
+			(document.getElementById("m_cant_download") as HTMLDivElement).classList.add("tplus_hidden");
 			const downloadButton = document.getElementById(`m_download_mp${downloadType as "3" | "4"}`) as HTMLAnchorElement;
-			downloadButton.classList.remove("maor_hidden");
+			downloadButton.classList.remove("tplus_hidden");
 			downloadButton.addEventListener("click", async () => {
 				await chrome.runtime.sendMessage({
 					mess_t: "single_download", link: downloads[downloadType as "3" | "4"].url,
@@ -153,8 +155,8 @@
 				previewCanvases[i].getContext("2d")?.drawImage(videoElements[i], 0, 0, videoElements[i].videoWidth, videoElements[i].videoHeight, 0, 0, previewCanvases[i].width, previewCanvases[i].height);
 			};
 		videoSelectionContainer.querySelectorAll("span")[2].addEventListener("click", () => {
-			videoSelectionContainer.className = "maor_hidden";
-			(document.getElementById("maor_menu") as HTMLDivElement).classList.remove("start", "overlaid");
+			videoSelectionContainer.className = "tplus_hidden";
+			(document.getElementById("tplus_menu") as HTMLDivElement).classList.remove("start", "overlaid");
 		});
 		const canvas = document.createElement("canvas"),
 			downloadAnchors = [document.createElement("a"), document.createElement("a")],
@@ -177,8 +179,8 @@
 		snapshotButton.addEventListener("click", () => {
 			drawPreviewThumbnail(0);
 			if (videoElements.length === 2) {
-				(document.getElementById("maor_menu") as HTMLDivElement).classList.add("start", "overlaid");
-				videoSelectionContainer.className = "maor_persist";
+				(document.getElementById("tplus_menu") as HTMLDivElement).classList.add("start", "overlaid");
+				videoSelectionContainer.className = "tplus_persist";
 				drawPreviewThumbnail(1);
 			} else takeAndDownloadSnapshot(0);
 		});
@@ -208,7 +210,7 @@
 							newWindowMessageDiv.style.display = HideVideoEh ? "block" : "none";
 							expandButton.style.opacity = HideVideoEh ? "0.3" : "1.0";
 						};
-					expandButton.classList.remove("maor_hidden");
+					expandButton.classList.remove("tplus_hidden");
 					expandButton.addEventListener("click", () => {
 						if (expandButton.style.opacity === "0.3") return;
 
@@ -261,36 +263,45 @@
 	}
 
 	function toggleDarkMode(styleSheet: CSSStyleSheet) {
-		if (styleSheet.cssRules.length === 1)
-			["#viewer {background-color: #000 !important;}",
+		if (!styleSheet.cssRules.length)
+			[
+				".player, #viewer, #playControlsWrapper {background-color: #000 !important;}",
 				"#viewerHeader, .transport-button, #timeElapsed, #timeRemaining, #positionControl, .viewer .transport-button .clicked, #volumeFlyout, #playSpeedExpander, #qualityButton, #qualityExpander, #inlineMessageLetterbox, .next-delivery-thumb, #thumbnailList, #thumbnailList img, .thumbnail-timestamp {filter:invert(1);}",
-				"#leftPane aside {background-color: #eee; filter: invert(1);}",
-				"#leftPane {background-color: #111;}",
-				"#playControlsWrapper {background-color: #000;}",
+				"#leftPane aside, #header {background-color: #eee; filter: invert(1);}",
+				"#leftPane, #pageBody, .top-level-items > div, .top-level-items > ul {background-color: #111;}",
 				"#playControls {background-color: #000; border-top: 1px solid #555; opacity: 0.8;}",
 				"#playControls:hover, #playControls:focus {opacity: 1;}",
 				"#thumbnailList {background-color: #eee;}",
-				"#leftPane #eventTabs #eventTabControl .event-tab-header{filter:invert(0.05);}",
+				"#leftPane #eventTabs #eventTabControl .event-tab-header {filter:invert(0.05);}",
 				"#leftPane #searchRegion input {background-color: transparent}",
 				"#transportControls {background-color: transparent !important; border-left-color: #0c0c0d !important;}",
 				"#playSpeedExpander > div, #qualityExpander > div {filter: none !important;}",
 				"#thumbnailList img {opacity: 0.5;}",
-				"#thumbnailList img:hover{opacity:1}",
+				"#thumbnailList img:hover{opacity: 1}",
+				".top-level-items {background: linear-gradient(transparent, transparent) padding-box, #111 content-box !important; background-clip: padding-box !important; border-width: 1px 1px 0 0; border-style: solid; border-color: #444;}",
+				"#playlistContainer > div:not(:first-child) {background-image: none;}",
 			].forEach(cssRule => styleSheet.insertRule(cssRule, 0));
-		else while (styleSheet.cssRules.length > 1) styleSheet.deleteRule(0);
+		else while (styleSheet.cssRules.length > 0) styleSheet.deleteRule(0);
 	}
 
-	async function saveSetting(settingsKey: "showhide" | "darkmode" | "speed" | "settings") {
+	async function saveSetting(settingsKey: "showhide" | "darkmode" | "speed" | "returnbackwards" | "floatingspeed" | "settings") {
 		const settingsObj: { [key: string]: string | boolean | number } = {};
 		switch (settingsKey) {
 			case "showhide":
-				settingsObj.panopto_hide = "true" !== (document.getElementById("toggleThumbnailsButton") as HTMLElement).getAttribute("aria-expanded");
+				const attr = (document.getElementById("toggleThumbnailsButton") as HTMLElement).getAttribute("aria-expanded");
+				settingsObj.panopto_hide = attr === null || attr === "true"; // weird race conditions, but this works :/
 				break;
 			case "darkmode":
-				settingsObj.panopto_light = (document.getElementById("m_darkmode") as HTMLInputElement).checked;
+				settingsObj.panopto_darkmode = (document.getElementById("m_darkmode") as HTMLInputElement).checked;
 				break;
 			case "speed":
-				settingsObj.panopto_speed = (document.querySelector(".play-speed .selected") as HTMLDivElement).id;
+				settingsObj.panopto_speed = (document.getElementById("primaryVideo") as HTMLVideoElement).playbackRate.toString();
+				break;
+			case "returnbackwards":
+				settingsObj.panopto_return_backwards = (document.getElementById("m_returnbackwards") as HTMLInputElement).checked;
+				break;
+			case "floatingspeed":
+				settingsObj.panopto_floating_speed = (document.getElementById("m_floatingspeed") as HTMLInputElement).checked;
 				break;
 			case "settings":
 				settingsObj.panopto_save = (document.getElementById("m_save") as HTMLInputElement).checked;
@@ -328,54 +339,76 @@
 		}
 	}
 
-	function changeRealTime(wrongTimeElement: HTMLDivElement, newTimeElement: HTMLDivElement) {
+	function updateRealTime() {
+		const falseTimeElement = document.getElementById("timeRemaining") as HTMLDivElement,
+			trueTimeElement = document.getElementById("tplusRealTime") as HTMLDivElement;
 		const playbackRate = (document.getElementById("primaryVideo") as HTMLVideoElement).playbackRate || 1;
-		const timeString = wrongTimeElement.textContent.trim();
-		if (!timeString) return;
-
-		const cleanedTimeString = timeString.startsWith('-') ? timeString.substring(1) : timeString;
-		const timeParts = cleanedTimeString.split(':').map(part => parseInt(part, 10));
-
-		// Handle different time formats (e.g. 'MM:SS' or 'HH:MM:SS')
-		let totalSeconds = 0;
-		if (timeParts.length === 3) {
-			totalSeconds = timeParts[0] * 3600 + timeParts[1] * 60 + timeParts[2];
-		} else if (timeParts.length === 2) {
-			totalSeconds = timeParts[0] * 60 + timeParts[1];
-		} else {
-			console.error("TE_panopto_real_time: Invalid time format in the source element.");
+		if (playbackRate === 1) {
+			falseTimeElement.style.display = "table-cell";
+			trueTimeElement.style.display = "none";
 			return;
 		}
 
-		if (timeParts.some(isNaN)) return;
+		falseTimeElement.style.display = "none";
+		trueTimeElement.style.display = "table-cell";
 
-		const adjustedSeconds = totalSeconds / playbackRate;
-		const hours = Math.floor(adjustedSeconds / 3600),
-			minutes = Math.floor((adjustedSeconds % 3600) / 60),
-			seconds = Math.floor(adjustedSeconds % 60);
+		const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
+		const falseTimeRemaining = videoElement.duration - videoElement.currentTime;
+		const trueTimeRemaining = falseTimeRemaining / playbackRate;
+		const timeString = new Date(trueTimeRemaining * 1000).toISOString().slice(11, 19);
+		if (trueTimeRemaining >= 3600)
+			(document.getElementById("tplusRealTimeRemaining") as HTMLDivElement).textContent = timeString;
+		else
+			(document.getElementById("tplusRealTimeRemaining") as HTMLDivElement).textContent = timeString.slice(3);
+		(document.getElementById("tplusRealTimeRate") as HTMLSpanElement).textContent = `\t(x${playbackRate}, `;
+	}
 
-		const formattedMinutes = String(minutes).padStart(2, '0'),
-			formattedSeconds = String(seconds).padStart(2, '0');
+	function setupTimer() {
+		const newTimeElement = document.createElement("div") as HTMLDivElement;
+		newTimeElement.id = "tplusRealTime";
+		newTimeElement.setAttribute("style", "{vertical-align: middle; width: 50px; font-size: 0.95em; color: #fff;}".replace(/[{}]/g, ''));
+		newTimeElement.style.display = "none";
 
-		const rateText = ` (x${playbackRate})`;
-		const timeText = (hours > 0 ? `${String(hours).padStart(2, '0')}:` : '') + `${formattedMinutes}:${formattedSeconds}`;
-		newTimeElement.textContent = `-${timeText}`;
+		const realTime = document.createElement("div"),
+			extraText = document.createElement('small'),
+			rateInfo = document.createElement('span'),
+			extensionInfo = document.createElement('span'),
+			literalBracket = document.createElement('span');
+		realTime.id = "tplusRealTimeRemaining";
+		rateInfo.textContent = `\t(x1, `;
+		rateInfo.id = "tplusRealTimeRate";
+		extensionInfo.textContent = `T++`;
+		extensionInfo.style.color = "var(--sec-light)";
+		literalBracket.textContent = `)`;
+		extraText.append(rateInfo, extensionInfo, literalBracket);
+		newTimeElement.append(realTime, extraText);
 
-		const rateSpan = document.createElement('small');
-		rateSpan.textContent = rateText;
-		newTimeElement.prepend(rateSpan);
+		(document.getElementById("transportControls") as HTMLDivElement)
+			.insertBefore(newTimeElement, document.getElementById("liveButton"));
+		(document.getElementById("primaryVideo") as HTMLVideoElement)
+			.addEventListener("timeupdate", () => updateRealTime());
+	}
+
+	function applyCustomSpeed(speedValue: string) {
+		const parsedSpeed = parseFloat(speedValue);
+		if (isNaN(parsedSpeed) || parsedSpeed < 0.1 || parsedSpeed > 6.7) {
+			window.alert("הכנסת ערך לא חוקי, אנא נסה שנית.");
+			return;
+		}
+		for (const video of document.querySelectorAll(".video-js"))
+			(video as HTMLVideoElement).playbackRate = parsedSpeed;
 	}
 
 	function setupMenu() {
 		const menu = (new DOMParser).parseFromString(`
-<div id="maor_menu_container">
-    <div id="maor_menu" class="start">
-        <div id="maor_content">
-            <div id="maor_overlay"></div>
+<div id="tplus_menu_container">
+    <div id="tplus_menu" class="start">
+        <div id="tplus_content">
+            <div id="tplus_overlay"></div>
             <div id="m_cant_download"><a><i>הורדת ההקלטה נחסמה על ידי צוות הקורס</i></a></div>
-            <a id="m_download_mp4" class="maor_hidden">הורדת הקלטה</a>
-            <a id="m_download_mp3" class="maor_hidden">הורדת שמע</a>
-            <div id="m_vid_list" class="maor_hidden">
+            <a id="m_download_mp4" class="tplus_hidden">הורדת הקלטה</a>
+            <a id="m_download_mp3" class="tplus_hidden">הורדת שמע</a>
+            <div id="m_vid_list" class="tplus_hidden">
                 <div>בחר וידאו: </div>
                 <span><canvas></canvas></span>
                 <span><canvas></canvas></span>
@@ -386,157 +419,217 @@
                 <div><span>העתק קישור פשוט</span><span>העתק קישור מעוצב</span></div>
                 <span style="display: block">העתק קישור כעת</span>
             </a>
-            <a id="m_expand" class="maor_hidden">פצל לשני מסכים</a>
-            <a id="m_float" class="maor_hidden">פתח בחלון צף</a>
+            <a id="m_expand" class="tplus_hidden">פצל לשני מסכים</a>
+            <a id="m_float" class="tplus_hidden">פתח בחלון צף</a>
             <a id="m_speed">
-                <div><span>2.25</span><span>2.5</span><span>2.75</span><span>3</span></div>
+                <div><span>2.25</span><span>2.5</span><span>2.75</span><span>3</span>
+                <div id="custom_speed">מהירות מותאמת אישית</div></div>
                 <span style="display: block">מהירויות נוספות</span>
             </a>
-            <a id="m_sound">שיפורי שמע</a>
+            <label for="m_floatingspeed"><a>חלונית שליטת מהירויות צפה<input id="m_floatingspeed" type="checkbox" /></a></label>
             <label for="m_darkmode"><a>מצב לילה<input id="m_darkmode" type="checkbox" /></a></label>
+            <label for="m_returnbackwards"><a>חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_returnbackwards" type="checkbox" /></a></label>
             <label for="m_save"><a>זכור הגדרות<input id="m_save" type="checkbox" /></a></label>
         </div>
-        <div id="maor_koteret">Technion<sup>++</sup></div>
-    </div>
-    <div id="maor_sound">
-        <div class="m_header">
-            שיפורי שמע <sup>BETA</sup>
-            <span id="maor_sound_close">סגור</span>
-        </div>
-
-        <div class="m_grid">
-            <div>
-                השימוש באפקטים הבאים עלול להגביר רעשי רקע.
-                <span style="display: none"><br />בדפדפן פיירפוקס, השימוש באפקטים הנ"ל ינעל את הרצת הווידאו למהירות x1. כדי לבטל נעילה זו יש לרענן את הדף.</span>
-            </div>
-            <div>
-                <b>רמת סינון רעשי רקע</b><br />
-                סינון בסיסי, שימושי למשל עבור הקלטות עם "זמזום חשמלי" ברקע.
-            </div>
-            <div>
-                <select id="maor_sound_noise">
-                    <option selected value="0">ללא</option>
-                    <option value="1">נמוכה</option>
-                    <option value="2">בינונית</option>
-                    <option value="3">גבוהה</option>
-                </select>
-            </div>
-            <div>
-                <b>תוספת ווליום</b><br />
-                שימושי כאשר עוצמת השמע של ההקלטה נמוכה מאוד.
-            </div>
-            <div>
-                <select id="maor_sound_volume">
-                    <option selected value="0">ללא</option>
-                    <option value="1">נמוכה</option>
-                    <option value="2">בינונית</option>
-                    <option value="3">גבוהה</option>
-                </select>
-            </div>
-            <div>
-                <b>איזון צלילים</b><br />
-                מגביר צלילים נמוכים ומנמיך צלילים גבוהים מאוד. שימושי כאשר איכות ההקלטה לא אחידה.
-            </div>
-            <div>
-                <select id="maor_sound_compressor">
-                    <option selected value="0">כבוי</option>
-                    <option value="1">פעיל</option>
-                </select>
-            </div>
-        </div>
-        <div class="m_grid" style="display: none">
-            עקב מגבלות טכניות לא ניתן להשתמש בשיפורי שמע עבור הקלטה זו.
-        </div>
+        <div id="tplus_koteret">Technion<sup>++</sup></div>
     </div>
 </div>
-`, "text/html").getElementById("maor_menu_container") as HTMLDivElement;
+`, "text/html").getElementById("tplus_menu_container") as HTMLDivElement;
 		for (let menuButton of menu.querySelectorAll("a"))
 			if (menuButton.id)
 				menuButton.style.backgroundImage = `url(${chrome.runtime.getURL("icons/panopto/" + menuButton.id.replace(/_mp[34]/, "") + ".svg")})`;
 
 		const bigBossElement = document.getElementById("transportControls") as HTMLDivElement;
-		bigBossElement.appendChild(document.createElement("div")).classList.add("maor_menu_divider", "transport-button");
+		bigBossElement.appendChild(document.createElement("div")).classList.add("tplus_menu_divider", "transport-button");
 		bigBossElement.appendChild(menu);
-		(document.getElementById("maor_koteret") as HTMLDivElement).style.backgroundImage = `url(${chrome.runtime.getURL("../icons/technion_plus_plus/logo.svg").toString()})`;
+		(document.getElementById("tplus_koteret") as HTMLDivElement).style.backgroundImage = `url(${chrome.runtime.getURL("../icons/technion_plus_plus/logo.svg").toString()})`;
 
 		setupVideoDownloadButtons();
 		snapshotHandler();
 
-		(document.getElementById("m_save") as HTMLAnchorElement).addEventListener("change", () => saveSetting("settings"));
+		(document.getElementById("m_darkmode") as HTMLInputElement).addEventListener("change", async () => {
+			toggleDarkMode(darkModeStyle);
+			await saveSetting("darkmode");
+		});
+
+		(document.getElementById("m_floatingspeed") as HTMLInputElement).addEventListener("change", () => {
+			if ((document.getElementById("m_floatingspeed") as HTMLInputElement).checked) setupFloatingSpeedController();
+			else document.getElementById("tplus_floating_speed_controller")?.remove();
+			saveSetting("floatingspeed");
+		});
+
+		(document.getElementById("m_returnbackwards") as HTMLInputElement)
+			.addEventListener("change", () => saveSetting("returnbackwards"));
+		(document.getElementById("m_save") as HTMLInputElement)
+			.addEventListener("change", () => saveSetting("settings"));
 
 		if (document.pictureInPictureEnabled && !(document.querySelector(".video-js") as HTMLVideoElement).disablePictureInPicture) {
-			const floatyButton = document.getElementById("m_float") as HTMLAnchorElement;
-			floatyButton.classList.remove("maor_hidden");
+			const floatyButton = document.getElementById("m_float") as HTMLInputElement;
+			floatyButton.classList.remove("tplus_hidden");
 			floatyButton.addEventListener("click", async () => {
 				if (!document.pictureInPictureElement)
 					await (document.querySelector(".video-js") as HTMLVideoElement).requestPictureInPicture();
 			});
 		}
 
-		const wrongTime = document.getElementById("timeRemaining") as HTMLDivElement,
-			realTime = document.createElement("div") as HTMLDivElement;
-		realTime.id = "ethan_realtimeRemaining";
-		realTime.setAttribute("style", "{vertical-align: middle; width: 44px; font-size: 0.95em; color: #fff;}".replace(/[{}]/g, ''));
-		bigBossElement.insertBefore(realTime, document.getElementById("liveButton"));
-		const observer = new MutationObserver(_ => changeRealTime(wrongTime, realTime));
-		setTimeout(() => observer.observe(wrongTime, {
-			characterData: false, attributes: false, childList: true, subtree: false,
-		}), 1E3);
-
-		for (const span of document.querySelectorAll("#m_speed span"))
-			span.addEventListener("click", () => {
-				for (const speedButton of document.querySelectorAll(".video-js"))
-					(speedButton as HTMLVideoElement).playbackRate = parseInt(span.textContent);
-				let selectedElement = document.querySelector(".maor_selected");
-				if (selectedElement) selectedElement.classList.remove("maor_selected");
-				span.classList.add("maor_selected");
+		for (const speedButton of document.querySelectorAll("#m_speed span"))
+			speedButton.addEventListener("click", () => {
+				for (const video of document.querySelectorAll(".video-js"))
+					(video as HTMLVideoElement).playbackRate = parseFloat(speedButton.textContent);
 			});
 
-		(document.getElementById("m_sound") as HTMLAnchorElement).style.display = "none";
+		(document.querySelector("#custom_speed") as HTMLDivElement).addEventListener("click", () => {
+			const userSpeed = prompt("הכנס מהירות נגן מותאמת אישית (לדוגמה: 1.25, 1.5, 2, וכו'):", "1.0");
+			if (userSpeed === null) return;
+			applyCustomSpeed(userSpeed);
+		});
 
 		const timestampSpans = document.querySelectorAll("#m_timestamp span");
 		timestampSpans[0].addEventListener("click", () => copyTimestampedURL(false));
 		timestampSpans[1].addEventListener("click", () => copyTimestampedURL(true));
 	}
 
+	function setupFloatingSpeedController() {
+		const floatingPanel = document.createElement('div');
+		floatingPanel.id = 'tplus_floating_speed_controller';
+		document.body.appendChild(floatingPanel);
+
+		const speedInput = document.createElement('input');
+		speedInput.type = 'number';
+		speedInput.min = '0.1';
+		speedInput.max = '6.7';
+		speedInput.step = '0.1';
+		speedInput.value = '1.0';
+		speedInput.title = "הכנס מהירות נגן מותאמת אישית (לדוגמה: 1.25, 1.5, 2, וכו') ואז לחץ על אנטר במקלדת או עם העכבר מחוץ לחלונית הצפה.";
+		floatingPanel.appendChild(speedInput);
+		speedInput.addEventListener('change', () => applyCustomSpeed(speedInput.value));
+		speedInput.addEventListener('keyup', (event) => {
+			if (event.key === 'Enter') {
+				applyCustomSpeed(speedInput.value);
+				speedInput.blur();
+			}
+		});
+
+		let isDragging = false;
+		let startX: number, startY: number, initialPanelX: number, initialPanelY: number;
+
+		floatingPanel.addEventListener('mousedown', (event) => {
+			if (event.target === speedInput) {
+				return;
+			}
+			if (event.button !== 0) return;
+			event.preventDefault();
+			isDragging = true;
+
+			startX = event.clientX;
+			startY = event.clientY;
+
+			const rect = floatingPanel.getBoundingClientRect();
+			initialPanelX = rect.left;
+			initialPanelY = rect.top;
+
+			floatingPanel.style.cursor = 'grabbing';
+		});
+
+		document.addEventListener('mousemove', (event) => {
+			if (!isDragging) return;
+
+			const deltaX = event.clientX - startX;
+			const deltaY = event.clientY - startY;
+			floatingPanel.style.left = `${initialPanelX + deltaX}px`;
+			floatingPanel.style.top = `${initialPanelY + deltaY}px`;
+		});
+
+		document.addEventListener('mouseup', () => {
+			if (isDragging) {
+				isDragging = false;
+				floatingPanel.style.cursor = 'grab';
+			}
+		});
+	}
+
+	function changeVolume(delta: number) {
+		const video = document.querySelector(".video-js") as HTMLVideoElement;
+		if (!video) return;
+
+		const volumeStep = 0.05;
+		let newVolume = video.volume;
+		if (delta < 0) newVolume = Math.min(1.0, newVolume + volumeStep);
+		else if (delta > 0) newVolume = Math.max(0.0, newVolume - volumeStep);
+		else return;
+		video.volume = newVolume;
+
+		const muteButton = document.getElementById('muteButton') as HTMLDivElement;
+		if (newVolume > 0 && video.muted) {
+			video.muted = false;
+			muteButton.classList.remove('muted');
+		} else if (newVolume === 0 && !video.muted) {
+			video.muted = true;
+			muteButton.classList.add('muted');
+		}
+
+		const volumeLevelBar = document.getElementById('volumeLevel') as HTMLDivElement,
+			volumeHandle = document.querySelector('#volumeSlider a[role="slider"]') as HTMLAnchorElement;
+		const volumePercent = Math.round(newVolume * 100);
+		volumeHandle.style.bottom = `${volumePercent}%`;
+		volumeLevelBar.style.height = `${volumePercent}%`;
+		volumeHandle.setAttribute('aria-valuenow', volumePercent.toString());
+		volumeHandle.setAttribute('aria-valuetext', `${volumePercent} percent`);
+	}
+
+	const storageData = await chrome.storage.local.get({
+		panopto_speed: "1.0", panopto_darkmode: false, panopto_hide: false, panopto_return_backwards: false,
+		panopto_floating_speed: false, panopto_save: true,
+	});
+	if (chrome.runtime.lastError) console.error("TE_panopto: " + chrome.runtime.lastError.message);
+
+	const darkModeStyle = document.head.appendChild(document.createElement("style")).sheet as CSSStyleSheet;
+	if (storageData.panopto_save && storageData.panopto_darkmode) toggleDarkMode(darkModeStyle);
 
 	if (window.location.href.includes("List.aspx"))
 		await setupFolderDownloadButtons();
 	else if (window.location.href.includes("Viewer.aspx")) {
+		setupDetachableVideoPlayer();
+		setupTimer();
 		setupMenu();
-		const darkModeStyle = document.head.appendChild(document.createElement("style")).sheet as CSSStyleSheet;
-		darkModeStyle.insertRule(".player {background-color: #000 !important;}", 0);
-		(document.getElementById("m_darkmode") as HTMLInputElement).addEventListener("change", async () => {
-			toggleDarkMode(darkModeStyle);
-			await saveSetting("darkmode");
-		});
 
-		const storageData = await chrome.storage.local.get({
-			panopto_speed: "Normal", panopto_light: false, panopto_hide: false, panopto_save: true,
-		});
-		if (chrome.runtime.lastError) console.error("TE_panopto: " + chrome.runtime.lastError.message);
+		document.addEventListener('wheel', (event) => changeVolume(event.deltaY));
+
 		if (storageData.panopto_save) {
 			(document.getElementById("m_save") as HTMLInputElement).checked = storageData.panopto_save;
-			if (storageData.panopto_light) toggleDarkMode(darkModeStyle);
-			(document.getElementById("m_darkmode") as HTMLInputElement).checked = storageData.panopto_light;
-			const controlsCheckInterval = setInterval(() => {
-				if (document.getElementById("Faster")) {
-					clearInterval(controlsCheckInterval);
-					const thumbnailsButton = document.getElementById("toggleThumbnailsButton") as HTMLElement;
-					if (storageData.panopto_hide && thumbnailsButton.style.display !== "none") thumbnailsButton.click();
-					(document.getElementById(storageData.panopto_speed) as HTMLDivElement).click();
-					for (let speed of document.querySelectorAll(".play-speed"))
-						speed.addEventListener("click", () => {
-							saveSetting("speed");
-							const selectedElement = document.querySelector(".maor_selected");
-							if (selectedElement) selectedElement.classList.remove("maor_selected");
-						});
-					thumbnailsButton.addEventListener("click", () => saveSetting("showhide"));
+			(document.getElementById("m_darkmode") as HTMLInputElement).checked = storageData.panopto_darkmode;
+			(document.getElementById("m_returnbackwards") as HTMLInputElement).checked = storageData.panopto_return_backwards;
+			(document.getElementById("m_floatingspeed") as HTMLInputElement).checked = storageData.panopto_floating_speed;
+
+			const thumbnailsButton = document.getElementById("toggleThumbnailsButton") as HTMLElement;
+			thumbnailsButton?.addEventListener("click", async () => await saveSetting("showhide"));
+			setTimeout(() => {
+				if (storageData.panopto_hide && thumbnailsButton?.style.display !== "none")
+					thumbnailsButton.click();
+				// noinspection SpellCheckingInspection
+				(document.querySelector(".MuiListItemIcon-root.css-19e1foa.css-1f8bwsm") as HTMLDivElement)?.remove();
+			}, 2000);
+
+			const mainVideoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
+			mainVideoElement.addEventListener("ratechange", async () => {
+				if ((document.getElementById("m_returnbackwards") as HTMLInputElement).checked && mainVideoElement.playbackRate < speed) {
+					mainVideoElement.currentTime = Math.max(0, mainVideoElement.currentTime - 10);
 				}
-			}, 2E3);
+				speed = mainVideoElement.playbackRate;
+				updateRealTime();
+				await saveSetting("speed");
+				// noinspection SpellCheckingInspection
+				(document.querySelector(".MuiListItemIcon-root.css-19e1foa.css-1f8bwsm") as HTMLDivElement)?.remove();
+			});
+
+			for (const video of document.querySelectorAll(".video-js"))
+				(video as HTMLVideoElement).addEventListener("loadedmetadata", () => {
+					(video as HTMLVideoElement).playbackRate = parseFloat(storageData.panopto_speed);
+				});
+
+			if (storageData.panopto_floating_speed) setupFloatingSpeedController();
 		}
 
-		setupDetachableVideoPlayer();
-		setTimeout(() => (document.getElementById("maor_menu") as HTMLDivElement).classList.remove("start"), 1500);
+		setTimeout(() => (document.getElementById("tplus_menu") as HTMLDivElement).classList.remove("start"), 1500);
 	}
 })();

@@ -1,18 +1,18 @@
-.maor_hidden {
+.tplus_hidden {
     display: none !important;
 }
 
-label.maor_download input[type=checkbox] {
+label.tplus_download input[type=checkbox] {
     cursor: pointer;
     margin: 0 0 0 5px;
 }
 
-label.maor_download div, .maor_flex {
+label.tplus_download div, .tplus_flex {
     display: inline-flex;
     align-items: center;
 }
 
-a.maor_download, label.maor_download {
+a.tplus_download, label.tplus_download {
     cursor: pointer;
     display: inline-block !important;
     padding: 0.25rem 0.7rem;
@@ -23,7 +23,7 @@ a.maor_download, label.maor_download {
     letter-spacing: 0.03rem;
     font-family: 'Segoe UI', arial, sans-serif;
     margin: 2px;
-    background-color: rgb(246, 198, 54);
+    background-color: var(--sec-light);
     color: #0c0c0d !important;
     border: 0;
     font-weight: 500;
@@ -32,31 +32,31 @@ a.maor_download, label.maor_download {
     -webkit-user-select: none;
 }
 
-a.maor_download:hover {
-    background-color: rgb(238, 154, 65);
+a.tplus_download:hover {
+    background-color: var(--sec-norm);
 }
 
-label.maor_download {
-    background-color: rgb(205, 114, 19);
+label.tplus_download {
+    background-color: var(--sec-dark);
     color: #f9f9fa !important;
 }
 
-label.maor_download:hover {
-    background-color: rgb(119, 64, 6);
+label.tplus_download:hover {
+    background-color: var(--sec-darker);
 }
 
-div.maor_fieldset {
+div.tplus_fieldset {
     text-align: right;
 }
 
-div.maor_fieldset fieldset {
+div.tplus_fieldset fieldset {
     display: inline-block;
     border: 1px solid #ddd;
     padding: 6px 11px 12px;
     margin: 0 4px 20px;
 }
 
-div.maor_fieldset fieldset legend {
+div.tplus_fieldset fieldset legend {
     padding: 1px 6px 5px;
     color: #043766;
     font-weight: 700;
@@ -65,7 +65,7 @@ div.maor_fieldset fieldset legend {
     direction: ltr;
 }
 
-div.maor_fieldset fieldset legend::after {
+div.tplus_fieldset fieldset legend::after {
     content: "++";
     display: inline-block;
     vertical-align: super;

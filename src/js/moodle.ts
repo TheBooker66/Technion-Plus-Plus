@@ -12,7 +12,7 @@
 		}
 
 		function create_download(parent: HTMLElement, courseID: number, isLight: number, linkText: string) {
-			return create_element("a", parent, isLight ? "maor_download_light" : "maor_download", {
+			return create_element("a", parent, isLight ? "tplus_download_light" : "tplus_download", {
 				href: `https://${window.location.hostname}/blocks/material_download/download_materialien.php?courseid=${courseID}"&ccsectid=${isLight}`,
 			}, linkText);
 		}
@@ -134,7 +134,7 @@
 					"אביב": "201",
 					"קיץ": "202",
 				}[course?.groups?.csemester as string] ?? "200";
-				create_element("a", buttons, "maor_download", {
+				create_element("a", buttons, "tplus_download", {
 					href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2024/${semester}/SM/${course_num}`,
 					target: "_blank",
 				}, "דף הקורס בסאפ");
@@ -154,7 +154,7 @@
 						text = 1 < data.length ? `וידאו #${j + 1} ` : "וידאו ";
 						text = 0 < data[j]["t"] ? ["הרצאה", "תרגול"][data[j]["t"] - 1] : text;
 						text += "(פנופטו)";
-						create_element("a", buttons, "maor_download", {
+						create_element("a", buttons, "tplus_download", {
 							href: `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${data[j]["l"]}"`,
 							target: "_blank",
 							title: data[j]?.["vn"] ?? short_course_num,

@@ -1,12 +1,14 @@
-a.maor_download {
-    background-color: rgb(246, 198, 54);
+@import "colours.css";
+
+a.tplus_download {
+    background-color: var(--sec-light);
     color: #0c0c0d !important;
     border: 0;
     font-weight: 500;
     box-shadow: 0 3px 1px -2px rgb(0, 0, 0, 0.2), 0 2px 2px 0 rgb(0, 0, 0, 0.14), 0 1px 5px 0 rgb(0, 0, 0, .12);
 }
 
-a.maor_download, a.maor_download_light {
+a.tplus_download, a.tplus_download_light {
     cursor: pointer;
     float: left;
     display: block;
@@ -20,23 +22,23 @@ a.maor_download, a.maor_download_light {
     -webkit-user-select: none;
 }
 
-a.maor_download:hover {
-    background-color: rgb(238, 154, 65);
+a.tplus_download:hover {
+    background-color: var(--sec-norm);
 }
 
-a.maor_download_light {
+a.tplus_download_light {
     /*color: #fff !important;
     background-color: rgb(255,255,255,0.1);
     border: 1px solid #fff;*/
-    background-color: rgb(246, 198, 54);
+    background-color: var(--sec-light);
     color: #0c0c0d !important;
     font-weight: 400;
 }
 
-a.maor_download_light:hover {
+a.tplus_download_light:hover {
     /*background-color: #fff;
     color: #16253D !important;*/
-    background-color: rgb(238, 154, 65);
+    background-color: var(--sec-norm);
 }
 
 .tilecontainer {
@@ -191,57 +193,4 @@ a.maor_download_light:hover {
 
 #coursecontentcollapseid1 .tplus_main_actions > div.custom-switch {
     padding-right: calc(2.6875rem + 8px);
-}
-
-.row.maor_mgrid {
-    display: grid;
-    grid-template-areas: "a b" "a c";
-    grid-template-rows: auto 1fr;
-    grid-template-columns: 70% 30%;
-}
-
-.row.maor_mgrid > div:not(.maor_mgrid_expanded) .card-text.content {
-    display: none;
-}
-
-.row.maor_mgrid > div {
-    max-width: unset;
-}
-
-.row.maor_mgrid > div.maor_mgrid_expanded {
-    grid-area: a;
-}
-
-a.fa.maor_download {
-    border-radius: 20px;
-    padding: 4px 8px;
-    box-sizing: content-box;
-    height: 1em;
-    line-height: 1em;
-    position: absolute;
-    left: .75rem;
-    top: .75rem;
-}
-
-.row a.fa.maor_download::after {
-    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    padding-right: 4px;
-}
-
-.row a.fa.maor_download.fa-compress::after {
-    content: "שחזר"
-}
-
-.row.maor_mgrid a.fa.maor_download.fa-expand::after {
-    content: "הרחב"
-}
-
-.row.maor_mgrid a.fa.maor_download.fa-expand {
-    position: unset;
-    float: unset;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 10ch;
-    margin: 0 auto;
 }

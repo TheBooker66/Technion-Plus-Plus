@@ -29,7 +29,7 @@
 		const password = icsLink.href.slice(-8),
 			copyButton = document.createElement("a"),
 			icsDiv = document.querySelector("div.ics") as HTMLDivElement;
-		copyButton.className = "maor_download";
+		copyButton.className = "tplus_download";
 		copyButton.textContent = "העתק סיסמת יומן";
 		copyButton.addEventListener("click", async () => {
 			try {

@@ -103,20 +103,19 @@
     },
     {
       "css": [
-        "css/maor_download.css",
+        "css/download.css",
         "css/panopto.css"
       ],
       "js": [
         "js/panopto.js"
       ],
       "matches": [
-        "https://panoptotech.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?*",
-        "https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx*"
+        "https://panoptotech.cloud.panopto.eu/Panopto/Pages/*"
       ]
     },
     {
       "css": [
-        "css/maor_download.css"
+        "css/download.css"
       ],
       "js": [
         "js/webcourse.js",
@@ -129,7 +128,7 @@
     },
     {
       "css": [
-        "css/maor_download.css"
+        "css/download.css"
       ],
       "js": [
         "js/grades.js"
@@ -140,7 +139,7 @@
     },
     {
       "css": [
-        "css/maor_download.css"
+        "css/download.css"
       ],
       "js": [
         "js/cs.js"
