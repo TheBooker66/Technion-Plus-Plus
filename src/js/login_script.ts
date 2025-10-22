@@ -84,7 +84,7 @@
 	function cs(storageData: { [key: string]: string | boolean }) {
 		if (document.querySelector("form")!.querySelectorAll(".red-text").length !== 0 ||
 			document.referrer.includes("grades.cs.technion.ac.il")) return;
-		const username = document.getElementById("ID") as HTMLInputElement | null,
+		const username = document.getElementById("Username") as HTMLInputElement | null,
 			password = document.getElementById("password") as HTMLInputElement | null;
 		if (!username || !password) return;
 		username.value = storageData.username.toString();

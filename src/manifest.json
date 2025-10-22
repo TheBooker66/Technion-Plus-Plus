@@ -97,7 +97,7 @@
         "https://moodle25.technion.ac.il/*.php?*",
         "https://moodle25.technion.ac.il/login/index.php",
         "https://grades.technion.ac.il/*",
-        "https://grades.cs.technion.ac.il/",
+        "https://grades.cs.technion.ac.il/*",
         "https://grades.cs.technion.ac.il/grades.cgi",
         "https://webcourse.cs.technion.ac.il/*",
         "https://portalex.technion.ac.il/irj/portal/external*",
