@@ -76,7 +76,7 @@
 		if (document.querySelectorAll(".navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
 		if (storageData.external_enable) window.location.href = "https://techwww.technion.ac.il/tech_ident/";
 		else {
-			const specificMoodleNumber = website.match(/moodle([0-9]+)\.technion\.ac\.il/)![0];
+			const specificMoodleNumber = website.match(/moodle([0-9]+)\.technion\.ac\.il/)?.[1] || "25";
 			window.location.href = `https://moodle${specificMoodleNumber}.technion.ac.il/auth/oidc/`;
 		}
 	}
