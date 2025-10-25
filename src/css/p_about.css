@@ -8,8 +8,6 @@ a.button {
     margin: 10px auto 5px;
     text-decoration: none;
     padding: 8px;
-    /*background-color: var(--prim-cool);
-    color: #fff;*/
     width: 132px;
     border-radius: 4px;
     text-align: center;
@@ -23,7 +21,6 @@ a.button {
 }
 
 a.button:hover {
-    /*background: var(--prim-dark);*/
     background-color: var(--sec-norm);
 }
 
@@ -35,4 +32,8 @@ h3 {
 
 small {
     color: #38383d;
+}
+
+.donation {
+    vertical-align: text-bottom;
 }

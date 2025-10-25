@@ -266,7 +266,7 @@ let speed = 1.0;
 		if (!styleSheet.cssRules.length)
 			[
 				".player, #viewer, #playControlsWrapper {background-color: #000 !important;}",
-				"#viewerHeader, .transport-button, #timeElapsed, #timeRemaining, #positionControl, .viewer .transport-button .clicked, #volumeFlyout, #playSpeedExpander, #qualityButton, #qualityExpander, #inlineMessageLetterbox, .next-delivery-thumb, #thumbnailList, #thumbnailList img, .thumbnail-timestamp {filter:invert(1);}",
+				"#viewerHeader, .transport-button, #timeElapsed, #timeRemaining, #tplusRealTime, #positionControl, .viewer .transport-button .clicked, #volumeFlyout, #playSpeedExpander, #qualityButton, #qualityExpander, #inlineMessageLetterbox, .next-delivery-thumb, #thumbnailList, #thumbnailList img, .thumbnail-timestamp {filter:invert(1);}",
 				"#leftPane aside, #header {background-color: #eee; filter: invert(1);}",
 				"#leftPane, #pageBody, .top-level-items > div, .top-level-items > ul {background-color: #111;}",
 				"#playControls {background-color: #000; border-top: 1px solid #555; opacity: 0.8;}",
@@ -366,7 +366,7 @@ let speed = 1.0;
 	function setupTimer() {
 		const newTimeElement = document.createElement("div") as HTMLDivElement;
 		newTimeElement.id = "tplusRealTime";
-		newTimeElement.setAttribute("style", "{vertical-align: middle; width: 50px; font-size: 0.95em; color: #fff;}".replace(/[{}]/g, ''));
+		newTimeElement.setAttribute("style", "{vertical-align: middle; width: 50px; font-size: 0.95em;}".replace(/[{}]/g, ''));
 		newTimeElement.style.display = "none";
 
 		const realTime = document.createElement("div"),
@@ -427,8 +427,8 @@ let speed = 1.0;
                 <span style="display: block">מהירויות נוספות</span>
             </a>
             <label for="m_floatingspeed"><a>חלונית שליטת מהירויות צפה<input id="m_floatingspeed" type="checkbox" /></a></label>
-            <label for="m_darkmode"><a>מצב לילה<input id="m_darkmode" type="checkbox" /></a></label>
             <label for="m_returnbackwards"><a>חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_returnbackwards" type="checkbox" /></a></label>
+            <label for="m_darkmode"><a>מצב לילה<input id="m_darkmode" type="checkbox" /></a></label>
             <label for="m_save"><a>זכור הגדרות<input id="m_save" type="checkbox" /></a></label>
         </div>
         <div id="tplus_koteret">Technion<sup>++</sup></div>
@@ -495,12 +495,14 @@ let speed = 1.0;
 		document.body.appendChild(floatingPanel);
 
 		const speedInput = document.createElement('input');
-		speedInput.type = 'number';
-		speedInput.min = '0.1';
-		speedInput.max = '6.7';
-		speedInput.step = '0.1';
-		speedInput.value = '1.0';
-		speedInput.title = "הכנס מהירות נגן מותאמת אישית (לדוגמה: 1.25, 1.5, 2, וכו') ואז לחץ על אנטר במקלדת או עם העכבר מחוץ לחלונית הצפה.";
+		Object.assign(speedInput, {
+			type: 'number',
+			min: '0.1',
+			max: '6.7',
+			step: '0.1',
+			value: '1.0',
+			title: "הכנס מהירות נגן מותאמת אישית (לדוגמה: 1.25, 1.5, 2, וכו') ואז לחץ על אנטר במקלדת או עם העכבר מחוץ לחלונית הצפה.",
+		});
 		floatingPanel.appendChild(speedInput);
 		speedInput.addEventListener('change', () => applyCustomSpeed(speedInput.value));
 		speedInput.addEventListener('keyup', (event) => {
