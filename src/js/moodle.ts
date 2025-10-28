@@ -136,7 +136,7 @@
 					"קיץ": "202",
 				}[course?.groups?.csemester as string] ?? "200";
 				create_element("a", buttons, "tplus_download", {
-					href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2024/${semester}/SM/${course_num}`,
+					href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2025/${semester}/SM/${course_num}`,
 					target: "_blank",
 				}, "דף הקורס בסאפ");
 				const storageData: { videos_courses: string[][], videos_data: { [key: string]: RecordingCourse["v"] } }
