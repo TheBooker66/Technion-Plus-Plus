@@ -22,6 +22,7 @@ a.tplus_panopto_action {
     font-family: 'Segoe UI', arial, sans-serif !important;
     letter-spacing: 0.03rem;
     font-size: 0.9rem !important;
+    align-content: center;
 }
 
 a.tplus_panopto_action:hover {

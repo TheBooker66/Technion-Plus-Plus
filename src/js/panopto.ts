@@ -12,8 +12,8 @@ let speed = 1.0;
 
 		downloadAllButton.style.marginRight = "8px";
 		downloadSelectedButton.style.marginRight = "8px";
-		downloadAllButton.setAttribute("class", "tplus_panopto_action css-fehuet");
-		downloadSelectedButton.setAttribute("class", "tplus_panopto_action css-fehuet");
+		downloadAllButton.setAttribute("class", "tplus_download tplus_panopto_action");
+		downloadSelectedButton.setAttribute("class", "tplus_download tplus_panopto_action");
 		const pollingInterval = setInterval(() => {
 			if ((document.getElementById("loadingMessage") as HTMLElement).style.display === "none" &&
 				document.querySelectorAll(".thumbnail-link").length > 0 &&
