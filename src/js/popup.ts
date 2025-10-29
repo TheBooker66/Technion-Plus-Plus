@@ -45,13 +45,14 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		width: Math.min(window.screen.width - 20, 1200),
 		top: 0,
 		left: 0,
-	}, toolLinks = (document.getElementById("tools_content") as HTMLDivElement).querySelectorAll("a");
-	popup_window.top = (window.screen.height - popup_window.height) / 2;
-	popup_window.left = (window.screen.width - popup_window.width) / 2;
+		} as chrome.windows.CreateData,
+		toolLinks = (document.getElementById("tools_content") as HTMLDivElement).querySelectorAll("a");
+	popup_window.top = parseInt(((window.screen.height - (popup_window.height as number)) / 2).toString());
+	popup_window.left = parseInt(((window.screen.width - (popup_window.width as number)) / 2).toString());
 	(document.getElementById("release_notes") as HTMLAnchorElement)
 		.addEventListener("click", () => chrome.tabs.create({url: "html/release_notes.html"}));
 	(document.getElementById("organizer") as HTMLAnchorElement)
-		.addEventListener("click", () => chrome.windows.create(popup_window as chrome.windows.CreateData));
+		.addEventListener("click", () => chrome.windows.create(popup_window));
 	(document.getElementById("calculator") as HTMLAnchorElement)
 		.addEventListener("click", () => chrome.tabs.create({url: "html/calculator.html"}));
 	for (let i = 0; i < toolLinks.length; i++) {
