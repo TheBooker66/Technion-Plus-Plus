@@ -3,6 +3,7 @@ import path from "node:path";
 import { promises as fs } from "node:fs";
 import CopyPlugin from "copy-webpack-plugin";
 import { fileURLToPath } from "node:url";
+import * as terser from 'terser';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,9 +25,10 @@ try {
     }
 
     const scriptContent = await response.text();
+    const minifiedResult = await terser.minify(scriptContent);
     await fs.writeFile(
         path.join(cheeseforkDestDir, "share-histograms.js"),
-        scriptContent
+        minifiedResult.code
     );
     console.log("Downloaded Cheesefork library file.");
 } catch (err) {
@@ -82,7 +84,7 @@ const config = {
         },
     },
     performance: {
-        hints: false
+        hints: false,
     },
     module: {
         rules: [
@@ -90,6 +92,10 @@ const config = {
                 test: /\.tsx?$/,
                 use: "ts-loader",
                 exclude: /node_modules/,
+            },
+            {
+                test: /\.html$/,
+                loader: "html-loader",
             },
         ],
     },
