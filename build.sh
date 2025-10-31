@@ -37,7 +37,7 @@ minify_js() {
 
 minify_html() {
     local FILE_PATH=$1
-    replace_in_place "$FILE_PATH" "npx html-minifier \"$FILE_PATH\" --collapse-whitespace --conservative-collapse --remove-comments --minify-css true --minify-js true"
+    replace_in_place "$FILE_PATH" "npx html-minifier-next \"$FILE_PATH\" --collapse-whitespace --conservative-collapse --remove-comments --minify-css true --minify-js true"
     echo "Minified html: $FILE_PATH"
 }
 
@@ -49,7 +49,7 @@ minify_css() {
 
 minify_svg() {
     local FILE_PATH=$1
-    replace_in_place "$FILE_PATH" "npx html-minifier \"$FILE_PATH\" --collapse-whitespace --remove-comments --case-sensitive"
+    replace_in_place "$FILE_PATH" "npx html-minifier-next \"$FILE_PATH\" --collapse-whitespace --remove-comments --case-sensitive"
     echo "Minified svg: $FILE_PATH"
 }
 

@@ -7,6 +7,10 @@
       "DOM",
       "DOM.Iterable"
     ],
+    "types": [
+      "chrome",
+      "firefox-webext-browser",
+    ],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

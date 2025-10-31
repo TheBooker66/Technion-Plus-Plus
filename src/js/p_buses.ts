@@ -38,14 +38,14 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
 		(document.getElementById("error") as HTMLDivElement).textContent = msg;
 	}
 
-	async function fetchBusData(interval: NodeJS.Timeout | number) {
+	async function fetchBusData(intervalID: number) {
 		const url = encodeURI("https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/"
 			+ (document.getElementById("station_select") as HTMLSelectElement).value + "/he/false");
 		const storageData = await chrome.storage.local.get({bus_alerts: []});
 		if (chrome.runtime.lastError) {
 			console.error("TE_bus_err: " + chrome.runtime.lastError.message);
 			displayError("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");
-			clearInterval(interval);
+			clearInterval(intervalID);
 			return;
 		}
 
