@@ -45,7 +45,7 @@ export class CommonPopup {
 				console.error("TE_p: " + chrome.runtime.lastError.message);
 		});
 		document.getElementById("goToAbout")?.addEventListener("click", () => window.location.href = "../html/p_about.html");
-		if (this.title !== "") document.getElementById("returnHome")?.addEventListener("click", () => window.location.href = "../popup.html");
+		if (this.title !== "") document.getElementById("returnHome")?.addEventListener("click", () => window.location.href = "../html/popup.html");
 	}
 
 	async XHR(URL: string, responseType: string, bodyData: string = "") {
