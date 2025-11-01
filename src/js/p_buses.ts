@@ -1,5 +1,5 @@
 import {CommonPopup} from "./common_popup.js";
-import {TE_shutBusesAlerts, TE_toggleBusAlert} from "../service_worker.js";
+import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 
 (async function () {
 	function createBusLineElement(lineDetails = ["", "", 0], parentContainer: HTMLDivElement) {
