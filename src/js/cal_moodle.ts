@@ -1,6 +1,6 @@
 import {CommonPopup} from './common_popup.js';
 import {CommonCalendar} from './common_calendar.js';
-import {TE_AutoLogin} from "../service_worker.js";
+import {TE_AutoLogin} from "./service_worker.js";
 
 (async function () {
 	function openMoodle(eventID: number, eventTimestamp: number): () => Promise<chrome.tabs.Tab> {

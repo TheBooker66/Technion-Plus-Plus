@@ -1,5 +1,5 @@
 import {CommonPopup} from "./common_popup.js";
-import {TE_updateVideosInfo} from "../service_worker.js";
+import {TE_updateVideosInfo} from "./service_worker.js";
 
 (async function () {
 	function stop_spinning() {
