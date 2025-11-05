@@ -37,14 +37,14 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 	});
 
 	const popup_window = {
-		type: "popup",
-		focused: true,
-		state: "normal",
-		url: "../html/organizer.html",
-		height: Math.min(window.screen.height - 40, 720),
-		width: Math.min(window.screen.width - 20, 1200),
-		top: 0,
-		left: 0,
+			type: "popup",
+			focused: true,
+			state: "normal",
+			url: "../html/organizer.html",
+			height: Math.min(window.screen.height - 40, 720),
+			width: Math.min(window.screen.width - 20, 1200),
+			top: 0,
+			left: 0,
 		} as chrome.windows.CreateData,
 		toolLinks = (document.getElementById("tools_content") as HTMLDivElement).querySelectorAll("a");
 	popup_window.top = parseInt(((window.screen.height - (popup_window.height as number)) / 2).toString());
