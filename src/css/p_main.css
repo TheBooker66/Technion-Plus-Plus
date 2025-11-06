@@ -124,11 +124,16 @@
 .img_container {
     width: 20px;
     height: 20px;
+    line-height: 20px;
     display: inline-block;
     border-radius: 8px;
     background: var(--sec-light);
     margin: 0 3px;
     padding: 0;
+    vertical-align: middle;
+}
+
+.img_container img {
     vertical-align: middle;
 }
 
