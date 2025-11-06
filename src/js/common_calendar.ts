@@ -118,14 +118,14 @@ export async function toggle(sys: HWSystem, event: number, item: HTMLDivElement,
 		else {
 			let calendar;
 			if (sys === "webwork") {
-				calendar = storageData[calendar_name] as { [key: string]: { done: boolean } };
-				calendar[event.toString()].done = !calendar[event.toString()].done;
+				calendar = storageData[calendar_name] as { [key: number]: { done: boolean } };
+				calendar[event].done = !calendar[event].done;
 			}
 			else {
-				calendar = storageData[calendar_name] as Array<string>;
-				if (calendar.includes(event.toString()))
-					calendar.splice(storageData[calendar_name].indexOf(event.toString()), 1);
-				else calendar.push(event.toString());
+				calendar = storageData[calendar_name] as number[];
+				if (calendar.includes(event))
+					calendar.splice(storageData[calendar_name].indexOf(event), 1);
+				else calendar.push(event);
 			}
 			await chrome.storage.local.set({[calendar_name]: calendar});
 		}

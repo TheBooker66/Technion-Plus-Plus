@@ -45,20 +45,19 @@ import {reverseString, xorStrings} from './utils.js';
 				regexPatterns = {
 					summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
 					banned: /Exam|moed| - Late|הרצאה|תרגול/,
-					uid: /UID:([0-9.a-zA-Z-]+)/,
+					uid: /UID:[0-9.]+HW([0-9]+)/,
 					time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
 					description: /DESCRIPTION;LANGUAGE=en-US:([^,]+)/,
 					url: /URL:(.+)/,
 				};
-			let finishedItems: string[] = [], seenItems: { [key: string]: string } = {},
+			let finishedItems: number[] = [], seenItems: { [key: string]: string } = {},
 				toDoList: HWAssignment[] = [], finishedList: HWAssignment[] = [], courseName = "";
 			for (let i = 1; i < eventSections.length; i++) {
 				const summary = eventSections[i].match(regexPatterns.summary)![1];
 				let trimmedSummary = summary.split("(")[0].trim();
 				if (regexPatterns.banned.test(trimmedSummary)) continue;
 
-				const eventUID = eventSections[i].match(regexPatterns.uid)?.[1] || summary;
-				if (eventUID === "icspasswordexpired" || eventUID === "icspasswordexpired1") {
+				if (eventSections[i].includes("icspasswordexpired") || eventSections[i].includes("icspasswordexpired1")) {
 					reject({
 						msg: "סיסמת היומן של הצגת המטלות של מדמ\"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!",
 						is_error: true,
@@ -66,17 +65,22 @@ import {reverseString, xorStrings} from './utils.js';
 					break;
 				}
 
+				const eventUIDMatch = eventSections[i].match(regexPatterns.uid)?.[1];
+				if (!eventUIDMatch) continue;
+				const eventID = parseInt(eventUIDMatch);
+				if (isNaN(eventID)) continue;
+
 				const timeMatch = eventSections[i].match(regexPatterns.time)!.groups as { [key: string]: string };
 				const dueDate = new Date(`${timeMatch.Y}-${timeMatch.M}-${timeMatch.D}T${timeMatch.TH || 23}:${timeMatch.TM || 59}:00+03:00`);
 				if (dueDate.getTime() < currentTime || dueDate.getTime() > currentTime + THIRTY_DAYS) continue;
 
-				if (eventUID.includes(".PHW")) {
+				if (eventSections[i].includes(".PHW")) {
 					if (dueDate.getTime() > currentTime) {
-						let newEventUID = eventUID.replace(".PHW", ".HW");
 						trimmedSummary = trimmedSummary.replace("פרסום של ", "");
-						seenItems.hasOwnProperty(courseName) && (seenItems[courseName] = seenItems[courseName].replace("[[" + trimmedSummary + "]]", ""));
-						toDoList = toDoList.filter(element => element.eventID !== parseInt(newEventUID));
-						finishedList = finishedList.filter(element => element.eventID !== parseInt(newEventUID));
+						if (seenItems.hasOwnProperty(courseName))
+							(seenItems[courseName] = seenItems[courseName].replace("[[" + trimmedSummary + "]]", ""));
+						toDoList = toDoList.filter(element => element.eventID !== eventID);
+						finishedList = finishedList.filter(element => element.eventID !== eventID);
 					}
 					continue;
 				}
@@ -92,8 +96,8 @@ import {reverseString, xorStrings} from './utils.js';
 				const newEventEh = !(storageData.cs_cal_seen.hasOwnProperty(courseName) &&
 					storageData.cs_cal_seen[courseName].includes("[[" + trimmedSummary + "]]"));
 
-				const finishedEh = (storageData.cs_cal_finished as Array<string>).includes(eventUID);
-				if (finishedEh) finishedItems.push(eventUID);
+				const finishedEh = (storageData.cs_cal_finished as number[]).includes(eventID);
+				if (finishedEh) finishedItems.push(eventID);
 
 				const Assignment: HWAssignment = {
 					name: trimmedSummary,
@@ -101,7 +105,7 @@ import {reverseString, xorStrings} from './utils.js';
 					finalDate: formattedDate,
 					newEh: newEventEh,
 					goToFunc: () => new Promise(go => go(chrome.tabs.create({url: eventURL}))),
-					eventID: parseInt(eventUID),
+					eventID: eventID,
 					timestamp: dueDate.getTime(),
 					sys: "cs",
 					course: courseName,

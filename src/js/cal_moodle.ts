@@ -123,7 +123,7 @@ import {TE_AutoLogin} from "./service_worker.js";
 				"201": "אביב",
 				"202": "קיץ",
 			};
-			let maxEventID = 0, finishedEvents: string[] = [],
+			let maxEventID = 0, finishedEvents: number[] = [],
 				newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
 			for (let i = 1; i < cal.length; i++) {
 				const eventID = parseInt(cal[i].split("UID:")[1].split("@moodle")[0]);
@@ -164,8 +164,8 @@ import {TE_AutoLogin} from "./service_worker.js";
 					.replace(/\\n/g, ' ').replace(/\\,/g, ',').trim();
 				eventDescription = 95 < eventDescription.length ? eventDescription.slice(0, 90) + "..." : eventDescription;
 
-				const finishedEh = (storageData.moodle_cal_finished as Array<string>).includes(eventID.toString());
-				if (finishedEh) finishedEvents.push(eventID.toString());
+				const finishedEh = (storageData.moodle_cal_finished as number[]).includes(eventID);
+				if (finishedEh) finishedEvents.push(eventID);
 
 				const event: HWAssignment = {
 					name: eventTitle,

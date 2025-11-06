@@ -378,7 +378,7 @@ async function TE_csCalendarCheck(
 		const THIRTY_DAYS = 2592E6, now = Date.now(), newHWSet = new Set(), regexes = {
 			summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
 			banned: /Exam|moed| - Late|\u05d4\u05e8\u05e6\u05d0\u05d4|\u05ea\u05e8\u05d2\u05d5\u05dc/,
-			uid: /UID:([0-9.a-zA-Z-]+)/,
+			uid: /UID:[0-9.]+HW([0-9]+)/,
 			time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
 		};
 
@@ -388,25 +388,29 @@ async function TE_csCalendarCheck(
 			const trimmedSummary = summary.split("(")[0].trim();
 			if (regexes.banned.test(trimmedSummary)) continue;
 
-			const eventUID = eventText.match(regexes.uid)?.[1] || summary;
-			if (eventUID === "icspasswordexpired") {
+			if (eventText.includes("icspasswordexpired")) {
 				newHWSet.clear();
 				console.error("TE_cs_cal_err: CS password expired.");
 				await TE_notification('סיסמת היומן של הצגת המטלות של מדמ"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!', false);
 				break;
 			}
 
+			const eventUIDMatch = eventText[i].match(regexes.uid)?.[1];
+			if (!eventUIDMatch) continue;
+			const eventID = parseInt(eventUIDMatch);
+			if (isNaN(eventID)) continue;
+
 			const timeMatch = eventText.match(regexes.time)!.groups as { [key: string]: string };
 			const dueDate = new Date(`${timeMatch.Y}-${timeMatch.M}-${timeMatch.D}T${timeMatch.TH || 23}:${timeMatch.TM || 59}:00+03:00`).getTime();
 			if (dueDate < now || dueDate > now + THIRTY_DAYS) continue;
 
-			if (eventUID.includes(".PHW"))
-				newHWSet.delete(eventUID.replace(".PHW", ".HW"));
+			if (eventText.includes(".PHW"))
+				newHWSet.delete(eventID);
 			else {
-				newHWSet.add(eventUID);
+				newHWSet.add(eventID);
 				const courseNum = summary.split("(")[1].split(")")[0];
 				if (seenStatus[courseNum]?.includes(`[[${trimmedSummary}]]`)) {
-					newHWSet.delete(eventUID);
+					newHWSet.delete(eventID);
 				}
 			}
 		}
