@@ -98,7 +98,7 @@ function insertMessage(msg: string, errorEh: boolean) {
 	messageElement.textContent = msg;
 }
 
-export async function toggle(sys: HWSystem, event: number, item: HTMLDivElement, VorX: 0 | 1) {
+export async function toggle(sys: HWSystem, event: string | number, item: HTMLDivElement, VorX: 0 | 1) {
 	if (sys === "ua") {
 		const storageData = await chrome.storage.local.get({user_agenda: {}});
 		if (chrome.runtime.lastError) console.error("TE_organize7: " + chrome.runtime.lastError.message);

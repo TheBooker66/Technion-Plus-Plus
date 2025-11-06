@@ -75,8 +75,8 @@ import {reverseString, xorStrings} from './utils.js';
 						let newEventUID = eventUID.replace(".PHW", ".HW");
 						trimmedSummary = trimmedSummary.replace("פרסום של ", "");
 						seenItems.hasOwnProperty(courseName) && (seenItems[courseName] = seenItems[courseName].replace("[[" + trimmedSummary + "]]", ""));
-						toDoList = toDoList.filter(element => element.eventID !== parseInt(newEventUID));
-						finishedList = finishedList.filter(element => element.eventID !== parseInt(newEventUID));
+						toDoList = toDoList.filter(element => element.eventID !== newEventUID);
+						finishedList = finishedList.filter(element => element.eventID !== newEventUID);
 					}
 					continue;
 				}
@@ -101,7 +101,7 @@ import {reverseString, xorStrings} from './utils.js';
 					finalDate: formattedDate,
 					newEh: newEventEh,
 					goToFunc: () => new Promise(go => go(chrome.tabs.create({url: eventURL}))),
-					eventID: parseInt(eventUID),
+					eventID: eventUID,
 					timestamp: dueDate.getTime(),
 					sys: "cs",
 					course: courseName,

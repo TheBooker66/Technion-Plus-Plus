@@ -82,7 +82,7 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 	checkForEmpty();
 }
 
-async function editUA(assignmentID: number) {
+async function editUA(assignmentID: string | number) {
 	const storageData = await chrome.storage.local.get({user_agenda: {}});
 	const userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
 	form.subject.value = userAgenda[assignmentID].name;
@@ -101,7 +101,7 @@ async function editUA(assignmentID: number) {
 	tabContents[2].style.display = "block";
 }
 
-async function removeUA(assignmentID: number) {
+async function removeUA(assignmentID: string | number) {
 	const storageData = await chrome.storage.local.get({user_agenda: {}});
 	if (!storageData.user_agenda.hasOwnProperty(assignmentID)) return;
 	if (!window.confirm(`המטלה "${storageData.user_agenda[assignmentID].name}" תימחק!`)) return;

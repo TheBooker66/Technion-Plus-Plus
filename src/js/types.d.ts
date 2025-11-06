@@ -2,7 +2,7 @@ type HWSystem = "moodle" | "cs" | "webwork" | "ua";
 
 // If a property is not present, it is due to the assignment being a user-added assignment ("ua")
 type HWAssignment = {
-	eventID: number,
+	eventID: string | number,
 	name: string,
 	description: string,
 	course?: string,
