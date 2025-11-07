@@ -46,11 +46,8 @@ import {TE_AutoLogin} from "./service_worker.js";
 				});
 
 				const res = await popup.XHR("https://moodle25.technion.ac.il/calendar/export.php", "document");
-
 				const sessionKey: string = res.response.querySelector("[name='sesskey']").value;
-
 				const exportResponse = await popup.XHR(res.responseURL, "document", "sesskey=" + sessionKey + "&_qf__core_calendar_export_form=1&events[exportevents]=all&period[timeperiod]=recentupcoming&generateurl=\u05d4\u05e9\u05d2+\u05d0\u05ea+\u05db\u05ea\u05d5\u05d1\u05ea+\u05d4-URL+\u05e9\u05dc+\u05dc\u05d5\u05d7+\u05d4\u05e9\u05e0\u05d4");
-
 				const exportResponse2: string = "userid=" + exportResponse.response.getElementById("calendarexporturl").value.split("userid=")[1].split("&preset_what=all")[0];
 
 				await chrome.storage.local.set({moodle_cal_prop: exportResponse2});
@@ -78,6 +75,7 @@ import {TE_AutoLogin} from "./service_worker.js";
 			moodle_cal_max: 0,
 			moodle_cal_courses: {},
 			filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
+			pinned_assignments: [],
 		});
 		if (chrome.runtime.lastError) {
 			console.error("TE_cal: " + chrome.runtime.lastError.message);
@@ -143,8 +141,8 @@ import {TE_AutoLogin} from "./service_worker.js";
 
 				let eventDateStr: string = cal[i].split("DTSTART")[1].split("\n")[0]
 						.replace(";VALUE=DATE:", "").replace(":", ""),
-					eventTimeStr: string = !eventDateStr.includes("T") ? "21:55:00Z" :
-						eventDateStr.split("T")[1].replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3");
+					eventTimeStr: string = eventDateStr.includes("T") ? eventDateStr.split("T")[1]
+						.replace(/([0-9]{2})([0-9]{2})([0-9]{2})/g, "$1:$2:$3") : "21:55:00Z";
 				eventDateStr = eventDateStr.substring(0, 8)
 					.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/g, "$1-$2-$3").trim() + "T" + eventTimeStr.trim();
 				const eventDate = new Date(eventDateStr);
@@ -158,7 +156,8 @@ import {TE_AutoLogin} from "./service_worker.js";
 				const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
 					semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
 				const course = (storageData.moodle_cal_courses.hasOwnProperty(courseNum) && semesterNum.toString() in semesters) ?
-					storageData.moodle_cal_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "") : courseInfo.toString();
+					storageData.moodle_cal_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "")
+					: courseInfo.toString();
 
 				let eventDescription: string = cal[i].split("DESCRIPTION:")[1].split("CLASS:")[0]
 					.replace(/\\n/g, ' ').replace(/\\,/g, ',').trim();
@@ -178,6 +177,7 @@ import {TE_AutoLogin} from "./service_worker.js";
 					timestamp: eventDate.getTime(),
 					sys: "moodle",
 					done: finishedEh,
+					pinned: (storageData.pinned_assignments as number[]).includes(eventID),
 				};
 				finishedEh ? finishedAssignmentsList.push(event) : newAssignmentsList.push(event);
 			}
@@ -187,6 +187,8 @@ import {TE_AutoLogin} from "./service_worker.js";
 				moodle_cal_max: maxEventID,
 			});
 			if (chrome.runtime.lastError) console.error("TE_cal_moodle: " + chrome.runtime.lastError);
+			newAssignmentsList.sort((a, b) => (a.timestamp - b.timestamp) || a.name.localeCompare(b.name));
+			finishedAssignmentsList.sort((a, b) => (a.timestamp - b.timestamp) || a.name.localeCompare(b.name));
 			resolve({new_list: newAssignmentsList, finished_list: finishedAssignmentsList});
 		} catch (err) {
 			console.error(err);

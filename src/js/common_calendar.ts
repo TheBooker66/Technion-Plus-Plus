@@ -6,15 +6,15 @@ export class CommonCalendar {
 	private readonly common: CommonPopup;
 	private readonly system: HWSystem;
 	private readonly flags: { moodle: 1; cs: 2; webwork: 4 };
-	private readonly organiser: string;
+	private readonly organiser: boolean;
 
 	constructor(popup: CommonPopup, system: "moodle" | "cs" | "webwork", context: string) {
 		this.common = popup;
 		this.system = system;
 		this.flags = {moodle: 1, cs: 2, webwork: 4};
-		this.organiser = context;
+		this.organiser = context === "ארגונית++";
 
-		if (this.organiser === "ארגונית++") return;
+		if (this.organiser) return;
 
 		const tabButtons = document.getElementById("tabs")?.querySelectorAll("div");
 		if (!tabButtons) return;
@@ -32,7 +32,7 @@ export class CommonCalendar {
 
 	async removeCalendarAlert(currentAlertFlag: number) {
 		// noinspection JSBitwiseOperatorUsage
-		if (this.organiser === "ארגונית++" || this.system === "ua") currentAlertFlag &= -12;
+		if (this.organiser || this.system === "ua") currentAlertFlag &= -12;
 		// noinspection JSBitwiseOperatorUsage
 		else currentAlertFlag &= ~this.flags[this.system];
 
@@ -50,8 +50,8 @@ export class CommonCalendar {
 				newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
 				newAssigment.querySelector(".end_time")!.textContent += assignmentData.finalDate;
 				const actionButtons = newAssigment.querySelectorAll("img");
-				actionButtons[1].addEventListener("click", () => toggle(this.system, assignmentData.eventID, newAssigment, 1));
-				actionButtons[2].addEventListener("click", () => toggle(this.system, assignmentData.eventID, newAssigment, 0));
+				actionButtons[1].addEventListener("click", () => toggleDone(this.system, assignmentData.eventID, newAssigment, 1));
+				actionButtons[2].addEventListener("click", () => toggleDone(this.system, assignmentData.eventID, newAssigment, 0));
 				actionButtons[0].title = "moodle" === this.system ? "עבור להגשה במודל" : "עבור לאתר הקורס";
 				actionButtons[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				newAssigment.querySelector(".assignment_name")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
@@ -69,7 +69,7 @@ export class CommonCalendar {
 	}
 
 	async progress(promiseCreator: () => Promise<{ new_list: HWAssignment[], finished_list: HWAssignment[] }>) {
-		if (this.organiser === "ארגונית++")
+		if (this.organiser)
 			await addAssignmentsToList(promiseCreator, this.system);
 		else promiseCreator()
 			.then(result => this.insertAssignments(result.new_list, result.finished_list))
@@ -98,41 +98,29 @@ function insertMessage(msg: string, errorEh: boolean) {
 	messageElement.textContent = msg;
 }
 
-export async function toggle(sys: HWSystem, event: number, item: HTMLDivElement, VorX: 0 | 1) {
-	if (sys === "ua") {
-		const storageData = await chrome.storage.local.get({user_agenda: {}});
-		if (chrome.runtime.lastError) console.error("TE_organize7: " + chrome.runtime.lastError.message);
-		else {
-			storageData.user_agenda[event].done = !storageData.user_agenda[event].done;
-			await chrome.storage.local.set({user_agenda: storageData.user_agenda});
-		}
-	} else {
-		let calendar_name = {
-			moodle: "moodle_cal_finished",
-			cs: "cs_cal_finished",
-			webwork: "webwork_cal_events",
-		}[sys];
-		const storageData = await chrome.storage.local.get(calendar_name);
-		if (chrome.runtime.lastError)
-			console.error("TE_cal7: " + chrome.runtime.lastError.message);
-		else {
-			let calendar;
-			if (sys === "webwork") {
-				calendar = storageData[calendar_name] as { [key: number]: { done: boolean } };
-				calendar[event].done = !calendar[event].done;
-			}
-			else {
-				calendar = storageData[calendar_name] as number[];
-				if (calendar.includes(event))
-					calendar.splice(storageData[calendar_name].indexOf(event), 1);
-				else calendar.push(event);
-			}
-			await chrome.storage.local.set({[calendar_name]: calendar});
-		}
-	}
+async function toggleDone(sys: HWSystem, eventID: number, item: HTMLDivElement, VorX: 0 | 1) {
 	const assignmentLists = [document.getElementById("new_assignments"), document.getElementById("finished_assignments")];
 	assignmentLists[VorX]?.appendChild(item);
 	checkForEmpty();
+
+	const storageKey = `${sys}_cal_finished`;
+	const storageData = await chrome.storage.local.get(storageKey);
+	if (chrome.runtime.lastError) {
+		console.error("TE_cal: " + chrome.runtime.lastError.message);
+		return;
+	}
+
+	let calendar;
+	if (sys === "webwork") {
+		calendar = storageData[storageKey] as { [key: number]: { done: boolean } };
+		calendar[eventID].done = !calendar[eventID].done;
+	} else {
+		calendar = storageData[storageKey] as number[];
+		if (calendar.includes(eventID))
+			calendar.splice(storageData[storageKey].indexOf(eventID), 1);
+		else calendar.push(eventID);
+	}
+	await chrome.storage.local.set({[storageKey]: calendar});
 }
 
 function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => Promise<chrome.tabs.Tab>) {
@@ -142,7 +130,7 @@ function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => Prom
 	openFunction().catch(() => {
 		assignmentItem.style.borderRadius = "3px;";
 		assignmentItem.style.backgroundColor = "var(--status-danger) !important;";
-		setTimeout(() => assignmentItem.style.backgroundColor = "", 1E3);
+		setTimeout(assignmentItem.style.backgroundColor = "", 1E3);
 	}).finally(() => {
 		spinner.style.display = "block";
 		spinner.parentElement?.classList.remove("small_spinner");

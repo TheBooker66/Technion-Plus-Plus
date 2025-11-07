@@ -1,5 +1,3 @@
-import {toggle} from "./common_calendar.js";
-
 function insertMessage(messageText: string, errorEh: boolean = true) {
 	const element = document.getElementById("error")!.appendChild(document.createElement("div"));
 	element.className = errorEh ? "error_bar" : "attention";
@@ -30,11 +28,83 @@ function openAssignment(assignment: HTMLDivElement, gotoFunction: () => Promise<
 	});
 }
 
+function sortAssignments(a: HWAssignment, b: HWAssignment, considerPins: boolean): number {
+	if (considerPins) {
+		if (a.pinned && !b.pinned) return -1;
+		if (!a.pinned && b.pinned) return 1;
+	}
+	return (a.timestamp - b.timestamp) || a.name.localeCompare(b.name);
+}
+
+function sortElements(a: HTMLDivElement, b: HTMLDivElement, considerPins: boolean): number {
+	if (considerPins) {
+		const aPinned = a.classList.contains("pinned");
+		const bPinned = b.classList.contains("pinned");
+		if (aPinned && !bPinned) return -1;
+		if (!aPinned && bPinned) return 1;
+	}
+	const aTime = parseInt(a.dataset.timestamp || "0");
+	const bTime = parseInt(b.dataset.timestamp || "0");
+	return (aTime - bTime) || (a.querySelector('.assignment_name') as HTMLElement).textContent!.localeCompare((b.querySelector('.assignment_name') as HTMLElement).textContent!);
+}
+
+async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElement, action: 0 | 1) {
+	if (sys === "ua") {
+		const storageData = await chrome.storage.local.get({user_agenda: {}});
+		if (chrome.runtime.lastError) console.error("TE_organizer: " + chrome.runtime.lastError.message);
+		else {
+			storageData.user_agenda[eventID].done = !storageData.user_agenda[eventID].done;
+			await chrome.storage.local.set({user_agenda: storageData.user_agenda});
+		}
+	} else {
+		const storageKey = `${sys}_cal_finished`;
+		const storageData = await chrome.storage.local.get({[storageKey]: []});
+		if (chrome.runtime.lastError) {
+			console.error("TE_cal: " + chrome.runtime.lastError.message);
+			return;
+		}
+
+		let finishedList: number[] = storageData[storageKey];
+		const index = finishedList.indexOf(eventID);
+
+		if (action === 1 && index === -1)
+			finishedList.push(eventID);
+		else if (action === 0 && index !== -1)
+			finishedList.splice(index, 1);
+		else
+			return;
+
+		await chrome.storage.local.set({[storageKey]: finishedList});
+	}
+
+	let targetList: HTMLElement;
+	if (action === 1) {
+		targetList = document.getElementById("finished_assignments")!;
+		element.classList.remove("pinned");
+		targetList.appendChild(element);
+	} else {
+		targetList = document.getElementById("new_assignments")!;
+		const storageData = await chrome.storage.local.get({pinned_assignments: []});
+		if (storageData.pinned_assignments.includes(eventID)) {
+			element.classList.add("pinned");
+		}
+		targetList.appendChild(element);
+	}
+
+	const assignments = Array.from(targetList.children) as HTMLDivElement[];
+	assignments.sort((a, b) => sortElements(a, b, targetList.id === "new_assignments"));
+	assignments.forEach(el => targetList.appendChild(el));
+	checkForEmpty();
+}
+
 function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: HWAssignment[]) {
 	let courses: Set<string> = new Set;
 	const insertAssignment =
 		(assignmentData: HWAssignment, template: DocumentFragment, targetListID: "new_assignments" | "finished_assignments") => {
 			const newAssigment = template.querySelector(".list_item") as HTMLDivElement;
+			newAssigment.dataset.timestamp = assignmentData.timestamp.toString();
+			if (assignmentData.pinned && targetListID === "new_assignments") newAssigment.classList.add("pinned");
+
 			if (assignmentData.sys === "ua")
 				insertUserAssignment(assignmentData, newAssigment, targetListID);
 			else {
@@ -58,18 +128,19 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 				newAssigment.querySelector(".end_time > span")!.textContent = assignmentData.finalDate!;
 				const buttonElements = newAssigment.querySelectorAll("a.button");
 				buttonElements[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
-				buttonElements[1].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, newAssigment, 1));
-				buttonElements[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, newAssigment, 0));
+				buttonElements[1].addEventListener("click", () => togglePinned(assignmentData.eventID, assignmentData.sys, newAssigment));
+				buttonElements[2].addEventListener("click", () => togglePinned(assignmentData.eventID, assignmentData.sys, newAssigment));
+				buttonElements[3].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, newAssigment, 1));
+				buttonElements[4].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, newAssigment, 0));
 				newAssigment.querySelector(".assignment_name")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				document.getElementById(targetListID)!.appendChild(newAssigment);
 			}
 		};
 
 	const assignmentTemplate = loadTemplate("assignment"), userAgendaTemplate = loadTemplate("userAgenda"),
-		sortAssignments = (a: HWAssignment, b: HWAssignment): number => a.timestamp === b.timestamp ? a.name.localeCompare(b.name) : a.timestamp < b.timestamp ? -1 : a.timestamp > b.timestamp ? 1 : 0,
 		chooseTemplate = (assignmentData: HWAssignment): DocumentFragment => "ua" === assignmentData.sys ? userAgendaTemplate.cloneNode(true) as DocumentFragment : assignmentTemplate.cloneNode(true) as DocumentFragment;
-	newAssignments.sort(sortAssignments);
-	finishedAssignments.sort(sortAssignments);
+	newAssignments.sort((a, b) => sortAssignments(a, b, true));
+	finishedAssignments.sort((a, b) => sortAssignments(a, b, false));
 	newAssignments.forEach(assignmentData => insertAssignment(assignmentData, chooseTemplate(assignmentData), "new_assignments"));
 	finishedAssignments.forEach(assignmentData => insertAssignment(assignmentData, chooseTemplate(assignmentData), "finished_assignments"));
 	const courseFilterElement = document.getElementById("course_filter") as HTMLSelectElement;
@@ -79,6 +150,35 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 		optionElement.textContent = courseName;
 	});
 	document.getElementById("spinner")!.style.display = "none";
+	checkForEmpty();
+}
+
+async function togglePinned(eventID: number, sys: HWSystem, element: HTMLDivElement) {
+	const storageData = await chrome.storage.local.get({pinned_assignments: [], user_agenda: {}});
+
+	let pinnedList: number[] = storageData.pinned_assignments;
+	const alreadyPinnedEh = pinnedList.includes(eventID);
+
+	if (alreadyPinnedEh) {
+		pinnedList.splice(pinnedList.indexOf(eventID), 1);
+		element.classList.remove("pinned");
+	} else {
+		pinnedList.push(eventID);
+		element.classList.add("pinned");
+	}
+
+	if (sys === "ua" && storageData.user_agenda[eventID]) {
+		storageData.user_agenda[eventID].pinned = !alreadyPinnedEh;
+		await chrome.storage.local.set({user_agenda: storageData.user_agenda});
+	}
+
+	await chrome.storage.local.set({pinned_assignments: pinnedList});
+
+	const container = element.parentElement as HTMLDivElement;
+	const assignments = Array.from(container.children) as HTMLDivElement[];
+	assignments.sort((a, b) => sortElements(a, b, container.id === "new_assignments"));
+
+	assignments.forEach(assignment => container.appendChild(assignment));
 	checkForEmpty();
 }
 
@@ -115,6 +215,8 @@ async function removeUA(assignmentID: number) {
 function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivElement, targetListID: "new_assignments" | "finished_assignments" | "" = "", insertAtBeginning: boolean = false) {
 	if (container.nodeName !== "DIV") container = container.querySelector(".list_item") as HTMLDivElement;
 	container.id = `U_${assignmentData.eventID}`;
+	container.dataset.timestamp = assignmentData.timestamp.toString();
+	if (assignmentData.pinned && targetListID === "new_assignments") container.classList.add("pinned");
 	container.querySelector(".assignment_name")!.textContent = assignmentData.name;
 	container.dataset.course = "#user-course";
 	let textareaHeight = 20 * (assignmentData.description.split("\n").length + 1),
@@ -136,8 +238,10 @@ function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivEl
 	const targetListButtons = container.querySelectorAll("a.button");
 	targetListButtons[0].addEventListener("click", () => editUA(assignmentData.eventID));
 	targetListButtons[1].addEventListener("click", () => removeUA(assignmentData.eventID));
-	targetListButtons[2].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, container, 1));
-	targetListButtons[3].addEventListener("click", () => toggle(assignmentData.sys, assignmentData.eventID, container, 0));
+	targetListButtons[2].addEventListener("click", () => togglePinned(assignmentData.eventID, assignmentData.sys, container));
+	targetListButtons[3].addEventListener("click", () => togglePinned(assignmentData.eventID, assignmentData.sys, container));
+	targetListButtons[4].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, container, 1));
+	targetListButtons[5].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, container, 0));
 }
 
 
@@ -150,6 +254,7 @@ export async function addAssignmentsToList(
 	const storageData = await chrome.storage.local.get({
 		quick_login: true, enable_login: true, user_agenda: {},
 		moodle_cal_enabled: true, cs_cal_enabled: false, webwork_cal_enabled: false,
+		pinned_assignments: [],
 	});
 	const userAgendaData: { [key: string]: HWAssignment } = storageData.user_agenda,
 		enabledCalendars = {
@@ -161,7 +266,8 @@ export async function addAssignmentsToList(
 	Object.keys(userAgendaData).forEach(agendaID => {
 		userAgendaData[agendaID].eventID = parseInt(agendaID);
 		userAgendaData[agendaID].sys = "ua";
-		userAgendaData[agendaID].done ? newAssignmentsList.push(userAgendaData[agendaID]) : finishedAssignmentsList.push(userAgendaData[agendaID]);
+		userAgendaData[agendaID].pinned = userAgendaData[agendaID].pinned ?? false;
+		userAgendaData[agendaID].done ? finishedAssignmentsList.push(userAgendaData[agendaID]) : newAssignmentsList.push(userAgendaData[agendaID]);
 	});
 	for (let type of Object.keys(assignmentPromises)) if (enabledCalendars[type as "moodle" | "cs" | "webwork"]) promisesList.push(assignmentPromises[type]);
 	let completedPromises = 0;
@@ -217,6 +323,7 @@ async function form_submit() {
 		sys: "ua",
 		timestamp: !form.no_end.checked && 0 < parseInt(form.end_time.valueAsNumber) ? parseInt(form.end_time.valueAsNumber) : 0,
 		done: isExistingAssignment ? userAgenda[finalAssignmentID].done : false,
+		pinned: isExistingAssignment ? userAgenda[finalAssignmentID].pinned : false,
 	};
 	if (50 < Object.keys(userAgenda).length) {
 		alert("לא ניתן ליצור יותר מ־50 מטלות משתמש.");

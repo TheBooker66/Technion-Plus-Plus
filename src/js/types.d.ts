@@ -8,6 +8,7 @@ type HWAssignment = {
 	course?: string,
 	sys: HWSystem,
 	done: boolean,
+	pinned: boolean,
 	timestamp: number,
 	finalDate?: string,
 	newEh?: boolean,

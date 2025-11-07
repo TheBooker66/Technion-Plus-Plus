@@ -80,8 +80,8 @@
                         </div>
                     </div>
                     <div style="grid-column: 1 / 3;">
-                        <a class="button" style="display: inline-block">שמור מטלה</a>
-                        <a class="button" style="display: inline-block">ביטול</a>
+                        <a class="button" style="display: inline-block;">שמור מטלה</a>
+                        <a class="button" style="display: inline-block;">ביטול</a>
                     </div>
                 </form>
             </div>
@@ -90,7 +90,7 @@
 
     <div id="error">
         <div class="error_bar" id="need_refresh" style="display: none;">
-            נמצאו מטלות חדשות! <a class="button" style="display: inline-block; margin: 0 1ch 0 0">רענן</a>
+            נמצאו מטלות חדשות! <a class="button" style="display: inline-block; margin: 0 1ch 0 0;">רענן</a>
         </div>
     </div>
 </main>
@@ -111,9 +111,8 @@
         <b><a href="https://www.bitpay.co.il/app/me/5BE56597-841F-4699-A112-319D7ED43CE96539">טיפ</a> למפתח
             התוסף</b><br/>
         <small>עזרו לי לעזור לכם 🙂</small><br/>
-        <a id="bit" class="button" target="_blank" href="../resources/bit_donation.jpg">
-            תרום ב-<img src="../icons/bit.svg" style="height: 1.3rem; vertical-align: text-bottom;"
-                        alt="תרומה בביט"/></a>
+        <a id="bit" class="button" target="_blank" href="../resources/bit_donation.jpg">תרום ב-
+            <img src="../icons/bit.svg" style="height: 1.3rem; vertical-align: text-bottom;" alt="תרומה בביט"/></a>
     </div>
 </footer>
 
@@ -132,8 +131,10 @@
         <div class="assignment_description"></div>
         <div class="end_time">תאריך סיום: <br/><span></span></div>
         <a title="עבור אל אתר ההגשה" class="button">פתח מטלה</a>
+        <a title="נעץ מטלה בראש הרשימה" class="button pin">נעץ</a>
+        <a title="בטל נעיצה של מטלה" class="button unpin">בטל נעיצה</a>
         <a title='העבר מטלה אל רשימת "מטלות שהושלמו"' class="button finish">סמן כהושלמה</a>
-        <a title='העבר מטלה אל רשימת "מטלות לביצוע"' class="button restore">סמן לביצוע</a>
+        <a title='העבר מטלה אל רשימת "מטלות לביצוע"' class="button unfinish">סמן לביצוע</a>
     </div>
 </template>
 
@@ -149,8 +150,10 @@
             <a title="ערוך מטלה" class="button">ערוך</a>
             <a title="מחק מטלה" class="button">מחק</a>
         </div>
+        <a title="נעץ מטלה בראש הרשימה" class="button pin">נעץ</a>
+        <a title="בטל נעיצה של מטלה" class="button unpin">בטל נעיצה</a>
         <a title='העבר מטלה אל רשימת "מטלות שהושלמו"' class="button finish">סמן כהושלמה</a>
-        <a title='העבר מטלה אל רשימת "מטלות לביצוע"' class="button restore">סמן לביצוע</a>
+        <a title='העבר מטלה אל רשימת "מטלות לביצוע"' class="button unfinish">סמן לביצוע</a>
     </div>
 </template>
 <script type="module" src="../js/cal_moodle.js"></script>

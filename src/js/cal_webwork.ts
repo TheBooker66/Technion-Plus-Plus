@@ -11,6 +11,7 @@ import {CommonCalendar} from './common_calendar.js';
 			webwork_cal_events: {},
 			webwork_cal_courses: {},
 			webwork_cal_update: 0,
+			pinned_assignments: [],
 		});
 		if (chrome.runtime.lastError) {
 			console.error("TE_ww_cal: " + chrome.runtime.lastError.message);
@@ -45,11 +46,12 @@ import {CommonCalendar} from './common_calendar.js';
 			sortedAssignments.push([assignment, webworkCalendarData[assignment]]);
 		});
 		sortedAssignments.sort((a, b) => {
-			return a[1].ts === b[1].ts ? a[1].h.localeCompare(b[1].h) : 0 === a[1].ts ? 1 : 0 === b[1].ts || a[1].ts < b[1].ts ? -1 : a[1].ts > b[1].ts ? 1 : 0;
+			return (a[1].ts - b[1].ts) || a[1].h.localeCompare(b[1].h);
 		});
 		for (let i = 0; i < sortedAssignments.length; i++) {
 			const assignment = sortedAssignments[i];
 			const courseLTI = assignment[0].substring(0, assignment[0].indexOf("000"));
+			const eventID = parseInt(assignment[0]);
 			const assignmentObject: HWAssignment = {
 				name: assignment[1].h,
 				description: "",
@@ -57,10 +59,11 @@ import {CommonCalendar} from './common_calendar.js';
 				finalDate: assignment[1].due,
 				newEh: !assignment[1].seen,
 				goToFunc: () => chrome.tabs.create({url: `https://moodle25.technion.ac.il/mod/lti/launch.php?id=${courseLTI}`}),
-				eventID: parseInt(assignment[0]),
+				eventID: eventID,
 				timestamp: assignment[1].ts,
 				sys: "webwork",
 				done: assignment[1].done,
+				pinned: (storageData.pinned_assignments as number[]).includes(eventID),
 			};
 			assignment[1].done ? finishedAssignmentsList.push(assignmentObject) : newAssignmentsList.push(assignmentObject);
 			assignment[1].seen = true;

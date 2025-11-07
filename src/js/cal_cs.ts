@@ -13,6 +13,7 @@ import {reverseString, xorStrings} from './utils.js';
 			cs_cal_seen: {},
 			cs_cal_pass: "",
 			uidn_arr: ["", ""],
+			pinned_assignments: [],
 		});
 		if (chrome.runtime.lastError) {
 			console.error("TE_cs_cal: " + chrome.runtime.lastError.message);
@@ -110,6 +111,7 @@ import {reverseString, xorStrings} from './utils.js';
 					sys: "cs",
 					course: courseName,
 					done: finishedEh,
+					pinned: (storageData.pinned_assignments as number[]).includes(eventID),
 				};
 				finishedEh ? finishedList.push(Assignment) : toDoList.push(Assignment);
 			}
@@ -119,7 +121,8 @@ import {reverseString, xorStrings} from './utils.js';
 				cs_cal_seen: seenItems,
 				cs_cal_update: currentTime,
 			});
-			toDoList.sort((a, b) => a.timestamp - b.timestamp);
+			toDoList.sort((a, b) => (a.timestamp - b.timestamp) || a.name.localeCompare(b.name));
+			finishedList.sort((a, b) => (a.timestamp - b.timestamp) || a.name.localeCompare(b.name));
 			resolve({new_list: toDoList, finished_list: finishedList});
 		} catch (errCode) {
 			const err_msg =

@@ -502,6 +502,9 @@
           <language minSize="59" name="JavaScript" />
         </Languages>
       </scope>
+      <Languages>
+        <language minSize="46" name="TypeScript" />
+      </Languages>
     </inspection_tool>
     <inspection_tool class="DuplicatedJobUsage" enabled="true" level="ERROR" enabled_by_default="true">
       <scope name="Libraries" level="ERROR" enabled="false" />

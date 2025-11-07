@@ -141,11 +141,15 @@ main {
     display: grid;
     background-color: #f9f9fa;
     transition: background-color .5s ease;
-    grid-template-columns: max-content minmax(200px, 400px) minmax(420px, auto) 134px repeat(2, 100px);
+    grid-template-columns: max-content minmax(200px, 400px) minmax(320px, auto) 134px repeat(3, 100px);
     align-items: center;
     column-gap: 12px;
     padding: 12px 6px 12px;
     border-right: 6px solid transparent;
+}
+
+#finished_assignments .list_item {
+    grid-template-columns: max-content minmax(200px, 400px) minmax(320px, auto) 134px repeat(2, 100px);
 }
 
 .list_item:last-of-type {
@@ -179,8 +183,20 @@ img.system {
     filter: invert();
 }
 
-#new_assignments .restore, #finished_assignments .finish {
+#new_assignments .unfinish, #finished_assignments .finish, #finished_assignments .pin, #finished_assignments .unpin {
     display: none;
+}
+
+.list_item .unpin {
+    display: none;
+}
+
+.list_item.pinned .pin {
+    display: none;
+}
+
+.list_item.pinned .unpin {
+    display: block;
 }
 
 b.assignment_name {
@@ -262,21 +278,21 @@ a.button:hover {
     background-color: var(--sec-norm);
 }
 
-a.button.finish, a.button.restore {
+a.button.finish, a.button.unfinish, a.button.pin, a.button.unpin {
     background-color: var(--button-color);
     color: #fff;
 }
 
-a.button.finish:hover, a.button.restore:hover {
+a.button.finish:hover, a.button.unfinish:hover, a.button.pin:hover, a.button.unpin:hover {
     background-color: var(--button-hover-color);
 }
 
-a.button.finish {
+a.button.finish, a.button.pin {
     --button-color: var(--status-success);
     --button-hover-color: var(--status-successer);
 }
 
-a.button.restore {
+a.button.unfinish, a.button.unpin {
     --button-color: var(--status-danger);
     --button-hover-color: var(--status-dangerer);
 }

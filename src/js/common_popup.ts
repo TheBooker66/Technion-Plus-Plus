@@ -1,9 +1,9 @@
 export class CommonPopup {
 	private readonly title: string;
 
-	constructor(title: string = "", css_list: string[] = [], organiser: string) {
+	constructor(title: string = "", css_list: string[] = [], context: string) {
 		this.title = title;
-		if (organiser === "ארגונית++") return;
+		if (context === "ארגונית++") return;
 
 		void this.useTemplatesFile("popup", (documentContext: Document) => {
 			for (let i = 0; i < css_list.length; i++) {

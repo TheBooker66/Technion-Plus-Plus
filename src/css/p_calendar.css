@@ -133,7 +133,7 @@
     display: none;
 }
 
-#new_assignments .restore, #finished_assignments .finish {
+#new_assignments .unfinish, #finished_assignments .finish {
     display: none;
 }
 
