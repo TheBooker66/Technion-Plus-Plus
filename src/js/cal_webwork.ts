@@ -41,7 +41,6 @@ import {CommonCalendar} from './common_calendar.js';
 		let webworkCalendarData = storageData.webwork_cal_events,
 			sortedAssignments: [string, { h: string, due: string, ts: number, seen: boolean, done: boolean }][] = [],
 			newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
-		console.log(webworkCalendarData);
 		Object.keys(webworkCalendarData).forEach(assignment => {
 			sortedAssignments.push([assignment, webworkCalendarData[assignment]]);
 		});
