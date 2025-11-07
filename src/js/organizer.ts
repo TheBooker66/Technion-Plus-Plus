@@ -185,6 +185,8 @@ async function togglePinned(eventID: number, sys: HWSystem, element: HTMLDivElem
 async function editUA(assignmentID: number) {
 	const storageData = await chrome.storage.local.get({user_agenda: {}});
 	const userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
+
+	tabHeaders[2].click();
 	form.subject.value = userAgenda[assignmentID].name;
 	form.notes.value = userAgenda[assignmentID].description;
 	form.edit.value = assignmentID;
@@ -196,9 +198,7 @@ async function editUA(assignmentID: number) {
 		form.end_time.value = "";
 	}
 
-	form_manual_events();
-	tabContents.forEach(optionElement => optionElement.style.display = "none");
-	tabContents[2].style.display = "block";
+	updateUAFormCounters();
 }
 
 async function removeUA(assignmentID: number) {
@@ -285,30 +285,30 @@ export async function addAssignmentsToList(
 	}
 }
 
-function form_manual_events() {
+function updateUAFormCounters() {
 	const input_counters = form.querySelectorAll("span");
 	input_counters[0].textContent = form.subject.value.length;
 	input_counters[1].textContent = form.notes.value.length;
 	form.end_time.disabled = form.no_end.checked;
 }
 
-function form_reset_all() {
+function resetUAForm() {
 	form.reset();
 	form.edit.value = "0";
-	form_manual_events();
+	updateUAFormCounters();
 }
 
-async function form_submit() {
+async function saveUA() {
 	if (form.subject.value.length === 0) {
-		alert("חובה למלא נושא למטלה");
+		alert("חובה למלא נושא למטלה.");
 		return;
 	}
 	if (!(form.no_end.checked || "" !== form.end_time.value)) {
-		alert('חובה לבחור תאריך סיום או לסמן את "ללא תאריך סיום"');
+		alert('חובה לבחור תאריך סיום או לסמן את "ללא תאריך סיום".');
 		return;
 	}
 	if (!form.no_end.checked && form.end_time.valueAsNumber < Date.now()) {
-		alert("תאריך הסיום שבחרת כבר עבר, נא לבחור תאריך סיום חדש");
+		alert("תאריך הסיום שבחרת כבר עבר, נא לבחור תאריך סיום חדש.");
 		return;
 	}
 	const storageData = await chrome.storage.local.get({user_agenda: {}});
@@ -341,7 +341,7 @@ async function form_submit() {
 		checkForEmpty();
 		tabHeaders[0].click();
 	}
-	form_reset_all();
+	resetUAForm();
 }
 
 async function setUpFilters() {
@@ -436,16 +436,18 @@ const form = document.querySelector("form") as HTMLFormElement,
 if (document.title === "ארגונית++") {
 	form.addEventListener("submit", async event => {
 		event.preventDefault();
-		await form_submit();
+		await saveUA();
 	});
 	const form_buttons = form.querySelectorAll("a.button") as NodeListOf<HTMLAnchorElement>;
-	form_buttons[0].addEventListener("click", () => form_submit());
-	form_buttons[1].addEventListener("click", () => {
-		form_reset_all();
-		let currentTab = document.querySelector(".tab.current") as HTMLDivElement;
-		currentTab === tabHeaders[2] ? tabHeaders[0].click() : currentTab.click();
+	form_buttons[0].addEventListener("click", async () => {
+		await saveUA();
+		tabHeaders[0].click();
 	});
-	tabHeaders[2].addEventListener("click", () => form_reset_all());
+	form_buttons[1].addEventListener("click", () => {
+		resetUAForm();
+		tabHeaders[0].click();
+	});
+	tabHeaders[2].addEventListener("click", resetUAForm);
 
 	const need_refresh = document.querySelector("#need_refresh") as HTMLDivElement;
 	need_refresh.querySelector("a.button")?.addEventListener("click", () => window.location.reload());

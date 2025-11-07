@@ -367,19 +367,15 @@ label, label input {
     background-color: #ccc7;
 }
 
-/*
- edit mode
-*/
-
-input[type="hidden"]:not([value="0"]) + div {
+input[type="hidden"] + div::before {
     display: block;
-    grid-column: 1 / 3;
     font-size: 16px;
     font-weight: 500;
+    content: "עריכת מטלה 📝";
 }
 
-input[type="hidden"][value="0"] + div {
-    display: none;
+input[type="hidden"][value="0"] + div::before {
+    content: "הוספת מטלה 📝";
 }
 
 .hidden {
