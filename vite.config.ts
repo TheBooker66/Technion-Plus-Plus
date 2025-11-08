@@ -67,26 +67,54 @@ function zipPlugin(outDir: string, isProd: boolean) {
 		name: "zip-bundle",
 		async closeBundle() {
 			const projectRoot = resolve(import.meta.dirname);
-			const distDir = resolve(projectRoot, outDir);
-			const output = fs.createWriteStream(resolve(projectRoot, outDir + ".zip"));
-			const archive = archiver("zip", {
+			const distOutput = fs.createWriteStream(resolve(projectRoot, outDir + ".zip")),
+				sourceOutput = fs.createWriteStream(resolve(projectRoot, "source.zip"));
+			const distArchiver = archiver("zip", {
+				zlib: {level: 9},
+			}), sourceArchiver = archiver("zip", {
 				zlib: {level: 9},
 			});
 
 			new Promise<void>((resolvePromise, reject) => {
-				output.on("close", () => {
-					console.log(`\n📦 Zip complete. Total bytes: ${archive.pointer()}.`);
+				distOutput.on("close", () => {
+					console.log(`\n📦 Zip complete. Total bytes: ${distArchiver.pointer()}.`);
 					console.log(`Output archive written to: ${resolve(projectRoot, outDir + ".zip")}`);
 					resolvePromise();
 				});
 
-				archive.on("error", (err) => {
+				distArchiver.on("error", (err) => {
 					reject(err);
 				});
 
-				archive.pipe(output);
-				archive.directory(distDir, false);
-				archive.finalize();
+				distArchiver.pipe(distOutput);
+				distArchiver.directory(resolve(projectRoot, outDir), false);
+				distArchiver.finalize();
+			});
+
+			new Promise<void>((resolvePromise, reject) => {
+				sourceOutput.on("close", () => {
+					console.log(`\n📦 Source Zip complete. Total bytes: ${sourceArchiver.pointer()}.`);
+					console.log(`Output archive written to: ${resolve(projectRoot, "source.zip")}`);
+					resolvePromise();
+				});
+
+				sourceArchiver.on("error", (err) => {
+					reject(err);
+				});
+
+				sourceArchiver.pipe(sourceOutput);
+				sourceArchiver.glob("**/*", {
+					cwd: projectRoot,
+					ignore: [
+						".git**", ".idea/**", "node_modules/**", "package-lock.json",
+						outDir + "/**", outDir + ".zip", "source.zip",
+					],
+				});
+				// create lib folder structure in source zip
+				sourceArchiver.file(resolve(projectRoot, "node_modules/pdfjs-dist/build/pdf.min.mjs"), {name: "src/lib/pdfjs/pdf.min.mjs"});
+				sourceArchiver.file(resolve(projectRoot, "node_modules/pdfjs-dist/build/pdf.worker.min.mjs"), {name: "src/lib/pdfjs/pdf.worker.min.mjs"});
+				sourceArchiver.file(resolve(projectRoot, outDir + "/lib/cheesefork/share-histograms.js"), {name: "src/lib/cheesefork/share-histograms.js"});
+				sourceArchiver.finalize();
 			});
 		},
 	};

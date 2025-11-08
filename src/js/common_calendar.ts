@@ -130,7 +130,7 @@ function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => Prom
 	openFunction().catch(() => {
 		assignmentItem.style.borderRadius = "3px;";
 		assignmentItem.style.backgroundColor = "var(--status-danger) !important;";
-		setTimeout(assignmentItem.style.backgroundColor = "", 1E3);
+		setTimeout(() => assignmentItem.style.backgroundColor = "", 1E3);
 	}).finally(() => {
 		spinner.style.display = "block";
 		spinner.parentElement?.classList.remove("small_spinner");

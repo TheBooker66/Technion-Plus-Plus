@@ -230,7 +230,7 @@ async function TE_notification(message: string, silentEh: boolean, notificationI
 	};
 
 	// @ts-ignore
-	if (typeof chrome.notifications.NotificationOptions.silent !== "undefined") notificationOptions.silent = true;
+	if (typeof chrome.notifications.NotificationOptions?.silent !== "undefined") notificationOptions.silent = true;
 	if (notificationId) await chrome.notifications.clear(notificationId);
 	await chrome.notifications.create(notificationId, notificationOptions);
 	if (silentEh) return;
