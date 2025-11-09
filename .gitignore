@@ -8,3 +8,7 @@ package-lock.json
 # Build output
 /dist/
 dist.zip
+source.zip
+
+# Copilot stuff
+/.idea/copilot*

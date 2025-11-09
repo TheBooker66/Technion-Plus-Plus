@@ -7,6 +7,8 @@
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludePattern pattern="dist.zip" />
+      <excludePattern pattern="source.zip" />
+      <excludePattern pattern="copilot*" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
