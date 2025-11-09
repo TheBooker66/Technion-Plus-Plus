@@ -12,6 +12,31 @@ import {minify as minifyHTMLSVG} from "html-minifier-next";
 import {transform as minifyCSS} from "lightningcss";
 import archiver from "archiver";
 
+
+function cleanPlugin(outDir: string) {
+	return {
+		name: "clean",
+		buildStart() {
+			const projectRoot = resolve(import.meta.dirname);
+			const fullOut = resolve(projectRoot, outDir),
+				zipOut = fullOut + ".zip",
+				sourceZipOut = resolve(projectRoot, "source.zip");
+			if (fs.existsSync(fullOut)) {
+				console.log(`Removing existing output directory: ${fullOut}`);
+				fs.rmSync(fullOut, {recursive: true, force: true});
+			}
+			if (fs.existsSync(zipOut)) {
+				console.log(`Removing existing zip archive: ${zipOut}`);
+				fs.rmSync(zipOut, {force: true});
+			}
+			if (fs.existsSync(sourceZipOut)) {
+				console.log(`Removing existing source zip archive: ${sourceZipOut}`);
+				fs.rmSync(sourceZipOut, {force: true});
+			}
+		},
+	};
+}
+
 function downloadPlugin(url: string, destRelative: string, isProd: boolean) {
 	return {
 		name: "download",
@@ -148,6 +173,9 @@ export default defineConfig(({mode}) => {
 			},
 		},
 		plugins: [
+			cleanPlugin(
+				outDir,
+			),
 			viteStaticCopy({
 				targets: [
 					{
