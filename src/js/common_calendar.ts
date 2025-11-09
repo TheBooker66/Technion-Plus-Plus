@@ -50,8 +50,8 @@ export class CommonCalendar {
 				newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
 				newAssigment.querySelector(".end_time")!.textContent += assignmentData.finalDate;
 				const actionButtons = newAssigment.querySelectorAll("img");
-				actionButtons[1].addEventListener("click", () => toggleDone(this.system, assignmentData.eventID, newAssigment, 1));
-				actionButtons[2].addEventListener("click", () => toggleDone(this.system, assignmentData.eventID, newAssigment, 0));
+				actionButtons[1].addEventListener("click", () => toggleDoneOriginal(this.system, assignmentData.eventID, newAssigment, true));
+				actionButtons[2].addEventListener("click", () => toggleDoneOriginal(this.system, assignmentData.eventID, newAssigment, false));
 				actionButtons[0].title = "moodle" === this.system ? "עבור להגשה במודל" : "עבור לאתר הקורס";
 				actionButtons[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				newAssigment.querySelector(".assignment_name")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
@@ -98,26 +98,30 @@ function insertMessage(msg: string, errorEh: boolean) {
 	messageElement.textContent = msg;
 }
 
-async function toggleDone(sys: HWSystem, eventID: number, item: HTMLDivElement, VorX: 0 | 1) {
-	const assignmentLists = [document.getElementById("new_assignments"), document.getElementById("finished_assignments")];
-	assignmentLists[VorX]?.appendChild(item);
+export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: HTMLDivElement, finishEh: boolean) {
+	if (finishEh) document.getElementById("finished_assignments")?.appendChild(item);
+	else document.getElementById("new_assignments")?.appendChild(item);
 	checkForEmpty();
 
-	const storageKey = `${sys}_cal_finished`;
+	let storageKey: string;
+	if (sys === "webwork")
+		storageKey = "webwork_cal_events";
+	else
+		storageKey = `${sys}_cal_finished`;
+
 	const storageData = await chrome.storage.local.get(storageKey);
 	if (chrome.runtime.lastError) {
 		console.error("TE_cal: " + chrome.runtime.lastError.message);
 		return;
 	}
 
-	let calendar;
+	let calendar: { [key: number]: { done: boolean } } | number[];
 	if (sys === "webwork") {
 		calendar = storageData[storageKey] as { [key: number]: { done: boolean } };
 		calendar[eventID].done = !calendar[eventID].done;
 	} else {
 		calendar = storageData[storageKey] as number[];
-		if (calendar.includes(eventID))
-			calendar.splice(storageData[storageKey].indexOf(eventID), 1);
+		if (calendar.includes(eventID)) calendar.splice(storageData[storageKey].indexOf(eventID), 1);
 		else calendar.push(eventID);
 	}
 	await chrome.storage.local.set({[storageKey]: calendar});

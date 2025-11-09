@@ -472,14 +472,14 @@ async function TE_webworkScan() {
 
 		const finalBody = new URLSearchParams(step3[1] as string).toString();
 		const page = await XHR(step3[0] as string, "document", ["WebworkMissions"], finalBody);
-		const assignments: { [key: string]: { h: string, due: string, ts: number, seen: boolean, done: boolean } } = {},
+		const assignments: { [key: number]: { h: string, due: string, ts: number, seen: boolean, done: boolean } } = {},
 			missions: { name: string, due: string }[] = page.response["WebworkMissions"];
 
 		for (let i = 0; i < missions.length; i++) {
 			const mission = missions[i];
 			if (ignoreRegex.test(mission.due)) continue;
 			const hwName = mission.name;
-			const assignmentId = (courseData as WebworkCourse).lti.toString() + "000" + i.toString();
+			const assignmentId = parseInt((courseData as WebworkCourse).lti + "000" + i.toString());
 
 			let seen = false, done = false;
 			if (storageData.webwork_cal_events[assignmentId]) {

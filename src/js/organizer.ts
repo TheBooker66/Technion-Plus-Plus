@@ -1,3 +1,5 @@
+import {toggleDoneOriginal} from "./common_calendar";
+
 function insertMessage(messageText: string, errorEh: boolean = true) {
 	const element = document.getElementById("error")!.appendChild(document.createElement("div"));
 	element.className = errorEh ? "error_bar" : "attention";
@@ -48,7 +50,7 @@ function sortElements(a: HTMLDivElement, b: HTMLDivElement, considerPins: boolea
 	return (aTime - bTime) || (a.querySelector('.assignment_name') as HTMLElement).textContent!.localeCompare((b.querySelector('.assignment_name') as HTMLElement).textContent!);
 }
 
-async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElement, action: 0 | 1) {
+async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElement, finishEh: boolean) {
 	if (sys === "ua") {
 		const storageData = await chrome.storage.local.get({user_agenda: {}});
 		if (chrome.runtime.lastError) console.error("TE_organizer: " + chrome.runtime.lastError.message);
@@ -56,29 +58,10 @@ async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElemen
 			storageData.user_agenda[eventID].done = !storageData.user_agenda[eventID].done;
 			await chrome.storage.local.set({user_agenda: storageData.user_agenda});
 		}
-	} else {
-		const storageKey = `${sys}_cal_finished`;
-		const storageData = await chrome.storage.local.get({[storageKey]: []});
-		if (chrome.runtime.lastError) {
-			console.error("TE_cal: " + chrome.runtime.lastError.message);
-			return;
-		}
-
-		let finishedList: number[] = storageData[storageKey];
-		const index = finishedList.indexOf(eventID);
-
-		if (action === 1 && index === -1)
-			finishedList.push(eventID);
-		else if (action === 0 && index !== -1)
-			finishedList.splice(index, 1);
-		else
-			return;
-
-		await chrome.storage.local.set({[storageKey]: finishedList});
-	}
+	} else await toggleDoneOriginal(sys, eventID, element, finishEh);
 
 	let targetList: HTMLElement;
-	if (action === 1) {
+	if (finishEh) {
 		targetList = document.getElementById("finished_assignments")!;
 		element.classList.remove("pinned");
 		targetList.appendChild(element);
@@ -130,8 +113,8 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 				buttonElements[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				buttonElements[1].addEventListener("click", () => togglePinned(assignmentData.eventID, assignmentData.sys, newAssigment));
 				buttonElements[2].addEventListener("click", () => togglePinned(assignmentData.eventID, assignmentData.sys, newAssigment));
-				buttonElements[3].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, newAssigment, 1));
-				buttonElements[4].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, newAssigment, 0));
+				buttonElements[3].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, newAssigment, true));
+				buttonElements[4].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, newAssigment, false));
 				newAssigment.querySelector(".assignment_name")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 				document.getElementById(targetListID)!.appendChild(newAssigment);
 			}
@@ -240,8 +223,8 @@ function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivEl
 	targetListButtons[1].addEventListener("click", () => removeUA(assignmentData.eventID));
 	targetListButtons[2].addEventListener("click", () => togglePinned(assignmentData.eventID, assignmentData.sys, container));
 	targetListButtons[3].addEventListener("click", () => togglePinned(assignmentData.eventID, assignmentData.sys, container));
-	targetListButtons[4].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, container, 1));
-	targetListButtons[5].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, container, 0));
+	targetListButtons[4].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, container, true));
+	targetListButtons[5].addEventListener("click", () => toggleDone(assignmentData.sys, assignmentData.eventID, container, false));
 }
 
 

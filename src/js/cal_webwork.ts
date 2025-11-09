@@ -39,18 +39,19 @@ import {CommonCalendar} from './common_calendar.js';
 			})}.` : " לא ידוע";
 
 		let webworkCalendarData = storageData.webwork_cal_events,
-			sortedAssignments: [string, { h: string, due: string, ts: number, seen: boolean, done: boolean }][] = [],
+			sortedAssignments: [number, { h: string, due: string, ts: number, seen: boolean, done: boolean }][] = [],
 			newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
 		Object.keys(webworkCalendarData).forEach(assignment => {
-			sortedAssignments.push([assignment, webworkCalendarData[assignment]]);
+			sortedAssignments.push([parseInt(assignment), webworkCalendarData[assignment]]);
 		});
 		sortedAssignments.sort((a, b) => {
 			return (a[1].ts - b[1].ts) || a[1].h.localeCompare(b[1].h);
 		});
 		for (let i = 0; i < sortedAssignments.length; i++) {
 			const assignment = sortedAssignments[i];
-			const courseLTI = assignment[0].substring(0, assignment[0].indexOf("000"));
-			const eventID = parseInt(assignment[0]);
+			const courseLTI = assignment[0].toString().substring(0,
+				assignment[0].toString().indexOf("000"));
+			const eventID = assignment[0];
 			const assignmentObject: HWAssignment = {
 				name: assignment[1].h,
 				description: "",
