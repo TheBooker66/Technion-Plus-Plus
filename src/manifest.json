@@ -10,7 +10,7 @@
     "48": "icons/technion_plus_plus/icon-48.png",
     "128": "icons/technion_plus_plus/icon-128.png"
   },
-  "version": "4.2.1",
+  "version": "4.2.2",
   "manifest_version": 3,
   "browser_specific_settings": {
     "gecko": {

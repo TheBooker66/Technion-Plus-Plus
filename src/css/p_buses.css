@@ -79,8 +79,7 @@
 
 .settings select {
     border: 0;
-    -moz-appearance: none;
-    -webkit-appearance: none;
+    appearance: none;
     color: #0c0c0d;
     display: inline-block;
     margin: 0;

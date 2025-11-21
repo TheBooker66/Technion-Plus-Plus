@@ -369,8 +369,6 @@ body tr.animate td {
     transition: background-color 1s ease, border-color 2s ease, color 1s ease, transform 0.1s ease;
     box-sizing: border-box;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
 }
 
@@ -406,8 +404,6 @@ input#delete_grades:focus {
 }
 
 select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     background-image: url("../icons/arrowhead-down-black.svg");
     background-repeat: no-repeat;

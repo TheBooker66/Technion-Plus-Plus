@@ -290,5 +290,5 @@ floating speed control panel
 }
 
 #tplus_floating_speed_controller input[type="number"] {
-    -moz-appearance: textfield;
+    appearance: textfield;
 }
