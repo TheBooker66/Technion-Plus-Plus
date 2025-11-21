@@ -216,10 +216,11 @@ let speed = 1.0;
 
 						toggleSecondaryVideoDisplay(true);
 						const newWindow = window.open("", "Technion", "width=830,height=655,menubar=no,statusbar=no,titlebar=no,toolbar=no") as Window;
-						newWindow.document.title = "Technion - " + document.title;
-						newWindow.document.body.setAttribute("style", "{text-align: center; background: #000; font-family: arial,serif; direction: rtl; font-size: 11px; color: #f9f9fa;}".replace(/[{}]/g, ''));
+						const newDocument = newWindow.document;
+						newDocument.title = "Technion - " + document.title;
+						newDocument.body.setAttribute("style", "{text-align: center; background: #000; font-family: arial,serif; direction: rtl; font-size: 11px; color: #f9f9fa;}".replace(/[{}]/g, ''));
 						const newWindowCanvas = document.createElement("canvas");
-						newWindow.document.body.appendChild(newWindowCanvas);
+						newDocument.body.appendChild(newWindowCanvas);
 						newWindowCanvas.height = secondaryVideoElements.videoHeight;
 						newWindowCanvas.width = secondaryVideoElements.videoWidth;
 						newWindowCanvas.setAttribute("style", "{max-width: 800px; border: 1px solid #fff; margin: auto; display: block;}".replace(/[{}]/g, ''));
@@ -240,20 +241,18 @@ let speed = 1.0;
 						fullscreenButton.style.margin = "8px";
 						fullscreenButton.style.cursor = "pointer";
 						instructionsSpan.textContent = "ניתן לגרור את החלון למסך שני וכך לצפות בווידאו במצב מסך מלא בשני המסכים.";
-						newWindow.document.addEventListener("dblclick", () => {
+						newDocument.addEventListener("dblclick", () => {
 							if (!NewWindowFullscreenEh) return;
-							// @ts-ignore
-							"function" === typeof newWindow.document.mozCancelFullScreen ? newWindow.document.mozCancelFullScreen() : newWindow.document.webkitExitFullscreen();
+							newDocument.exitFullscreen();
 							NewWindowFullscreenEh = false;
 						});
 						fullscreenButton.addEventListener("click", () => {
-							// @ts-ignore
-							"function" === typeof newWindowCanvas.mozRequestFullScreen ? newWindowCanvas.mozRequestFullScreen() : newWindowCanvas.webkitRequestFullscreen();
+							newWindowCanvas.requestFullscreen();
 							NewWindowFullscreenEh = true;
 						});
-						newWindow.document.body.appendChild(fullscreenButton);
+						newDocument.body.appendChild(fullscreenButton);
 						newWindow.onbeforeunload = () => toggleSecondaryVideoDisplay(false);
-						newWindow.document.body.appendChild(fullscreenButton);
+						newDocument.body.appendChild(fullscreenButton);
 					});
 
 					observer.disconnect();
@@ -314,9 +313,7 @@ let speed = 1.0;
 		const url = document.URL, startPos = url.indexOf("&");
 		const parsedURL = startPos === -1 ? url : url.substring(0, startPos);
 
-		const videoElement =
-			document.querySelector("video#secondaryVideo") as HTMLVideoElement || // Dual player
-			document.querySelector("video#primaryVideo") as HTMLVideoElement; // Single player
+		const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
 		const timestampUrl = `${parsedURL}&start=${videoElement.currentTime}`;
 
 		if (!markdownLinkEh) {
@@ -596,6 +593,15 @@ let speed = 1.0;
 		setupMenu();
 
 		document.addEventListener('wheel', (event) => changeVolume(event.deltaY));
+		document.addEventListener('keydown', (event) => {
+			if (event.key !== 'f') return;
+
+			const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
+			if (document.fullscreenElement)
+				document.exitFullscreen();
+			else
+				videoElement.requestFullscreen();
+		});
 
 		if (storageData.panopto_save) {
 			(document.getElementById("m_save") as HTMLInputElement).checked = storageData.panopto_save;
@@ -612,12 +618,12 @@ let speed = 1.0;
 				(document.querySelector(".MuiListItemIcon-root.css-19e1foa.css-1f8bwsm") as HTMLDivElement)?.remove();
 			}, 2000);
 
-			const mainVideoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
-			mainVideoElement.addEventListener("ratechange", async () => {
-				if ((document.getElementById("m_returnbackwards") as HTMLInputElement).checked && mainVideoElement.playbackRate < speed) {
-					mainVideoElement.currentTime = Math.max(0, mainVideoElement.currentTime - 10);
+			const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
+			videoElement.addEventListener("ratechange", async () => {
+				if ((document.getElementById("m_returnbackwards") as HTMLInputElement).checked && videoElement.playbackRate < speed) {
+					videoElement.currentTime = Math.max(0, videoElement.currentTime - 10);
 				}
-				speed = mainVideoElement.playbackRate;
+				speed = videoElement.playbackRate;
 				updateRealTime();
 				await saveSetting("speed");
 				// noinspection SpellCheckingInspection
