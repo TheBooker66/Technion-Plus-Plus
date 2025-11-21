@@ -10,13 +10,4 @@ import {CommonPopup} from "./common_popup.js";
 		`mailto:${emailInfo.ad}?subject=${emailInfo.su}`;
 	button.setAttribute("href", emailURL);
 	if (storageData.gmail) button.setAttribute("target", "_blank");
-
-	const chromeLinkElement = document.getElementById("chromeStoreLink") as HTMLAnchorElement,
-		firefoxLinkElement = document.getElementById("firefoxStoreLink") as HTMLAnchorElement,
-		chromeStoreURL = "https://chromewebstore.google.com/detail/technion-plus-plus/pfhjnidbfndnjhpcpfecngcigdjebemk",
-		firefoxStoreURL = "https://addons.mozilla.org/en-GB/firefox/addon/technion-plus-plus/";
-	chromeLinkElement.setAttribute("href", chromeStoreURL);
-	chromeLinkElement.setAttribute("target", "_blank");
-	firefoxLinkElement.setAttribute("href", firefoxStoreURL);
-	firefoxLinkElement.setAttribute("target", "_blank");
 })();

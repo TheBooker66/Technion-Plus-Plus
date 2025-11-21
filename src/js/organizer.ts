@@ -256,14 +256,14 @@ export async function addAssignmentsToList(
 	let completedPromises = 0;
 	for (let calendarPromise of promisesList) {
 		calendarPromise().then(calendarData => {
-			finishedAssignmentsList = finishedAssignmentsList.concat(calendarData.new_list);
-			newAssignmentsList = newAssignmentsList.concat(calendarData.finished_list);
+			newAssignmentsList = newAssignmentsList.concat(calendarData.new_list);
+			finishedAssignmentsList = finishedAssignmentsList.concat(calendarData.finished_list);
 		}).catch(err => insertMessage(err.msg, err.is_error)).finally(() => {
-			if (++completedPromises === promisesList.length) insertAssignments(finishedAssignmentsList, newAssignmentsList);
+			if (++completedPromises === promisesList.length) insertAssignments(newAssignmentsList, finishedAssignmentsList);
 		});
 	}
 	if (promisesList.length === 0) {
-		insertAssignments(finishedAssignmentsList, newAssignmentsList);
+		insertAssignments(newAssignmentsList, finishedAssignmentsList);
 		insertMessage(`משיכת מטלות הבית עבור מודל, וובוורק ומדמ"ח כבויה. יש להגדיר הצגת מטלות בית עבור המערכות הרצויות בהגדרות התוסף.`, false);
 	}
 }

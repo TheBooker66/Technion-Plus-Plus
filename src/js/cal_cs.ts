@@ -105,7 +105,7 @@ import {reverseString, xorStrings} from './utils.js';
 					description: description,
 					finalDate: formattedDate,
 					newEh: newEventEh,
-					goToFunc: () => new Promise(go => go(chrome.tabs.create({url: eventURL}))),
+					goToFunc: () => chrome.tabs.create({url: eventURL}),
 					eventID: eventID,
 					timestamp: dueDate.getTime(),
 					sys: "cs",

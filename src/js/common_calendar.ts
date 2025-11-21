@@ -121,8 +121,8 @@ export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: H
 		calendar[eventID].done = !calendar[eventID].done;
 	} else {
 		calendar = storageData[storageKey] as number[];
-		if (calendar.includes(eventID)) calendar.splice(storageData[storageKey].indexOf(eventID), 1);
-		else calendar.push(eventID);
+		if (finishEh) calendar.push(eventID);
+		else calendar.splice(storageData[storageKey].indexOf(eventID), 1);
 	}
 	await chrome.storage.local.set({[storageKey]: calendar});
 }
