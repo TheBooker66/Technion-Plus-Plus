@@ -54,6 +54,18 @@
 		selectedTableCells[7].textContent = selectedStats.points_passed.toString();
 	}
 
+	function handleSelectAllClick(event: Event) {
+		const checkedEh = (event.target as HTMLInputElement).checked;
+
+		document.querySelectorAll("#grades_list tbody tr").forEach(rowElement => {
+			const checkbox = rowElement.querySelector("input[type='checkbox'].select_course") as HTMLInputElement;
+			checkbox.checked = checkedEh;
+			rowElement.classList.toggle("selected", checkedEh);
+		});
+
+		updateSelectedCoursesStats();
+	}
+
 	function updateAllStats() {
 		const allGradesStats = calculateTableStats("#grades_list"),
 			allPointsElements = document.querySelectorAll("#grades_list tr .points") as NodeListOf<HTMLInputElement>,
@@ -122,7 +134,6 @@
 			return;
 		}
 
-		// noinspection DuplicatedCode
 		if (!target.matches("td button")) return;
 
 		const storageData = await chrome.storage.local.get({grades: []});
@@ -196,7 +207,6 @@
 		if (!rowElement) return;
 		if (rowElement.parentElement?.tagName !== 'TBODY') return;
 
-		// noinspection DuplicatedCode
 		if (!target.matches("td button")) return;
 
 		const storageData = await chrome.storage.local.get({grades: []});
@@ -554,6 +564,8 @@
 
 		(document.getElementById("grades_list") as HTMLTableElement).addEventListener("click", handleGradesListClick);
 		(document.getElementById("ignore_list") as HTMLTableElement).addEventListener("click", handleIgnoreListClick);
+
+		(document.getElementById("select_all_courses") as HTMLInputElement).addEventListener("change", handleSelectAllClick);
 	}
 
 	async function renderAllCourses() {

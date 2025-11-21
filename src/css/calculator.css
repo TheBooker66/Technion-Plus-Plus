@@ -353,7 +353,7 @@ body tr.animate td {
     font-weight: 500;
 }
 
-#buttons input {
+#buttons input[type=button], #buttons label {
     display: block;
     width: 100%;
     margin: 10px 0;
@@ -374,18 +374,18 @@ body tr.animate td {
     appearance: none;
 }
 
-#buttons input:hover {
+#buttons input[type=button]:hover, #buttons label:hover {
     background-color: var(--button-default-hover-bg);
     border-color: var(--button-default-hover-border);
     transform: translateY(-1px);
 }
 
-#buttons input:focus {
+#buttons input[type=button]:focus, #buttons label:focus {
     background-color: var(--button-default-hover-bg);
     border-color: var(--button-default-hover-border);
 }
 
-#buttons input:active {
+#buttons input[type=button]:active, #buttons label:active {
     transform: translateY(0);
 }
 
@@ -468,7 +468,7 @@ select {
     box-shadow: 0 3px 8px rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
-[tplus=dm] #buttons input {
+[tplus=dm] #buttons input[type=button], [tplus=dm] #buttons label {
     box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05), 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
