@@ -154,7 +154,7 @@ import {TE_AutoLogin} from "./service_worker.js";
 
 				const courseInfo: string[] = cal[i].split("CATEGORIES:")[1].split("\n")[0].trim().split(".");
 				const courseNum = courseInfo[0]?.replace(/[^0-9]/i, "").trim(),
-					semesterNum = courseInfo[1]?.replace(/[^0-9]/i, "").trim();
+					semesterNum = (courseInfo[2] ?? courseInfo[1])?.replace(/[^0-9]/i, "").trim();
 				const course = (storageData.moodle_cal_courses.hasOwnProperty(courseNum) && semesterNum.toString() in semesters) ?
 					storageData.moodle_cal_courses[courseNum] + (semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "")
 					: courseInfo.toString();
