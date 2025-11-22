@@ -1,4 +1,6 @@
 (async function () {
+	type ExtendedStorageData = StorageData & { username_ext: string, password: string };
+
 	// Duplicate of util.js due to the login script being executed in a different context
 
 	function reverseString(str: string): string {
@@ -24,7 +26,7 @@
 		(document.querySelector(".btn.btn-secondary.btn-block") as HTMLAnchorElement)?.click();
 	}
 
-	function microsoft(storageData: { [key: string]: string | boolean }) {
+	function microsoft(storageData: ExtendedStorageData) {
 		const handleMicrosoftLogin = () => {
 			const loginForm = document.forms.namedItem("f1"),
 				microsoftLoginButton = document.getElementById("idSIButton9");
@@ -60,7 +62,7 @@
 			.observe(document.forms[0] ?? document.body, {childList: true, attributes: false, subtree: true});
 	}
 
-	function techwww(storageData: { [key: string]: string | boolean }) {
+	function techwww(storageData: ExtendedStorageData) {
 		const form = document.createElement("form");
 		appendInfo(form, "username", storageData.username_ext.toString());
 		appendInfo(form, "password", storageData.password.toString());
@@ -72,7 +74,7 @@
 		form.submit();
 	}
 
-	function moodle(storageData: { [key: string]: string | boolean }, website: string) {
+	function moodle(storageData: StorageData, website: string) {
 		if (document.querySelectorAll(".navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
 		if (storageData.external_enable) window.location.href = "https://techwww.technion.ac.il/tech_ident/";
 		else {
@@ -81,7 +83,7 @@
 		}
 	}
 
-	function cs(storageData: { [key: string]: string | boolean }) {
+	function cs(storageData: ExtendedStorageData) {
 		if (document.querySelector("form")!.querySelectorAll(".red-text").length !== 0 ||
 			document.referrer.includes("grades.cs.technion.ac.il")) return;
 		const username = document.getElementById("Username") as HTMLInputElement | null,
@@ -94,7 +96,7 @@
 		else (document.querySelector("form")!.querySelector(".submit-button") as HTMLButtonElement).click();
 	}
 
-	function sap(storageData: { [key: string]: string | boolean }) {
+	function sap(storageData: ExtendedStorageData) {
 		if ((document.getElementById("certLogonForm") === null || document.referrer.includes("portalex"))
 			&& !document.getElementById("divChangeContent")) {
 			const form = document.createElement("form");
@@ -116,7 +118,7 @@
 			(document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton") as HTMLElement).click();
 	}
 
-	function grades(storageData: { [key: string]: string | boolean }) {
+	function grades(storageData: ExtendedStorageData) {
 		const username = document.getElementById("Usertxt") as HTMLInputElement,
 			password = document.getElementById("Passwordtxt") as HTMLInputElement;
 		if (!username || !password) return;
@@ -127,7 +129,7 @@
 
 	if (chrome.extension.inIncognitoContext) return;
 	if (window.location.protocol !== "https:") return;
-	const storageData = await chrome.storage.local.get({
+	const storageData: ExtendedStorageData = await chrome.storage.local.get({
 		username: "", email_server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
 		quick_login: true, enable_login: false, external_enable: false,
 	});

@@ -76,7 +76,7 @@ import {TE_AutoLogin} from "./service_worker.js";
 			moodle_cal_courses: {},
 			filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
 			pinned_assignments: [],
-		});
+		}) as StorageData;
 		if (chrome.runtime.lastError) {
 			console.error("TE_cal: " + chrome.runtime.lastError.message);
 			reject({
@@ -177,7 +177,7 @@ import {TE_AutoLogin} from "./service_worker.js";
 					timestamp: eventDate.getTime(),
 					sys: "moodle",
 					done: finishedEh,
-					pinned: (storageData.pinned_assignments as number[]).includes(eventID),
+					pinned: storageData.pinned_assignments.includes(eventID),
 				};
 				finishedEh ? finishedAssignmentsList.push(event) : newAssignmentsList.push(event);
 			}

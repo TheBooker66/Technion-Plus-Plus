@@ -33,9 +33,9 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 			resultsContainer.appendChild(listItem);
 			if (courseData.data.length - 1 > i) create_divider(resultsContainer);
 		}
-		const storageData = await chrome.storage.local.get({videos_last: []});
+		const storageData = await chrome.storage.local.get({videos_last: []}) as StorageData;
 		const courseNumber = courseData.name.split(" - ")[0];
-		const lastSearches = storageData.videos_last.filter((courseNum: number) => courseNum !== parseInt(courseNumber));
+		const lastSearches = storageData.videos_last.filter((courseNum: string) => courseNum !== courseNumber);
 		lastSearches.push(courseNumber);
 		if (lastSearches.length > 7) lastSearches.splice(0, lastSearches.length - 7);
 		await chrome.storage.local.set({videos_last: lastSearches});
@@ -60,7 +60,7 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 		resultsContainer.appendChild(listFragment);
 	}
 
-	function processSearchResults(coursesList: string[][], videosData: { [p: string]: RecordingCourse["v"] },
+	function processSearchResults(coursesList: StorageData["videos_courses"], videosData: StorageData["videos_data"],
 	                              courseQuery: string) {
 		if (null == coursesList[0]) {
 			messageElement.textContent = "חלה שגיאה בניסיון להשיג את רשימת הקורסים, אנא נסה מאוחר יותר.";
@@ -90,8 +90,7 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 		matchCount === 1 ? displayCourseRecordings(resultsArray[0]) : displayMultipleCourses(resultsArray);
 	}
 
-	async function fetchAndUpdateVideos(
-		storageData: { [p: string]: string[][] | { [p: string]: RecordingCourse["v"] } }, courseQuery: string) {
+	async function fetchAndUpdateVideos(storageData: StorageData, courseQuery: string) {
 		const callbacks = [
 			(coursesList: string[][], videosData: { [key: string]: RecordingCourse["v"] }) =>
 				processSearchResults(coursesList, videosData, courseQuery),
@@ -127,7 +126,7 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 			queryDisplay.style.display = "none";
 		} else {
 			queryDisplay.textContent += '"' + courseQuery + '"';
-			const storageData = await chrome.storage.local.get({videos_data: {}, videos_courses: [], videos_update: 0});
+			const storageData = await chrome.storage.local.get({videos_data: {}, videos_courses: [], videos_update: 0}) as StorageData;
 			if (storageData.videos_update < (new Date).getTime() - 6048E5 || chrome.runtime.lastError)
 				await fetchAndUpdateVideos(storageData, courseQuery as string);
 			else
@@ -139,7 +138,7 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 		(document.querySelector(".main-content > h3") as HTMLHeadingElement).style.display = "none";
 		(document.getElementById("block") as HTMLDivElement).insertBefore(document.getElementById("myform") as HTMLFormElement, document.getElementById("last_searches"));
 		(document.querySelector("#myform input") as HTMLInputElement).focus();
-		const storageData = await chrome.storage.local.get({videos_last: [], videos_courses: []});
+		const storageData = await chrome.storage.local.get({videos_last: [], videos_courses: []}) as StorageData;
 		const lastSearchesContainer = document.getElementById("last_list") as HTMLDivElement;
 		if (storageData.videos_last.length === 0) {
 			lastSearchesContainer.textContent = "לא נמצאו חיפושים קודמים...";
@@ -148,7 +147,7 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 		}
 
 		storageData.videos_last.reverse().forEach((video: string) => {
-			const matchingCourse = storageData.videos_courses.filter((item: string) => item[0] === video)[0],
+			const matchingCourse = storageData.videos_courses.filter((item: string[]) => item[0] === video)[0],
 				courseLink = document.createElement("a");
 			courseLink.className = "list_item";
 			courseLink.textContent = matchingCourse.slice(0, 2).join(" - ");

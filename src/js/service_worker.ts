@@ -235,7 +235,7 @@ async function TE_notification(message: string, silentEh: boolean, notificationI
 	await chrome.notifications.create(notificationId, notificationOptions);
 	if (silentEh) return;
 
-	const storageData = await chrome.storage.local.get({notif_vol: 1, alerts_sound: true});
+	const storageData = await chrome.storage.local.get({notif_vol: 1, alerts_sound: true}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_bg_notification_err: " + chrome.runtime.lastError.message);
 	} else if (storageData.alerts_sound) {
@@ -269,7 +269,7 @@ async function TE_alertNewHW(sourceIndex: number) {
 
 	await TE_setBadge(false);
 
-	const storageData = await chrome.storage.local.get({cal_seen: 0, hw_alerts: true});
+	const storageData = await chrome.storage.local.get({cal_seen: 0, hw_alerts: true}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_bg_HWA: " + chrome.runtime.lastError.message);
 		return;
@@ -448,7 +448,7 @@ async function TE_webworkStep(url: string | FormData, body = "") {
 }
 
 async function TE_webworkScan() {
-	const storageData = await chrome.storage.local.get({webwork_cal_courses: {}, webwork_cal_events: {}});
+	const storageData = await chrome.storage.local.get({webwork_cal_courses: {}, webwork_cal_events: {}}) as StorageData;
 	const newWebworkCal = {}, ignoreRegex = /^ייפתח|^סגור|^Answers available for review./,
 		dateRegex = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4}) @ (?<hour>\d{2}):(?<minute>\d{2})/;
 	let foundNewAssignment = false;
@@ -517,7 +517,7 @@ async function TE_getWebwork(moodleData: { response: any, responseURL: string },
 		return;
 	}
 
-	const newWebworkCourses: { [key: string]: { name: string, lti: string } } = {},
+	const newWebworkCourses: StorageData["webwork_cal_courses"] = {},
 		webworkRegex = /webwork|וובוורק|ווב-וורק/i, // The Next line is HARDCODED COURSE NUMBERS, thanks to Cheesefork.
 		mathCourseNums = ["01040044", "01040276", "01060937", "01060429", "01060010", "01040253", "01040142", "01040038", "01060405", "01040214", "01040222", "01040013", "01040228", "01060309", "01040195", "01040144", "01060015", "01970008", "01060942", "01060393", "01040185", "01060431", "01040221", "01040002", "01060396", "01040164", "01040181", "01060802", "01060800", "01040285", "01060423", "01040165", "01040064", "01040814", "01060931", "01970010", "01040192", "01040215", "01960015", "01040012", "01060383", "01970011", "01040131", "01030015", "01040918", "01960013", "01040279", "01040122", "01040135", "01040824", "01040034", "01060803", "01040183", "01040065", "01040066", "01960014", "01040041", "01980000", "01040043", "01040283", "01040157", "01040004", "01040168", "01040277", "01060427", "01040818", "01040182", "01060742", "01060009", "01060935", "01040112", "01060156", "01040952", "01060411", "01040018", "01040281", "01040136", "01040280", "01060941", "01060395", "01060012", "01040030", "01060350", "01040022", "01960012", "01060397", "01040177", "01060960", "01060380", "01040019", "01970014", "01960001", "01040032", "01040293", "01060716", "01080002", "01040220", "01040166", "01040158", "01040174", "01060349", "01060375", "01040031", "01060702", "01040250", "01060723", "01040119", "01040163", "01040016", "01040033", "01040000", "01060011", "01060062", "01040823", "01040291", "01040295", "01040042", "01040294", "01040003", "01060927", "01060347", "01060394", "01060170", "01060804", "01060944", "01060413", "01970007", "01060928", "01060330", "01040286", "01040273", "01040252", "01060860", "01040134", "01040274", "01040193"];
 
@@ -556,7 +556,7 @@ async function TE_single_download(link: string, name: string) {
 }
 
 async function TE_doDownloads(chunk: DownloadItem) {
-	const storageData = await chrome.storage.local.get({dl_queue: []});
+	const storageData = await chrome.storage.local.get({dl_queue: []}) as StorageData;
 	storageData.dl_queue.push(chunk);
 	await TE_setStorage({dl_queue: storageData.dl_queue}, "doDownloads");
 	if (chrome.runtime.lastError) {
@@ -572,7 +572,7 @@ async function TE_doDownloads(chunk: DownloadItem) {
 
 async function TE_nextDownload() {
 	const urlPrefixes = ["https://moodle25.technion.ac.il/blocks/material_download/download_materialien.php?courseid=", "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/", "https://grades.cs.technion.ac.il/grades.cgi?", "https://webcourse.cs.technion.ac.il/"];
-	const storageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []});
+	const storageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []}) as StorageData;
 	if (storageData.dl_current === 0 && storageData.dl_queue.length > 0) {
 		const currentQueueItem: DownloadItem = storageData.dl_queue[0];
 		const downloadItem = currentQueueItem.list.shift() as DownloadItem["list"][0];
@@ -640,7 +640,7 @@ export async function TE_updateInfo() {
 		cs_cal_enabled: false, cs_cal_update: 0, cs_cal_pass: "", cs_cal_seen: {},
 		webwork_cal_enabled: false, webwork_cal_update: 0, webwork_cal_courses: {},
 		user_agenda: {}, videos_update: 0,
-	});
+	}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_bg_Alarm: " + chrome.runtime.lastError.message);
 		return;
@@ -672,7 +672,7 @@ export async function TE_updateInfo() {
 	if (storageData.cs_cal_enabled && now - storageData.cs_cal_update > 1)
 		await TE_csCalendarCheck(storageData.uidn_arr, storageData.cs_cal_pass, storageData.cs_cal_seen);
 
-	const userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
+	const userAgenda = storageData.user_agenda;
 	let hasChanged = false;
 	for (const key in userAgenda) {
 		const timestamp = userAgenda[key].timestamp;
@@ -685,7 +685,7 @@ export async function TE_updateInfo() {
 }
 
 export async function TE_toggleBusAlert(busLine: string) {
-	const storageData = await chrome.storage.local.get({bus_alerts: []});
+	const storageData = await chrome.storage.local.get({bus_alerts: []}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_back_bus_err: " + chrome.runtime.lastError.message);
 		return;
@@ -723,7 +723,7 @@ async function TE_busAlertNow(arrivingBuses: BusLine[]) {
 	}
 	await TE_notification(messageBody, false);
 
-	const storageData = await chrome.storage.local.get({bus_alerts: []});
+	const storageData = await chrome.storage.local.get({bus_alerts: []}) as StorageData;
 	const alertedLines = arrivingBuses.map(bus => bus["Shilut"]);
 	storageData.bus_alerts = storageData.bus_alerts.filter((line: string) => !alertedLines.includes(line));
 	await TE_setStorage({bus_alerts: storageData.bus_alerts}, "removeAlertedBuses");
@@ -733,7 +733,7 @@ async function TE_busAlertNow(arrivingBuses: BusLine[]) {
 
 async function TE_checkBuses() {
 	console.log("TE_checkBuses");
-	const storageData = await chrome.storage.local.get({bus_station: 41205, bus_time: 10, bus_alerts: []});
+	const storageData = await chrome.storage.local.get({bus_station: 41205, bus_time: 10, bus_alerts: []}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message);
 		return;
@@ -810,7 +810,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
 });
 
 chrome.downloads.onChanged.addListener(async (delta) => {
-	const storageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []});
+	const storageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []}) as StorageData;
 	if (delta.id !== storageData.dl_current) return;
 
 	const finishDownload = async (isError = false) => {

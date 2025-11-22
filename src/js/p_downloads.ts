@@ -13,7 +13,7 @@ import {CommonPopup} from './common_popup.js';
 	}
 
 	async function updateCurrentDownload() {
-		const storageData = await chrome.storage.local.get({dl_current: 0});
+		const storageData = await chrome.storage.local.get({dl_current: 0}) as StorageData;
 		if (storageData.dl_current !== 0)
 			chrome.downloads.search({id: storageData.dl_current}, downloads => {
 				if (downloads[0].filename) {
@@ -39,7 +39,7 @@ import {CommonPopup} from './common_popup.js';
 
 	async function updateDownloadQueue() {
 		while (queueList.firstChild) queueList.removeChild(queueList.lastChild as Node);
-		const storageData = await chrome.storage.local.get({dl_queue: []});
+		const storageData = await chrome.storage.local.get({dl_queue: []}) as StorageData;
 		let itemCount = 0;
 		storageData.dl_queue.forEach((downloadEntry: DownloadItem) => {
 			for (let i = 0; i < downloadEntry.list.length; i++) {
@@ -80,7 +80,7 @@ import {CommonPopup} from './common_popup.js';
 		if (changes.state || changes.paused) updateDownloadQueue();
 	});
 	(document.getElementById("pause") as HTMLInputElement).addEventListener("click", async () => {
-		const storageData = await chrome.storage.local.get({dl_current: 0});
+		const storageData = await chrome.storage.local.get({dl_current: 0}) as StorageData;
 		if (storageData.dl_current === 0) return;
 
 		const downloads = await chrome.downloads.search({id: storageData.dl_current});
@@ -89,11 +89,11 @@ import {CommonPopup} from './common_popup.js';
 			await chrome.downloads.resume(storageData.dl_current) : await chrome.downloads.pause(storageData.dl_current);
 	});
 	(document.getElementById("cancel") as HTMLInputElement).addEventListener("click", async () => {
-		const storageData = await chrome.storage.local.get({dl_current: 0});
+		const storageData = await chrome.storage.local.get({dl_current: 0}) as StorageData;
 		if (storageData.dl_current !== 0) await chrome.downloads.cancel(storageData.dl_current);
 	});
 	(document.getElementById("cancelAll") as HTMLInputElement).addEventListener("click", async () => {
-		const storageData = await chrome.storage.local.get({dl_current: 0});
+		const storageData = await chrome.storage.local.get({dl_current: 0}) as StorageData;
 		await chrome.storage.local.set({dl_current: 0, dl_queue: []});
 		if (storageData.dl_current !== 0) await chrome.downloads.cancel(storageData.dl_current);
 		await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-128.png"});

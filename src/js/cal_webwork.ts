@@ -12,7 +12,7 @@ import {CommonCalendar} from './common_calendar.js';
 			webwork_cal_courses: {},
 			webwork_cal_update: 0,
 			pinned_assignments: [],
-		});
+		}) as StorageData;
 		if (chrome.runtime.lastError) {
 			console.error("TE_ww_cal: " + chrome.runtime.lastError.message);
 			reject({
@@ -63,7 +63,7 @@ import {CommonCalendar} from './common_calendar.js';
 				timestamp: assignment[1].ts,
 				sys: "webwork",
 				done: assignment[1].done,
-				pinned: (storageData.pinned_assignments as number[]).includes(eventID),
+				pinned: storageData.pinned_assignments.includes(eventID),
 			};
 			assignment[1].done ? finishedAssignmentsList.push(assignmentObject) : newAssignmentsList.push(assignmentObject);
 			assignment[1].seen = true;

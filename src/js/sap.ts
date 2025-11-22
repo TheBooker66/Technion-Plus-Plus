@@ -33,7 +33,7 @@
 			toggleHists(checkbox.checked);
 			await chrome.storage.local.set({sap_hist: checkbox.checked});
 		});
-		const storageData = await chrome.storage.local.get({sap_hist: false});
+		const storageData = await chrome.storage.local.get({sap_hist: false}) as StorageData;
 		toggleHists(storageData.sap_hist);
 	}
 

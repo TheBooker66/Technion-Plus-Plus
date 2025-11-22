@@ -52,7 +52,7 @@ function sortElements(a: HTMLDivElement, b: HTMLDivElement, considerPins: boolea
 
 async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElement, finishEh: boolean) {
 	if (sys === "ua") {
-		const storageData = await chrome.storage.local.get({user_agenda: {}});
+		const storageData = await chrome.storage.local.get({user_agenda: {}}) as StorageData;
 		if (chrome.runtime.lastError) console.error("TE_organizer: " + chrome.runtime.lastError.message);
 		else {
 			storageData.user_agenda[eventID].done = !storageData.user_agenda[eventID].done;
@@ -64,15 +64,14 @@ async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElemen
 	if (finishEh) {
 		targetList = document.getElementById("finished_assignments")!;
 		element.classList.remove("pinned");
-		targetList.appendChild(element);
 	} else {
 		targetList = document.getElementById("new_assignments")!;
-		const storageData = await chrome.storage.local.get({pinned_assignments: []});
+		const storageData = await chrome.storage.local.get({pinned_assignments: []}) as StorageData;
 		if (storageData.pinned_assignments.includes(eventID)) {
 			element.classList.add("pinned");
 		}
-		targetList.appendChild(element);
 	}
+	targetList.appendChild(element);
 
 	const assignments = Array.from(targetList.children) as HTMLDivElement[];
 	assignments.sort((a, b) => sortElements(a, b, targetList.id === "new_assignments"));
@@ -137,7 +136,7 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 }
 
 async function togglePinned(eventID: number, sys: HWSystem, element: HTMLDivElement) {
-	const storageData = await chrome.storage.local.get({pinned_assignments: [], user_agenda: {}});
+	const storageData = await chrome.storage.local.get({pinned_assignments: [], user_agenda: {}}) as StorageData;
 
 	let pinnedList: number[] = storageData.pinned_assignments;
 	const alreadyPinnedEh = pinnedList.includes(eventID);
@@ -166,7 +165,7 @@ async function togglePinned(eventID: number, sys: HWSystem, element: HTMLDivElem
 }
 
 async function editUA(assignmentID: number) {
-	const storageData = await chrome.storage.local.get({user_agenda: {}});
+	const storageData = await chrome.storage.local.get({user_agenda: {}}) as StorageData;
 	const userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
 
 	tabHeaders[2].click();
@@ -185,7 +184,7 @@ async function editUA(assignmentID: number) {
 }
 
 async function removeUA(assignmentID: number) {
-	const storageData = await chrome.storage.local.get({user_agenda: {}});
+	const storageData = await chrome.storage.local.get({user_agenda: {}}) as StorageData;
 	if (!storageData.user_agenda.hasOwnProperty(assignmentID)) return;
 	if (!window.confirm(`המטלה "${storageData.user_agenda[assignmentID].name}" תימחק!`)) return;
 
@@ -238,8 +237,8 @@ export async function addAssignmentsToList(
 		quick_login: true, enable_login: true, user_agenda: {},
 		moodle_cal_enabled: true, cs_cal_enabled: false, webwork_cal_enabled: false,
 		pinned_assignments: [],
-	});
-	const userAgendaData: { [key: string]: HWAssignment } = storageData.user_agenda,
+	}) as StorageData;
+	const userAgendaData = storageData.user_agenda,
 		enabledCalendars = {
 			"moodle": storageData.quick_login && storageData.enable_login && storageData.moodle_cal_enabled,
 			"cs": storageData.cs_cal_enabled,
@@ -294,8 +293,8 @@ async function saveUA() {
 		alert("תאריך הסיום שבחרת כבר עבר, נא לבחור תאריך סיום חדש.");
 		return;
 	}
-	const storageData = await chrome.storage.local.get({user_agenda: {}});
-	let userAgenda: { [key: string]: HWAssignment } = storageData.user_agenda;
+	const storageData = await chrome.storage.local.get({user_agenda: {}}) as StorageData;
+	let userAgenda = storageData.user_agenda;
 	const assignmentID = parseInt(form.edit.value);
 	const isExistingAssignment = 0 < assignmentID ? userAgenda.hasOwnProperty(assignmentID) : false;
 	const finalAssignmentID = isExistingAssignment ? assignmentID : Date.now();
@@ -362,15 +361,16 @@ async function setUpFilters() {
 		typeFilters[i].addEventListener("change", async () => {
 			const storageData = await chrome.storage.local.get({
 				filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
-			});
+			}) as StorageData;
 			if (chrome.runtime.lastError) {
 				console.error("TE_cal: " + chrome.runtime.lastError.message);
 				insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
 				return;
 			}
-			for (const type in storageData.filter_toggles) {
-				storageData.filter_toggles[type] = (document.getElementById(type) as HTMLInputElement).checked;
-			}
+			for (const type in storageData.filter_toggles)
+				storageData.filter_toggles[type as keyof StorageData["filter_toggles"]] =
+					(document.getElementById(type) as HTMLInputElement).checked;
+
 			await chrome.storage.local.set({filter_toggles: storageData.filter_toggles});
 			if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError);
 			else location.reload();
@@ -386,7 +386,7 @@ async function setUpFilters() {
 
 	const storageData = await chrome.storage.local.get({
 		filter_toggles: {"appeals": false, "zooms": false, "attendance": false, "reserveDuty": false},
-	});
+	}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_cal: " + chrome.runtime.lastError.message);
 		insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
@@ -394,13 +394,14 @@ async function setUpFilters() {
 	}
 	let filtersEnabledEh = false;
 	for (const type in storageData.filter_toggles) {
-		(document.getElementById(type) as HTMLInputElement).checked = storageData.filter_toggles[type];
-		if (!filtersEnabledEh && storageData.filter_toggles[type]) {
-			filtersEnabledEh = true;
-			typeFilterToggle.textContent = "בטל סינון";
-			typeFiltersDiv.classList.remove("hidden");
-			filtersDiv.classList.remove("hidden");
-		}
+		(document.getElementById(type) as HTMLInputElement).checked =
+			storageData.filter_toggles[type as keyof StorageData["filter_toggles"]];
+		if (filtersEnabledEh || !storageData.filter_toggles[type as keyof StorageData["filter_toggles"]]) continue;
+
+		filtersEnabledEh = true;
+		typeFilterToggle.textContent = "בטל סינון";
+		typeFiltersDiv.classList.remove("hidden");
+		filtersDiv.classList.remove("hidden");
 	}
 }
 

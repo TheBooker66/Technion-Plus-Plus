@@ -88,7 +88,7 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		moodle_cal_enabled: true, remoodle: false, remoodle_angle: 120, cal_seen: 0,
 		cs_cal_enabled: false, uidn_arr: ["", ""], webwork_cal_enabled: false,
 		dl_current: 0, username: "", email_server: true, custom_name: "", custom_link: "",
-	});
+	}) as StorageData;
 	quick_login_toggle.checked = storageData.quick_login;
 	mute_alerts_toggle.checked = storageData.alerts_sound;
 	(document.getElementById("cant_login") as HTMLDivElement).style.display =

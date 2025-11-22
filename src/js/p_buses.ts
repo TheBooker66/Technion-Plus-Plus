@@ -41,7 +41,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 	async function fetchBusData(intervalID: number) {
 		const url = encodeURI("https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/"
 			+ (document.getElementById("station_select") as HTMLSelectElement).value + "/he/false");
-		const storageData = await chrome.storage.local.get({bus_alerts: []});
+		const storageData = await chrome.storage.local.get({bus_alerts: []}) as StorageData;
 		if (chrome.runtime.lastError) {
 			console.error("TE_bus_err: " + chrome.runtime.lastError.message);
 			displayError("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");
@@ -137,7 +137,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 			val: 41200,
 		},
 	];
-	const storageData = await chrome.storage.local.get({bus_station: 41205, bus_time: 10, allow_timings: false});
+	const storageData = await chrome.storage.local.get({bus_station: 41205, bus_time: 10, allow_timings: false}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_bus_err: " + chrome.runtime.lastError.message);
 		displayError("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");

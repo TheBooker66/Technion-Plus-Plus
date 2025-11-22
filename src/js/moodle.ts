@@ -58,9 +58,9 @@
 				step: "30",
 			}) as HTMLInputElement;
 
-			const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120});
+			const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120}) as StorageData;
 			darkModeCheckbox.checked = storageData.remoodle;
-			colourSlider.value = storageData.remoodle_angle;
+			colourSlider.value = storageData.remoodle_angle.toString();
 			darkModeCheckbox.addEventListener("change", async () => {
 				await chrome.storage.local.set({remoodle: darkModeCheckbox.checked});
 				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
@@ -202,7 +202,7 @@
 			["--dark_bg", "hsl(" + (90 + hueOffset) + ", 100%, 10%)"],
 			["--calendar_today", "hsla(" + (70 + hueOffset) + ", 100%, 20%, 0.5)"],
 		];
-		const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120});
+		const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120}) as StorageData;
 		if (chrome.runtime.lastError) {
 			console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
 			return;

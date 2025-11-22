@@ -136,8 +136,8 @@
 
 		if (!target.matches("td button")) return;
 
-		const storageData = await chrome.storage.local.get({grades: []});
-		const allGrades: CalculatorCourse[] = storageData.grades;
+		const storageData = await chrome.storage.local.get({grades: []}) as StorageData;
+		const allGrades = storageData.grades;
 		const courseNum = (rowElement.querySelector("td:first-child") as HTMLTableCellElement).textContent;
 		const courseData = allGrades.find((course: CalculatorCourse) => course.num === courseNum);
 
@@ -209,8 +209,8 @@
 
 		if (!target.matches("td button")) return;
 
-		const storageData = await chrome.storage.local.get({grades: []});
-		const allGrades: CalculatorCourse[] = storageData.grades;
+		const storageData = await chrome.storage.local.get({grades: []}) as StorageData;
+		const allGrades = storageData.grades;
 		const courseNum = (rowElement.querySelector("td:first-child") as HTMLTableCellElement).textContent;
 		const courseData = allGrades.find((course: CalculatorCourse) => course.num === courseNum);
 
@@ -324,8 +324,8 @@
 				return;
 			}
 
-			const storageData = await chrome.storage.local.get({grades: []});
-			if (storageData.grades.some((course: CalculatorCourse) => course.num === newCourse.num)) {
+			const storageData = await chrome.storage.local.get({grades: []}) as StorageData;
+			if (storageData.grades.some((course) => course.num === newCourse.num)) {
 				alert(`קורס עם המספר ${newCourse.num} כבר קיים ברשימה.`);
 				addGradeForm.classList.add("failed");
 				setTimeout(() => addGradeForm.classList.remove("failed"), 1000);
@@ -426,8 +426,8 @@
 					reader.readAsText(file, 'UTF-8');
 					reader.onload = async (event) => {
 						const lines = (event?.target?.result as string)?.split('\n').filter(line => line.trim() !== '').slice(1);
-						const storageData = await chrome.storage.local.get({grades: []});
-						const currentStoredGrades: CalculatorCourse[] = storageData.grades;
+						const storageData = await chrome.storage.local.get({grades: []}) as StorageData;
+						const currentStoredGrades = storageData.grades;
 
 						lines.forEach(line => {
 							const parts = [];
@@ -510,8 +510,8 @@
 						lines[lines.length - 1] = lines[lines.length - 1].substring(0, lines[lines.length - 1].indexOf('סוף תעודת הציונים')).trim();
 
 						const coursePattern = /^(\d{6}|\d{8}) ([\w\s\p{P}\u0590-\u05FF]+?) (1?\d(?:\.\d)? |20(?:\.0)? |)(\d{1,3}|עובר|לא עובר|פטור ללא ניקוד|פטור עם ניקוד|פטור) \d{4}-(\d{4}) (חורף|אביב|קיץ) ([\u0590-\u05FF]{3}"[\u0590-\u05FF]+)$/u;
-						const storageData = await chrome.storage.local.get({grades: []});
-						const currentStoredGrades: CalculatorCourse[] = storageData.grades;
+						const storageData = await chrome.storage.local.get({grades: []}) as StorageData;
+						const currentStoredGrades = storageData.grades;
 
 						lines.forEach(line => {
 							const parts = coursePattern.exec(line);
@@ -569,8 +569,8 @@
 	}
 
 	async function renderAllCourses() {
-		const storageData = await chrome.storage.local.get({grades: []});
-		let allGrades: CalculatorCourse[] = storageData.grades, latestYear = 1912, latestSemesterOrder = 0;
+		const storageData = await chrome.storage.local.get({grades: []}) as StorageData;
+		let allGrades = storageData.grades, latestYear = 1912, latestSemesterOrder = 0;
 
 		if (allGrades.length > 0) {
 			latestYear = allGrades.reduce((acc: number, course: CalculatorCourse) => Math.max(acc, course.year), 1912);

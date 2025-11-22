@@ -14,7 +14,7 @@ import {reverseString, xorStrings} from './utils.js';
 			cs_cal_pass: "",
 			uidn_arr: ["", ""],
 			pinned_assignments: [],
-		});
+		}) as StorageData;
 		if (chrome.runtime.lastError) {
 			console.error("TE_cs_cal: " + chrome.runtime.lastError.message);
 			reject({
@@ -97,7 +97,7 @@ import {reverseString, xorStrings} from './utils.js';
 				const newEventEh = !(storageData.cs_cal_seen.hasOwnProperty(courseName) &&
 					storageData.cs_cal_seen[courseName].includes("[[" + trimmedSummary + "]]"));
 
-				const finishedEh = (storageData.cs_cal_finished as number[]).includes(eventID);
+				const finishedEh = storageData.cs_cal_finished.includes(eventID);
 				if (finishedEh) finishedItems.push(eventID);
 
 				const Assignment: HWAssignment = {
@@ -111,7 +111,7 @@ import {reverseString, xorStrings} from './utils.js';
 					sys: "cs",
 					course: courseName,
 					done: finishedEh,
-					pinned: (storageData.pinned_assignments as number[]).includes(eventID),
+					pinned: storageData.pinned_assignments.includes(eventID),
 				};
 				finishedEh ? finishedList.push(Assignment) : toDoList.push(Assignment);
 			}

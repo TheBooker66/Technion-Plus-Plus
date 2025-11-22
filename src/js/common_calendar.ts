@@ -99,32 +99,28 @@ function insertMessage(msg: string, errorEh: boolean) {
 }
 
 export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: HTMLDivElement, finishEh: boolean) {
-	if (finishEh) document.getElementById("finished_assignments")?.appendChild(item);
-	else document.getElementById("new_assignments")?.appendChild(item);
+	document.getElementById(finishEh ? "finished_assignments" : "new_assignments")?.appendChild(item);
 	checkForEmpty();
 
-	let storageKey: string;
-	if (sys === "webwork")
-		storageKey = "webwork_cal_events";
-	else
-		storageKey = `${sys}_cal_finished`;
+	const keyMap: Record<string, keyof StorageData> = {
+		webwork: "webwork_cal_events", moodle: "moodle_cal_finished", cs: "cs_cal_finished",
+	};
+	const key = keyMap[sys];
+	if (!key) return;
 
-	const storageData = await chrome.storage.local.get(storageKey);
-	if (chrome.runtime.lastError) {
-		console.error("TE_cal: " + chrome.runtime.lastError.message);
-		return;
-	}
+	const storageData = await chrome.storage.local.get(key) as StorageData;
+	if (chrome.runtime.lastError) return console.error(`TE_cal: ${chrome.runtime.lastError.message}`);
 
-	let calendar: { [key: number]: { done: boolean } } | number[];
+	let newCalendar;
 	if (sys === "webwork") {
-		calendar = storageData[storageKey] as { [key: number]: { done: boolean } };
-		calendar[eventID].done = !calendar[eventID].done;
+		newCalendar = storageData[key] as StorageData["webwork_cal_events"];
+		newCalendar[eventID].done = !newCalendar[eventID].done;
 	} else {
-		calendar = storageData[storageKey] as number[];
-		if (finishEh) calendar.push(eventID);
-		else calendar.splice(storageData[storageKey].indexOf(eventID), 1);
+		newCalendar = storageData[key] as StorageData["moodle_cal_finished"] | StorageData["cs_cal_finished"];
+		finishEh ? newCalendar.push(eventID) : newCalendar.splice(newCalendar.indexOf(eventID), 1);
 	}
-	await chrome.storage.local.set({[storageKey]: calendar});
+
+	await chrome.storage.local.set({[key]: newCalendar});
 }
 
 function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => Promise<chrome.tabs.Tab>) {

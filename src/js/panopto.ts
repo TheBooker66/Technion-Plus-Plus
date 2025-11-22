@@ -579,7 +579,7 @@ let speed = 1.0;
 	const storageData = await chrome.storage.local.get({
 		panopto_speed: "1.0", panopto_darkmode: false, panopto_hide: false, panopto_return_backwards: false,
 		panopto_floating_speed: false, panopto_save: true,
-	});
+	}) as StorageData;
 	if (chrome.runtime.lastError) console.error("TE_panopto: " + chrome.runtime.lastError.message);
 
 	const darkModeStyle = document.head.appendChild(document.createElement("style")).sheet as CSSStyleSheet;

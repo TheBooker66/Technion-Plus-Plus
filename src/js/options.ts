@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		moodle_cal_enabled: true, cs_cal_enabled: false, cs_cal_pass: "",
 		webwork_cal_enabled: false, webwork_cal_courses: {},
 		notif_vol: 1, dark_mode: false, custom_name: "", custom_link: "",
-	});
+	}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_opt: " + chrome.runtime.lastError.message);
 		document.querySelector(".wrapper")!.textContent = "שגיאה באחזור הנתונים, אנא נסה שנית.";
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		(document.getElementById("outlook_select") as HTMLInputElement).checked = !storageData.gmail;
 		(document.getElementById("allow_timings") as HTMLInputElement).checked = storageData.allow_timings;
 		(document.getElementById("panopto_save") as HTMLInputElement).checked = storageData.panopto_save;
-		(document.getElementById("notification_volume") as HTMLInputElement).value = storageData.notif_vol;
+		(document.getElementById("notification_volume") as HTMLInputElement).value = storageData.notif_vol.toString();
 		(document.getElementById("try_vol") as HTMLElement).textContent = `נסה (${100 * storageData.notif_vol}%)`;
 		(document.getElementById("idn") as HTMLInputElement).value = decryptedID;
 		(document.getElementById("cs_cal_pass") as HTMLInputElement).value = storageData.cs_cal_pass;
