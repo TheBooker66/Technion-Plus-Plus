@@ -88,13 +88,12 @@
     float: left;
     text-align: left;
     direction: rtl;
-    background: url("../icons/arrowhead-down-black.svg") no-repeat 0 50%;
+    background: url("../icons/arrowhead-down.svg") no-repeat 0 50%;
     opacity: 0.7;
 }
 
 .settings select:hover {
     color: #003eaa;
-    background: url("../icons/arrowhead-down-black.svg") no-repeat 0 50%;
     opacity: 1;
     cursor: pointer;
 }

@@ -141,62 +141,6 @@
     height: 90px;
 }
 
-#remoodle_select, #remoodle_select_layer {
-    border-radius: 3px;
-    cursor: pointer;
-    border: 1px solid rgb(12, 12, 13, 0);
-    flex-flow: column;
-    width: 12px;
-    min-height: 1rem;
-    background: transparent url('../icons/arrowhead-down-white.svg') no-repeat 0 2px;
-    opacity: 0.3;
-    position: absolute;
-    right: 147px;
-    margin-top: 7px;
-}
-
-#remoodle_select_layer {
-    z-index: 1;
-    cursor: not-allowed;
-}
-
-#remoodle_select:focus, #remoodle_select:hover {
-    width: 50px;
-    right: 109px;
-    background: url('../icons/arrowhead-down-black.svg') no-repeat 0 2px #fff;
-}
-
-#remoodle_select:focus, #remoodle_select:hover, #remoodle_select .opt:hover, #remoodle_select :not(#rmshidden) .opt {
-    opacity: 1;
-}
-
-#remoodle_select:focus {
-    border: 1px solid var(--sec-darker);
-    box-shadow: 0 0 4px 1px var(--sec-light);
-    outline: none !important;
-}
-
-#remoodle_select .opt {
-    cursor: pointer;
-    opacity: 0.6;
-    width: 32px;
-    height: 9px;
-    margin: 2px;
-    display: block;
-    border: 1px solid #000;
-    border-radius: 4px
-}
-
-#remoodle_select #rmshidden {
-    cursor: default;
-    width: 50px;
-    background: #fff;
-    display: none;
-    border: 1px solid #444;
-    border-top: 0;
-    margin: 0 -1px 0 0;
-    border-radius: 0 0 3px 3px;
-}
 
 /*---------------------------------------*/
 /* Quick Toggles */

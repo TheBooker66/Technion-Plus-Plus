@@ -405,7 +405,7 @@ input#delete_grades:focus {
 
 select {
     appearance: none;
-    background-image: url("../icons/arrowhead-down-black.svg");
+    background-image: url("../icons/arrowhead-down.svg");
     background-repeat: no-repeat;
     background-position: left 8px center;
     background-size: 16px;
@@ -441,7 +441,6 @@ select {
 
 [tplus=dm] select {
     background-color: var(--input-bg);
-    background-image: url("../icons/arrowhead-down-white.svg");
 }
 
 [tplus=dm] body tbody tr, [tplus=dm] body .grades tbody tr {

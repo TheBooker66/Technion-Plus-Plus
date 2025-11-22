@@ -1,8 +1,4 @@
-<!-- This Source Code Form is subject to the terms of the Mozilla Public
-   - License, v. 2.0. If a copy of the MPL was not distributed with this
-   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-    <path fill="rgb(237, 237, 240, 1)" d="M8 16a8 8 0 1 1 8-8 8.009 8.009 0 0 1-8 8zM8 2a6 6 0 1 0 6 6 6.006 6.006 0 0 0-6-6z"/>
-    <path fill="rgb(237, 237, 240, 1)" d="M8 7a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V8a1 1 0 0 0-1-1z"/>
-    <circle fill="rgb(237, 237, 240, 1)" cx="8" cy="5" r="1.188"/>
+    <path d="M 9.188,5 A 1.188,1.188 0 0 1 8,6.188 1.188,1.188 0 0 1 6.812,5 1.188,1.188 0 0 1 8,3.812 1.188,1.188 0 0 1 9.188,5 Z M 8,7 A 1,1 0 0 0 7,8 v 3 a 1,1 0 0 0 2,0 V 8 A 1,1 0 0 0 8,7 Z m 0,9 A 8,8 0 1 1 16,8 8.009,8.009 0 0 1 8,16 Z M 8,2 A 6,6 0 1 0 14,8 6.006,6.006 0 0 0 8,2 Z"
+          fill="#edeff0"/>
 </svg>
