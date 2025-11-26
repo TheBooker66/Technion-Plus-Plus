@@ -4,7 +4,6 @@ import {defineConfig} from "vite";
 import {resolve, relative, dirname, basename, extname} from "node:path";
 import {fileURLToPath} from "node:url";
 import {viteStaticCopy} from "vite-plugin-static-copy";
-import https from "node:https";
 import fs from "node:fs";
 import {globSync} from "glob";
 import {minify as minifyJS} from "terser";
@@ -42,45 +41,31 @@ function downloadPlugin(url: string, destRelative: string, isProd: boolean) {
 		name: "download",
 		async writeBundle(options: { dir?: string }) {
 			const outDir = options.dir;
-			if (!outDir) {
-				this.error("Output directory is not defined. Cannot download file.");
-				return;
-			}
 			const fullDestPath = resolve(outDir, destRelative);
 
 			console.log(`Downloading ${basename(destRelative)}...`);
 			fs.mkdirSync(dirname(fullDestPath), {recursive: true});
 
-			await new Promise<void>((resolvePromise, reject) => {
-				https.get(url, (res) => {
-					if (res.statusCode !== 200) {
-						reject(new Error(`Download failed with status: ${res.statusCode}`));
-						return;
-					}
+			try {
+				const response = await fetch(url);
+				if (!response.ok) {
+					throw new Error(`Download failed with status: ${response.status} ${response.statusText}`);
+				}
 
-					let rawData = "";
-					res.on("data", (chunk) => {
-						rawData += chunk;
-					});
-					res.on("end", async () => {
-						try {
-							let finalCode = rawData;
-							if (isProd) {
-								console.log(`Minifying ${basename(destRelative)}...`);
-								const result = await minifyJS(rawData);
-								finalCode = result.code ?? "";
-							}
-							fs.writeFileSync(fullDestPath, finalCode);
-							console.log(`${basename(destRelative)} processed successfully.`);
-							resolvePromise();
-						} catch (err) {
-							reject(err);
-						}
-					});
-				}).on("error", (err) => {
-					reject(err);
-				});
-			});
+				let finalCode = await response.text();
+
+				if (isProd) {
+					console.log(`Minifying ${basename(destRelative)}...`);
+					const result = await minifyJS(finalCode);
+					finalCode = result.code ?? "";
+				}
+
+				fs.writeFileSync(fullDestPath, finalCode, "utf8");
+				console.log(`${basename(destRelative)} processed successfully.`);
+
+			} catch (err) {
+				this.error(`Failed to download or process ${basename(destRelative)}: ${err.message}`);
+			}
 		},
 	};
 }
