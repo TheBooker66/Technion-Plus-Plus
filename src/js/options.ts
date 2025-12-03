@@ -1,7 +1,7 @@
 import {resetBadge, reverseString, xorStrings} from './utils.js';
 import {TE_updateInfo} from './service_worker.js';
 
-function encryptDecrypt(inputStr: string) {
+function encryptDecrypt(inputStr: string): [string, string] {
 	const originalChars = inputStr.split(""), randomChars = [];
 	const specialChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=,.";
 	for (let i = 0; i < originalChars.length; i++) {
@@ -37,7 +37,7 @@ async function main() {
 		panopto = (document.getElementById("panopto_save") as HTMLInputElement).checked,
 		external = (document.getElementById("external_user") as HTMLInputElement).checked,
 		hw_alerts = (document.getElementById("allow_hw_alerts") as HTMLInputElement).checked,
-		notif_vol = (document.getElementById("notification_volume") as HTMLSelectElement).value,
+		notif_vol = parseInt((document.getElementById("notification_volume") as HTMLSelectElement).value),
 		moodle = (document.getElementById("moodle_cal_enabled") as HTMLInputElement).checked,
 		cs = (document.getElementById("cs_cal_enabled") as HTMLInputElement).checked,
 		cs_cal_pass = (document.getElementById("cs_cal_pass") as HTMLInputElement).value,
@@ -55,7 +55,7 @@ async function main() {
 		external_user: external, external_enable: externalEh, hw_alerts: hw_alerts,
 		moodle_cal_enabled: moodle, cs_cal_enabled: cs, cs_cal_pass: cs_cal_pass, webwork_cal_enabled: webwork,
 		notif_vol: notif_vol, dark_mode: darkMode, custom_name: customName, custom_link: customLink,
-	});
+	} as Partial<StorageData>);
 	if (chrome.runtime.lastError) {
 		status_bar.textContent = "שגיאה בשמירת הנתונים, אנא נסה שנית!";
 		console.error("TE_opt: " + chrome.runtime.lastError.message);

@@ -3,7 +3,7 @@ import {reverseString, xorStrings} from "./utils.js";
 const courseRegex = /(?<cname>.+)\s-\s(?<cnum>\d{6,8})/, semesterRegex = / - (?:קיץ|חורף|אביב)/;
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function TE_setStorage(data: any, callerName = "unknown") {
+async function TE_setStorage(data: Partial<StorageData>, callerName = "unknown") {
 	await chrome.storage.local.set(data);
 	if (chrome.runtime.lastError) console.error(`TE_bg_${callerName}: ${chrome.runtime.lastError.message}`);
 }

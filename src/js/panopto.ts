@@ -284,7 +284,7 @@ let speed = 1.0;
 	}
 
 	async function saveSetting(settingsKey: "showhide" | "darkmode" | "speed" | "returnbackwards" | "floatingspeed" | "settings") {
-		const settingsObj: { [key: string]: string | boolean | number } = {};
+		const settingsObj: Partial<StorageData> = {};
 		switch (settingsKey) {
 			case "showhide":
 				const attr = (document.getElementById("toggleThumbnailsButton") as HTMLElement).getAttribute("aria-expanded");
