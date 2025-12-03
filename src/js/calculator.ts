@@ -612,6 +612,7 @@
 	const storageData = await chrome.storage.local.get({dark_mode: false});
 	const entirePage = document.querySelector("html") as HTMLHtmlElement;
 	storageData.dark_mode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
+	document.getElementById("goToSettings")?.addEventListener("click", () => chrome.runtime.openOptionsPage());
 
 	setUpButtons();
 	await renderAllCourses();

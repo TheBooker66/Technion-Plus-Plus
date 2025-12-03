@@ -84,7 +84,7 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 	});
 
 	const storageData = await chrome.storage.local.get({
-		enable_login: false, quick_login: true, alerts_sound: true, gmail: true,
+		enable_login: false, quick_login: true, alerts_sound: true, email_preference: "gmail",
 		moodle_cal_enabled: true, remoodle: false, remoodle_angle: 120, cal_seen: 0,
 		cs_cal_enabled: false, uidn_arr: ["", ""], webwork_cal_enabled: false,
 		dl_current: 0, username: "", email_server: true, custom_name: "", custom_link: "",
@@ -110,12 +110,13 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 	if (storageData.dl_current !== 0) (document.getElementById("downloads") as HTMLAnchorElement).classList.add("active");
 
 	const printerLinks = printScreen.querySelectorAll("a"),
-		id: string = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1])) || "הקלד מספר זהות כאן",
-		gmailEh: boolean = storageData.gmail && !chrome.runtime.lastError;
+		id: string = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1])) || "הקלד מספר זהות כאן";
 	for (let i = 0; i < printerLinks.length; i++) {
-		const emailURL = gmailEh
-			? `https://mail.google.com/mail/u/0/?view=cm&to=print.${printerLinks[i].id}@campus.technion.ac.il&su=${id}&fs=1&tf=1`
-			: `mailto:print.${printerLinks[i].id}@campus.technion.ac.il?subject=${id}`;
+		const emailURL = storageData.email_preference === "gmail"
+			? `https://mail.google.com/mail/u/0/?view=cm&fs=1&to=print.${printerLinks[i].id}@campus.technion.ac.il&su=${id}`
+			: storageData.email_preference === "outlook"
+				? `https://outlook.office.com/mail/deeplink/compose?login_hint=${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il&to=print.${printerLinks[i].id}@campus.technion.ac.il&subject=${id}`
+				: `mailto:print.${printerLinks[i].id}@campus.technion.ac.il?subject=${id}`;
 		printerLinks[i].setAttribute("href", emailURL);
 		if (id !== "הקלד מספר זהות כאן" && id !== "") continue;
 		printerLinks[i].addEventListener("click", async () => {

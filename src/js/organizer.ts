@@ -474,4 +474,5 @@ if (document.title === "ארגונית++") {
 	});
 	storageData.dark_mode ? document.querySelector("html")?.setAttribute("tplus", "dm") :
 		document.querySelector("html")?.removeAttribute("tplus");
+	document.getElementById("goToSettings")?.addEventListener("click", () => chrome.runtime.openOptionsPage());
 }

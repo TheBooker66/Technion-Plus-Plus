@@ -31,13 +31,12 @@ async function main() {
 	}
 	const idn = (document.getElementById("idn") as HTMLInputElement).value,
 		campus = (document.getElementById("campus") as HTMLOptionElement).selected,
-		email = (document.getElementById("gmail_select") as HTMLInputElement).checked,
 		login = (document.getElementById("quick_login") as HTMLInputElement).checked,
 		timings = (document.getElementById("allow_timings") as HTMLInputElement).checked,
 		panopto = (document.getElementById("panopto_save") as HTMLInputElement).checked,
 		external = (document.getElementById("external_user") as HTMLInputElement).checked,
 		hw_alerts = (document.getElementById("allow_hw_alerts") as HTMLInputElement).checked,
-		notif_vol = parseInt((document.getElementById("notification_volume") as HTMLSelectElement).value),
+		notif_vol = parseFloat((document.getElementById("notification_volume") as HTMLSelectElement).value),
 		moodle = (document.getElementById("moodle_cal_enabled") as HTMLInputElement).checked,
 		cs = (document.getElementById("cs_cal_enabled") as HTMLInputElement).checked,
 		cs_cal_pass = (document.getElementById("cs_cal_pass") as HTMLInputElement).value,
@@ -46,11 +45,16 @@ async function main() {
 		customName = (document.getElementById("custom_name") as HTMLInputElement).value,
 		customLink = (document.getElementById("custom_link") as HTMLInputElement).value,
 		status_bar = document.getElementById("status") as HTMLDivElement;
+	let email: string;
+	if ((document.getElementById("gmail_select") as HTMLInputElement).checked) email = "gmail";
+	else if ((document.getElementById("outlook_select") as HTMLInputElement).checked) email = "outlook";
+	else email = "program";
+
 	const loginEh = "" !== username && "" !== password,
 		externalEh = external && "" !== password && "" !== idn;
 	await chrome.storage.local.set({
 		username: username, email_server: campus, phrase: encryptedSubstring, term: encryptedString,
-		maor_p: encryptionResult, uidn_arr: encryptDecrypt(reverseString(idn)), gmail: email,
+		maor_p: encryptionResult, uidn_arr: encryptDecrypt(reverseString(idn)), email_preference: email,
 		enable_login: loginEh, quick_login: login, allow_timings: timings, panopto_save: panopto,
 		external_user: external, external_enable: externalEh, hw_alerts: hw_alerts,
 		moodle_cal_enabled: moodle, cs_cal_enabled: cs, cs_cal_pass: cs_cal_pass, webwork_cal_enabled: webwork,
@@ -95,9 +99,9 @@ document.addEventListener("keypress", async event => {
 });
 document.addEventListener("DOMContentLoaded", async () => {
 	const storageData = await chrome.storage.local.get({
-		username: "", email_server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""], gmail: true,
-		quick_login: true, allow_timings: false, panopto_save: true, external_user: false, hw_alerts: true,
-		moodle_cal_enabled: true, cs_cal_enabled: false, cs_cal_pass: "",
+		username: "", email_server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
+		email_preference: "gmail", quick_login: true, allow_timings: false, panopto_save: true, external_user: false,
+		hw_alerts: true, moodle_cal_enabled: true, cs_cal_enabled: false, cs_cal_pass: "",
 		webwork_cal_enabled: false, webwork_cal_courses: {},
 		notif_vol: 1, dark_mode: false, custom_name: "", custom_link: "",
 	}) as StorageData;
@@ -113,8 +117,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		(document.getElementById("password") as HTMLInputElement).value = decryptedPassword;
 		(document.getElementById("quick_login") as HTMLInputElement).checked = storageData.quick_login;
 		(document.getElementById("moodle_cal_enabled") as HTMLInputElement).checked = storageData.moodle_cal_enabled;
-		(document.getElementById("gmail_select") as HTMLInputElement).checked = storageData.gmail;
-		(document.getElementById("outlook_select") as HTMLInputElement).checked = !storageData.gmail;
 		(document.getElementById("allow_timings") as HTMLInputElement).checked = storageData.allow_timings;
 		(document.getElementById("panopto_save") as HTMLInputElement).checked = storageData.panopto_save;
 		(document.getElementById("notification_volume") as HTMLInputElement).value = storageData.notif_vol.toString();
@@ -130,6 +132,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 		(document.getElementById("dark_mode") as HTMLInputElement).checked = storageData.dark_mode;
 		(document.getElementById("custom_name") as HTMLInputElement).value = storageData.custom_name;
 		(document.getElementById("custom_link") as HTMLInputElement).value = storageData.custom_link;
+		switch (storageData.email_preference) {
+			case "gmail":
+				(document.getElementById("gmail_select") as HTMLInputElement).checked = true;
+				break;
+			case "outlook":
+				(document.getElementById("outlook_select") as HTMLInputElement).checked = true;
+				break;
+			default:
+				(document.getElementById("program_select") as HTMLInputElement).checked = true;
+		}
 
 		const entirePage = document.querySelector("html") as HTMLHtmlElement;
 		storageData.dark_mode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");

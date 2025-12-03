@@ -13,6 +13,13 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 		parentContainer.appendChild(div);
 	}
 
+	function displayError(message: string) {
+		stop_spinning();
+		messageElement.textContent = message;
+		messageElement.className = "error_bar";
+		queryDisplay.style.display = "none";
+	}
+
 	async function displayCourseRecordings(courseData: { name: string, data: RecordingCourse["v"] }) {
 		stop_spinning();
 		messageElement.textContent = "בחר הקלטה לצפייה.";
@@ -62,12 +69,8 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 
 	function processSearchResults(coursesList: StorageData["videos_courses"], videosData: StorageData["videos_data"],
 	                              courseQuery: string) {
-		if (null == coursesList[0]) {
-			messageElement.textContent = "חלה שגיאה בניסיון להשיג את רשימת הקורסים, אנא נסה מאוחר יותר.";
-			messageElement.className = "error_bar";
-			stop_spinning();
-			return;
-		}
+		if (null == coursesList[0])
+			return displayError("חלה שגיאה בניסיון להשיג את רשימת הקורסים, אנא נסה מאוחר יותר.")
 		const searchRegex = new RegExp(courseQuery.replace(/ /g, ".*")),
 			resultsArray: { name: string, data: RecordingCourse["v"] }[] = [];
 		let matchCount = 0;
@@ -81,12 +84,8 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 				};
 			}
 		}
-		if (matchCount === 0) {
-			messageElement.textContent = "לא נמצא קורס המתאים לקריטריון המבוקש.";
-			messageElement.className = "attention";
-			stop_spinning();
-			return;
-		}
+		if (matchCount === 0)
+			return displayError("לא נמצא קורס המתאים לקריטריון המבוקש.")
 		matchCount === 1 ? displayCourseRecordings(resultsArray[0]) : displayMultipleCourses(resultsArray);
 	}
 
@@ -114,19 +113,15 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 	if (courseQuery) {
 		courseQuery = courseQuery.replace(/[^a-zA-Z\u05d0-\u05ea0-9\-" ]/g, "").trim();
 		messageElement.textContent = "מחפש את הקורס, אנא המתן...";
-		if (courseQuery.length === 0) {
-			messageElement.textContent = "לא ניתן לשלוח בקשה ריקה, נסה שנית.";
-			messageElement.className = "error_bar";
-			stop_spinning();
-			queryDisplay.style.display = "none";
-		} else if (courseQuery.length < 3) {
-			messageElement.textContent = "קריטריון החיפוש חייב להיות מאורך 3 תווים ומעלה.";
-			messageElement.className = "error_bar";
-			stop_spinning();
-			queryDisplay.style.display = "none";
-		} else {
+		if (courseQuery.length === 0)
+			displayError("לא ניתן לשלוח בקשה ריקה, נסה שנית.");
+		else if (courseQuery.length < 3)
+			displayError("קריטריון החיפוש חייב להיות מאורך 3 תווים ומעלה.");
+		else {
 			queryDisplay.textContent += '"' + courseQuery + '"';
-			const storageData = await chrome.storage.local.get({videos_data: {}, videos_courses: [], videos_update: 0}) as StorageData;
+			const storageData = await chrome.storage.local.get({
+				videos_data: {}, videos_courses: [], videos_update: 0,
+			}) as StorageData;
 			if (storageData.videos_update < (new Date).getTime() - 6048E5 || chrome.runtime.lastError)
 				await fetchAndUpdateVideos(storageData, courseQuery as string);
 			else

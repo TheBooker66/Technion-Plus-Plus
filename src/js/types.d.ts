@@ -13,7 +13,7 @@ type StorageData = {
 
 	// --- Global UI & Settings ---
 	dark_mode: boolean;
-	gmail: boolean;
+	email_preference: string;
 	custom_name: string;
 	custom_link: string;
 	remoodle: boolean;
