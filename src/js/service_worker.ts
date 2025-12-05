@@ -100,7 +100,7 @@ async function XHR(url: string, resType: string, info: string[] = [], body = "",
 					},
 				};
 
-				let returnObj: { [key: string]: any } = {};
+				const returnObj: { [key: string]: any } = {};
 				for (const key of info) {
 					if (actions[key as keyof typeof actions] !== undefined)
 						returnObj[key] = actions[key as keyof typeof actions];
@@ -194,7 +194,7 @@ async function TE_AutoLoginExternal() {
 					console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
 					return finalResponse;
 				}
-			} catch (err) {
+			} catch {
 				// If XHR fails, it might be a temporary network issue.
 			}
 			await delay(RETRY_DELAY);
@@ -229,7 +229,6 @@ async function TE_notification(message: string, silentEh: boolean, notificationI
 		message: `${message}\n${timestamp}`,
 	};
 
-	// @ts-ignore
 	if (typeof chrome.notifications.NotificationOptions?.silent !== "undefined") notificationOptions.silent = true;
 	if (notificationId) await chrome.notifications.clear(notificationId);
 	await chrome.notifications.create(notificationId, notificationOptions);
@@ -338,7 +337,7 @@ async function TE_alertMoodleCalendar(seenStatus: number, calendarProp: string, 
 
 		for (let i = 1; i < events.length; i++) {
 			const eventText = events[i];
-			let summary = eventText.split("SUMMARY:")[1].split("\n")[0].trim();
+			const summary = eventText.split("SUMMARY:")[1].split("\n")[0].trim();
 
 			const appealEh = filterToggles.appeals && summary.includes("ערעור"),
 				zoomEh = filterToggles.zooms && /(זום|Zoom|zoom|הרצא|תרגול)/.test(summary),
@@ -442,7 +441,7 @@ async function TE_webworkStep(url: string | FormData, body = "") {
 		const redirectUri = formData.get("redirect_uri") || formData.get("target_link_uri") || actionUrl;
 
 		return webworkRegex.test(redirectUri.toString()) ? [actionUrl, formData] : false;
-	} catch (err) {
+	} catch {
 		return false;
 	}
 }
@@ -459,14 +458,14 @@ async function TE_webworkScan() {
 	}
 
 	for (const courseData of Object.values(storageData.webwork_cal_courses)) {
-		let step1 = await TE_webworkStep(`https://moodle25.technion.ac.il/mod/lti/launch.php?id=${(courseData as WebworkCourse).lti}`);
+		const step1 = await TE_webworkStep(`https://moodle25.technion.ac.il/mod/lti/launch.php?id=${(courseData as WebworkCourse).lti}`);
 		if (!step1) continue;
 
-		let step2 = await TE_webworkStep(step1[0],
+		const step2 = await TE_webworkStep(step1[0],
 			new URLSearchParams(step1[1] as string).toString());
 		if (!step2) continue;
 
-		let step3 = await TE_webworkStep(step2[0],
+		const step3 = await TE_webworkStep(step2[0],
 			new URLSearchParams(step2[1] as string).toString());
 		if (!step3) continue;
 
@@ -521,7 +520,7 @@ async function TE_getWebwork(moodleData: { response: any, responseURL: string },
 		webworkRegex = /webwork|וובוורק|ווב-וורק/i, // The Next line is HARDCODED COURSE NUMBERS, thanks to Cheesefork.
 		mathCourseNums = ["01040044", "01040276", "01060937", "01060429", "01060010", "01040253", "01040142", "01040038", "01060405", "01040214", "01040222", "01040013", "01040228", "01060309", "01040195", "01040144", "01060015", "01970008", "01060942", "01060393", "01040185", "01060431", "01040221", "01040002", "01060396", "01040164", "01040181", "01060802", "01060800", "01040285", "01060423", "01040165", "01040064", "01040814", "01060931", "01970010", "01040192", "01040215", "01960015", "01040012", "01060383", "01970011", "01040131", "01030015", "01040918", "01960013", "01040279", "01040122", "01040135", "01040824", "01040034", "01060803", "01040183", "01040065", "01040066", "01960014", "01040041", "01980000", "01040043", "01040283", "01040157", "01040004", "01040168", "01040277", "01060427", "01040818", "01040182", "01060742", "01060009", "01060935", "01040112", "01060156", "01040952", "01060411", "01040018", "01040281", "01040136", "01040280", "01060941", "01060395", "01060012", "01040030", "01060350", "01040022", "01960012", "01060397", "01040177", "01060960", "01060380", "01040019", "01970014", "01960001", "01040032", "01040293", "01060716", "01080002", "01040220", "01040166", "01040158", "01040174", "01060349", "01060375", "01040031", "01060702", "01040250", "01060723", "01040119", "01040163", "01040016", "01040033", "01040000", "01060011", "01060062", "01040823", "01040291", "01040295", "01040042", "01040294", "01040003", "01060927", "01060347", "01060394", "01060170", "01060804", "01060944", "01060413", "01970007", "01060928", "01060330", "01040286", "01040273", "01040252", "01060860", "01040134", "01040274", "01040193"];
 
-	let courseHeadings = moodleData.response["CourseNames"];
+	const courseHeadings = moodleData.response["CourseNames"];
 	const courseUrlElements = moodleData.response["CourseLinks"];
 
 	for (let i = 0; i < courseUrlElements.length; i++) {
@@ -751,7 +750,7 @@ async function TE_checkBuses() {
 		const busesToAlert = realtimeData.filter(bus => storageData.bus_alerts.includes(bus["Shilut"]) && bus["MinutesToArrival"] <= storageData.bus_time);
 
 		if (busesToAlert.length > 0) await TE_busAlertNow(busesToAlert);
-	} catch (err) {
+	} catch {
 		await TE_busAlertError();
 	}
 }

@@ -15,7 +15,7 @@
 			const webcourseEh = window.location.hostname.includes("webcourse");
 			for (let i = 0; i < fileLinks.length; i++) {
 				const subdirectory = (document.getElementById("tplus_sub_" + index) as HTMLInputElement).checked ? fileLinks[i][1].replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_ ]/g, "").trim() + "/" : "";
-				let downloadItem: { [key: string]: string } = {};
+				const downloadItem: { [key: string]: string } = {};
 				if (webcourseEh) {
 					const urlParts = fileLinks[i][0].split("/");
 					downloadItem.n = courseTitle + "/" + pagePrefix + subdirectory + decodeURIComponent(urlParts[urlParts.length - 1].split("?")[0]).replace(/[^a-zA-Z\u05d0-\u05ea0-9\-_. ]/g, "").trim();
@@ -38,12 +38,12 @@
 		parentContainer.appendChild(downloadButton);
 	}
 
-	let allLinks = document.querySelectorAll("a");
+	const allLinks = document.querySelectorAll("a");
 	for (let i = 0; i < allLinks.length; i++)
-		allLinks[i].getAttribute("target") === "wc_output" && allLinks[i].setAttribute("target", "_blank");
+		if (allLinks[i].getAttribute("target") === "wc_output") allLinks[i].setAttribute("target", "_blank");
 	if (window.location.href.includes("ho.html") || window.location.href.search("ho_.*.html") !== -1)
 		for (let ticketContainers = document.querySelectorAll(".tickets"), i = 0; i < ticketContainers.length; i++) {
-			let pdfLinks = [], pptLinks = [], docLinks = [], zipLinks = [], otherLinks = [],
+			const pdfLinks = [], pptLinks = [], docLinks = [], zipLinks = [], otherLinks = [],
 				ticketItems = ticketContainers[i].querySelectorAll(".ticket");
 			for (let j = 0; j < ticketItems.length; j++) {
 				const fileAnchors = ticketItems[j].querySelectorAll("a"),

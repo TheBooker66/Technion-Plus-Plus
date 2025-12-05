@@ -29,7 +29,7 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 		const courseTypes = ["הרצאה", "תרגול"];
 		const template = popup.loadTemplate("courses-list-item");
 		for (let i = 0; i < courseData.data.length; i++) {
-			let recordingDetails = [],
+			const recordingDetails = [],
 				listItem = (template.cloneNode(true) as HTMLElement).querySelector(".list_item") as HTMLAnchorElement;
 			listItem.setAttribute("href", `https://panoptotech.cloud.panopto.eu/Panopto/Pages/Sessions/List.aspx#folderID="${courseData.data[i]["l"]}"`);
 			listItem.querySelector("span")!.textContent = courseData.data[i]["vn"] ?? courseData.name;
@@ -75,7 +75,7 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 			resultsArray: { name: string, data: RecordingCourse["v"] }[] = [];
 		let matchCount = 0;
 		for (const course of coursesList) {
-			let courseName = course.slice(0, 2).join(" - ");
+			const courseName = course.slice(0, 2).join(" - ");
 			if (searchRegex.exec(course.join(" "))) {
 				messageElement.textContent = "נמצא קורס כמבוקש!";
 				resultsArray[matchCount++] = {
@@ -84,9 +84,14 @@ import {TE_updateVideosInfo} from "./service_worker.js";
 				};
 			}
 		}
-		if (matchCount === 0)
+
+		if (matchCount === 0) {
 			return displayError("לא נמצא קורס המתאים לקריטריון המבוקש.")
-		matchCount === 1 ? displayCourseRecordings(resultsArray[0]) : displayMultipleCourses(resultsArray);
+		} else if (matchCount === 1) {
+			displayCourseRecordings(resultsArray[0]);
+		} else {
+			displayMultipleCourses(resultsArray);
+		}
 	}
 
 	async function fetchAndUpdateVideos(storageData: StorageData, courseQuery: string) {

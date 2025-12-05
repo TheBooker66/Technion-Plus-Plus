@@ -1,13 +1,16 @@
 (async function () {
 	async function main() {
 		function create_element(elementType: string, parent: HTMLElement, classes: string,
-		                        attributes: { [p: string]: string } = {}, text: string = "",
-		                        prepend: boolean = false) {
+			attributes: { [p: string]: string } = {}, text: string = "",
+			prepend: boolean = false) {
 			const element = document.createElement(elementType);
 			if (classes) element.className = classes;
 			for (const attribute in attributes) element.setAttribute(attribute, attributes[attribute]);
 			if (text) element.textContent = text;
-			if (parent) prepend ? parent.insertBefore(element, parent.childNodes[0]) : parent.appendChild(element);
+			if (parent) {
+				if (prepend) parent.insertBefore(element, parent.childNodes[0]);
+				else parent.appendChild(element);
+			}
 			return element;
 		}
 
@@ -58,19 +61,19 @@
 				step: "30",
 			}) as HTMLInputElement;
 
-			const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120}) as StorageData;
+			const storageData = await chrome.storage.local.get({ remoodle: false, remoodle_angle: 120 }) as StorageData;
 			darkModeCheckbox.checked = storageData.remoodle;
 			colourSlider.value = storageData.remoodle_angle.toString();
 			darkModeCheckbox.addEventListener("change", async () => {
-				await chrome.storage.local.set({remoodle: darkModeCheckbox.checked});
-				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
-					await chrome.runtime.sendMessage({mess_t: "TE_moodle_darkmode"});
+				await chrome.storage.local.set({ remoodle: darkModeCheckbox.checked });
+				if (chrome.runtime.lastError) console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message);
+				else await chrome.runtime.sendMessage({ mess_t: "TE_moodle_darkmode" });
 			});
 			colourSlider.addEventListener("change", async () => {
 				const newAngle = parseInt(colourSlider.value);
-				await chrome.storage.local.set({remoodle_angle: newAngle});
-				chrome.runtime.lastError ? console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message) :
-					await chrome.runtime.sendMessage({mess_t: "TE_moodle_colour", angle: newAngle});
+				await chrome.storage.local.set({ remoodle_angle: newAngle });
+				if (chrome.runtime.lastError) console.warn("TE_popup_remoodle: " + chrome.runtime.lastError.message);
+				else await chrome.runtime.sendMessage({ mess_t: "TE_moodle_colour", angle: newAngle });
 			});
 			let colorGradientString = "";
 			for (let gradientStep = 0; gradientStep < 12; gradientStep++) {
@@ -87,13 +90,13 @@
 				userCourses: { [key: string]: string } = {},
 				courseNameRegex = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/, semesterRegex = / - (?:חורף|אביב|קיץ)/;
 			for (const courseTile of courseTiles) {
-				let courseMatch = courseTile.querySelector("h3")
+				const courseMatch = courseTile.querySelector("h3")
 					?.textContent.replace(semesterRegex, "").match(courseNameRegex);
 				if (!courseMatch?.groups) continue;
 				userCourses[courseMatch.groups.cnum.trim()] = courseMatch.groups.cname.trim();
 			}
 			if (Object.keys(userCourses).length > 0) {
-				await chrome.storage.local.set({moodle_cal_courses: userCourses});
+				await chrome.storage.local.set({ moodle_cal_courses: userCourses });
 				if (chrome.runtime.lastError) console.error("TE_moodle_001_: " + chrome.runtime.lastError);
 			}
 
@@ -104,15 +107,19 @@
 				const downloadButtonContainer = document.createElement("div");
 				downloadButtonContainer.style.cssFloat = "left";
 				courseContainers[i].insertBefore(downloadButtonContainer, courseContainers[i].querySelector("a.btn.btn-primary.coursestyle2btn"));
-				let course = courseTiles[i].querySelector("h3")!.textContent,
+				const course = courseTiles[i].querySelector("h3")!.textContent,
 					courseLink = courseTiles[i].querySelector(".coursestyle2btn")!.getAttribute("href") as string;
-				course.includes("חורף") ? coursesBySemester[0].push({
+				if (course.includes("חורף")) {
+					coursesBySemester[0].push({
 					cname: course.replace(" - חורף", ""),
 					clink: courseLink,
-				}) : course.includes("אביב") ? coursesBySemester[1].push({
+				})} else if (course.includes("אביב")) {
+					coursesBySemester[1].push({
 					cname: course.replace(" - אביב", ""),
 					clink: courseLink,
-				}) : coursesBySemester[2].push({cname: course, clink: courseLink});
+				})} else {
+					coursesBySemester[2].push({ cname: course, clink: courseLink });
+				}
 				create_download(downloadButtonContainer, parseInt(courseTiles[i].querySelector(".coursestyle2btn")!.getAttribute("href")!.split("?id=")[1]), 0, "הורדת קבצי הקורס");
 			}
 			const buttons = await create_tp_buttons();
@@ -140,7 +147,7 @@
 					target: "_blank",
 				}, "דף הקורס בסאפ");
 				const storageData: { videos_courses: string[][], videos_data: { [key: string]: RecordingCourse["v"] } }
-					= await chrome.storage.local.get({videos_data: {}, videos_courses: []});
+					= await chrome.storage.local.get({ videos_data: {}, videos_courses: [] });
 				const short_course_num = course_num.substring(1, 4) + course_num.substring(5, 8);
 				let videoID = "";
 				for (let i = 0; i < storageData.videos_courses.length; i++)
@@ -180,7 +187,7 @@
 				const link = target.closest('a');
 				if (!link) return;
 				if (!link.href.includes("forcedownload=1")) return;
-				let url = link.href.replace(/\??forcedownload=1/g, "");
+				const url = link.href.replace(/\??forcedownload=1/g, "");
 
 				event.preventDefault();
 				event.stopImmediatePropagation();
@@ -202,7 +209,7 @@
 			["--dark_bg", "hsl(" + (90 + hueOffset) + ", 100%, 10%)"],
 			["--calendar_today", "hsla(" + (70 + hueOffset) + ", 100%, 20%, 0.5)"],
 		];
-		const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120}) as StorageData;
+		const storageData = await chrome.storage.local.get({ remoodle: false, remoodle_angle: 120 }) as StorageData;
 		if (chrome.runtime.lastError) {
 			console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
 			return;
@@ -211,7 +218,7 @@
 		let darkModeEnabled: boolean = storageData.remoodle;
 		const setDarkMode = (darkmodeEh: boolean) => {
 			const entirePage = document.querySelector("html") as HTMLHtmlElement;
-			darkmodeEh ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
+			if (darkmodeEh) entirePage.setAttribute("tplus", "dm"); else entirePage.removeAttribute("tplus");
 			const checkbox = document.getElementById("tp_darkmode_input") as HTMLInputElement;
 			if (checkbox) checkbox.checked = darkmodeEh;
 		};
@@ -224,12 +231,13 @@
 					setDarkMode(!darkModeEnabled);
 					darkModeEnabled = !darkModeEnabled;
 					break;
-				case "TE_moodle_colour":
+				case "TE_moodle_colour": {
 					themeProperties(message.angle)
 						.forEach(property => document.documentElement.style.setProperty(property[0], property[1]));
 					const colorSlider = document.querySelector("#tp_colour_switcher input[type=range]") as HTMLInputElement;
 					if (colorSlider) colorSlider.value = message.angle;
 					break;
+				}
 			}
 		});
 	}

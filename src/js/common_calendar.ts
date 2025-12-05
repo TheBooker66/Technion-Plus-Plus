@@ -63,7 +63,7 @@ export class CommonCalendar {
 				createAssignmentElement(assignment, assignmentTemplate.cloneNode(true) as DocumentFragment, "new_assignments"));
 			finishedAssignmentsList.forEach(assignment =>
 				createAssignmentElement(assignment, assignmentTemplate.cloneNode(true) as DocumentFragment, "finished_assignments"));
-			0 === newAssignmentsList.length + finishedAssignmentsList.length && insertMessage("לא נמצאו אירועים קרובים לתצוגה.", false);
+			if (!newAssignmentsList.length && !finishedAssignmentsList.length) insertMessage("לא נמצאו אירועים קרובים לתצוגה.", false);
 			stopSpinning();
 		});
 	}
@@ -73,7 +73,7 @@ export class CommonCalendar {
 			await addAssignmentsToList(promiseCreator, this.system);
 		else promiseCreator()
 			.then(result => this.insertAssignments(result.new_list, result.finished_list))
-			.catch((err: any) => insertMessage(err.msg, err.is_error));
+			.catch((err: { msg: string, is_error: boolean }) => insertMessage(err.msg, err.is_error));
 	}
 }
 
@@ -82,7 +82,11 @@ function checkForEmpty() {
 	["new_assignments", "finished_assignments"].forEach(tabID => {
 		const tab = document.getElementById(tabID);
 		if (!tab) return;
-		tab.childNodes.length === 0 ? tab.classList.add("empty_list") : tab.classList.remove("empty_list");
+		if (tab.childNodes.length === 0) {
+			tab.classList.add("empty_list");
+		} else {
+			tab.classList.remove("empty_list");
+		}
 	});
 }
 
@@ -117,7 +121,7 @@ export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: H
 		newCalendar[eventID].done = !newCalendar[eventID].done;
 	} else {
 		newCalendar = storageData[key] as StorageData["moodle_cal_finished"] | StorageData["cs_cal_finished"];
-		finishEh ? newCalendar.push(eventID) : newCalendar.splice(newCalendar.indexOf(eventID), 1);
+		if (finishEh) newCalendar.push(eventID); else newCalendar.splice(newCalendar.indexOf(eventID), 1);
 	}
 
 	await chrome.storage.local.set({[key]: newCalendar});

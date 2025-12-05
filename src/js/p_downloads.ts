@@ -43,12 +43,12 @@ import {CommonPopup} from './common_popup.js';
 		let itemCount = 0;
 		storageData.dl_queue.forEach((downloadEntry: DownloadItem) => {
 			for (let i = 0; i < downloadEntry.list.length; i++) {
-				let file = downloadEntry.list[i],
+				const file = downloadEntry.list[i],
 					listItem = (popup.loadTemplate("dl_item").cloneNode(true) as HTMLElement).querySelector(".list_item") as HTMLDivElement;
 				(listItem.querySelector(".dl_name") as HTMLElement).textContent = file.n;
 				(listItem.querySelector(".dl_from") as HTMLImageElement).src = "../icons/" + ["moodle.svg", "panopto.svg", "cs.png", "cs.png"][downloadEntry.sys];
 				(listItem.querySelector(".remove") as HTMLImageElement).addEventListener("click", async () => {
-					let fileIndex = downloadEntry.list.indexOf(file);
+					const fileIndex = downloadEntry.list.indexOf(file);
 					downloadEntry.list.splice(fileIndex, 1);
 					if (downloadEntry.list.length === 0)
 						storageData.dl_queue.splice(storageData.dl_queue.indexOf(downloadEntry), 1);
@@ -75,7 +75,7 @@ import {CommonPopup} from './common_popup.js';
 	await updateCurrentDownload();
 	setInterval(updateCurrentDownload, 350);
 	await updateDownloadQueue();
-	chrome.downloads.onCreated.addListener(_ => setTimeout(updateDownloadQueue, 1E3));
+	chrome.downloads.onCreated.addListener(() => setTimeout(updateDownloadQueue, 1E3));
 	chrome.downloads.onChanged.addListener(changes => {
 		if (changes.state || changes.paused) updateDownloadQueue();
 	});
@@ -85,8 +85,11 @@ import {CommonPopup} from './common_popup.js';
 
 		const downloads = await chrome.downloads.search({id: storageData.dl_current});
 		if (!downloads[0]) return;
-		downloads[0].paused ?
-			await chrome.downloads.resume(storageData.dl_current) : await chrome.downloads.pause(storageData.dl_current);
+		if (downloads[0].paused) {
+			await chrome.downloads.resume(storageData.dl_current);
+		} else {
+			await chrome.downloads.pause(storageData.dl_current);
+		}
 	});
 	(document.getElementById("cancel") as HTMLInputElement).addEventListener("click", async () => {
 		const storageData = await chrome.storage.local.get({dl_current: 0}) as StorageData;

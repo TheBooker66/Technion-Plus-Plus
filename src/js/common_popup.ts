@@ -71,29 +71,26 @@ export class CommonPopup {
 			(fetchOptions.headers as { [key: string]: string })["Content-type"] = "text/csv;charset=UTF-8";
 		}
 
-		try {
-			const response = await fetch(URL, fetchOptions);
+		const response = await fetch(URL, fetchOptions);
 
-			if (!response.ok) {
-				throw new Error(response.statusText);
-			}
-
-			let data;
-			switch (responseType) {
-				case "json":
-					data = await response.json();
-					break;
-				case "document":
-					const text = await response.text();
-					data = new DOMParser().parseFromString(text, "text/html");
-					break;
-				default:
-					data = await response.text();
-			}
-
-			return {response: data, responseURL: response.url};
-		} catch (error) {
-			throw error;
+		if (!response.ok) {
+			throw new Error(response.statusText);
 		}
+
+		let data;
+		switch (responseType) {
+			case "json":
+				data = await response.json();
+				break;
+			case "document": {
+				const text = await response.text();
+				data = new DOMParser().parseFromString(text, "text/html");
+				break;
+			}
+			default:
+				data = await response.text();
+		}
+
+		return {response: data, responseURL: response.url};
 	}
 }

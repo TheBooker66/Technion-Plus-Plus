@@ -1,11 +1,12 @@
 chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 	switch (message.mess_t) {
-		case "audio notification":
+		case "audio notification": {
 			const audio = new Audio(chrome.runtime.getURL("../resources/notification.mp3"));
 			audio.volume = message.volume;
 			await audio.play();
 			break;
-		case "DOMParser":
+		}
+		case "DOMParser": {
 			const doc = new DOMParser().parseFromString(message.data, "text/html");
 			const courseVisibleElements = Array.from(doc.querySelectorAll(".coursevisible"));
 			// noinspection DuplicatedCode
@@ -73,13 +74,14 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 				},
 			};
 
-			let returnObj: { [key: string]: any } = {};
+			const returnObj: { [key: string]: any } = {};
 			for (const key of message.dataNeeded) {
 				if (actions[key as keyof typeof actions] !== undefined)
 					returnObj[key] = actions[key as keyof typeof actions];
 			}
 			sendResponse(returnObj);
 			return true;
+		}
 	}
 	return false;
 });

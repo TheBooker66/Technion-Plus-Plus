@@ -26,7 +26,11 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 					setTimeout(() => element.classList.remove("blat"), 1E3);
 				} else {
 					await TE_toggleBusAlert(busData["Shilut"]);
-					element.classList.contains("chosen") ? element.className = "drow" : element.classList.add("chosen");
+					if (element.classList.contains("chosen")) {
+						element.className = "drow";
+					} else {
+						element.classList.add("chosen");
+					}
 				}
 			}
 		});
@@ -157,7 +161,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 		const optionElement = document.createElement("option") as HTMLOptionElement;
 		optionElement.value = stopData.val.toString();
 		optionElement.textContent = stopData.name;
-		stopData.val === storageData.bus_station && (optionElement.selected = true);
+		if (stopData.val === storageData.bus_station) optionElement.selected = true;
 		stationSelectElement.appendChild(optionElement);
 	});
 	stationSelectElement.addEventListener("change", refreshBusTable);

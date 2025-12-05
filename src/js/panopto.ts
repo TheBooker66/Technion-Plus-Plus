@@ -76,7 +76,7 @@ let speed = 1.0;
 					sys: 1, sub_pre: "", list: [],
 				};
 			for (let i = 0; i < xmlItems.length; i++) {
-				let downloadItem: { [key: string]: string } = {};
+				const downloadItem: { [key: string]: string } = {};
 				downloadItem.u = xmlItems[i].querySelector("guid")!.textContent.split("/Syndication/")[1];
 				downloadItem.n = courseTitle + xmlItems[i].querySelector("title")!.textContent
 					.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4";
@@ -95,7 +95,7 @@ let speed = 1.0;
 				downloadChunk: DownloadItem = {sys: 1, sub_pre: "", list: []};
 			for (let i = 0; i < listRows.length; i++) {
 				if (!(listRows[i].querySelector(".tplus_check") as HTMLInputElement).checked) continue;
-				let downloadItem = {
+				const downloadItem = {
 					u: listRows[i].id + ".mp4",
 					n: courseTitle + listRows[i].querySelector("a.detail-title")?.textContent.trim().replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, "").replace(/\s\s+/g, " ") + ".mp4",
 				};
@@ -190,7 +190,7 @@ let speed = 1.0;
 		(new MutationObserver((records, observer) => {
 			for (const record of records)
 				for (let i = 0; i < record.addedNodes.length; i++) {
-					let node = record.addedNodes[i] as HTMLElement;
+					const node = record.addedNodes[i] as HTMLElement;
 					if (!("function" === typeof node.querySelector && !document.getElementById("new_win") &&
 						node.classList.contains("player") && document.querySelectorAll(".video-js").length === 2))
 						continue;
@@ -286,10 +286,11 @@ let speed = 1.0;
 	async function saveSetting(settingsKey: "showhide" | "darkmode" | "speed" | "returnbackwards" | "floatingspeed" | "settings") {
 		const settingsObj: Partial<StorageData> = {};
 		switch (settingsKey) {
-			case "showhide":
+			case "showhide": {
 				const attr = (document.getElementById("toggleThumbnailsButton") as HTMLElement).getAttribute("aria-expanded");
 				settingsObj.panopto_hide = attr === null || attr === "true"; // weird race conditions, but this works :/
 				break;
+			}
 			case "darkmode":
 				settingsObj.panopto_darkmode = (document.getElementById("m_darkmode") as HTMLInputElement).checked;
 				break;
@@ -432,7 +433,7 @@ let speed = 1.0;
     </div>
 </div>
 `, "text/html").getElementById("tplus_menu_container") as HTMLDivElement;
-		for (let menuButton of menu.querySelectorAll("a"))
+		for (const menuButton of menu.querySelectorAll("a"))
 			if (menuButton.id)
 				menuButton.style.backgroundImage = `url(${chrome.runtime.getURL("icons/panopto/" + menuButton.id.replace(/_mp[34]/, "") + ".svg")})`;
 

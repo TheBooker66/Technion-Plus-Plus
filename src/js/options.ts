@@ -5,13 +5,10 @@ function encryptDecrypt(inputStr: string): [string, string] {
 	const originalChars = inputStr.split(""), randomChars = [];
 	const specialChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=,.";
 	for (let i = 0; i < originalChars.length; i++) {
-		while (true) {
+		do {
 			randomChars[i] = specialChars.charAt(Math.floor(78 * Math.random()));
 			originalChars[i] = String.fromCharCode(inputStr.charCodeAt(i) ^ randomChars[i].charCodeAt(0));
-			if (/^[ -~]*$/.test(originalChars[i])) {
-				break;
-			}
-		}
+		} while (!/^[ -~]*$/.test(originalChars[i]))
 	}
 	return [originalChars.join(""), randomChars.join("")];
 }
@@ -20,15 +17,13 @@ async function main() {
 	const username = (document.getElementById("username") as HTMLInputElement).value,
 		password = (document.getElementById("password") as HTMLInputElement).value;
 	let encryptionResult, encryptedString, encryptedSubstring;
-	while (true) {
+	do {
 		encryptionResult = encryptDecrypt(reverseString(password));
 		encryptedString = encryptionResult[0].toString();
 		encryptedSubstring = encryptedString.substring(Math.floor(encryptedString.length / 2), encryptedString.length);
 		encryptedString = encryptedString.substring(0, Math.floor(encryptedString.length / 2));
 		encryptionResult = encryptionResult[1];
-		if (reverseString(xorStrings(encryptedString + encryptedSubstring, encryptionResult)).toString()
-			=== password.toString()) break;
-	}
+	} while (reverseString(xorStrings(encryptedString + encryptedSubstring, encryptionResult)).toString() !== password.toString());
 	const idn = (document.getElementById("idn") as HTMLInputElement).value,
 		campus = (document.getElementById("campus") as HTMLOptionElement).selected,
 		login = (document.getElementById("quick_login") as HTMLInputElement).checked,
@@ -69,7 +64,7 @@ async function main() {
 	}
 
 	const entirePage = document.querySelector("html") as HTMLHtmlElement;
-	darkMode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
+	if (darkMode) entirePage.setAttribute("tplus", "dm"); else entirePage.removeAttribute("tplus");
 
 	if (moodle && loginEh && login) await TE_updateInfo();
 	else await resetBadge();
@@ -144,13 +139,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 
 		const entirePage = document.querySelector("html") as HTMLHtmlElement;
-		storageData.dark_mode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
+		if (storageData.dark_mode) entirePage.setAttribute("tplus", "dm"); else entirePage.removeAttribute("tplus");
 
 		if (storageData.webwork_cal_enabled) {
 			const webworkCoursesElement = document.getElementById("ww_current") as HTMLSpanElement,
 				webworkCourseNames = [];
 			webworkCoursesElement.style.display = "block";
-			for (let course of Object.values(storageData.webwork_cal_courses))
+			for (const course of Object.values(storageData.webwork_cal_courses))
 				webworkCourseNames.push((course as { lti: string, name: string }).name);
 			if (0 < webworkCourseNames.length)
 				webworkCoursesElement.querySelector("span")!.textContent = webworkCourseNames.join(", ");

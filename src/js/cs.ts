@@ -11,7 +11,7 @@
         </table>`, "text/html").querySelector("td") as HTMLTableCellElement;
 			courseRows[courseRows.length - 1].children[0].setAttribute("colspan", "4");
 			for (let i = 1; i < courseRows.length - 1; i++) {
-				let buttonCell = courseButtonTemplate.cloneNode(true) as DocumentFragment;
+				const buttonCell = courseButtonTemplate.cloneNode(true) as DocumentFragment;
 				(buttonCell.querySelector("input") as HTMLInputElement).addEventListener("click", f => {
 					f.preventDefault();
 					document.forms.namedItem("SubSub")!["RecreatePath"].value = `5-${i - 1}`;
@@ -23,7 +23,7 @@
 	}
 
 	function addCopyPasswordButton() {
-		let icsLink = document.querySelector("a.ics") as HTMLAnchorElement;
+		const icsLink = document.querySelector("a.ics") as HTMLAnchorElement;
 		if (!icsLink) return;
 
 		const password = icsLink.href.slice(-8),
@@ -45,7 +45,7 @@
 
 	function updateTabNames() {
 		const courseTabs = document.querySelectorAll("form[name='SubSub'] table table a.tab");
-		for (let tab of courseTabs) {
+		for (const tab of courseTabs) {
 			tab.textContent += " - " + (document.querySelector(`#c${tab.textContent} span.black-text > strong`) as HTMLElement).textContent;
 			tab.setAttribute("style", "{white-space: nowrap; max-width: calc((90vw - 350px) / ${courseTabs.length + 1}); text-overflow: ellipsis; overflow-x: hidden; display: block; min-width: 9ch;}".replace(/[{}]/g, ''));
 		}

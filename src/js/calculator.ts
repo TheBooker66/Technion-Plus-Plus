@@ -129,7 +129,11 @@
 		if (rowElement.parentElement?.tagName !== 'TBODY') return;
 
 		if (target.matches("td input[type='checkbox'].select_course")) {
-			(target as HTMLInputElement).checked ? rowElement.classList.add("selected") : rowElement.classList.remove("selected");
+			if ((target as HTMLInputElement).checked) {
+				rowElement.classList.add("selected");
+			} else {
+				rowElement.classList.remove("selected");
+			}
 			updateSelectedCoursesStats();
 			return;
 		}
@@ -154,7 +158,7 @@
 				target.textContent = "אישור";
 				gradeInput.focus();
 				break;
-			case "אישור":
+			case "אישור": {
 				const newGradeValue = parseFloat(gradeInput.value.toString());
 				if (Number.isNaN(newGradeValue) || newGradeValue < 0 || newGradeValue > 100) {
 					alert("נא להזין ציון תקין בין 0 ל-100.");
@@ -178,11 +182,12 @@
 						?.prepend(createCourseRowElement(courseData, "ignore_list"));
 				}
 				break;
+			}
 			case "תמיד":
 				courseData.perm_ignored = true;
 				await chrome.storage.local.set({grades: allGrades});
 				handleStorageError("ignore_grade");
-			// NO BREAK;
+				// falls through
 			case "התעלם":
 				rowElement.remove();
 				document.getElementById("ignore_list")?.querySelector('tbody')
@@ -230,7 +235,7 @@
 				await chrome.storage.local.set({grades: allGrades});
 				handleStorageError("restore_grade");
 				break;
-			case "מחק":
+			case "מחק": {
 				const sureEh = confirm("האם אתם בטוחים שברצונכם למחוק את הקורס הזה?");
 				if (!sureEh) return;
 
@@ -241,6 +246,7 @@
 				await chrome.storage.local.set({grades: updatedGrades});
 				handleStorageError("delete_grade");
 				break;
+			}
 		}
 		updateAllStats();
 	}
@@ -269,7 +275,7 @@
 		if (course.year && (Number.isNaN(Number(course.year)) || course.year < 1912 || course.year > 65537)) {
 			return {isValid: false, message: "שנה לא תקינה."};
 		}
-		if (course.semester && !semesterOrder.hasOwnProperty(course.semester)) {
+		if (course.semester && !Object.prototype.hasOwnProperty.call(semesterOrder, course.semester)) {
 			return {isValid: false, message: "סמסטר לא תקין."};
 		}
 		return {isValid: true, message: "Valid"};
@@ -420,7 +426,7 @@
 						alert("לא נמצאו קורסים תקינים לייבוא מהקובץ.");
 				}
 
-				let newCourses: CalculatorCourse[] = [];
+				const newCourses: CalculatorCourse[] = [];
 				if (file.name.endsWith(".csv")) {
 					const reader = new FileReader();
 					reader.readAsText(file, 'UTF-8');
@@ -570,7 +576,8 @@
 
 	async function renderAllCourses() {
 		const storageData = await chrome.storage.local.get({grades: []}) as StorageData;
-		let allGrades = storageData.grades, latestYear = 1912, latestSemesterOrder = 0;
+		const allGrades = storageData.grades;
+		let latestYear = 1912, latestSemesterOrder = 0;
 
 		if (allGrades.length > 0) {
 			latestYear = allGrades.reduce((acc: number, course: CalculatorCourse) => Math.max(acc, course.year), 1912);
@@ -611,9 +618,13 @@
 	// Initial setup and data load
 	const storageData = await chrome.storage.local.get({dark_mode: false});
 	const entirePage = document.querySelector("html") as HTMLHtmlElement;
-	storageData.dark_mode ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
-	document.getElementById("goToSettings")?.addEventListener("click", () => chrome.runtime.openOptionsPage());
+	if (storageData.dark_mode) {
+		entirePage.setAttribute("tplus", "dm");
+	} else {
+		entirePage.removeAttribute("tplus");
+	}
 
+	document.getElementById("goToSettings")?.addEventListener("click", () => chrome.runtime.openOptionsPage());
 	setUpButtons();
 	await renderAllCourses();
 })();

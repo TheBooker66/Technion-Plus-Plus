@@ -58,8 +58,11 @@
 				}
 			}
 		};
-		document.querySelector(".banner-logo") ? handleMicrosoftLogin() : (new MutationObserver(_ => handleMicrosoftLogin()))
-			.observe(document.forms[0] ?? document.body, {childList: true, attributes: false, subtree: true});
+		if (document.querySelector(".banner-logo"))
+			handleMicrosoftLogin();
+		else
+			(new MutationObserver(() => handleMicrosoftLogin()))
+				.observe(document.forms[0] ?? document.body, { childList: true, attributes: false, subtree: true });
 	}
 
 	function techwww(storageData: ExtendedStorageData) {

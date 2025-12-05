@@ -143,7 +143,7 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 			authURL = "https://students.technion.ac.il/auth/oidc/";
 		}
 		if (!storageData.enable_login || !storageData.quick_login) return;
-		let urlParts = authURL.split("?");
+		const urlParts = authURL.split("?");
 		const urlParams = new URLSearchParams(urlParts[1]);
 		urlParams.delete("prompt");
 		urlParams.append("login_hint", storageData.username + "@" + (storageData.email_server ? "campus." : "") + "technion.ac.il");

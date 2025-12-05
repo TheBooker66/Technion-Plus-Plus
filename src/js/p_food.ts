@@ -2,7 +2,7 @@ import {CommonPopup} from "./common_popup.js";
 
 (async function () {
 	function oops(message: string) {
-		let element = document.getElementById("info") as HTMLDivElement;
+		const element = document.getElementById("info") as HTMLDivElement;
 		element.className = "error_bar";
 		element.style.display = "block";
 		element.textContent = message;
@@ -29,7 +29,7 @@ import {CommonPopup} from "./common_popup.js";
 		.map((item: string) => item.split('\t'));
 
 	// Map the array of strings into an array of objects
-	let restaurants: { [key: string]: string | number }[] = rest.map((item: string[]) => {
+	const restaurants: { [key: string]: string | number }[] = rest.map((item: string[]) => {
 		const object: { [key: string]: string | number } = {};
 		keys.forEach((key: string, index: number) => (object[key] = item.at(index) as string));
 		return object;
@@ -56,19 +56,17 @@ import {CommonPopup} from "./common_popup.js";
 	date.time = date.hour + ":" + date.minutes;
 
 	// Get the template for the list of restaurants and the table to display the list
-	let foodTable = document.getElementById("food_table") as HTMLDivElement,
+	const foodTable = document.getElementById("food_table") as HTMLDivElement,
 		technionLoc = {latitude: 32.776763, longitude: 35.023121};
 
 	for (let i = 0; i < restaurants.length; i++) {
 		// Check which restaurants are open right now by the hour (if a restaurant isn't open, splice it)
-		// @ts-ignore
 		if (!restaurants[i]['working_hours'][days[date.day]]) {
 			restaurants.splice(i, 1);
 			i--;
 			continue;
 		}
 
-		// @ts-ignore
 		let [start, end] = restaurants[i]['working_hours'][days[date.day]].split("-");
 		if (start === "סגור" || end === "סגור") {
 			restaurants.splice(i, 1);
@@ -98,16 +96,15 @@ import {CommonPopup} from "./common_popup.js";
 	let counter = 0;
 	restaurants.forEach(item => {
 		// Create the list of restaurants and display it
-		let node = popup.loadTemplate("list-item").cloneNode(true) as HTMLElement;
-		let text = node.querySelectorAll(".list_item div")[0];
+		const node = popup.loadTemplate("list-item").cloneNode(true) as HTMLElement;
+		const text = node.querySelectorAll(".list_item div")[0];
 		text.querySelector("a")!.textContent = item['name'] as string;
 		text.querySelector("a")!.href = item['site'] as string;
 		text.querySelector("span")!.textContent += `– ${item['full_address']} – ★${item['rating']}`;
-		let type_and_hours = node.querySelectorAll(".list_item div")[1];
-		// @ts-ignore
+		const type_and_hours = node.querySelectorAll(".list_item div")[1];
 		type_and_hours.querySelector("span")!.textContent = `סוג אוכל: ${item['type']}; שעות פתיחה היום: ${item['working_hours'][days[date.day]]}; טלפון: ${item['phone']}`;
 		if (counter !== 0) {
-			let divider = document.createElement("div");
+			const divider = document.createElement("div");
 			divider.className = "divider";
 			foodTable.appendChild(divider);
 		}

@@ -9,8 +9,7 @@ function insertMessage(messageText: string, errorEh: boolean = true) {
 function checkForEmpty() {
 	["new_assignments", "finished_assignments"].forEach(tabID => {
 		const tab = document.getElementById(tabID) as HTMLDivElement;
-		tab.querySelectorAll("div.list_item:not(.hidden)").length === 0
-			? tab.classList.add("empty_list") : tab.classList.remove("empty_list");
+		if (tab.querySelectorAll("div.list_item:not(.hidden)").length === 0) tab.classList.add("empty_list"); else tab.classList.remove("empty_list");
 	});
 }
 
@@ -23,7 +22,7 @@ function openAssignment(assignment: HTMLDivElement, gotoFunction: () => Promise<
 		button.classList.remove("small_spinner");
 		button.textContent = originalText;
 	};
-	gotoFunction().then(resetButton).catch(_ => {
+	gotoFunction().then(resetButton).catch(() => {
 		assignment.style.background = "var(--status-danger) !important;";
 		setTimeout(() => assignment.style.background = "", 1E3);
 		resetButton();
@@ -80,7 +79,7 @@ async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElemen
 }
 
 function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: HWAssignment[]) {
-	let courses: Set<string> = new Set;
+	const courses: Set<string> = new Set;
 	const insertAssignment =
 		(assignmentData: HWAssignment, template: DocumentFragment, targetListID: "new_assignments" | "finished_assignments") => {
 			const newAssigment = template.querySelector(".list_item") as HTMLDivElement;
@@ -127,7 +126,7 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 	finishedAssignments.forEach(assignmentData => insertAssignment(assignmentData, chooseTemplate(assignmentData), "finished_assignments"));
 	const courseFilterElement = document.getElementById("course_filter") as HTMLSelectElement;
 	Array.from(courses).forEach(courseName => {
-		let optionElement = courseFilterElement.appendChild(document.createElement("option"));
+		const optionElement = courseFilterElement.appendChild(document.createElement("option"));
 		optionElement.value = courseName;
 		optionElement.textContent = courseName;
 	});
@@ -138,7 +137,7 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 async function togglePinned(eventID: number, sys: HWSystem, element: HTMLDivElement) {
 	const storageData = await chrome.storage.local.get({pinned_assignments: [], user_agenda: {}}) as StorageData;
 
-	let pinnedList: number[] = storageData.pinned_assignments;
+	const pinnedList: number[] = storageData.pinned_assignments;
 	const alreadyPinnedEh = pinnedList.includes(eventID);
 
 	if (alreadyPinnedEh) {
@@ -185,7 +184,7 @@ async function editUA(assignmentID: number) {
 
 async function removeUA(assignmentID: number) {
 	const storageData = await chrome.storage.local.get({user_agenda: {}}) as StorageData;
-	if (!storageData.user_agenda.hasOwnProperty(assignmentID)) return;
+	if (!Object.prototype.hasOwnProperty.call(storageData.user_agenda, assignmentID)) return;
 	if (!window.confirm(`המטלה "${storageData.user_agenda[assignmentID].name}" תימחק!`)) return;
 
 	delete storageData.user_agenda[assignmentID];
@@ -201,7 +200,7 @@ function insertUserAssignment(assignmentData: HWAssignment, container: HTMLDivEl
 	if (assignmentData.pinned && targetListID === "new_assignments") container.classList.add("pinned");
 	container.querySelector(".assignment_name")!.textContent = assignmentData.name;
 	container.dataset.course = "#user-course";
-	let textareaHeight = 20 * (assignmentData.description.split("\n").length + 1),
+	const textareaHeight = 20 * (assignmentData.description.split("\n").length + 1),
 		textareaElement = container.querySelector(".assignment_description textarea") as HTMLTextAreaElement,
 		inputElement = container.querySelector(".end_time > span") as HTMLInputElement;
 	textareaElement.textContent = assignmentData.description;
@@ -244,16 +243,21 @@ export async function addAssignmentsToList(
 			"cs": storageData.cs_cal_enabled,
 			"webwork": storageData.quick_login && storageData.enable_login && storageData.webwork_cal_enabled,
 		};
-	let newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [], promisesList = [];
+	let newAssignmentsList: HWAssignment[] = [], finishedAssignmentsList: HWAssignment[] = [];
+	const promisesList = [];
 	Object.keys(userAgendaData).forEach(agendaID => {
 		userAgendaData[agendaID].eventID = parseInt(agendaID);
 		userAgendaData[agendaID].sys = "ua";
 		userAgendaData[agendaID].pinned = userAgendaData[agendaID].pinned ?? false;
-		userAgendaData[agendaID].done ? finishedAssignmentsList.push(userAgendaData[agendaID]) : newAssignmentsList.push(userAgendaData[agendaID]);
+		if (userAgendaData[agendaID].done) {
+			finishedAssignmentsList.push(userAgendaData[agendaID]);
+		} else {
+			newAssignmentsList.push(userAgendaData[agendaID]);
+		}
 	});
-	for (let type of Object.keys(assignmentPromises)) if (enabledCalendars[type as "moodle" | "cs" | "webwork"]) promisesList.push(assignmentPromises[type]);
+	for (const type of Object.keys(assignmentPromises)) if (enabledCalendars[type as "moodle" | "cs" | "webwork"]) promisesList.push(assignmentPromises[type]);
 	let completedPromises = 0;
-	for (let calendarPromise of promisesList) {
+	for (const calendarPromise of promisesList) {
 		calendarPromise().then(calendarData => {
 			newAssignmentsList = newAssignmentsList.concat(calendarData.new_list);
 			finishedAssignmentsList = finishedAssignmentsList.concat(calendarData.finished_list);
@@ -294,9 +298,9 @@ async function saveUA() {
 		return;
 	}
 	const storageData = await chrome.storage.local.get({user_agenda: {}}) as StorageData;
-	let userAgenda = storageData.user_agenda;
+	const userAgenda = storageData.user_agenda;
 	const assignmentID = parseInt(form.edit.value);
-	const isExistingAssignment = 0 < assignmentID ? userAgenda.hasOwnProperty(assignmentID) : false;
+	const isExistingAssignment = 0 < assignmentID ? Object.prototype.hasOwnProperty.call(userAgenda, assignmentID) : false;
 	const finalAssignmentID = isExistingAssignment ? assignmentID : Date.now();
 	userAgenda[finalAssignmentID] = {
 		eventID: finalAssignmentID,
@@ -468,11 +472,15 @@ if (document.title === "ארגונית++") {
 		fullscreenCheckbox.checked = true;
 		await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: "maximized"});
 	}
-	fullscreenCheckbox.addEventListener("change", async _ => {
+	fullscreenCheckbox.addEventListener("change", async () => {
 		await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
 		await chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
 	});
-	storageData.dark_mode ? document.querySelector("html")?.setAttribute("tplus", "dm") :
+	if (storageData.dark_mode) {
+		document.querySelector("html")?.setAttribute("tplus", "dm");
+	} else {
 		document.querySelector("html")?.removeAttribute("tplus");
+	}
+
 	document.getElementById("goToSettings")?.addEventListener("click", () => chrome.runtime.openOptionsPage());
 }
