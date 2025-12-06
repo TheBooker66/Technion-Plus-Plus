@@ -1,20 +1,37 @@
 (function () {
 	function addCourseWebsiteLinks() {
-		const courseRows = document.querySelectorAll("center > table + table > tbody > tr");
+		const courseRows = document.querySelectorAll(
+			"center > table + table > tbody > tr",
+		);
 		if (courseRows[1].getAttribute("bgcolor") !== "yellow") {
-			courseRows[0].appendChild(document.createElement("th")).textContent = "אתר הקורס";
+			courseRows[0].appendChild(
+				document.createElement("th"),
+			).textContent = "אתר הקורס";
 			// noinspection HtmlUnknownTarget
-			const courseButtonTemplate = (new DOMParser).parseFromString(`<table>
+			const courseButtonTemplate = new DOMParser()
+				.parseFromString(
+					`<table>
             <td style="text-align: center; vertical-align: middle;">
                 <input type="image" src="/Images/StudImages/prev.gif" style="display: inline"  alt="חץ לאתר הקורס"/>
             </td>
-        </table>`, "text/html").querySelector("td") as HTMLTableCellElement;
-			courseRows[courseRows.length - 1].children[0].setAttribute("colspan", "4");
+        </table>`,
+					"text/html",
+				)
+				.querySelector("td") as HTMLTableCellElement;
+			courseRows[courseRows.length - 1].children[0].setAttribute(
+				"colspan",
+				"4",
+			);
 			for (let i = 1; i < courseRows.length - 1; i++) {
-				const buttonCell = courseButtonTemplate.cloneNode(true) as DocumentFragment;
-				(buttonCell.querySelector("input") as HTMLInputElement).addEventListener("click", f => {
+				const buttonCell = courseButtonTemplate.cloneNode(
+					true,
+				) as DocumentFragment;
+				(
+					buttonCell.querySelector("input") as HTMLInputElement
+				).addEventListener("click", (f) => {
 					f.preventDefault();
-					document.forms.namedItem("SubSub")!["RecreatePath"].value = `5-${i - 1}`;
+					document.forms.namedItem("SubSub")!["RecreatePath"].value =
+						`5-${i - 1}`;
 					document.forms.namedItem("SubSub")!.submit();
 				});
 				courseRows[i].appendChild(buttonCell);
@@ -44,15 +61,31 @@
 	}
 
 	function updateTabNames() {
-		const courseTabs = document.querySelectorAll("form[name='SubSub'] table table a.tab");
+		const courseTabs = document.querySelectorAll(
+			"form[name='SubSub'] table table a.tab",
+		);
 		for (const tab of courseTabs) {
-			tab.textContent += " - " + (document.querySelector(`#c${tab.textContent} span.black-text > strong`) as HTMLElement).textContent;
-			tab.setAttribute("style", "{white-space: nowrap; max-width: calc((90vw - 350px) / ${courseTabs.length + 1}); text-overflow: ellipsis; overflow-x: hidden; display: block; min-width: 9ch;}".replace(/[{}]/g, ''));
+			tab.textContent +=
+				" - " +
+				(
+					document.querySelector(
+						`#c${tab.textContent} span.black-text > strong`,
+					) as HTMLElement
+				).textContent;
+			tab.setAttribute(
+				"style",
+				"{white-space: nowrap; max-width: calc((90vw - 350px) / ${courseTabs.length + 1}); text-overflow: ellipsis; overflow-x: hidden; display: block; min-width: 9ch;}".replace(
+					/[{}]/g,
+					"",
+				),
+			);
 		}
 	}
 
 	if (document.forms.namedItem("SubSub")) {
-		const pathInputs = document.querySelectorAll("form input[name='RecreatePath']") as NodeListOf<HTMLInputElement>;
+		const pathInputs = document.querySelectorAll(
+			"form input[name='RecreatePath']",
+		) as NodeListOf<HTMLInputElement>;
 		let recreatePathValue = "";
 		for (let i = 0; i < pathInputs.length; i++)
 			if (pathInputs[i].value.length === 3) {

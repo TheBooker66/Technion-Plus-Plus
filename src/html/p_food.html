@@ -1,31 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html dir="rtl" lang="he">
-<head>
-    <meta charset="utf-8">
-    <title>Technion++</title>
-    <link rel="stylesheet" href="../css/p_popup.css" type="text/css">
-    <script type="module" src="../js/common_popup.js"></script>
-</head>
-<body>
+	<head>
+		<meta charset="utf-8" />
+		<title>Technion++</title>
+		<link rel="stylesheet" href="../css/p_popup.css" type="text/css" />
+		<script type="module" src="../js/common_popup.js"></script>
+	</head>
+	<body>
+		<template id="list-item">
+			<div class="list_item">
+				<div>
+					<b><a target="_blank"></a></b>
+					<span></span>
+				</div>
+				<div>
+					<span></span>
+				</div>
+			</div>
+		</template>
 
-<template id="list-item">
-    <div class="list_item">
-        <div>
-            <b><a target="_blank"></a></b>
-            <span></span>
-        </div>
-        <div>
-            <span></span>
-        </div>
-    </div>
-</template>
-
-<div class="wrapper">
-    <div class="main-content">
-        <div id="food_table" style="overflow-y: auto; max-height: 400px;"></div>
-        <div id="info" class="attention"></div>
-    </div>
-</div>
-<script type="module" src="../js/p_food.js"></script>
-</body>
+		<div class="wrapper">
+			<div class="main-content">
+				<div
+					id="food_table"
+					style="overflow-y: auto; max-height: 400px"
+				></div>
+				<div id="info" class="attention"></div>
+			</div>
+		</div>
+		<script type="module" src="../js/p_food.js"></script>
+	</body>
 </html>
