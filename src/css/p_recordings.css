@@ -1,76 +1,77 @@
 a.list_item {
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: none;
-    color: #0c0c0d;
-    display: flex;
-    align-items: center;
-    unicode-bidi: plaintext;
+	font-size: 13px;
+	cursor: pointer;
+	text-decoration: none;
+	color: #0c0c0d;
+	display: flex;
+	align-items: center;
+	unicode-bidi: plaintext;
 }
 
 .list_item .recording_from {
-    margin-left: 8px;
-    float: right;
+	margin-left: 8px;
+	float: right;
 }
 
 a.list_item small {
-    display: block;
+	display: block;
 }
 
 a:hover {
-    color: #003eaa;
-    background-color: #f9f9fa;
+	color: #003eaa;
+	background-color: #f9f9fa;
 }
 
 #results {
-    max-height: 330px;
-    overflow-y: auto;
+	max-height: 330px;
+	overflow-y: auto;
 }
 
-#message:not(.attention):not(.error_bar), #query {
-    padding: 8px 4px;
+#message:not(.attention):not(.error_bar),
+#query {
+	padding: 8px 4px;
 }
 
 #small_spinner:before {
-    content: '';
-    box-sizing: border-box;
-    width: 19px;
-    height: 19px;
-    float: left;
-    border-radius: 50%;
-    border-top: 4px solid rgb(0, 120, 220, 1.0);
-    border-right: 4px solid rgb(0, 120, 220, 0.0);
-    animation: spinner .3s linear infinite;
-    display: block;
+	content: "";
+	box-sizing: border-box;
+	width: 19px;
+	height: 19px;
+	float: left;
+	border-radius: 50%;
+	border-top: 4px solid rgb(0, 120, 220, 1);
+	border-right: 4px solid rgb(0, 120, 220, 0);
+	animation: spinner 0.3s linear infinite;
+	display: block;
 }
 
 #spinner:before {
-    content: '';
-    box-sizing: border-box;
-    width: 50px;
-    height: 50px;
-    position: absolute;
-    right: 50%;
-    margin: 20px -25px;
-    border-radius: 50%;
-    border-top: 4px solid rgb(0, 120, 220, 1.0);
-    border-right: 4px solid rgb(0, 120, 220, 0.0);
-    animation: spinner .3s linear infinite;
+	content: "";
+	box-sizing: border-box;
+	width: 50px;
+	height: 50px;
+	position: absolute;
+	right: 50%;
+	margin: 20px -25px;
+	border-radius: 50%;
+	border-top: 4px solid rgb(0, 120, 220, 1);
+	border-right: 4px solid rgb(0, 120, 220, 0);
+	animation: spinner 0.3s linear infinite;
 }
 
 @keyframes spinner {
-    to {
-        transform: rotate(360deg);
-    }
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 h3 {
-    border-top: 1px solid #d7d7db;
-    background-color: #f9f9fa;
-    color: #0060df;
-    font-size: 12px;
-    font-weight: 400;
-    padding: 8px;
-    text-align: right;
-    margin: 2px 0 5px 0;
+	border-top: 1px solid #d7d7db;
+	background-color: #f9f9fa;
+	color: #0060df;
+	font-size: 12px;
+	font-weight: 400;
+	padding: 8px;
+	text-align: right;
+	margin: 2px 0 5px 0;
 }

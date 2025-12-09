@@ -1,165 +1,285 @@
-<!DOCTYPE html>
+<!doctype html>
 <html dir="rtl" lang="he">
-<head>
-    <meta charset="utf-8">
-    <title>ארגונית++</title>
-    <link rel="stylesheet" href="../css/general.css" type="text/css">
-    <link rel="stylesheet" href="../css/organizer.css" type="text/css">
-</head>
-<body>
-<header>
-    <span class="mod_name">
-        <img src="../icons/organizer.svg" alt="מגירה"/><span>ארגונית<sup>++</sup></span>
-    </span>
-    <span>
-        <span class="TP_name">Technion<sup>++</sup></span>
-        <img src="../icons/technion_plus_plus/logo.svg" alt="טכניון++"/>
-    </span>
-</header>
-<main>
-    <div id="tabs">
-        <div class="tab current"><img src="../icons/organizer.svg" alt="מטלות לביצוע"/> מטלות לביצוע</div>
-        <div class="tab"><img src="../icons/calendar_done.svg" alt="מטלות שהושלמו"/> מטלות שהושלמו</div>
-        <div class="tab"><img src="../icons/clipboard.svg" alt="הוסף מטלה"/> מטלות אישיות</div>
-        <div class="dummy">
-            <label for="fullscreen"><input type="checkbox" id="fullscreen"/>פתח ארגונית במסך מלא</label>
-            <a class="button" id="type_filter_toggle">סינון מטלות לפי סוג</a>
-            <a class="button" id="course_filter_toggle">סינון מטלות לפי קורס</a>
-        </div>
-    </div>
+	<head>
+		<meta charset="utf-8" />
+		<title>ארגונית++</title>
+		<link rel="stylesheet" href="../css/general.css" type="text/css" />
+		<link rel="stylesheet" href="../css/organizer.css" type="text/css" />
+	</head>
+	<body>
+		<header>
+			<span class="mod_name">
+				<img src="../icons/organizer.svg" alt="מגירה" /><span
+					>ארגונית<sup>++</sup></span
+				>
+			</span>
+			<span>
+				<span class="TP_name">Technion<sup>++</sup></span>
+				<img
+					src="../icons/technion_plus_plus/logo.svg"
+					alt="טכניון++"
+				/>
+			</span>
+		</header>
+		<main>
+			<div id="tabs">
+				<div class="tab current">
+					<img src="../icons/organizer.svg" alt="מטלות לביצוע" />
+					מטלות לביצוע
+				</div>
+				<div class="tab">
+					<img src="../icons/calendar_done.svg" alt="מטלות שהושלמו" />
+					מטלות שהושלמו
+				</div>
+				<div class="tab">
+					<img src="../icons/clipboard.svg" alt="הוסף מטלה" /> מטלות
+					אישיות
+				</div>
+				<div class="dummy">
+					<label for="fullscreen"
+						><input type="checkbox" id="fullscreen" />פתח ארגונית
+						במסך מלא</label
+					>
+					<a class="button" id="type_filter_toggle"
+						>סינון מטלות לפי סוג</a
+					>
+					<a class="button" id="course_filter_toggle"
+						>סינון מטלות לפי קורס</a
+					>
+				</div>
+			</div>
 
-    <div id="assignments_container">
-        <div id="filters_div" class="hidden">
-            <span>סינון</span>
-            <span id="type_filters_div" class="hidden">
-                    סוגי מטלות להסתיר:
-                    <label><input type="checkbox" id="appeals"/>ערעורים</label>
-                    <label><input type="checkbox" id="zooms"/>זומים</label>
-                    <label><input type="checkbox" id="attendance"/>נוכחות</label>
-                    <label><input type="checkbox" id="reserveDuty"/>מילואים</label>
-                </span>
-            <span class="divider"></span>
-            <span id="course_filters_div" class="hidden">
-					<label for="course_filter">קורס לתצוגה:</label>
-                    <select id="course_filter">
-						<option value="">הצג הכל</option>
-						<option value="user-course">מטלות שנוספו ידנית</option>
-					</select>
-				</span>
-        </div>
-        <div id="spinner"></div>
-        <div id="bodies">
-            <div id="new_assignments" class="body"></div>
-            <div id="finished_assignments" class="body"></div>
-            <div id="add_assignment" class="body">
-                <form>
-                    <input type="hidden" value="0" name="edit"/>
-                    <div></div><br/>
-                    <div>
-                        <label for="subject">נושא:</label>
-                    </div>
-                    <div>
-                        <input type="text" maxlength="50" value="" name="subject" id="subject" required/>
-                        (<span>0</span>/50)
-                    </div>
-                    <div>
-                        <label for="notes">הערות:</label>
-                    </div>
-                    <div>
-                        <textarea maxlength="280" name="notes" id="notes"></textarea> (<span>0</span>/280)
-                    </div>
-                    <div>
-                        <label for="end_time">תאריך סיום:</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" name="no_end" id="no_end" checked/>
-                        <label for="no_end"> ללא תאריך סיום (המטלה לא תימחק אוטומטית)</label>
-                        <div style="margin-top: 6px;">
-                            <input type="date" lang="he" name="end_time" id="end_time"/>
-                            (המטלה תימחק אוטומטית יומיים לאחר סיומה)
-                        </div>
-                    </div>
-                    <div style="grid-column: 1 / 3;">
-                        <a class="button" style="display: inline-block;">שמור מטלה</a>
-                        <a class="button" style="display: inline-block;">ביטול</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+			<div id="assignments_container">
+				<div id="filters_div" class="hidden">
+					<span>סינון</span>
+					<span id="type_filters_div" class="hidden">
+						סוגי מטלות להסתיר:
+						<label
+							><input
+								type="checkbox"
+								id="appeals"
+							/>ערעורים</label
+						>
+						<label><input type="checkbox" id="zooms" />זומים</label>
+						<label
+							><input
+								type="checkbox"
+								id="attendance"
+							/>נוכחות</label
+						>
+						<label
+							><input
+								type="checkbox"
+								id="reserveDuty"
+							/>מילואים</label
+						>
+					</span>
+					<span class="divider"></span>
+					<span id="course_filters_div" class="hidden">
+						<label for="course_filter">קורס לתצוגה:</label>
+						<select id="course_filter">
+							<option value="">הצג הכל</option>
+							<option value="user-course">
+								מטלות שנוספו ידנית
+							</option>
+						</select>
+					</span>
+				</div>
+				<div id="spinner"></div>
+				<div id="bodies">
+					<div id="new_assignments" class="body"></div>
+					<div id="finished_assignments" class="body"></div>
+					<div id="add_assignment" class="body">
+						<form>
+							<input type="hidden" value="0" name="edit" />
+							<div></div>
+							<br />
+							<div>
+								<label for="subject">נושא:</label>
+							</div>
+							<div>
+								<input
+									type="text"
+									maxlength="50"
+									value=""
+									name="subject"
+									id="subject"
+									required
+								/>
+								(<span>0</span>/50)
+							</div>
+							<div>
+								<label for="notes">הערות:</label>
+							</div>
+							<div>
+								<textarea
+									maxlength="280"
+									name="notes"
+									id="notes"
+								></textarea>
+								(<span>0</span>/280)
+							</div>
+							<div>
+								<label for="end_time">תאריך סיום:</label>
+							</div>
+							<div>
+								<input
+									type="checkbox"
+									name="no_end"
+									id="no_end"
+									checked
+								/>
+								<label for="no_end">
+									ללא תאריך סיום (המטלה לא תימחק
+									אוטומטית)</label
+								>
+								<div style="margin-top: 6px">
+									<input
+										type="date"
+										lang="he"
+										name="end_time"
+										id="end_time"
+									/>
+									(המטלה תימחק אוטומטית יומיים לאחר סיומה)
+								</div>
+							</div>
+							<div style="grid-column: 1 / 3">
+								<a class="button" style="display: inline-block"
+									>שמור מטלה</a
+								>
+								<a class="button" style="display: inline-block"
+									>ביטול</a
+								>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 
-    <div id="error">
-        <div class="error_bar" id="need_refresh" style="display: none;">
-            נמצאו מטלות חדשות! <a class="button" style="display: inline-block; margin: 0 1ch 0 0;">רענן</a>
-        </div>
-    </div>
-</main>
-<footer>
-    <div>
-        <b>אודות</b><br/>
-        התוסף <span class="TP_name">Technion<sup>++</sup></span> מפותח על ידי <b>איתן "67" עמירן</b><br/>
-        <small>( לא מוגש מטעם הטכניון )</small>
-    </div>
-    <div>
-        <b id="links">קישורים</b><br/>
-        <ul>
-            <li><a id="goToSettings">הגדרות <span class="TP_name">Technion<sup>++</sup></span></a></li>
-            <li><a id="mail_to_me">פניה אל מפתח התוסף בדוא"ל</a></li>
-        </ul>
-    </div>
-    <div>
-        <b><a href="https://www.bitpay.co.il/app/me/5BE56597-841F-4699-A112-319D7ED43CE96539">טיפ</a> למפתח
-            התוסף</b><br/>
-        <small>עזרו לי לעזור לכם 🙂</small><br/>
-        <a id="bit" class="button" target="_blank" href="../resources/bit_donation.jpg">תרום ב-
-            <img src="../icons/bit.svg" style="height: 1.3rem; vertical-align: text-bottom;" alt="תרומה בביט"/></a>
-    </div>
-</footer>
+			<div id="error">
+				<div class="error_bar" id="need_refresh" style="display: none">
+					נמצאו מטלות חדשות!
+					<a
+						class="button"
+						style="display: inline-block; margin: 0 1ch 0 0"
+						>רענן</a
+					>
+				</div>
+			</div>
+		</main>
+		<footer>
+			<div>
+				<b>אודות</b><br />
+				התוסף <span class="TP_name">Technion<sup>++</sup></span> מפותח
+				על ידי <b>איתן "67" עמירן</b><br />
+				<small>( לא מוגש מטעם הטכניון )</small>
+			</div>
+			<div>
+				<b id="links">קישורים</b><br />
+				<ul>
+					<li>
+						<a id="goToSettings"
+							>הגדרות
+							<span class="TP_name"
+								>Technion<sup>++</sup></span
+							></a
+						>
+					</li>
+					<li><a id="mail_to_me">פניה אל מפתח התוסף בדוא"ל</a></li>
+				</ul>
+			</div>
+			<div>
+				<b
+					><a
+						href="https://www.bitpay.co.il/app/me/5BE56597-841F-4699-A112-319D7ED43CE96539"
+						>טיפ</a
+					>
+					למפתח התוסף</b
+				><br />
+				<small>עזרו לי לעזור לכם 🙂</small><br />
+				<a
+					id="bit"
+					class="button"
+					target="_blank"
+					href="../resources/bit_donation.jpg"
+					>תרום ב-
+					<img
+						src="../icons/bit.svg"
+						style="height: 1.3rem; vertical-align: text-bottom"
+						alt="תרומה בביט"
+				/></a>
+			</div>
+		</footer>
 
-<div class="hidden">
-    <div id="last_check">בדיקה אחרונה:</div>
-    <div id="recheck"><a>בדוק מחדש כעת</a></div>
-</div>
+		<div class="hidden">
+			<div id="last_check">בדיקה אחרונה:</div>
+			<div id="recheck"><a>בדוק מחדש כעת</a></div>
+		</div>
 
-<template id="assignment">
-    <div class="list_item" data-course="">
-        <div><img class="system" alt="מערכת"/></div>
-        <div>
-            <b class="assignment_name"></b>
-            <div class="course_name">קורס: </div>
-        </div>
-        <div class="assignment_description"></div>
-        <div class="end_time">תאריך סיום: <br/><span></span></div>
-        <a title="עבור אל אתר ההגשה" class="button">פתח מטלה</a>
-        <a title="נעץ מטלה בראש הרשימה" class="button pin">נעץ</a>
-        <a title="בטל נעיצה של מטלה" class="button unpin">בטל נעיצה</a>
-        <a title='העבר מטלה אל רשימת "מטלות שהושלמו"' class="button finish">סמן כהושלמה</a>
-        <a title='העבר מטלה אל רשימת "מטלות לביצוע"' class="button unfinish">סמן לביצוע</a>
-    </div>
-</template>
+		<template id="assignment">
+			<div class="list_item" data-course="">
+				<div><img class="system" alt="מערכת" /></div>
+				<div>
+					<b class="assignment_name"></b>
+					<div class="course_name">קורס:</div>
+				</div>
+				<div class="assignment_description"></div>
+				<div class="end_time">תאריך סיום: <br /><span></span></div>
+				<a title="עבור אל אתר ההגשה" class="button">פתח מטלה</a>
+				<a title="נעץ מטלה בראש הרשימה" class="button pin">נעץ</a>
+				<a title="בטל נעיצה של מטלה" class="button unpin">בטל נעיצה</a>
+				<a
+					title='העבר מטלה אל רשימת "מטלות שהושלמו"'
+					class="button finish"
+					>סמן כהושלמה</a
+				>
+				<a
+					title='העבר מטלה אל רשימת "מטלות לביצוע"'
+					class="button unfinish"
+					>סמן לביצוע</a
+				>
+			</div>
+		</template>
 
-<template id="userAgenda">
-    <div class="list_item">
-        <div><img class="system" src="../icons/bookmark.svg" title="מטלת משתמש" alt="מטלת משתמש"/></div>
-        <div>
-            <b class="assignment_name"></b>
-        </div>
-        <div class="assignment_description"><textarea disabled readonly></textarea></div>
-        <div class="end_time">תאריך סיום:<br/><span></span></div>
-        <div class="actions">
-            <a title="ערוך מטלה" class="button">ערוך</a>
-            <a title="מחק מטלה" class="button">מחק</a>
-        </div>
-        <a title="נעץ מטלה בראש הרשימה" class="button pin">נעץ</a>
-        <a title="בטל נעיצה של מטלה" class="button unpin">בטל נעיצה</a>
-        <a title='העבר מטלה אל רשימת "מטלות שהושלמו"' class="button finish">סמן כהושלמה</a>
-        <a title='העבר מטלה אל רשימת "מטלות לביצוע"' class="button unfinish">סמן לביצוע</a>
-    </div>
-</template>
-<script type="module" src="../js/cal_moodle.js"></script>
-<script type="module" src="../js/cal_webwork.js"></script>
-<script type="module" src="../js/cal_cs.js"></script>
-<script type="module" src="../js/organizer.js"></script>
-<script type="module" src="../js/email.js"></script>
-</body>
+		<template id="userAgenda">
+			<div class="list_item">
+				<div>
+					<img
+						class="system"
+						src="../icons/bookmark.svg"
+						title="מטלת משתמש"
+						alt="מטלת משתמש"
+					/>
+				</div>
+				<div>
+					<b class="assignment_name"></b>
+				</div>
+				<div class="assignment_description">
+					<textarea disabled readonly></textarea>
+				</div>
+				<div class="end_time">תאריך סיום:<br /><span></span></div>
+				<div class="actions">
+					<a title="ערוך מטלה" class="button">ערוך</a>
+					<a title="מחק מטלה" class="button">מחק</a>
+				</div>
+				<a title="נעץ מטלה בראש הרשימה" class="button pin">נעץ</a>
+				<a title="בטל נעיצה של מטלה" class="button unpin">בטל נעיצה</a>
+				<a
+					title='העבר מטלה אל רשימת "מטלות שהושלמו"'
+					class="button finish"
+					>סמן כהושלמה</a
+				>
+				<a
+					title='העבר מטלה אל רשימת "מטלות לביצוע"'
+					class="button unfinish"
+					>סמן לביצוע</a
+				>
+			</div>
+		</template>
+		<script type="module" src="../js/cal_moodle.js"></script>
+		<script type="module" src="../js/cal_webwork.js"></script>
+		<script type="module" src="../js/cal_cs.js"></script>
+		<script type="module" src="../js/organizer.js"></script>
+		<script type="module" src="../js/email.js"></script>
+	</body>
 </html>

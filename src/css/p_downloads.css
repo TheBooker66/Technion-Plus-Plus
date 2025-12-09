@@ -1,136 +1,147 @@
 @import "colours.css";
 
 :root {
-    --prog: 0%;
+	--prog: 0%;
 }
 
-p, #current {
-    padding: 0 8px 8px;
-    margin: 0;
+p,
+#current {
+	padding: 0 8px 8px;
+	margin: 0;
 }
 
 #queue {
-    max-height: 300px;
-    min-height: 50px;
-    overflow-y: auto;
+	max-height: 300px;
+	min-height: 50px;
+	overflow-y: auto;
 }
 
 h4 {
-    padding: 0 8px;
-    margin-bottom: 0;
-    margin-top: 8px;
-    font-size: 14px;
+	padding: 0 8px;
+	margin-bottom: 0;
+	margin-top: 8px;
+	font-size: 14px;
 }
 
 h3 {
-    border-top: 1px solid #d7d7db;
-    background-color: #f9f9fa;
-    color: #0060df;
-    font-size: 12px;
-    font-weight: 400;
-    padding: 8px;
-    text-align: right;
-    margin: 2px 0 5px 0;
+	border-top: 1px solid #d7d7db;
+	background-color: #f9f9fa;
+	color: #0060df;
+	font-size: 12px;
+	font-weight: 400;
+	padding: 8px;
+	text-align: right;
+	margin: 2px 0 5px 0;
 }
 
 small {
-    color: #38383d;
+	color: #38383d;
 }
 
 #current span {
-    display: inline-block;
-    unicode-bidi: plaintext;
+	display: inline-block;
+	unicode-bidi: plaintext;
 }
 
 #current div {
-    margin: 6px 0;
+	margin: 6px 0;
 }
 
 #progress {
-    border-radius: 4px;
-    background-image: linear-gradient(#000, #222, #000);
-    font-size: 14px;
-    position: relative;
-    font-weight: bold;
-    direction: ltr;
-    color: #fff;
-    padding: 3px;
+	border-radius: 4px;
+	background-image: linear-gradient(#000, #222, #000);
+	font-size: 14px;
+	position: relative;
+	font-weight: bold;
+	direction: ltr;
+	color: #fff;
+	padding: 3px;
 }
 
 #progress::before {
-    background-image: linear-gradient(to right, var(--status-success), var(--status-successer), var(--status-success));
-    background-size: 200%;
-    content: "";
-    display: block;
-    width: calc((var(--prog) / 100) * (100% - 6px));
-    height: calc(100% - 6px);
-    animation: prog linear 10s infinite !important;
-    border-radius: 1px;
-    position: absolute;
-    z-index: 1;
+	background-image: linear-gradient(
+		to right,
+		var(--status-success),
+		var(--status-successer),
+		var(--status-success)
+	);
+	background-size: 200%;
+	content: "";
+	display: block;
+	width: calc((var(--prog) / 100) * (100% - 6px));
+	height: calc(100% - 6px);
+	animation: prog linear 10s infinite !important;
+	border-radius: 1px;
+	position: absolute;
+	z-index: 1;
 }
 
 #progress span {
-    z-index: 2;
-    display: block;
-    position: relative;
-    text-align: center;
-    width: 100%;
+	z-index: 2;
+	display: block;
+	position: relative;
+	text-align: center;
+	width: 100%;
 }
 
 @keyframes prog {
-    from {
-        background-position-x: 200%;
-    }
-    to {
-        background-position-x: 0;
-    }
+	from {
+		background-position-x: 200%;
+	}
+	to {
+		background-position-x: 0;
+	}
 }
 
 .list_item {
-    display: grid;
-    grid-template-columns: 28px auto 24px;
-    align-items: center;
-    column-gap: 4px;
+	display: grid;
+	grid-template-columns: 28px auto 24px;
+	align-items: center;
+	column-gap: 4px;
 }
 
 .list_item:not(:last-of-type) {
-    border-bottom: 1px solid;
-    border-image: linear-gradient(to right, transparent 10%, rgb(0, 0, 0, .12) 10% 90%, transparent 90%) 1;
+	border-bottom: 1px solid;
+	border-image: linear-gradient(
+			to right,
+			transparent 10%,
+			rgb(0, 0, 0, 0.12) 10% 90%,
+			transparent 90%
+		)
+		1;
 }
 
 .list_item div {
-    word-wrap: break-word;
-    unicode-bidi: plaintext;
-    overflow-x: hidden;
+	word-wrap: break-word;
+	unicode-bidi: plaintext;
+	overflow-x: hidden;
 }
 
 .list_item .dl_from {
-    width: 16px;
-    height: 16px;
-    background-color: #eee;
-    padding: 4px;
-    border-radius: 50%;
+	width: 16px;
+	height: 16px;
+	background-color: #eee;
+	padding: 4px;
+	border-radius: 50%;
 }
 
 .list_item .remove {
-    cursor: pointer;
-    margin: 4px;
+	cursor: pointer;
+	margin: 4px;
 }
 
 #myform {
-    text-align: center;
+	text-align: center;
 }
 
 #myform .submit {
-    font-size: 12px;
+	font-size: 12px;
 }
 
 #myform #cancelAll.submit {
-    background-color: var(--status-danger);
+	background-color: var(--status-danger);
 }
 
 #myform #cancelAll.submit:hover {
-    background-color: var(--status-dangerer);
+	background-color: var(--status-dangerer);
 }
-

@@ -1,72 +1,77 @@
 .tplus_hidden {
-    display: none !important;
+	display: none !important;
 }
 
-label.tplus_download input[type=checkbox] {
-    cursor: pointer;
-    margin: 0 0 0 5px;
+label.tplus_download input[type="checkbox"] {
+	cursor: pointer;
+	margin: 0 0 0 5px;
 }
 
-label.tplus_download div, .tplus_flex {
-    display: inline-flex;
-    align-items: center;
+label.tplus_download div,
+.tplus_flex {
+	display: inline-flex;
+	align-items: center;
 }
 
-a.tplus_download, label.tplus_download {
-    cursor: pointer;
-    display: inline-block !important;
-    padding: 0.25rem 0.7rem;
-    line-height: 1rem;
-    font-size: 0.9rem;
-    border-radius: 4px;
-    text-decoration: none !important;
-    letter-spacing: 0.03rem;
-    font-family: 'Segoe UI', arial, sans-serif;
-    margin: 2px;
-    background-color: var(--sec-light);
-    color: #0c0c0d !important;
-    border: 0;
-    font-weight: 500;
-    box-shadow: 0 3px 1px -2px rgb(255, 214, 214, 0.2), 0 2px 2px 0 rgb(0, 0, 0, 0.14), 0 1px 5px 0 rgb(0, 0, 0, .12);
-    user-select: none;
-    -webkit-user-select: none;
+a.tplus_download,
+label.tplus_download {
+	cursor: pointer;
+	display: inline-block !important;
+	padding: 0.25rem 0.7rem;
+	line-height: 1rem;
+	font-size: 0.9rem;
+	border-radius: 4px;
+	text-decoration: none !important;
+	letter-spacing: 0.03rem;
+	font-family: "Segoe UI", arial, sans-serif;
+	margin: 2px;
+	background-color: var(--sec-light);
+	color: #0c0c0d !important;
+	border: 0;
+	font-weight: 500;
+	box-shadow:
+		0 3px 1px -2px rgb(255, 214, 214, 0.2),
+		0 2px 2px 0 rgb(0, 0, 0, 0.14),
+		0 1px 5px 0 rgb(0, 0, 0, 0.12);
+	user-select: none;
+	-webkit-user-select: none;
 }
 
 a.tplus_download:hover {
-    background-color: var(--sec-norm);
+	background-color: var(--sec-norm);
 }
 
 label.tplus_download {
-    background-color: var(--sec-dark);
-    color: #f9f9fa !important;
+	background-color: var(--sec-dark);
+	color: #f9f9fa !important;
 }
 
 label.tplus_download:hover {
-    background-color: var(--sec-darker);
+	background-color: var(--sec-darker);
 }
 
 div.tplus_fieldset {
-    text-align: right;
+	text-align: right;
 }
 
 div.tplus_fieldset fieldset {
-    display: inline-block;
-    border: 1px solid #ddd;
-    padding: 6px 11px 12px;
-    margin: 0 4px 20px;
+	display: inline-block;
+	border: 1px solid #ddd;
+	padding: 6px 11px 12px;
+	margin: 0 4px 20px;
 }
 
 div.tplus_fieldset fieldset legend {
-    padding: 1px 6px 5px;
-    color: #043766;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.05em;
-    direction: ltr;
+	padding: 1px 6px 5px;
+	color: #043766;
+	font-weight: 700;
+	font-size: 14px;
+	letter-spacing: 0.05em;
+	direction: ltr;
 }
 
 div.tplus_fieldset fieldset legend::after {
-    content: "++";
-    display: inline-block;
-    vertical-align: super;
+	content: "++";
+	display: inline-block;
+	vertical-align: super;
 }
