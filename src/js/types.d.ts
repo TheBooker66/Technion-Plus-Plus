@@ -63,11 +63,12 @@ type StorageData = {
 
 	// --- Module: Panopto ---
 	panopto_save: boolean;
-	panopto_speed: string;
-	panopto_darkmode: boolean;
+	panopto_speed: number;
+	panopto_dark_mode: boolean;
 	panopto_return_backwards: boolean;
 	panopto_floating_speed: boolean;
-	panopto_hide: boolean;
+	panopto_hide_thumbnails: boolean;
+	panopto_hide_sidebar: boolean;
 
 	// --- Module: Bus Lines ---
 	bus_alerts: BusLine["Shilut"][];

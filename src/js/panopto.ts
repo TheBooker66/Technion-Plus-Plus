@@ -200,13 +200,13 @@ let speed = 1.0;
 <h4 dir="ltr">Technion<sup>++</sup></h4>
 הוידאו נפתח לתצוגה בחלון חדש, יש לסגור את החלון החדש כדי לחזור ולצפות בווידאו כאן.
 </div>`, "text/html").querySelector("div") as HTMLDivElement;
-					(document.getElementById("secondaryScreen") as HTMLDivElement)
-						.insertBefore(newWindowMessageDiv, (document.getElementById("secondaryScreen") as HTMLDivElement).childNodes[0]);
+					const secondaryScreen = document.getElementById("secondaryScreen") as HTMLDivElement;
+					secondaryScreen.insertBefore(newWindowMessageDiv, secondaryScreen.childNodes[0]);
 					const expandButton = document.getElementById("m_expand") as HTMLAnchorElement,
 						videoElements = document.querySelectorAll(".video-js") as NodeListOf<HTMLVideoElement>,
-						secondaryVideoElements = videoElements[videoElements.length - 1] as HTMLVideoElement,
+						secondaryVideoElement = videoElements[videoElements.length - 1] as HTMLVideoElement,
 						toggleSecondaryVideoDisplay = (HideVideoEh: boolean) => {
-							secondaryVideoElements.style.display = HideVideoEh ? "none" : "block";
+							secondaryVideoElement.style.display = HideVideoEh ? "none" : "block";
 							newWindowMessageDiv.style.display = HideVideoEh ? "block" : "none";
 							expandButton.style.opacity = HideVideoEh ? "0.3" : "1.0";
 						};
@@ -221,19 +221,19 @@ let speed = 1.0;
 						newDocument.body.setAttribute("style", "{text-align: center; background: #000; font-family: arial,serif; direction: rtl; font-size: 11px; color: #f9f9fa;}".replace(/[{}]/g, ''));
 						const newWindowCanvas = document.createElement("canvas");
 						newDocument.body.appendChild(newWindowCanvas);
-						newWindowCanvas.height = secondaryVideoElements.videoHeight;
-						newWindowCanvas.width = secondaryVideoElements.videoWidth;
+						newWindowCanvas.height = secondaryVideoElement.videoHeight;
+						newWindowCanvas.width = secondaryVideoElement.videoWidth;
 						newWindowCanvas.setAttribute("style", "{max-width: 800px; border: 1px solid #fff; margin: auto; display: block;}".replace(/[{}]/g, ''));
-						newWindowCanvas.getContext("2d")!.drawImage(secondaryVideoElements, 0, 0);
+						newWindowCanvas.getContext("2d")!.drawImage(secondaryVideoElement, 0, 0);
 						const drawVideoFrame = () => {
-							if (secondaryVideoElements.paused || secondaryVideoElements.ended) return;
-							newWindowCanvas.height = secondaryVideoElements.videoHeight;
-							newWindowCanvas.width = secondaryVideoElements.videoWidth;
-							newWindowCanvas.getContext("2d")!.drawImage(secondaryVideoElements, 0, 0);
+							if (secondaryVideoElement.paused || secondaryVideoElement.ended) return;
+							newWindowCanvas.height = secondaryVideoElement.videoHeight;
+							newWindowCanvas.width = secondaryVideoElement.videoWidth;
+							newWindowCanvas.getContext("2d")!.drawImage(secondaryVideoElement, 0, 0);
 							setTimeout(drawVideoFrame, 1E3 / 60);
 						};
 						drawVideoFrame();
-						secondaryVideoElements.addEventListener("play", drawVideoFrame);
+						secondaryVideoElement.addEventListener("play", drawVideoFrame);
 						const fullscreenButton = document.createElement("button"),
 							instructionsSpan = document.createElement("span");
 						let NewWindowFullscreenEh = false;
@@ -283,27 +283,35 @@ let speed = 1.0;
 		else while (styleSheet.cssRules.length > 0) styleSheet.deleteRule(0);
 	}
 
-	async function saveSetting(settingsKey: "showhide" | "darkmode" | "speed" | "returnbackwards" | "floatingspeed" | "settings") {
+	async function saveSetting(settingsKey: "dark_mode" | "speed" | "return_backwards" | "floating_speed" | "settings" | "show_hide_thumbnails" | "show_hide_sidebar") {
 		const settingsObj: Partial<StorageData> = {};
 		switch (settingsKey) {
-			case "showhide":
-				const attr = (document.getElementById("toggleThumbnailsButton") as HTMLElement).getAttribute("aria-expanded");
-				settingsObj.panopto_hide = attr === null || attr === "true"; // weird race conditions, but this works :/
-				break;
-			case "darkmode":
-				settingsObj.panopto_darkmode = (document.getElementById("m_darkmode") as HTMLInputElement).checked;
+			case "dark_mode":
+				settingsObj.panopto_dark_mode = (document.getElementById("m_dark_mode") as HTMLInputElement).checked;
 				break;
 			case "speed":
-				settingsObj.panopto_speed = (document.getElementById("primaryVideo") as HTMLVideoElement).playbackRate.toString();
+				settingsObj.panopto_speed = (document.getElementById("primaryVideo") as HTMLVideoElement).playbackRate;
 				break;
-			case "returnbackwards":
-				settingsObj.panopto_return_backwards = (document.getElementById("m_returnbackwards") as HTMLInputElement).checked;
+			case "return_backwards":
+				settingsObj.panopto_return_backwards = (document.getElementById("m_return_backwards") as HTMLInputElement).checked;
 				break;
-			case "floatingspeed":
-				settingsObj.panopto_floating_speed = (document.getElementById("m_floatingspeed") as HTMLInputElement).checked;
+			case "floating_speed":
+				settingsObj.panopto_floating_speed = (document.getElementById("m_floating_speed") as HTMLInputElement).checked;
 				break;
 			case "settings":
 				settingsObj.panopto_save = (document.getElementById("m_save") as HTMLInputElement).checked;
+				break;
+			// weird race conditions in the next two, but it works :/
+			case "show_hide_thumbnails": {
+				const attr = (document.getElementById("toggleThumbnailsButton") as HTMLDivElement).getAttribute("aria-expanded");
+				settingsObj.panopto_hide_thumbnails = attr === null || attr === "true";
+				break;
+			}
+			case "show_hide_sidebar": {
+				const attr = (document.querySelector("#eventsExpanderButton > div[role=button]") as HTMLDivElement).getAttribute("aria-expanded");
+				settingsObj.panopto_hide_sidebar = attr === null || attr === "true";
+				break;
+			}
 		}
 		await chrome.storage.local.set(settingsObj);
 		if (chrome.runtime.lastError) console.error("TE_panopto: " + chrome.runtime.lastError.message);
@@ -311,15 +319,13 @@ let speed = 1.0;
 
 	async function copyTimestampedURL(markdownLinkEh: boolean) {
 		const url = document.URL, startPos = url.indexOf("&");
-		const parsedURL = startPos === -1 ? url : url.substring(0, startPos);
+		const parsedURL = startPos === -1 ? url : url.substring(0, startPos),
+			currentTime = (document.getElementById("primaryVideo") as HTMLVideoElement).currentTime;
+		const timestampUrl = `${parsedURL}&start=${currentTime}`;
 
-		const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
-		const timestampUrl = `${parsedURL}&start=${videoElement.currentTime}`;
-
-		if (!markdownLinkEh) {
+		if (!markdownLinkEh)
 			await navigator.clipboard.writeText(timestampUrl);
-			window.alert("הקישור הועתק ללוח!");
-		} else {
+		else {
 			let resultText = "";
 			const LEVEL_CONNECTION_SYMBOL = "→",
 				tabTitle = document.title,
@@ -327,13 +333,13 @@ let speed = 1.0;
 				videoSectionName = document.querySelector(".index-event.highlighted .event-text span")?.textContent;
 
 			if (parentName) resultText += `${parentName} ${LEVEL_CONNECTION_SYMBOL} `;
-			if (videoSectionName) resultText += ` ${LEVEL_CONNECTION_SYMBOL} ${videoSectionName}`;
+			if (videoSectionName) resultText += `${videoSectionName} ${LEVEL_CONNECTION_SYMBOL} `;
 			resultText += tabTitle;
 
 			const mdLink = `[${resultText}](${timestampUrl})`;
 			await navigator.clipboard.writeText(mdLink);
-			window.alert("הקישור הועתק ללוח!");
 		}
+		window.alert("הקישור הועתק ללוח!");
 	}
 
 	function updateRealTime() {
@@ -423,9 +429,9 @@ let speed = 1.0;
                 <div id="custom_speed">מהירות מותאמת אישית</div></div>
                 <span style="display: block">מהירויות נוספות</span>
             </a>
-            <label for="m_floatingspeed"><a>חלונית שליטת מהירויות צפה<input id="m_floatingspeed" type="checkbox" /></a></label>
-            <label for="m_returnbackwards"><a>חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_returnbackwards" type="checkbox" /></a></label>
-            <label for="m_darkmode"><a>מצב לילה<input id="m_darkmode" type="checkbox" /></a></label>
+            <label for="m_floating_speed"><a>חלונית שליטת מהירויות צפה<input id="m_floating_speed" type="checkbox" /></a></label>
+            <label for="m_return_backwards"><a>חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_return_backwards" type="checkbox" /></a></label>
+            <label for="m_dark_mode"><a>מצב לילה<input id="m_dark_mode" type="checkbox" /></a></label>
             <label for="m_save"><a>זכור הגדרות<input id="m_save" type="checkbox" /></a></label>
         </div>
         <div id="tplus_koteret">Technion<sup>++</sup></div>
@@ -444,19 +450,21 @@ let speed = 1.0;
 		setupVideoDownloadButtons();
 		snapshotHandler();
 
-		(document.getElementById("m_darkmode") as HTMLInputElement).addEventListener("change", async () => {
+		(document.getElementById("m_dark_mode") as HTMLInputElement).addEventListener("change", async () => {
 			toggleDarkMode(darkModeStyle);
-			await saveSetting("darkmode");
+			await saveSetting("dark_mode");
 		});
 
-		(document.getElementById("m_floatingspeed") as HTMLInputElement).addEventListener("change", () => {
-			if ((document.getElementById("m_floatingspeed") as HTMLInputElement).checked) setupFloatingSpeedController();
-			else document.getElementById("tplus_floating_speed_controller")?.remove();
-			saveSetting("floatingspeed");
+		(document.getElementById("m_floating_speed") as HTMLInputElement).addEventListener("change", () => {
+			if ((document.getElementById("m_floating_speed") as HTMLInputElement).checked)
+				setupFloatingSpeedController(document.fullscreenElement ? document.fullscreenElement as HTMLElement : document.body);
+			else
+				document.getElementById("tplus_floating_speed_controller")?.remove();
+			saveSetting("floating_speed");
 		});
 
-		(document.getElementById("m_returnbackwards") as HTMLInputElement)
-			.addEventListener("change", () => saveSetting("returnbackwards"));
+		(document.getElementById("m_return_backwards") as HTMLInputElement)
+			.addEventListener("change", () => saveSetting("return_backwards"));
 		(document.getElementById("m_save") as HTMLInputElement)
 			.addEventListener("change", () => saveSetting("settings"));
 
@@ -486,10 +494,10 @@ let speed = 1.0;
 		timestampSpans[1].addEventListener("click", () => copyTimestampedURL(true));
 	}
 
-	function setupFloatingSpeedController() {
+	function setupFloatingSpeedController(parentElement: HTMLElement = document.body) {
 		const floatingPanel = document.createElement('div');
 		floatingPanel.id = 'tplus_floating_speed_controller';
-		document.body.appendChild(floatingPanel);
+		parentElement.appendChild(floatingPanel);
 
 		const speedInput = document.createElement('input');
 		Object.assign(speedInput, {
@@ -548,22 +556,22 @@ let speed = 1.0;
 	}
 
 	function changeVolume(delta: number) {
-		const video = document.querySelector(".video-js") as HTMLVideoElement;
-		if (!video) return;
+		const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
+		if (!videoElement) return;
 
 		const volumeStep = 0.05;
-		let newVolume = video.volume;
+		let newVolume = videoElement.volume;
 		if (delta < 0) newVolume = Math.min(1.0, newVolume + volumeStep);
 		else if (delta > 0) newVolume = Math.max(0.0, newVolume - volumeStep);
 		else return;
-		video.volume = newVolume;
+		videoElement.volume = newVolume;
 
 		const muteButton = document.getElementById('muteButton') as HTMLDivElement;
-		if (newVolume > 0 && video.muted) {
-			video.muted = false;
+		if (newVolume > 0 && videoElement.muted) {
+			videoElement.muted = false;
 			muteButton.classList.remove('muted');
-		} else if (newVolume === 0 && !video.muted) {
-			video.muted = true;
+		} else if (newVolume === 0 && !videoElement.muted) {
+			videoElement.muted = true;
 			muteButton.classList.add('muted');
 		}
 
@@ -576,14 +584,25 @@ let speed = 1.0;
 		volumeHandle.setAttribute('aria-valuetext', `${volumePercent} percent`);
 	}
 
+	function fullScreenToggleHandler(event: KeyboardEvent) {
+		if (event.code !== 'KeyF' && event.key !== 'F' && event.key !== 'f') return;
+		event.preventDefault();
+
+		const mainElement = document.getElementById("primaryScreen") as HTMLVideoElement;
+		if (document.fullscreenElement)
+			document.exitFullscreen();
+		else
+			mainElement.dispatchEvent(new MouseEvent("dblclick", {bubbles: true, cancelable: true, view: window}));
+	}
+
 	const storageData = await chrome.storage.local.get({
-		panopto_speed: "1.0", panopto_darkmode: false, panopto_hide: false, panopto_return_backwards: false,
-		panopto_floating_speed: false, panopto_save: true,
+		panopto_speed: 1.0, panopto_dark_mode: false, panopto_return_backwards: false, panopto_floating_speed: false,
+		panopto_save: true, panopto_hide_thumbnails: false, panopto_hide_sidebar: false,
 	}) as StorageData;
 	if (chrome.runtime.lastError) console.error("TE_panopto: " + chrome.runtime.lastError.message);
 
 	const darkModeStyle = document.head.appendChild(document.createElement("style")).sheet as CSSStyleSheet;
-	if (storageData.panopto_save && storageData.panopto_darkmode) toggleDarkMode(darkModeStyle);
+	if (storageData.panopto_save && storageData.panopto_dark_mode) toggleDarkMode(darkModeStyle);
 
 	if (window.location.href.includes("List.aspx"))
 		await setupFolderDownloadButtons();
@@ -593,51 +612,57 @@ let speed = 1.0;
 		setupMenu();
 
 		document.addEventListener('wheel', (event) => changeVolume(event.deltaY));
-		document.addEventListener('keydown', (event) => {
-			if (event.key !== 'f') return;
-
-			const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
-			if (document.fullscreenElement)
-				document.exitFullscreen();
-			else
-				videoElement.requestFullscreen();
-		});
+		document.addEventListener('keydown', (event) => fullScreenToggleHandler(event));
 
 		if (storageData.panopto_save) {
 			(document.getElementById("m_save") as HTMLInputElement).checked = storageData.panopto_save;
-			(document.getElementById("m_darkmode") as HTMLInputElement).checked = storageData.panopto_darkmode;
-			(document.getElementById("m_returnbackwards") as HTMLInputElement).checked = storageData.panopto_return_backwards;
-			(document.getElementById("m_floatingspeed") as HTMLInputElement).checked = storageData.panopto_floating_speed;
+			(document.getElementById("m_dark_mode") as HTMLInputElement).checked = storageData.panopto_dark_mode;
+			(document.getElementById("m_return_backwards") as HTMLInputElement).checked = storageData.panopto_return_backwards;
+			(document.getElementById("m_floating_speed") as HTMLInputElement).checked = storageData.panopto_floating_speed;
 
-			const thumbnailsButton = document.getElementById("toggleThumbnailsButton") as HTMLElement;
-			thumbnailsButton?.addEventListener("click", async () => await saveSetting("showhide"));
+			const thumbnailsButton = document.getElementById("toggleThumbnailsButton") as HTMLDivElement,
+				sidebarButton = document.querySelector("#eventsExpanderButton > div[role=button]") as HTMLDivElement;
+			thumbnailsButton?.addEventListener("click",
+				async () => await saveSetting("show_hide_thumbnails"));
+			sidebarButton?.addEventListener("click",
+				async () => await saveSetting("show_hide_sidebar"));
 			setTimeout(() => {
-				if (storageData.panopto_hide && thumbnailsButton?.style.display !== "none")
+				if (storageData.panopto_hide_thumbnails && thumbnailsButton?.style.display !== "none")
 					thumbnailsButton.click();
-				// noinspection SpellCheckingInspection
-				(document.querySelector(".MuiListItemIcon-root.css-19e1foa.css-1f8bwsm") as HTMLDivElement)?.remove();
-			}, 2000);
+				if (storageData.panopto_hide_sidebar && sidebarButton?.parentElement!.style.visibility !== "hidden" &&
+					sidebarButton.ariaExpanded === 'true')
+					sidebarButton.click();
+
+				(document.getElementById("tplus_menu") as HTMLDivElement).classList.remove("start");
+			}, 2E3);
 
 			const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
 			videoElement.addEventListener("ratechange", async () => {
-				if ((document.getElementById("m_returnbackwards") as HTMLInputElement).checked && videoElement.playbackRate < speed) {
+				if ((document.getElementById("m_return_backwards") as HTMLInputElement).checked && videoElement.playbackRate < speed) {
 					videoElement.currentTime = Math.max(0, videoElement.currentTime - 10);
 				}
 				speed = videoElement.playbackRate;
 				updateRealTime();
 				await saveSetting("speed");
-				// noinspection SpellCheckingInspection
-				(document.querySelector(".MuiListItemIcon-root.css-19e1foa.css-1f8bwsm") as HTMLDivElement)?.remove();
+
+				const checkmarkDiv = document
+					.querySelector("#captionSettings > div > ul > li > div:nth-of-type(2)") as HTMLDivElement;
+				if (checkmarkDiv) checkmarkDiv.style.display = "none";
 			});
 
 			for (const video of document.querySelectorAll(".video-js"))
-				(video as HTMLVideoElement).addEventListener("loadedmetadata", () => {
-					(video as HTMLVideoElement).playbackRate = parseFloat(storageData.panopto_speed);
-				});
+				(video as HTMLVideoElement).addEventListener("loadedmetadata",
+					() => (video as HTMLVideoElement).playbackRate = storageData.panopto_speed);
 
 			if (storageData.panopto_floating_speed) setupFloatingSpeedController();
-		}
+			document.addEventListener("fullscreenchange", () => {
+				const floatingController = document.getElementById("tplus_floating_speed_controller");
+				if (!floatingController) return;
 
-		setTimeout(() => (document.getElementById("tplus_menu") as HTMLDivElement).classList.remove("start"), 1500);
+				const fullscreenParent = document.fullscreenElement
+					? document.fullscreenElement as HTMLElement : document.body;
+				fullscreenParent.appendChild(floatingController);
+			});
+		}
 	}
 })();
