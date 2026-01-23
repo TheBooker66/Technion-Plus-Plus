@@ -123,16 +123,18 @@ export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: H
 	await chrome.storage.local.set({[key]: newCalendar});
 }
 
-function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => Promise<chrome.tabs.Tab>) {
+function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => void) {
 	const spinner = assignmentItem.querySelector("img") as HTMLImageElement;
 	spinner.style.display = "none";
 	spinner.parentElement?.classList.add("small_spinner");
-	openFunction().catch(() => {
+	try {
+		openFunction();
+	} catch (err) {
 		assignmentItem.style.borderRadius = "3px;";
 		assignmentItem.style.backgroundColor = "var(--status-danger) !important;";
 		setTimeout(() => assignmentItem.style.backgroundColor = "", 1E3);
-	}).finally(() => {
+	} finally {
 		spinner.style.display = "block";
 		spinner.parentElement?.classList.remove("small_spinner");
-	});
+	}
 }

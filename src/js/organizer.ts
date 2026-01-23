@@ -14,20 +14,20 @@ function checkForEmpty() {
 	});
 }
 
-function openAssignment(assignment: HTMLDivElement, gotoFunction: () => Promise<chrome.tabs.Tab>) {
+function openAssignment(assignment: HTMLDivElement, gotoFunction: () => void) {
 	const button = assignment.querySelector("a.button") as HTMLAnchorElement;
 	const originalText = button.textContent;
 	button.textContent = "פותח...";
 	button.classList.add("small_spinner");
-	const resetButton = () => {
-		button.classList.remove("small_spinner");
-		button.textContent = originalText;
-	};
-	gotoFunction().then(resetButton).catch(_ => {
+	try {
+		gotoFunction();
+	} catch (err) {
 		assignment.style.background = "var(--status-danger) !important;";
 		setTimeout(() => assignment.style.background = "", 1E3);
-		resetButton();
-	});
+	} finally {
+		button.classList.remove("small_spinner");
+		button.textContent = originalText;
+	}
 }
 
 function sortAssignments(a: HWAssignment, b: HWAssignment, considerPins: boolean): number {

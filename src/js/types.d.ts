@@ -97,7 +97,7 @@ type HWAssignment = {
 	timestamp: number,
 	finalDate?: string,
 	newEh?: boolean,
-	goToFunc?: () => Promise<chrome.tabs.Tab>,
+	goToFunc?: () => void,
 };
 
 type Semester = "חורף" | "אביב" | "קיץ";

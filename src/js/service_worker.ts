@@ -757,8 +757,7 @@ async function TE_checkBuses() {
 }
 
 async function TE_sendMessageToTabs(data: { mess_t: string, angle?: number | unknown }) {
-	const tabs = await chrome.tabs.query({});
-	const moodleTabs = tabs.filter(tab => (tab.url as string).includes("moodle"));
+	const moodleTabs = await chrome.tabs.query({ url: "https://moodle*" });
 	for (const tab of moodleTabs) {
 		await chrome.tabs.sendMessage(tab.id as number, data);
 		if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);

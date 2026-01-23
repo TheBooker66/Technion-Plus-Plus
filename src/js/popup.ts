@@ -147,7 +147,7 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		const urlParams = new URLSearchParams(urlParts[1]);
 		urlParams.delete("prompt");
 		urlParams.append("login_hint", storageData.username + "@" + (storageData.email_server ? "campus." : "") + "technion.ac.il");
-		await chrome.tabs.create({url: (urlParts[0] + "?" + urlParams.toString()) || authURL});
+		window.open((urlParts[0] + "?" + urlParams.toString()) || authURL, "_blank");
 		clearInterval(loadingInterval);
 		studentsLink.textContent = "Students";
 	});

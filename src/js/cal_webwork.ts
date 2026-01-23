@@ -51,14 +51,15 @@ import {CommonCalendar} from './common_calendar.js';
 			const assignment = sortedAssignments[i];
 			const courseLTI = assignment[0].toString().substring(0,
 				assignment[0].toString().indexOf("000"));
-			const eventID = assignment[0];
+			const eventID = assignment[0],
+				eventURL = `https://moodle25.technion.ac.il/mod/lti/launch.php?id=${courseLTI}`;
 			const assignmentObject: HWAssignment = {
 				name: assignment[1].h,
 				description: "",
 				course: courseMap[courseLTI],
 				finalDate: assignment[1].due,
 				newEh: !assignment[1].seen,
-				goToFunc: () => chrome.tabs.create({url: `https://moodle25.technion.ac.il/mod/lti/launch.php?id=${courseLTI}`}),
+				goToFunc: () => window.open(eventURL, "_blank"),
 				eventID: eventID,
 				timestamp: assignment[1].ts,
 				sys: "webwork",

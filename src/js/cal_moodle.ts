@@ -3,7 +3,7 @@ import {CommonCalendar} from './common_calendar.js';
 import {TE_AutoLogin} from "./service_worker.js";
 
 (async function () {
-	function openMoodle(eventID: number, eventTimestamp: number): () => Promise<chrome.tabs.Tab> {
+	function openMoodle(eventID: number, eventTimestamp: number): () => void {
 		return async () => {
 			try {
 				const eventURL = `https://moodle25.technion.ac.il/calendar/view.php?view=day&course=1&time=${eventTimestamp / 1E3}#event_${eventID}`;
@@ -13,7 +13,7 @@ import {TE_AutoLogin} from "./service_worker.js";
 				if (eventLinks.length) {
 					const lastLink = eventLinks[eventLinks.length - 1];
 					const url = lastLink.getAttribute("href");
-					return await chrome.tabs.create({url: url});
+					window.open(url, "_blank");
 				} else {
 					throw new Error("TE_cal_moodle: bad content");
 				}

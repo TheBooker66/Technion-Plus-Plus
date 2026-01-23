@@ -105,7 +105,7 @@ import {reverseString, xorStrings} from './utils.js';
 					description: description,
 					finalDate: formattedDate,
 					newEh: newEventEh,
-					goToFunc: () => chrome.tabs.create({url: eventURL}),
+					goToFunc: () => window.open(eventURL, "_blank"),
 					eventID: eventID,
 					timestamp: dueDate.getTime(),
 					sys: "cs",
