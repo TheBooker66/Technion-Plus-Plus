@@ -12,7 +12,7 @@ a.tplus_download, a.tplus_download_light {
     cursor: pointer;
     float: left;
     display: block;
-    line-height: 2.2rem;
+    line-height: 2.2rem !important;
     padding: 0 0.7rem;
     font-size: 0.95rem;
     border-radius: 4px;
@@ -27,28 +27,23 @@ a.tplus_download:hover {
 }
 
 a.tplus_download_light {
-    /*color: #fff !important;
-    background-color: rgb(255,255,255,0.1);
-    border: 1px solid #fff;*/
     background-color: var(--sec-light);
     color: #0c0c0d !important;
     font-weight: 400;
 }
 
 a.tplus_download_light:hover {
-    /*background-color: #fff;
-    color: #16253D !important;*/
     background-color: var(--sec-norm);
-}
-
-.tilecontainer {
-    position: relative;
-    margin: 0 0;
 }
 
 .card.tplus_block {
     border-color: #16253D80;
     color: #16253D;
+}
+
+#coursecontentcollapseid2 .tplus_block {
+    margin-top: 8px;
+    border-radius: 8px;
 }
 
 .tplus_block h5.card-title {
@@ -72,22 +67,6 @@ a.tplus_download_light:hover {
     margin: 0;
     font-weight: 600;
     color: #eee;
-}
-
-.tplus_block .tp_float_button {
-    height: 45px;
-    width: 50px;
-    background: #043766 no-repeat center center;
-    border-radius: 4px;
-    box-shadow: 0 3px 1px -2px rgb(0, 0, 0, 0.2), 0 2px 2px 0 rgb(0, 0, 0, 0.14), 0 1px 5px 0 rgb(0, 0, 0, .12);
-    display: none;
-    position: fixed;
-    left: 20px;
-    bottom: 80px;
-    z-index: 3;
-    margin: 1px;
-    border: 0;
-    box-sizing: content-box;
 }
 
 .tplus_block label {
@@ -160,21 +139,10 @@ a.tplus_download_light:hover {
     border-color: #fff;
 }
 
-#coursecontentcollapseid2 .tplus_block {
-    margin-top: 8px;
-    border-radius: 8px;
-}
-
 .tplus_main_actions {
     display: grid;
     text-align: center;
     grid-row-gap: 0.5rem;
-}
-
-.tplus_main_actions a.cmenu {
-    display: block;
-    padding: 2px 4px;
-    margin: 8px auto;
 }
 
 #coursecontentcollapseid2 .tplus_main_actions {

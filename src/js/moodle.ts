@@ -18,8 +18,8 @@
 		}
 
 		async function create_tp_buttons() {
-			const section = create_element("section", document.getElementById("block-region-side-pre")!, "block block_material_download card mb-3 tplus_block", {}, "", true) as HTMLElement;
-			const cardBody = create_element("div", section, "card-body") as HTMLDivElement;
+			const container = create_element("section", document.getElementById("block-region-side-pre")!, "block block_material_download card mb-3 tplus_block", {}, "", true) as HTMLElement;
+			const cardBody = create_element("div", container, "card-body") as HTMLDivElement;
 
 			const cardTitle = create_element("h5", cardBody, "card-title d-inline", {
 				dir: "ltr",
@@ -83,50 +83,48 @@
 
 		if (".ac.il/" === window.location.href.split("technion")[1]) { // Moodle main page
 			if (document.querySelector(".usermenu > .login")) return;
-			const courseTiles = document.querySelectorAll(".coursevisible"),
-				userCourses: { [key: string]: string } = {},
+
+			const buttons = await create_tp_buttons();
+			const parentNode = buttons.parentNode as HTMLHeadingElement,
+			container = document.getElementById("coursecontentcollapseid2") as HTMLElement;
+			parentNode.removeChild(buttons);
+			container.insertBefore(parentNode.parentNode as Node, container.childNodes[0]);
+			parentNode.style.padding = "8px";
+			(parentNode.querySelector(".tplus_main_actions")!.appendChild(parentNode.querySelector("h5") as Node) as HTMLElement).style.flex = "0 0 200px";
+			parentNode.querySelector(".tplus_main_actions")?.classList.remove("mt-3");
+
+			const userCourses: { [key: string]: string } = {},
 				courseNameRegex = /(?<cname>.+)\s-\s(?<cnum>[0-9]+)/, semesterRegex = / - (?:חורף|אביב|קיץ)/;
-			for (const courseTile of courseTiles) {
-				let courseMatch = courseTile.querySelector("h3")
-					?.textContent.replace(semesterRegex, "").match(courseNameRegex);
-				if (!courseMatch?.groups) continue;
-				userCourses[courseMatch.groups.cnum.trim()] = courseMatch.groups.cname.trim();
+
+			await new Promise(resolve => setTimeout(resolve, 1E3)); // Wait for courses to load
+			const courseList = document.querySelector("ul.custom_course_menu_category_list") as HTMLUListElement;
+			const courses = courseList.querySelectorAll("li.custom_course_menu_course") as NodeListOf<HTMLLIElement>;
+
+			for (const course of courses) {
+				let nameMatch = course.querySelector("a > span")!
+					.textContent.replace(semesterRegex, "").match(courseNameRegex);
+				if (!nameMatch?.groups) continue;
+				userCourses[nameMatch.groups.cnum.trim()] = nameMatch.groups.cname.trim();
 			}
 			if (Object.keys(userCourses).length > 0) {
 				await chrome.storage.local.set({moodle_cal_courses: userCourses});
 				if (chrome.runtime.lastError) console.error("TE_moodle_001_: " + chrome.runtime.lastError);
 			}
 
-			const coursesBySemester: [{ cname: string, clink: string }[], { cname: string, clink: string }[],
-				{ cname: string, clink: string }[]] = [[], [], []];
-			const courseContainers = document.querySelectorAll(".course-card");
-			if (0 < courseTiles.length) for (let i = 0; i < courseTiles.length; i++) {
+			if (0 < courses.length) for (const course of courses) {
+				course.style.whiteSpace = 'nowrap';
 				const downloadButtonContainer = document.createElement("div");
-				downloadButtonContainer.style.cssFloat = "left";
-				courseContainers[i].insertBefore(downloadButtonContainer, courseContainers[i].querySelector("a.btn.btn-primary.coursestyle2btn"));
-				let course = courseTiles[i].querySelector("h3")!.textContent,
-					courseLink = courseTiles[i].querySelector(".coursestyle2btn")!.getAttribute("href") as string;
-				course.includes("חורף") ? coursesBySemester[0].push({
-					cname: course.replace(" - חורף", ""),
-					clink: courseLink,
-				}) : course.includes("אביב") ? coursesBySemester[1].push({
-					cname: course.replace(" - אביב", ""),
-					clink: courseLink,
-				}) : coursesBySemester[2].push({cname: course, clink: courseLink});
-				create_download(downloadButtonContainer, parseInt(courseTiles[i].querySelector(".coursestyle2btn")!.getAttribute("href")!.split("?id=")[1]), 0, "הורדת קבצי הקורס");
+				downloadButtonContainer.style.cssFloat = "right";
+				const linkElement = course.querySelector("a") as HTMLAnchorElement;
+				course.insertBefore(downloadButtonContainer, linkElement);
+				create_download(downloadButtonContainer, parseInt(linkElement.getAttribute("href")!
+					.split("?id=")[1]), 0, "⇓");
 			}
-			const buttons = await create_tp_buttons();
-			const parentNode = buttons.parentNode as HTMLHeadingElement;
-			parentNode.removeChild(buttons);
-			document.getElementById("coursecontentcollapseid2")
-				?.insertBefore(parentNode.parentNode as Node, document.getElementById("coursecontentcollapseid2")!.childNodes[0]);
-			parentNode.style.padding = "8px";
-			(parentNode.querySelector(".tplus_main_actions")!.appendChild(parentNode.querySelector("h5") as Node) as HTMLElement).style.flex = "0 0 200px";
-			parentNode.querySelector(".tplus_main_actions")?.classList.remove("mt-3");
 		} else {
 			const moodleNum = window.location.href.split("?id=")[1],
 				course = document.title.match(/(?<cname>.+)\s-\s(?<csemester>.+)\s-\s(?<cnum>[0-9]+)/),
 				buttons = await create_tp_buttons();
+
 			const course_num = course?.groups!.cnum.trim();
 			if (course_num) {
 				create_download(buttons, parseInt(moodleNum), 0, "הורדת כל הקבצים בקורס");
@@ -177,15 +175,14 @@
 				const target = event.target as HTMLElement;
 				if (!target) return;
 
-				const link = target.closest('a');
+				const link = target.closest('a') as HTMLAnchorElement;
 				if (!link) return;
+
 				if (!link.href.includes("forcedownload=1")) return;
-				let url = link.href.replace(/\??forcedownload=1/g, "");
 
 				event.preventDefault();
 				event.stopImmediatePropagation();
-
-				window.open(url, '_blank');
+				window.open(link.href.replace(/\??forcedownload=1/g, ""), '_blank');
 			}, true);
 		}
 	}
