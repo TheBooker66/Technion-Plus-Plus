@@ -34,14 +34,14 @@ async function XHR(url: string, resType: string, info: string[] = [], body = "",
 		case "document":
 			if (typeof browser !== "undefined" && browser) {
 				const doc = new DOMParser().parseFromString(await response.text(), "text/html");
-				const courseVisibleElements = Array.from(doc.querySelectorAll(".coursevisible"));
+				const courseList = Array.from(doc.querySelectorAll(".tilecontainer"));
 				// noinspection DuplicatedCode
 				const actions = {
 					get CourseNames() {
-						return courseVisibleElements.map(name => name.querySelector("h3")!.textContent);
+						return courseList.map(course => course.querySelector("h3")!.textContent);
 					},
 					get CourseLinks() {
-						return courseVisibleElements.map(name => name.querySelector(".coursestyle2btn")!.getAttribute("href"));
+						return courseList.map(course => course.getAttribute("onClick")!.split("='")[1]);
 					},
 					get WebworkForm() {
 						const form = doc.querySelector("form");
@@ -757,7 +757,8 @@ async function TE_checkBuses() {
 }
 
 async function TE_sendMessageToTabs(data: { mess_t: string, angle?: number | unknown }) {
-	const moodleTabs = await chrome.tabs.query({ url: "https://moodle*" });
+	const tabs = await chrome.tabs.query({});
+	const moodleTabs = tabs.filter(tab => (tab.url as string).includes("moodle"));
 	for (const tab of moodleTabs) {
 		await chrome.tabs.sendMessage(tab.id as number, data);
 		if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);

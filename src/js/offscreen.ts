@@ -7,14 +7,14 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 			break;
 		case "DOMParser":
 			const doc = new DOMParser().parseFromString(message.data, "text/html");
-			const courseVisibleElements = Array.from(doc.querySelectorAll(".coursevisible"));
+			const courseList = Array.from(doc.querySelectorAll(".tilecontainer"));
 			// noinspection DuplicatedCode
 			const actions = {
 				get CourseNames() {
-					return courseVisibleElements.map(name => name.querySelector("h3")!.textContent);
+					return courseList.map(course => course.querySelector("h3")!.textContent);
 				},
 				get CourseLinks() {
-					return courseVisibleElements.map(name => name.querySelector(".coursestyle2btn")!.getAttribute("href"));
+					return courseList.map(course => course.getAttribute("onClick")!.split("='")[1]);
 				},
 				get WebworkForm() {
 					const form = doc.querySelector("form");

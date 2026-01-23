@@ -22,7 +22,18 @@ a.tplus_download, a.tplus_download_light {
     -webkit-user-select: none;
 }
 
-a.tplus_download:hover {
+.tilecontainer a.tplus_download, .tilecontainer a.tplus_download_light {
+    line-height: normal !important;
+    float: left;
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    text-indent: -9999px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+a.tplus_download:hover, a.tplus_download_light:hover {
     background-color: var(--sec-norm);
 }
 
@@ -30,10 +41,6 @@ a.tplus_download_light {
     background-color: var(--sec-light);
     color: #0c0c0d !important;
     font-weight: 400;
-}
-
-a.tplus_download_light:hover {
-    background-color: var(--sec-norm);
 }
 
 .card.tplus_block {

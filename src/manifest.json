@@ -217,6 +217,14 @@
     },
     {
       "resources": [
+        "icons/download.svg"
+      ],
+      "matches": [
+        "https://*.technion.ac.il/*"
+      ]
+    },
+    {
+      "resources": [
         "lib/cheesefork/share-histograms.js"
       ],
       "matches": [
