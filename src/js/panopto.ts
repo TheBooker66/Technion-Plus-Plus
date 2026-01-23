@@ -283,7 +283,7 @@ let speed = 1.0;
 		else while (styleSheet.cssRules.length > 0) styleSheet.deleteRule(0);
 	}
 
-	async function saveSetting(settingsKey: "dark_mode" | "speed" | "return_backwards" | "floating_speed" | "settings" | "show_hide_thumbnails" | "show_hide_sidebar") {
+	async function saveSetting(settingsKey: "dark_mode" | "speed" | "return_backwards" | "floating_speed" | "scroll_volume" | "settings" | "show_hide_thumbnails" | "show_hide_sidebar") {
 		const settingsObj: Partial<StorageData> = {};
 		switch (settingsKey) {
 			case "dark_mode":
@@ -297,6 +297,9 @@ let speed = 1.0;
 				break;
 			case "floating_speed":
 				settingsObj.panopto_floating_speed = (document.getElementById("m_floating_speed") as HTMLInputElement).checked;
+				break;
+			case "scroll_volume":
+				settingsObj.panopto_scroll_volume = (document.getElementById("m_scroll_volume") as HTMLInputElement).checked;
 				break;
 			case "settings":
 				settingsObj.panopto_save = (document.getElementById("m_save") as HTMLInputElement).checked;
@@ -430,6 +433,7 @@ let speed = 1.0;
                 <span style="display: block">מהירויות נוספות</span>
             </a>
             <label for="m_floating_speed"><a>חלונית שליטת מהירויות צפה<input id="m_floating_speed" type="checkbox" /></a></label>
+            <label for="m_scroll_volume"><a>שינוי עוצמה שמע עם גלגלת העכבר<input id="m_scroll_volume" type="checkbox" /></a></label>
             <label for="m_return_backwards"><a>חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_return_backwards" type="checkbox" /></a></label>
             <label for="m_dark_mode"><a>מצב לילה<input id="m_dark_mode" type="checkbox" /></a></label>
             <label for="m_save"><a>זכור הגדרות<input id="m_save" type="checkbox" /></a></label>
@@ -465,6 +469,8 @@ let speed = 1.0;
 
 		(document.getElementById("m_return_backwards") as HTMLInputElement)
 			.addEventListener("change", () => saveSetting("return_backwards"));
+		(document.getElementById("m_scroll_volume") as HTMLInputElement)
+			.addEventListener("change", () => saveSetting("scroll_volume"));
 		(document.getElementById("m_save") as HTMLInputElement)
 			.addEventListener("change", () => saveSetting("settings"));
 
@@ -597,7 +603,7 @@ let speed = 1.0;
 
 	const storageData = await chrome.storage.local.get({
 		panopto_speed: 1.0, panopto_dark_mode: false, panopto_return_backwards: false, panopto_floating_speed: false,
-		panopto_save: true, panopto_hide_thumbnails: false, panopto_hide_sidebar: false,
+		panopto_scroll_volume: false, panopto_save: true, panopto_hide_thumbnails: false, panopto_hide_sidebar: false,
 	}) as StorageData;
 	if (chrome.runtime.lastError) console.error("TE_panopto: " + chrome.runtime.lastError.message);
 
@@ -610,8 +616,6 @@ let speed = 1.0;
 		setupDetachableVideoPlayer();
 		setupTimer();
 		setupMenu();
-
-		document.addEventListener('wheel', (event) => changeVolume(event.deltaY));
 		document.addEventListener('keydown', (event) => fullScreenToggleHandler(event));
 
 		if (storageData.panopto_save) {
@@ -619,6 +623,7 @@ let speed = 1.0;
 			(document.getElementById("m_dark_mode") as HTMLInputElement).checked = storageData.panopto_dark_mode;
 			(document.getElementById("m_return_backwards") as HTMLInputElement).checked = storageData.panopto_return_backwards;
 			(document.getElementById("m_floating_speed") as HTMLInputElement).checked = storageData.panopto_floating_speed;
+			(document.getElementById("m_scroll_volume") as HTMLInputElement).checked = storageData.panopto_scroll_volume;
 
 			const thumbnailsButton = document.getElementById("toggleThumbnailsButton") as HTMLDivElement,
 				sidebarButton = document.querySelector("#eventsExpanderButton > div[role=button]") as HTMLDivElement;
@@ -662,6 +667,11 @@ let speed = 1.0;
 				const fullscreenParent = document.fullscreenElement
 					? document.fullscreenElement as HTMLElement : document.body;
 				fullscreenParent.appendChild(floatingController);
+			});
+
+			document.addEventListener('wheel', (event) => {
+				if ((document.getElementById("m_scroll_volume") as HTMLInputElement).checked)
+					changeVolume(event.deltaY);
 			});
 		}
 	}

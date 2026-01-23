@@ -67,6 +67,7 @@ type StorageData = {
 	panopto_dark_mode: boolean;
 	panopto_return_backwards: boolean;
 	panopto_floating_speed: boolean;
+	panopto_scroll_volume: boolean;
 	panopto_hide_thumbnails: boolean;
 	panopto_hide_sidebar: boolean;
 
