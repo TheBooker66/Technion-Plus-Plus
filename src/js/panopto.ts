@@ -433,7 +433,7 @@ let speed = 1.0;
                 <span style="display: block">מהירויות נוספות</span>
             </a>
             <label for="m_floating_speed"><a>חלונית שליטת מהירויות צפה<input id="m_floating_speed" type="checkbox" /></a></label>
-            <label for="m_scroll_volume"><a>שינוי עוצמה שמע עם גלגלת העכבר<input id="m_scroll_volume" type="checkbox" /></a></label>
+            <label for="m_scroll_volume"><a>שינוי עוצמת שמע עם גלגלת העכבר<input id="m_scroll_volume" type="checkbox" /></a></label>
             <label for="m_return_backwards"><a>חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_return_backwards" type="checkbox" /></a></label>
             <label for="m_dark_mode"><a>מצב לילה<input id="m_dark_mode" type="checkbox" /></a></label>
             <label for="m_save"><a>זכור הגדרות<input id="m_save" type="checkbox" /></a></label>

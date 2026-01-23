@@ -6,16 +6,16 @@
   },
   "devDependencies": {
     "@types/archiver": "^7.0.0",
-    "@types/chrome": "^0.1.31",
+    "@types/chrome": "^0.1.36",
     "@types/firefox-webext-browser": "^143.0.0",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.0.10",
     "archiver": "^7.0.1",
     "glob": "^13.0.0",
-    "html-minifier-next": "^4.2.2",
-    "lightningcss": "^1.30.2",
-    "pdfjs-dist": "^5.4.394",
+    "html-minifier-next": "^4.19.0",
+    "lightningcss": "^1.31.1",
+    "pdfjs-dist": "^5.4.530",
     "typescript": "^5.9.3",
-    "vite": "^7.2.4",
-    "vite-plugin-static-copy": "^3.1.4"
+    "vite": "^7.3.1",
+    "vite-plugin-static-copy": "^3.1.6"
   }
 }
