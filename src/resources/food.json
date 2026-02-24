@@ -1,0 +1,82 @@
+[
+  {
+    "restaurant_name": "שווארמה נינו",
+    "details": "א'-ה' 11:00 - 17:30",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "פאנדה ווק",
+    "details": "א'-ה' 11:00 - 17:30",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "קפה שווה",
+    "details": "א'-ה' 07:30 - 19:00",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "קפה שווה",
+    "details": "א'-ה' 07:15 - 20:00",
+    "location": "אולמן קומה 3"
+  },
+  {
+    "restaurant_name": "הסלטייה (Refresh)",
+    "details": "א'-ה' 11:00 - 17:00",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "מספרת יארה (Yara)",
+    "details": "054-490-8012",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "אנטריקוט בורגר",
+    "details": "א'-ה' 11:00 - 17:00",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "פיצה האט (Pizza Hut)",
+    "details": "א'-ה' 11:00 - 00:00",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "חומוס אבו מרון",
+    "details": "א'-ה' 11:00 - 16:30",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "בית דפוס (דפוס אסטכניון)",
+    "details": "א'-ה' 09:00 - 16:30",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "היידה בית מאפה",
+    "details": "א'-ה' 11:00 - 20:00",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "Shake It",
+    "details": "א'-ה' 9:00 - 20:30",
+    "location": "בית הסטודנט קומה 1"
+  },
+  {
+    "restaurant_name": "קפה קפה",
+    "details": "א'-ה' 07:30 - 20:30, ו' 07:30 - 14:30",
+    "location": "בית הסטודנט קומה 3"
+  },
+  {
+    "restaurant_name": "כבשה שחורה (חונטה)",
+    "details": "א'-ה' 11:30 - 23:30",
+    "location": "בית הסטודנט קומה 3"
+  },
+  {
+    "restaurant_name": "נאפו ברייק סושי (NAPO)",
+    "details": "א'-ה' 11:00 - 15:00",
+    "location": "בית הסטודנט קומה 3"
+  },
+  {
+    "restaurant_name": "מזכירות אס\"ט",
+    "details": "א'-ה' 9:00 - 15:00",
+    "location": "בית הסטודנט קומה 0"
+  }
+]
