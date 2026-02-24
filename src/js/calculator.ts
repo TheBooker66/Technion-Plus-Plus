@@ -290,10 +290,11 @@
 			binaryGradeLabel.hidden = !binary_checkbox.checked;
 		});
 
-		const currentMonth = (new Date()).getMonth() + 1;
+		const now = new Date();
+		const currentMonth = (now).getMonth() + 1, currentYear = (now).getFullYear();
 		(document.getElementById("semester") as HTMLSelectElement).value =
-			(currentMonth <= 4) ? "חורף" :
-				(currentMonth >= 4 && currentMonth <= 8) ? "אביב" : "קיץ";
+			(currentMonth <= 4) ? "חורף" : (currentMonth >= 4 && currentMonth <= 8) ? "אביב" : "קיץ";
+		(document.getElementById("year") as HTMLInputElement).value = currentYear.toString();
 
 		const addGradeForm = document.getElementById("add_grade_form") as HTMLFormElement;
 		addGradeForm.addEventListener("submit", async event => {
