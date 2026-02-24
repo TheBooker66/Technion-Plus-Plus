@@ -104,7 +104,6 @@
         "https://moodle25.technion.ac.il/login/index.php",
         "https://grades.technion.ac.il/*",
         "https://grades.cs.technion.ac.il/*",
-        "https://grades.cs.technion.ac.il/grades.cgi",
         "https://webcourse.cs.technion.ac.il/*",
         "https://portalex.technion.ac.il/irj/portal/external*",
         "https://techwww.technion.ac.il/tech_ident/"
@@ -132,8 +131,7 @@
         "js/cs.js"
       ],
       "matches": [
-        "https://webcourse.cs.technion.ac.il/*",
-        "https://grades.cs.technion.ac.il/grades.cgi?*.html"
+        "https://grades.cs.technion.ac.il/*"
       ]
     },
     {
@@ -145,17 +143,6 @@
       ],
       "matches": [
         "https://grades.technion.ac.il/*"
-      ]
-    },
-    {
-      "css": [
-        "css/download.css"
-      ],
-      "js": [
-        "js/cs.js"
-      ],
-      "matches": [
-        "https://grades.cs.technion.ac.il/grades.cgi"
       ]
     },
     {

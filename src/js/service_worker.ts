@@ -571,7 +571,7 @@ async function TE_doDownloads(chunk: DownloadItem) {
 }
 
 async function TE_nextDownload() {
-	const urlPrefixes = ["https://moodle25.technion.ac.il/blocks/material_download/download_materialien.php?courseid=", "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/", "https://grades.cs.technion.ac.il/grades.cgi?", "https://webcourse.cs.technion.ac.il/"];
+	const urlPrefixes = ["https://moodle25.technion.ac.il/blocks/material_download/download_materialien.php?courseid=", "https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/", "https://grades.cs.technion.ac.il/fetch/file?", "https://webcourse.cs.technion.ac.il/"];
 	const storageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []}) as StorageData;
 	if (storageData.dl_current === 0 && storageData.dl_queue.length > 0) {
 		const currentQueueItem: DownloadItem = storageData.dl_queue[0];

@@ -1,24 +1,34 @@
 (function () {
 	function addCourseWebsiteLinks() {
-		const courseRows = document.querySelectorAll("center > table + table > tbody > tr");
+		const courseRows = document.querySelectorAll("center > br + table > tbody > tr");
 		if (courseRows[1].getAttribute("bgcolor") !== "yellow") {
 			courseRows[0].appendChild(document.createElement("th")).textContent = "אתר הקורס";
-			// noinspection HtmlUnknownTarget
+			courseRows[courseRows.length - 1].children[0].setAttribute("colspan", "4");
+
 			const courseButtonTemplate = (new DOMParser).parseFromString(`<table>
             <td style="text-align: center; vertical-align: middle;">
-                <input type="image" src="/Images/StudImages/prev.gif" style="display: inline"  alt="חץ לאתר הקורס"/>
+                <a class="tp_link" title="חץ לאתר הקורס"/>
             </td>
         </table>`, "text/html").querySelector("td") as HTMLTableCellElement;
-			courseRows[courseRows.length - 1].children[0].setAttribute("colspan", "4");
+			const style = document.createElement('style');
+			// noinspection SpellCheckingInspection,GrazieStyle
+			style.textContent = `.tp_link {
+  display: inline-block; width: 31px; height: 14px; 
+  background-image: url('data:image/gif;base64,R0lGODlhHwAOALMOAP98AP+VAv9tAP9+Av+SAP+xAf/OAf+sAP/nAP/IAP/4AP/jAP/3AP//AAAAAAAAACH5BAEAAA4ALAAAAAAfAA4AAARV0MlJq70i372B/x4nEmRpkiJ1rGzrrlwiz3RtJ9Wi73zv94ygcEgsGoWNpHLJbDqVFYV0Sq1aqxyEdsvtehGpiWFMLpvH4UthzW6v06KAfC6Hwwf4CAA7');
+  background-repeat: no-repeat; background-position: center; background-size: contain;
+  overflow: hidden; border: none;
+} .tp_link:hover {
+  background-color: transparent;
+}`;
+			const cookie = window.location.toString().split("settings_courses/")[1];
+
 			for (let i = 1; i < courseRows.length - 1; i++) {
 				let buttonCell = courseButtonTemplate.cloneNode(true) as DocumentFragment;
-				(buttonCell.querySelector("input") as HTMLInputElement).addEventListener("click", f => {
-					f.preventDefault();
-					document.forms.namedItem("SubSub")!["RecreatePath"].value = `5-${i - 1}`;
-					document.forms.namedItem("SubSub")!.submit();
-				});
+				(buttonCell.querySelector("a") as HTMLAnchorElement).href =
+					`https://grades.cs.technion.ac.il/${courseRows[i].children[0].textContent}/${cookie}`;
 				courseRows[i].appendChild(buttonCell);
 			}
+			document.head.append(style);
 		}
 	}
 
@@ -44,28 +54,20 @@
 	}
 
 	function updateTabNames() {
-		const courseTabs = document.querySelectorAll("form[name='SubSub'] table table a.tab");
-		for (let tab of courseTabs) {
+		const currentTab = document.querySelector("div > table > tbody > tr > td > span") as HTMLSpanElement,
+			restOfTabs = document.querySelectorAll("div > table > tbody > tr > td > div > a") as NodeListOf<HTMLAnchorElement>;
+		const allTabs = [...restOfTabs, currentTab] as HTMLElement[];
+		for (let tab of allTabs) {
 			tab.textContent += " - " + (document.querySelector(`#c${tab.textContent} span.black-text > strong`) as HTMLElement).textContent;
 			tab.setAttribute("style", "{white-space: nowrap; max-width: calc((90vw - 350px) / ${courseTabs.length + 1}); text-overflow: ellipsis; overflow-x: hidden; display: block; min-width: 9ch;}".replace(/[{}]/g, ''));
 		}
 	}
 
-	if (document.forms.namedItem("SubSub")) {
-		const pathInputs = document.querySelectorAll("form input[name='RecreatePath']") as NodeListOf<HTMLInputElement>;
-		let recreatePathValue = "";
-		for (let i = 0; i < pathInputs.length; i++)
-			if (pathInputs[i].value.length === 3) {
-				recreatePathValue = pathInputs[i].value;
-				break;
-			}
-
-		if (recreatePathValue.toString() === "0-0") {
-			addCourseWebsiteLinks();
-		} else if (recreatePathValue.toString() === "0-2") {
-			addCopyPasswordButton();
-		} else if (recreatePathValue[0].toString() === "5") {
-			updateTabNames();
-		}
-	}
+	const currentPage = window.location.toString().split("/")[3];
+	if (currentPage === "settings_courses")
+		addCourseWebsiteLinks();
+	else if (currentPage === "settings_auto_update")
+		addCopyPasswordButton();
+	else if (/\d{8}/.test(currentPage))
+		updateTabNames();
 })();

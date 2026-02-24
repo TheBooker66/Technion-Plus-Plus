@@ -76,7 +76,8 @@
 
 	function moodle(storageData: StorageData, website: string) {
 		if (document.querySelectorAll(".navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
-		if (storageData.external_enable) window.location.href = "https://techwww.technion.ac.il/tech_ident/";
+		if (storageData.external_enable)
+			window.location.href = "https://techwww.technion.ac.il/tech_ident/";
 		else {
 			const specificMoodleNumber = website.match(/moodle([0-9]+)\.technion\.ac\.il/)?.[1] || "25";
 			window.location.href = `https://moodle${specificMoodleNumber}.technion.ac.il/auth/oidc/`;
@@ -84,21 +85,23 @@
 	}
 
 	function cs(storageData: ExtendedStorageData) {
-		if (document.querySelector("form")!.querySelectorAll(".red-text").length !== 0 ||
-			document.referrer.includes("grades.cs.technion.ac.il")) return;
+		if (document.referrer.includes("grades.cs.technion.ac.il")) return;
+
+		const form = document.querySelector("form");
+		if (!form || !!form.querySelector(".red-text")) return;
+
 		const username = document.getElementById("Username") as HTMLInputElement | null,
 			password = document.getElementById("password") as HTMLInputElement | null;
 		if (!username || !password) return;
 		username.value = storageData.username.toString();
 		password.value = storageData.password.toString();
-		if (document.querySelector("form")!.querySelectorAll(".white-button").length > 0)
-			document.querySelector("form")!.submit();
-		else (document.querySelector("form")!.querySelector(".submit-button") as HTMLButtonElement).click();
+		if (form.querySelectorAll(".white-button").length > 0) form.submit();
+		else (form.querySelector(".submit-button") as HTMLButtonElement).click();
 	}
 
 	function sap(storageData: ExtendedStorageData) {
-		if ((document.getElementById("certLogonForm") === null || document.referrer.includes("portalex"))
-			&& !document.getElementById("divChangeContent")) {
+		if (!document.getElementById("divChangeContent") &&
+			(!document.getElementById("certLogonForm") || document.referrer.includes("portalex"))) {
 			const form = document.createElement("form");
 			appendInfo(form, "j_username", storageData.username.toString());
 			appendInfo(form, "j_password", storageData.password.toString());
@@ -111,11 +114,14 @@
 	}
 
 	function panopto() {
-		if (document.getElementById("loginButton") != null && window.location.href.includes("Pages/Home.aspx"))
+		if (document.getElementById("loginButton") && window.location.href.includes("Pages/Home.aspx"))
 			window.location.href = (-1 === window.location.href.indexOf("?") ? "?" : "&") + "instance=TechnionAuthentication";
-		if (document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton") != null
-			&& ((document.getElementById("providerDropdown") as HTMLInputElement).value = "TechnionAuthentication"))
-			(document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton") as HTMLElement).click();
+
+		const button = document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton") as HTMLElement | null;
+		if (button) {
+			(document.getElementById("providerDropdown") as HTMLInputElement).value = "TechnionAuthentication";
+			button.click();
+		}
 	}
 
 	function grades(storageData: ExtendedStorageData) {
