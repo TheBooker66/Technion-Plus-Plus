@@ -141,19 +141,17 @@ type RecordingCourse = {
 };
 
 type BusLine = {
-	ID: number,
-	CompanyName: "אגד" | "נסיעות ותיירות" | "סופרבוס" | "ג.ב. טורס" | "קווים" | "נתיב אקספרס",
 	Shilut: string, // Bus line number
-	DestinationQuarterName: "חיפה אוניברסיטה",
-	MinutesToArrival: 0,
-	MinutesToArrivalList: number[],
+	DestinationQuarterName: string, // Bus line destination
+	MinutesToArrival: number, // Minutes to arrival for the first bus of a line
+	MinutesToArrivalList: number[], // Minutes to arrival for all buses of a line
 };
 
 type DownloadItem = {
-	sys: number, // Moodle / Panopto / CS websites
-	sub_pre: string, // No clue, it's related to WebCourse
+	sys: number, // URL prefix (Moodle / Panopto / CS websites)
+	sub_pre: string, // URL midfix (e.g. course name)
 	list: {
-		u: string, // Video URL
-		n: string, // Video name
+		u: string, // URL suffix (e.g. file name on server)
+		n: string, // File name to save as
 	}[],
 };
