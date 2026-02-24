@@ -26,7 +26,7 @@
 		let icsLink = document.querySelector("a.ics") as HTMLAnchorElement;
 		if (!icsLink) return;
 
-		const password = icsLink.href.slice(-8),
+		const password = icsLink.href.slice(-14),
 			copyButton = document.createElement("a"),
 			icsDiv = document.querySelector("div.ics") as HTMLDivElement;
 		copyButton.className = "tplus_download";
