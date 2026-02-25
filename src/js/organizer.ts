@@ -1,4 +1,5 @@
 import {toggleDoneOriginal} from "./common_calendar";
+import {resolveTheme} from "./utils";
 
 function insertMessage(messageText: string, errorEh: boolean = true) {
 	const element = document.getElementById("error")!.appendChild(document.createElement("div"));
@@ -462,7 +463,7 @@ if (document.title === "ארגונית++") {
 	form.no_end.addEventListener("input", () => form.end_time.disabled = form.no_end.checked);
 	await setUpFilters();
 
-	const storageData = await chrome.storage.local.get({organizer_fullscreen: false, dark_mode: false});
+	const storageData = await chrome.storage.local.get({organizer_fullscreen: false, theme: "light"}) as StorageData;
 	const fullscreenCheckbox = document.getElementById("fullscreen") as HTMLInputElement;
 	if (storageData.organizer_fullscreen) {
 		fullscreenCheckbox.checked = true;
@@ -472,7 +473,7 @@ if (document.title === "ארגונית++") {
 		await chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {state: fullscreenCheckbox.checked ? "maximized" : "normal"});
 		await chrome.storage.local.set({organizer_fullscreen: fullscreenCheckbox.checked});
 	});
-	storageData.dark_mode ? document.querySelector("html")?.setAttribute("tplus", "dm") :
-		document.querySelector("html")?.removeAttribute("tplus");
-	document.getElementById("goToSettings")?.addEventListener("click", () => chrome.runtime.openOptionsPage());
+	resolveTheme(storageData.theme);
+	document.getElementById("goToSettings")!
+		.addEventListener("click", () => chrome.runtime.openOptionsPage());
 }

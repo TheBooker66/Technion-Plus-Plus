@@ -15,4 +15,10 @@ async function resetBadge() {
 		await chrome.action.setBadgeText({text: ""});
 }
 
-export {reverseString, xorStrings, resetBadge};
+function resolveTheme(theme: string): void {
+	const entirePage = document.documentElement;
+	theme === "dark" || (theme === "auto" && window.matchMedia('(prefers-color-scheme: dark)').matches) ?
+		entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
+}
+
+export {reverseString, xorStrings, resetBadge, resolveTheme};

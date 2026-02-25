@@ -4,6 +4,8 @@ body {
     font-family: 'Segoe UI', arial, sans-serif;
     font-size: 15px;
     margin: 0;
+    min-height: 100vh;
+    box-sizing: border-box;
     background-image: linear-gradient(to bottom, #efefef, #f7f7f7);
     color: #0c0c0c;
 }
@@ -90,4 +92,26 @@ section {
     margin-top: 10px;
     margin-bottom: 25px;
     list-style-type: circle;
+}
+
+html[tplus="dm"] body {
+    background-image: linear-gradient(to bottom, #222, #171717);
+    color: #f9f9fa;
+}
+
+html[tplus="dm"] header {
+    box-shadow: 0 1px 4px 2px rgba(0, 0, 0, 0.8);
+}
+
+html[tplus="dm"] section {
+    background: #333;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html[tplus="dm"] a {
+    color: var(--prim-cooler);
+}
+
+html[tplus="dm"] a:hover {
+    color: var(--sec-light);
 }

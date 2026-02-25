@@ -9,7 +9,8 @@ header .mod_name img {
 h2 {
     background-color: var(--prim-cool);
     color: #fff;
-    text-align: right;
+    text-align: center;
+    margin-top: 0;
     padding: 6px 30px;
     border-radius: 10px;
     width: max-content;
@@ -33,6 +34,11 @@ input[type="text"], input[type="password"], input[type="url"], select {
     font-family: 'Segoe UI', arial, sans-serif;
     max-width: 50%;
     direction: ltr;
+}
+
+input[type="checkbox"], input[type="radio"] {
+    margin-left: 10px;
+    cursor: pointer;
 }
 
 input:placeholder-shown {

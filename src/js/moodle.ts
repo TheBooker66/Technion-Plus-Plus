@@ -195,26 +195,29 @@
 			["--dark_bg", "hsl(" + (90 + hueOffset) + ", 100%, 10%)"],
 			["--calendar_today", "hsla(" + (70 + hueOffset) + ", 100%, 20%, 0.5)"],
 		];
-		const storageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120}) as StorageData;
+		const storageData = await chrome.storage.local.get({
+			remoodle: false, remoodle_angle: 120, theme: "light",
+		}) as StorageData;
 		if (chrome.runtime.lastError) {
 			console.error("TE_remoodle_err: " + chrome.runtime.lastError.message);
 			return;
 		}
 
-		let darkModeEnabled: boolean = storageData.remoodle;
-		const setDarkMode = (darkmodeEh: boolean) => {
+		let darkModeEnabled= storageData.remoodle, theme = storageData.theme;
+		const setDarkMode = (darkmodeEh: boolean, theme: "light" | "dark" | "auto") => {
 			const entirePage = document.querySelector("html") as HTMLHtmlElement;
-			darkmodeEh ? entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
+			darkmodeEh && (theme !== "auto" || (theme === "auto" && window.matchMedia('(prefers-color-scheme: dark)').matches)) ?
+				entirePage.setAttribute("tplus", "dm") : entirePage.removeAttribute("tplus");
 			const checkbox = document.getElementById("tp_darkmode_input") as HTMLInputElement;
 			if (checkbox) checkbox.checked = darkmodeEh;
 		};
 		themeProperties(storageData.remoodle_angle)
 			.forEach(property => document.documentElement.style.setProperty(property[0], property[1]));
-		setDarkMode(darkModeEnabled);
+		setDarkMode(darkModeEnabled, theme);
 		chrome.runtime.onMessage.addListener(message => {
 			switch (message.mess_t) {
 				case "TE_moodle_darkmode":
-					setDarkMode(!darkModeEnabled);
+					setDarkMode(!darkModeEnabled, theme);
 					darkModeEnabled = !darkModeEnabled;
 					break;
 				case "TE_moodle_colour":

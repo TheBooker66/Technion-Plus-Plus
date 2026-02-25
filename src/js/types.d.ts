@@ -12,8 +12,8 @@ type StorageData = {
 	external_enable: boolean;
 
 	// --- Global UI & Settings ---
-	dark_mode: boolean;
-	email_preference: string;
+	theme: "light" | "dark" | "auto";
+	email_preference: "gmail" | "outlook" | "program";
 	custom_name: string;
 	custom_link: string;
 	remoodle: boolean;
@@ -28,6 +28,7 @@ type StorageData = {
 	user_agenda: { [key: string]: HWAssignment };
 	pinned_assignments: number[];
 	cal_seen: number;
+	organizer_fullscreen: boolean;
 	filter_toggles: {
 		appeals: boolean;
 		zooms: boolean;

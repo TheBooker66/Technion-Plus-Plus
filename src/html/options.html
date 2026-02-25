@@ -33,25 +33,43 @@
             <input type="password" id="password" placeholder="הכנס סיסמה" maxlength="256"/>
         </div>
         <div>
-            <label for="idn">מספר זהות *</label><br/>
-            <input type="text" placeholder="הכנס מספר זהות" maxlength="9" id="idn"/><br/>
-            <span class="description"> * נמצא בשימוש על ידי שליחת קבצים להדפסה וייבוא מטלות בית ממדמ"ח.</span>
+            <label for="idn">מספר זהות</label><br/>
+            <input type="text" placeholder="הכנס מספר זהות" minlength="9" maxlength="9" id="idn"/><br/>
+            <span class="description">נמצא בשימוש על ידי שליחת קבצים להדפסה וייבוא מטלות בית ממדמ"ח.</span>
         </div>
         <div>
-            <label><input type="checkbox" id="external_user"/> משתמש חיצוני</label><br/>
-            <span class="big-description">נא <b>לא</b> לסמן אם יש ברשותכם משתמש טכניוני. יש למלא מספר זהות.</span>
+            <label><input type="checkbox" id="external_user"/>משתמש חיצוני</label><br/>
+            <span class="big-description">נא <b>לא</b>לסמן אם יש ברשותכם משתמש טכניוני. יש למלא מספר זהות.</span>
         </div>
     </section>
 
     <section>
         <h2>הגדרות כלליות</h2>
-        <div><label><input type="checkbox" id="quick_login"/> הפעל התחברות אוטומטית בכניסה לאתרי הטכניון</label></div>
         <div>
-            <label><input type="checkbox" id="dark_mode"/>הפעל מצב חשוך ברחבי התוסף</label>
-            <span class="big-description">עמוד הגדרות זה, הארגונית<sup>++</sup> ומחשבון הממוצע האקדמי. שימו לב שהגדרה זו לא תקפה עבור המודל.</span>
+            <label><input type="checkbox" id="quick_login"/>הפעל התחברות אוטומטית בכניסה לאתרי הטכניון</label>
+            <span class="big-description">
+                מומלץ מאוד! חוסך זמן ומאפשר שימוש חלק יותר בתכונות התוסף.
+                עם זאת, שימו לב כי לפעמים ההתחברות תיכשל
+                (בייחוד בסאפ/באתרים חיצוניים כמו אתרי ירחונים אקדמיים).
+                אם זה קורה, בטלו אותה רגע, התחברו ידנית ואז הפעילו אותה שוב.
+            </span>
         </div>
+        <br/>
         <div>
-            <label><input type="checkbox" id="panopto_save"/> שמירת העדפות בפנופטו</label>
+            <span>
+            ערכת נושא ברחבי התוסף
+            <small>
+                (הגדרה זו תקפה עבור עמוד הגדרות זה, הארגונית ומחשבון הממוצע האקדמי,
+                תקפה למחצה עבור המודל ולא תקפה עבור פנופטו.)
+            </small>
+            </span><br/>
+            <label><input type="radio" name="theme" id="light"/>בהירה</label><br/>
+            <label><input type="radio" name="theme" id="dark"/>כהה</label><br/>
+            <label><input type="radio" name="theme" id="auto"/>אוטומטי (לפי המערכת)</label>
+        </div>
+        <br/>
+        <div>
+            <label><input type="checkbox" id="panopto_save"/>שמירת העדפות בפנופטו</label>
             <span class="big-description">תאפשר שמירה של מהירות ההפעלה ומצב התאורה בפנופטו.</span>
         </div>
         <br/>
@@ -70,16 +88,18 @@
         <br/>
         <div>
             אופן שימוש במייל <small>(בשימוש של שליחת קבצים להדפסה)</small><br/>
-            <label><input type="radio" name="mail_client" id="gmail_select"/> Gmail</label><br/>
-            <label><input type="radio" name="mail_client" id="outlook_select"/> Outlook</label><br/>
-            <label><input type="radio" name="mail_client" id="program_select"/> תוכנה חיצונית</label>
+            <label><input type="radio" name="mail_client" id="gmail"/>Gmail</label><br/>
+            <label><input type="radio" name="mail_client" id="outlook"/>Outlook</label><br/>
+            <label><input type="radio" name="mail_client" id="program"/>תוכנה חיצונית</label>
         </div>
         <div>
             <label><input type="checkbox" id="allow_timings"/>
-                הפעל את "מסעדות פתוחות בטכניון" ו"אוטובוסים קרובים"</label>
+                הפעל את "מסעדות ועסקים פתוחים בטכניון" ואת "אוטובוסים קרובים"</label>
             <span class="big-description">
-			כל בעיה שעלולה להתרחש מהשימוש בכלים הנ"ל, לרבות עקב תזמון שגוי של אוטובוס או עקב זמני פתיחה שגויים של מסעדה, אינה באחריות מפתח התוסף.<br/>
-			ובקיצור, האחריות על הפעלת ושימוש הכלים הנ"ל היא על המשתמש בלבד.
+                כל בעיה שעלולה להתרחש מהשימוש בכלים הנ"ל,
+                לרבות עקב תזמון שגוי של אוטובוס או עקב זמני פתיחה שגויים של מסעדה,
+                כולל דייט שנכשל כי האוטובוס לא הגיע בזמן או כי המסעדה נסגרה מוקדם, אינה באחריות מפתח התוסף.<br/>
+                ובקיצור, האחריות על הפעלת ושימוש הכלים הנ"ל היא על המשתמש בלבד.
 		    </span>
         </div>
         <div>
@@ -94,15 +114,15 @@
     <section>
         <h2>מטלות בית</h2>
         <div>
-            <label><input type="checkbox" id="allow_hw_alerts"/> הפעל התראות עבור מטלות בית חדשות</label>
+            <label><input type="checkbox" id="allow_hw_alerts"/>הפעל התראות עבור מטלות בית חדשות</label>
             <span class="big-description">יופעלו התראות כאשר התוסף יזהה מטלות חדשות עבור המערכות עבורן תבחר להציג מטלות קרובות.</span>
         </div>
         <div>
-            <label><input type="checkbox" id="moodle_cal_enabled"/> הצג מטלות קרובות מהמודל</label>
+            <label><input type="checkbox" id="moodle_cal_enabled"/>הצג מטלות קרובות מהמודל</label>
             <span class="big-description">חובה להפעיל התחברות אוטומטית.</span>
         </div>
         <div>
-            <label><input type="checkbox" id="cs_cal_enabled"/> הצג מטלות קרובות של הפקולטה למדמ"ח
+            <label><input type="checkbox" id="cs_cal_enabled"/>הצג מטלות קרובות של הפקולטה למדמ"ח
                 (GR++/Webcourse)</label>
             <span class="big-description">חובה להגדיר מספר זהות וסיסמת יומן <span dir="ltr">GR++</span>
                 לשם שימוש בתכונה זו. הפעלת התחברות אוטומטית אינה חובה עבור אפשרות זאת.</span>
@@ -138,7 +158,7 @@
             </div>
         </div>
         <div>
-            <label><input type="checkbox" id="webwork_cal_enabled"/> הצג מטלות קרובות של WeBWorK</label>
+            <label><input type="checkbox" id="webwork_cal_enabled"/>הצג מטלות קרובות של WeBWorK</label>
             <span class="big-description">חובה להפעיל התחברות אוטומטית.</span>
             <span class="big-description" style="display: none;" id="ww_current">
                 קורסים שנמצאו: <span>לא נמצאו קורסים</span>.</span>

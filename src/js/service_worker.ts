@@ -448,7 +448,9 @@ async function TE_webworkStep(url: string | FormData, body = "") {
 }
 
 async function TE_webworkScan() {
-	const storageData = await chrome.storage.local.get({webwork_cal_courses: {}, webwork_cal_events: {}}) as StorageData;
+	const storageData = await chrome.storage.local.get({
+		webwork_cal_courses: {}, webwork_cal_events: {},
+	}) as StorageData;
 	const newWebworkCal = {}, ignoreRegex = /^ייפתח|^סגור|^Answers available for review./,
 		dateRegex = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4}) @ (?<hour>\d{2}):(?<minute>\d{2})/;
 	let foundNewAssignment = false;
@@ -733,7 +735,9 @@ async function TE_busAlertNow(arrivingBuses: BusLine[]) {
 
 async function TE_checkBuses() {
 	console.log("TE_checkBuses");
-	const storageData = await chrome.storage.local.get({bus_station: 41205, bus_time: 10, bus_alerts: []}) as StorageData;
+	const storageData = await chrome.storage.local.get({
+		bus_station: 41205, bus_time: 10, bus_alerts: [],
+	}) as StorageData;
 	if (chrome.runtime.lastError) {
 		console.error("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message);
 		return;
@@ -854,6 +858,12 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 chrome.runtime.onInstalled.addListener(async details => {
 	if (details.reason === "install") console.log("Technion++: Welcome!"); // TODO: Do something in the future
 	else if (details.reason === "update") await chrome.tabs.create({url: 'html/release_notes.html'});
+
+	if (details.reason === "update" && details.previousVersion && details.previousVersion < "4.5.0") {
+		const storageData = await chrome.storage.local.get({dark_mode: false});
+		const newTheme = storageData.dark_mode ? "dark" : "light";
+		await TE_setStorage({theme: newTheme}, "update450");
+	}
 	await TE_startExtension();
 });
 
