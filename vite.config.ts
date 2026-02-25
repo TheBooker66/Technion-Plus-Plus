@@ -1,5 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
-
 import {defineConfig} from "vite";
 import {resolve, relative, dirname, basename, extname} from "node:path";
 import {fileURLToPath} from "node:url";

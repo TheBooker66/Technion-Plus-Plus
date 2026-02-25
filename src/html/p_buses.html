@@ -1,61 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html dir="rtl" lang="he">
-<head>
-    <meta charset="utf-8">
-    <title>Technion++</title>
-    <link rel="stylesheet" href="../css/p_popup.css" type="text/css">
-    <link rel="stylesheet" href="../css/p_buses.css" type="text/css">
-    <script type="module" src="../js/common_popup.js"></script>
-</head>
-<body>
+	<head>
+		<meta charset="utf-8" />
+		<title>Technion++</title>
+		<link rel="stylesheet" href="../css/p_popup.css" type="text/css" />
+		<link rel="stylesheet" href="../css/p_buses.css" type="text/css" />
+		<script type="module" src="../js/common_popup.js"></script>
+	</head>
+	<body>
+		<template id="bus_line">
+			<div class="drow">
+				<div class="dcell"></div>
+				<div class="dcell"></div>
+				<div class="dcellM"></div>
+			</div>
+		</template>
 
-<template id="bus_line">
-    <div class="drow">
-        <div class="dcell"></div>
-        <div class="dcell"></div>
-        <div class="dcellM"></div>
-    </div>
-</template>
-
-<div class="wrapper">
-    <div class="main-content">
-        <div style="padding: 0 4px; overflow-y: scroll; max-height: 340px; min-height: 100px">
-            <div id="bus_table" style="display: table; width: 100%">
-                <div id="captions">
-                    <div style="width: 25px">קו</div>
-                    <div>יעד</div>
-                    <div style="width: 5px; text-align: center">דקות לתחנה</div>
-                </div>
-            </div>
-            <div id="spinner"></div>
-        </div>
-        <div id="additional">
-            <div id="notice">
-                להפעלת/כיבוי התראה, לחץ על הקו המבוקש.
-            </div>
-            <h3>הגדרות</h3>
-            <div class="settings" style="border: 0;">
-                <div>
-                    <label for="station_select">תחנה:</label>
-                    <select id="station_select"></select>
-                </div>
-                <small>שינוי ימחק התראות קיימות.</small>
-            </div>
-            <div class="settings">
-                <span>
-					<label for="min_select">התראה לפני הגעה לתחנה:</label>
-                    <select id="min_select">
-						<option value="5">5 דקות</option>
-						<option value="10">10 דקות</option>
-						<option value="15">15 דקות</option>
-					</select>
-				</span>
-                <small>שינוי ישפיע על התראות קיימות.</small>
-            </div>
-        </div>
-        <div id="error" class="error_bar" style="display: none"></div>
-    </div>
-</div>
-<script type="module" src="../js/p_buses.js"></script>
-</body>
+		<div class="wrapper">
+			<div class="main-content">
+				<div style="padding: 0 4px; overflow-y: scroll; max-height: 340px; min-height: 100px">
+					<div id="bus_table" style="display: table; width: 100%">
+						<div id="captions">
+							<div style="width: 25px">קו</div>
+							<div>יעד</div>
+							<div style="width: 5px; text-align: center">דקות לתחנה</div>
+						</div>
+					</div>
+					<div id="spinner"></div>
+				</div>
+				<div id="additional">
+					<div id="notice">להפעלת/כיבוי התראה, לחץ על הקו המבוקש.</div>
+					<h3>הגדרות</h3>
+					<div class="settings" style="border: 0">
+						<div>
+							<label for="station_select">תחנה:</label>
+							<select id="station_select"></select>
+						</div>
+						<small>שינוי ימחק התראות קיימות.</small>
+					</div>
+					<div class="settings">
+						<span>
+							<label for="min_select">התראה לפני הגעה לתחנה:</label>
+							<select id="min_select">
+								<option value="5">5 דקות</option>
+								<option value="10">10 דקות</option>
+								<option value="15">15 דקות</option>
+							</select>
+						</span>
+						<small>שינוי ישפיע על התראות קיימות.</small>
+					</div>
+				</div>
+				<div id="error" class="error_bar" style="display: none"></div>
+			</div>
+		</div>
+		<script type="module" src="../js/p_buses.js"></script>
+	</body>
 </html>

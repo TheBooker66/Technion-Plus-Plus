@@ -1,9 +1,8 @@
 # Current workspace
 /.idea/workspace.xml
 
-# Dependency directories
+# Dependency directorie
 /node_modules/
-package-lock.json
 
 # Build output
 /dist/

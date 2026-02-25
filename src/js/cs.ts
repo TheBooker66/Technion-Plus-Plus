@@ -5,12 +5,17 @@
 			courseRows[0].appendChild(document.createElement("th")).textContent = "אתר הקורס";
 			courseRows[courseRows.length - 1].children[0].setAttribute("colspan", "4");
 
-			const courseButtonTemplate = (new DOMParser).parseFromString(`<table>
+			const courseButtonTemplate = new DOMParser()
+				.parseFromString(
+					`<table>
             <td style="text-align: center; vertical-align: middle;">
                 <a class="tp_link" title="חץ לאתר הקורס"/>
             </td>
-        </table>`, "text/html").querySelector("td") as HTMLTableCellElement;
-			const style = document.createElement('style');
+        </table>`,
+					"text/html"
+				)
+				.querySelector("td") as HTMLTableCellElement;
+			const style = document.createElement("style");
 			// noinspection SpellCheckingInspection,GrazieStyle
 			style.textContent = `.tp_link {
   display: inline-block; width: 31px; height: 14px; 
@@ -23,7 +28,7 @@
 			const cookie = window.location.toString().split("settings_courses/")[1];
 
 			for (let i = 1; i < courseRows.length - 1; i++) {
-				let buttonCell = courseButtonTemplate.cloneNode(true) as DocumentFragment;
+				const buttonCell = courseButtonTemplate.cloneNode(true) as DocumentFragment;
 				(buttonCell.querySelector("a") as HTMLAnchorElement).href =
 					`https://grades.cs.technion.ac.il/${courseRows[i].children[0].textContent}/${cookie}`;
 				courseRows[i].appendChild(buttonCell);
@@ -33,7 +38,7 @@
 	}
 
 	function addCopyPasswordButton() {
-		let icsLink = document.querySelector("a.ics") as HTMLAnchorElement;
+		const icsLink = document.querySelector("a.ics") as HTMLAnchorElement;
 		if (!icsLink) return;
 
 		const password = icsLink.href.slice(-14),
@@ -55,19 +60,26 @@
 
 	function updateTabNames() {
 		const currentTab = document.querySelector("div > table > tbody > tr > td > span") as HTMLSpanElement,
-			restOfTabs = document.querySelectorAll("div > table > tbody > tr > td > div > a") as NodeListOf<HTMLAnchorElement>;
+			restOfTabs = document.querySelectorAll(
+				"div > table > tbody > tr > td > div > a"
+			) as NodeListOf<HTMLAnchorElement>;
 		const allTabs = [...restOfTabs, currentTab] as HTMLElement[];
-		for (let tab of allTabs) {
-			tab.textContent += " - " + (document.querySelector(`#c${tab.textContent} span.black-text > strong`) as HTMLElement).textContent;
-			tab.setAttribute("style", "{white-space: nowrap; max-width: calc((90vw - 350px) / ${courseTabs.length + 1}); text-overflow: ellipsis; overflow-x: hidden; display: block; min-width: 9ch;}".replace(/[{}]/g, ''));
+		for (const tab of allTabs) {
+			tab.textContent +=
+				" - " +
+				(document.querySelector(`#c${tab.textContent} span.black-text > strong`) as HTMLElement).textContent;
+			tab.setAttribute(
+				"style",
+				"{white-space: nowrap; max-width: calc((90vw - 350px) / ${courseTabs.length + 1}); text-overflow: ellipsis; overflow-x: hidden; display: block; min-width: 9ch;}".replace(
+					/[{}]/g,
+					""
+				)
+			);
 		}
 	}
 
 	const currentPage = window.location.toString().split("/")[3];
-	if (currentPage === "settings_courses")
-		addCourseWebsiteLinks();
-	else if (currentPage === "settings_auto_update")
-		addCopyPasswordButton();
-	else if (/\d{8}/.test(currentPage))
-		updateTabNames();
+	if (currentPage === "settings_courses") addCourseWebsiteLinks();
+	else if (currentPage === "settings_auto_update") addCopyPasswordButton();
+	else if (/\d{8}/.test(currentPage)) updateTabNames();
 })();

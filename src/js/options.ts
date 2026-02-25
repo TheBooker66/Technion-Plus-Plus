@@ -1,8 +1,10 @@
-import {resetBadge, resolveTheme, reverseString, xorStrings} from './utils.js';
-import {TE_updateInfo} from './service_worker.js';
+import {resetBadge, resolveTheme, reverseString, xorStrings} from "./utils.js";
+import {TE_updateInfo} from "./service_worker.js";
 
 function encryptDecrypt(inputStr: string): [string, string] {
-	const originalChars = inputStr.split(""), randomChars = [], regex = /^[ -~]*$/,
+	const originalChars = inputStr.split(""),
+		randomChars = [],
+		regex = /^[ -~]*$/,
 		specialChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=,.";
 	for (let i = 0; i < originalChars.length; i++) {
 		while (true) {
@@ -26,8 +28,11 @@ async function saveData() {
 		encryptedSubstring = encryptedString.substring(Math.floor(encryptedString.length / 2), encryptedString.length);
 		encryptedString = encryptedString.substring(0, Math.floor(encryptedString.length / 2));
 		encryptionResult = encryptionResult[1];
-		if (reverseString(xorStrings(encryptedString + encryptedSubstring, encryptionResult)).toString()
-			=== password.toString()) break;
+		if (
+			reverseString(xorStrings(encryptedString + encryptedSubstring, encryptionResult)).toString() ===
+			password.toString()
+		)
+			break;
 	}
 	const idn = (document.getElementById("idn") as HTMLInputElement).value,
 		campus = (document.getElementById("campus") as HTMLOptionElement).selected,
@@ -55,19 +60,35 @@ async function saveData() {
 	const loginEh = "" !== username && "" !== password,
 		externalEh = external && "" !== password && "" !== idn;
 	await chrome.storage.local.set({
-		username: username, email_server: campus, phrase: encryptedSubstring, term: encryptedString,
-		maor_p: encryptionResult, uidn_arr: encryptDecrypt(reverseString(idn)), email_preference: email,
-		enable_login: loginEh, quick_login: login, allow_timings: timings, panopto_save: panopto,
-		external_user: external, external_enable: externalEh, hw_alerts: hw_alerts,
-		moodle_cal_enabled: moodle, cs_cal_enabled: cs, cs_cal_pass: cs_cal_pass, webwork_cal_enabled: webwork,
-		notif_vol: notif_vol, theme: theme, custom_name: customName, custom_link: customLink,
+		username: username,
+		email_server: campus,
+		phrase: encryptedSubstring,
+		term: encryptedString,
+		maor_p: encryptionResult,
+		uidn_arr: encryptDecrypt(reverseString(idn)),
+		email_preference: email,
+		enable_login: loginEh,
+		quick_login: login,
+		allow_timings: timings,
+		panopto_save: panopto,
+		external_user: external,
+		external_enable: externalEh,
+		hw_alerts: hw_alerts,
+		moodle_cal_enabled: moodle,
+		cs_cal_enabled: cs,
+		cs_cal_pass: cs_cal_pass,
+		webwork_cal_enabled: webwork,
+		notif_vol: notif_vol,
+		theme: theme,
+		custom_name: customName,
+		custom_link: customLink,
 	} as StorageData);
 	if (chrome.runtime.lastError) {
 		status_bar.textContent = "שגיאה בשמירת הנתונים, אנא נסה שנית!";
 		console.error("TE_opt: " + chrome.runtime.lastError.message);
 	} else {
 		status_bar.textContent = "השינויים נשמרו.";
-		setTimeout(() => status_bar.textContent = "", 2E3);
+		setTimeout(() => (status_bar.textContent = ""), 2e3);
 	}
 
 	if (moodle && loginEh && login) await TE_updateInfo();
@@ -86,7 +107,7 @@ const commonDOM = {
 };
 
 document.getElementById("save")!.addEventListener("click", async () => await saveData());
-document.addEventListener("keypress", async event => event.key === "Enter" && await saveData());
+document.addEventListener("keypress", async (event) => event.key === "Enter" && (await saveData()));
 
 commonDOM.try_vol.addEventListener("click", async () => {
 	const elem = document.createElement("audio");
@@ -96,39 +117,56 @@ commonDOM.try_vol.addEventListener("click", async () => {
 	elem.src = chrome.runtime.getURL("resources/notification.mp3");
 	await elem.play();
 });
-commonDOM.notification_volume.addEventListener("change", event => {
+commonDOM.notification_volume.addEventListener("change", (event) => {
 	commonDOM.try_vol.textContent = `נסה (${100 * parseFloat((event.target as HTMLInputElement).value)}%)`;
 });
 
-commonDOM.cs_cal_enabled.addEventListener("change", event => {
+commonDOM.cs_cal_enabled.addEventListener("change", (event) => {
 	commonDOM.cs_cal_div.style.marginRight = "20px !important";
 	commonDOM.cs_cal_div.style.display = (event.target as HTMLInputElement).checked ? "block" : "none";
 });
 
-commonDOM.light.addEventListener("change", event =>
-	(event.target as HTMLInputElement).checked && commonDOM.entirePage.removeAttribute("tplus"));
-commonDOM.dark.addEventListener("change", event =>
-	(event.target as HTMLInputElement).checked && commonDOM.entirePage.setAttribute("tplus", "dm"));
-commonDOM.auto.addEventListener("change", event => {
+commonDOM.light.addEventListener(
+	"change",
+	(event) => (event.target as HTMLInputElement).checked && commonDOM.entirePage.removeAttribute("tplus")
+);
+commonDOM.dark.addEventListener(
+	"change",
+	(event) => (event.target as HTMLInputElement).checked && commonDOM.entirePage.setAttribute("tplus", "dm")
+);
+commonDOM.auto.addEventListener("change", (event) => {
 	if (!(event.target as HTMLInputElement).checked) return;
-	window.matchMedia('(prefers-color-scheme: dark)').matches ?
-		commonDOM.entirePage.setAttribute("tplus", "dm") :
-		commonDOM.entirePage.removeAttribute("tplus");
+	if (window.matchMedia("(prefers-color-scheme: dark)").matches) commonDOM.entirePage.setAttribute("tplus", "dm");
+	else commonDOM.entirePage.removeAttribute("tplus");
 });
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-	commonDOM.auto.checked && event.matches ?
-		commonDOM.entirePage.setAttribute("tplus", "dm") :
-		commonDOM.entirePage.removeAttribute("tplus");
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+	if (commonDOM.auto.checked && event.matches) commonDOM.entirePage.setAttribute("tplus", "dm");
+	else commonDOM.entirePage.removeAttribute("tplus");
 });
 
-
-const storageData = await chrome.storage.local.get({
-	username: "", email_server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
-	email_preference: "gmail", quick_login: true, allow_timings: false, panopto_save: true, external_user: false,
-	hw_alerts: true, moodle_cal_enabled: true, cs_cal_enabled: false, cs_cal_pass: "",
-	webwork_cal_enabled: false, webwork_cal_courses: {},
-	notif_vol: 1, theme: "light", custom_name: "", custom_link: "",
-}) as StorageData;
+const storageData = (await chrome.storage.local.get({
+	username: "",
+	email_server: true,
+	phrase: "",
+	term: "",
+	maor_p: "maor",
+	uidn_arr: ["", ""],
+	email_preference: "gmail",
+	quick_login: true,
+	allow_timings: false,
+	panopto_save: true,
+	external_user: false,
+	hw_alerts: true,
+	moodle_cal_enabled: true,
+	cs_cal_enabled: false,
+	cs_cal_pass: "",
+	webwork_cal_enabled: false,
+	webwork_cal_courses: {},
+	notif_vol: 1,
+	theme: "light",
+	custom_name: "",
+	custom_link: "",
+})) as StorageData;
 if (chrome.runtime.lastError) {
 	console.error("TE_opt: " + chrome.runtime.lastError.message);
 	document.querySelector(".wrapper")!.textContent = "שגיאה באחזור הנתונים, אנא נסה שנית.";
@@ -149,7 +187,9 @@ if (chrome.runtime.lastError) {
 	(document.getElementById("cs_cal_pass") as HTMLInputElement).value = storageData.cs_cal_pass;
 	(document.getElementById("cs_cal_enabled") as HTMLInputElement).checked = storageData.cs_cal_enabled;
 	(document.getElementById("cs_cal_div") as HTMLElement).style.marginRight = "20px !important";
-	(document.getElementById("cs_cal_div") as HTMLElement).style.display = storageData.cs_cal_enabled ? "block" : "none";
+	(document.getElementById("cs_cal_div") as HTMLElement).style.display = storageData.cs_cal_enabled
+		? "block"
+		: "none";
 	(document.getElementById("webwork_cal_enabled") as HTMLInputElement).checked = storageData.webwork_cal_enabled;
 	(document.getElementById("external_user") as HTMLInputElement).checked = storageData.external_user;
 	(document.getElementById("allow_hw_alerts") as HTMLInputElement).checked = storageData.hw_alerts;
@@ -179,16 +219,16 @@ if (chrome.runtime.lastError) {
 
 	if (storageData.webwork_cal_enabled) {
 		const webworkCoursesElement = document.getElementById("ww_current") as HTMLSpanElement,
-			webworkCourseNames = Object.values(storageData.webwork_cal_courses)
-				.map(course => (course as WebWorkCourse).name);
+			webworkCourseNames = Object.values(storageData.webwork_cal_courses).map(
+				(course) => (course as WebWorkCourse).name
+			);
 		webworkCoursesElement.style.display = "block";
 		if (0 < webworkCourseNames.length)
 			webworkCoursesElement.querySelector("span")!.textContent = webworkCourseNames.join(", ");
 	}
 }
 
-const extensionSize = (await chrome.storage.local.getBytesInUse(null) / 1000).toFixed(3),
+const extensionSize = ((await chrome.storage.local.getBytesInUse(null)) / 1000).toFixed(3),
 	extensionVersion = chrome.runtime.getManifest().version;
 (document.getElementById("ext_version") as HTMLSpanElement).textContent += ` ${extensionVersion}`;
 (document.getElementById("storageVol") as HTMLSpanElement).textContent += ` ${extensionSize}kB`;
-

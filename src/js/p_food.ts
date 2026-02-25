@@ -26,20 +26,26 @@ import {CommonPopup} from "./common_popup.js";
 
 	const currentDate = new Date();
 	const currentDayKey = {
-		0: "ש'", 1: "א'-ה'", 2: "א'-ה'", 3: "א'-ה'", 4: "א'-ה'", 5: "א'-ה'", 6: "ו'",
+		0: "ש'",
+		1: "א'-ה'",
+		2: "א'-ה'",
+		3: "א'-ה'",
+		4: "א'-ה'",
+		5: "א'-ה'",
+		6: "ו'",
 	}[currentDate.getDay()]!;
-	const currentTime = currentDate.getHours().toString().padStart(2, '0') + ":" +
-		currentDate.getMinutes().toString().padStart(2, '0');
+	const currentTime =
+		currentDate.getHours().toString().padStart(2, "0") + ":" + currentDate.getMinutes().toString().padStart(2, "0");
 
 	for (const item of restaurants) {
-		let openEh = false, hoursToday = "";
+		let openEh = false,
+			hoursToday = "";
 
 		if (item.details.substring(0, 1) === "0") {
 			openEh = true;
 			hoursToday = item.details;
 		} else if (item.details.includes(":")) {
-			const todaySchedule = item.details.split(', ')
-				.find((s: string) => s.startsWith(currentDayKey));
+			const todaySchedule = item.details.split(", ").find((s: string) => s.startsWith(currentDayKey));
 			if (todaySchedule) {
 				const times = todaySchedule.match(/\d{2}:\d{2}/g);
 				if (times && currentTime >= times[0] && currentTime <= times[1]) {
@@ -51,15 +57,15 @@ import {CommonPopup} from "./common_popup.js";
 
 		if (!openEh) continue;
 
-		let node = popup.loadTemplate("list-item").cloneNode(true) as HTMLElement;
-		let container = node.querySelector(".list_item") as HTMLElement;
-		let titleRow = container.querySelectorAll("div")[0],
+		const node = popup.loadTemplate("list-item").cloneNode(true) as HTMLElement;
+		const container = node.querySelector(".list_item") as HTMLElement;
+		const titleRow = container.querySelectorAll("div")[0],
 			detailsRow = container.querySelectorAll("div")[1];
 		titleRow.querySelector("b")!.textContent = item.restaurant_name;
 		titleRow.querySelector("span")!.textContent = ` – ${item.location}`;
 		detailsRow.querySelector("span")!.textContent = `שעות פעילות: ${hoursToday}`;
 		if (counter !== 0) {
-			let divider = document.createElement("div");
+			const divider = document.createElement("div");
 			divider.className = "divider";
 			foodTable.appendChild(divider);
 		}
@@ -68,14 +74,17 @@ import {CommonPopup} from "./common_popup.js";
 	}
 
 	const info = document.getElementById("info") as HTMLDivElement;
-	if (counter === 0)
-		info.textContent = "כל המסעדות בבית הסטודנט סגורות כעת.";
+	if (counter === 0) info.textContent = "כל המסעדות בבית הסטודנט סגורות כעת.";
 	else {
 		const b = document.createElement("b");
 		b.textContent = "הפתוחים כעת";
 		info.appendChild(document.createTextNode("הרשימה מציגה מסעדות ועסקים "));
 		info.appendChild(b);
-		info.appendChild(document.createTextNode(" בקמפוס הטכניון. הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. " +
-			"כל המידע באדיבות המיילים השבועיים של אס\"ט. עודכן לאחרונה ב־24.2.26."));
+		info.appendChild(
+			document.createTextNode(
+				" בקמפוס הטכניון. הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. " +
+					'כל המידע באדיבות המיילים השבועיים של אס"ט. עודכן לאחרונה ב־24.2.26.'
+			)
+		);
 	}
 })();

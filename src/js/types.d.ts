@@ -25,7 +25,7 @@ type StorageData = {
 	notif_vol: number;
 
 	// --- General Agenda/Calendar ---
-	user_agenda: { [key: string]: HWAssignment };
+	user_agenda: {[key: string]: HWAssignment};
 	pinned_assignments: number[];
 	cal_seen: number;
 	organizer_fullscreen: boolean;
@@ -40,26 +40,26 @@ type StorageData = {
 	moodle_cal_enabled: boolean;
 	moodle_cal_prop: string;
 	moodle_cal_max: number;
-	moodle_cal_courses: { [key: HWAssignment["course"]]: string };
+	moodle_cal_courses: {[key: HWAssignment["course"]]: string};
 	moodle_cal_finished: number[];
 
 	// --- Module: CS System ---
 	cs_cal_enabled: boolean;
 	cs_cal_pass: string;
 	cs_cal_update: number;
-	cs_cal_seen: { [key: string]: string[] };
+	cs_cal_seen: {[key: string]: string[]};
 	cs_cal_finished: number[];
 
 	// --- Module: WebWork ---
 	webwork_cal_enabled: boolean;
 	webwork_cal_update: number;
-	webwork_cal_courses: { [key: string]: WebWorkCourse };
-	webwork_cal_events: { [key: string]: WebWorkAssignment };
+	webwork_cal_courses: {[key: string]: WebWorkCourse};
+	webwork_cal_events: {[key: string]: WebWorkAssignment};
 
 	// --- Module: Videos ---
 	videos_update: number;
 	videos_last: string[];
-	videos_data: { [key: string]: RecordingCourse["v"] };
+	videos_data: {[key: string]: RecordingCourse["v"]};
 	videos_courses: string[][];
 
 	// --- Module: Panopto ---
@@ -89,70 +89,71 @@ type HWSystem = "moodle" | "cs" | "webwork" | "ua";
 
 // If a property is not present, it is due to the assignment being a user-added assignment ("ua")
 type HWAssignment = {
-	eventID: number,
-	name: string,
-	description: string,
-	course?: string,
-	sys: HWSystem,
-	done: boolean,
-	pinned: boolean,
-	timestamp: number,
-	finalDate?: string,
-	newEh?: boolean,
-	goToFunc?: () => void,
+	eventID: number;
+	name: string;
+	description: string;
+	course?: string;
+	sys: HWSystem;
+	done: boolean;
+	pinned: boolean;
+	timestamp: number;
+	finalDate?: string;
+	newEh?: boolean;
+	goToFunc?: () => void;
 };
 
 type Semester = "חורף" | "אביב" | "קיץ";
 
 type CalculatorCourse = {
-	num: string,
-	name: string,
-	points: number,
-	binary: boolean,
-	grade: number | string,
-	year: number,
-	semester: Semester,
-	perm_ignored: boolean,
-	selected: boolean,
+	num: string;
+	name: string;
+	points: number;
+	binary: boolean;
+	grade: number | string;
+	year: number;
+	semester: Semester;
+	perm_ignored: boolean;
+	selected: boolean;
 };
 
 type WebWorkAssignment = {
-	h: string, // Homework name
-	ts: number, // Timestamp
-	due: string, // Due date as string
-	seen: boolean, // Seen by user
-	done: boolean, // Done by user
+	h: string; // Homework name
+	ts: number; // Timestamp
+	due: string; // Due date as string
+	seen: boolean; // Seen by user
+	done: boolean; // Done by user
 };
 
 type WebWorkCourse = {
-	name: string,
-	lti: string,
+	name: string;
+	lti: string;
 };
 
 type RecordingCourse = {
-	n: string, // Course name
-	v: { // Course data
-		vn: string, // Recording name
-		l: string, // Recording ID
-		p: number, // Panopto or the old Video Server (always Panopto)
-		t: number, // Lecture or Exercise
-		b: string, // No clue
-	}[],
-	a?: string, // Course Alias
+	n: string; // Course name
+	v: {
+		// Course data
+		vn: string; // Recording name
+		l: string; // Recording ID
+		p: number; // Panopto or the old Video Server (always Panopto)
+		t: number; // Lecture or Exercise
+		b: string; // No clue
+	}[];
+	a?: string; // Course Alias
 };
 
 type BusLine = {
-	Shilut: string, // Bus line number
-	DestinationQuarterName: string, // Bus line destination
-	MinutesToArrival: number, // Minutes to arrival for the first bus of a line
-	MinutesToArrivalList: number[], // Minutes to arrival for all buses of a line
+	Shilut: string; // Bus line number
+	DestinationQuarterName: string; // Bus line destination
+	MinutesToArrival: number; // Minutes to arrival for the first bus of a line
+	MinutesToArrivalList: number[]; // Minutes to arrival for all buses of a line
 };
 
 type DownloadItem = {
-	sys: number, // URL prefix (Moodle / Panopto / CS websites)
-	sub_pre: string, // URL midfix (e.g. course name)
+	sys: number; // URL prefix (Moodle / Panopto / CS websites)
+	sub_pre: string; // URL midfix (e.g. course name)
 	list: {
-		u: string, // URL suffix (e.g. file name on server)
-		n: string, // File name to save as
-	}[],
+		u: string; // URL suffix (e.g. file name on server)
+		n: string; // File name to save as
+	}[];
 };

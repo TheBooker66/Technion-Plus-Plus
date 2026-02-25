@@ -1,5 +1,5 @@
-import {CommonPopup} from './common_popup.js';
-import {resetBadge, reverseString, xorStrings} from './utils.js';
+import {CommonPopup} from "./common_popup.js";
+import {resetBadge, reverseString, xorStrings} from "./utils.js";
 
 (async function () {
 	function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[]) {
@@ -16,7 +16,8 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 
 	new CommonPopup("", ["main"], document.title);
 	const badgeColours = await chrome.action.getBadgeBackgroundColor({});
-	if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34) // Error colours
+	if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34)
+		// Error colours
 		(document.getElementById("bus_error") as HTMLDivElement).style.display = "block";
 	await resetBadge();
 
@@ -29,7 +30,7 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		{button: "returnFromPrint", from: printScreen, to: mainScreen},
 		{button: "returnFromApps", from: appsScreen, to: mainScreen},
 	];
-	screenTransitions.forEach(linkObject => {
+	screenTransitions.forEach((linkObject) => {
 		document.getElementById(linkObject.button)!.addEventListener("click", () => {
 			linkObject.to.style.display = "block";
 			linkObject.from.style.display = "none";
@@ -49,28 +50,37 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		toolLinks = (document.getElementById("tools_content") as HTMLDivElement).querySelectorAll("a");
 	popup_window.top = parseInt(((window.screen.height - (popup_window.height as number)) / 2).toString());
 	popup_window.left = parseInt(((window.screen.width - (popup_window.width as number)) / 2).toString());
-	(document.getElementById("release_notes") as HTMLAnchorElement)
-		.addEventListener("click", () => chrome.tabs.create({url: "../html/release_notes.html"}));
-	(document.getElementById("organizer") as HTMLAnchorElement)
-		.addEventListener("click", () => chrome.windows.create(popup_window));
-	(document.getElementById("calculator") as HTMLAnchorElement)
-		.addEventListener("click", () => chrome.tabs.create({url: "../html/calculator.html"}));
+	(document.getElementById("release_notes") as HTMLAnchorElement).addEventListener("click", () =>
+		chrome.tabs.create({url: "../html/release_notes.html"})
+	);
+	(document.getElementById("organizer") as HTMLAnchorElement).addEventListener("click", () =>
+		chrome.windows.create(popup_window)
+	);
+	(document.getElementById("calculator") as HTMLAnchorElement).addEventListener("click", () =>
+		chrome.tabs.create({url: "../html/calculator.html"})
+	);
 	for (let i = 0; i < toolLinks.length; i++) {
 		if ([0, 4, 5, 7].includes(i)) continue; // 0 - release notes, 4 - Organiser, 5 - calculator, 7 - printer
-		toolLinks[i].addEventListener("click", () => window.location.href = "../html/p_" + toolLinks[i].id + ".html");
+		toolLinks[i].addEventListener("click", () => (window.location.href = "../html/p_" + toolLinks[i].id + ".html"));
 	}
 
 	const mainScreensLinks = document.querySelectorAll("#tools_and_links > div") as NodeListOf<HTMLDivElement>,
 		printTabs = (document.getElementById("print_tabs") as HTMLDivElement).querySelectorAll("div"),
-		pages = [document.getElementById("single_page"), document.getElementById("double_page"), document.getElementById("quadruple_page")] as HTMLDivElement[];
+		pages = [
+			document.getElementById("single_page"),
+			document.getElementById("double_page"),
+			document.getElementById("quadruple_page"),
+		] as HTMLDivElement[];
 	makeTabsClicky(mainScreensLinks[0].querySelectorAll(".tab"), Array.from(mainScreensLinks).slice(1));
 	makeTabsClicky(printTabs, pages);
 
-	((document.getElementById("cant_login") as HTMLDivElement).querySelector("u") as HTMLElement).addEventListener("click", async () => {
-		await chrome.runtime.openOptionsPage();
-		if (chrome.runtime.lastError) console.error("TE_p: " + chrome.runtime.lastError.message);
-
-	});
+	((document.getElementById("cant_login") as HTMLDivElement).querySelector("u") as HTMLElement).addEventListener(
+		"click",
+		async () => {
+			await chrome.runtime.openOptionsPage();
+			if (chrome.runtime.lastError) console.error("TE_p: " + chrome.runtime.lastError.message);
+		}
+	);
 
 	const quick_login_toggle = document.getElementById("quick_login_toggle") as HTMLInputElement,
 		mute_alerts_toggle = document.getElementById("mute_alerts_toggle") as HTMLInputElement;
@@ -83,20 +93,34 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 		if (chrome.runtime.lastError) console.error("TE_popup_mute_alerts: " + chrome.runtime.lastError.message);
 	});
 
-	const storageData = await chrome.storage.local.get({
-		enable_login: false, quick_login: true, alerts_sound: true, email_preference: "gmail",
-		moodle_cal_enabled: true, remoodle: false, remoodle_angle: 120, cal_seen: 0,
-		cs_cal_enabled: false, uidn_arr: ["", ""], webwork_cal_enabled: false,
-		dl_current: 0, username: "", email_server: true, custom_name: "", custom_link: "",
-	}) as StorageData;
+	const storageData = (await chrome.storage.local.get({
+		enable_login: false,
+		quick_login: true,
+		alerts_sound: true,
+		email_preference: "gmail",
+		moodle_cal_enabled: true,
+		remoodle: false,
+		remoodle_angle: 120,
+		cal_seen: 0,
+		cs_cal_enabled: false,
+		uidn_arr: ["", ""],
+		webwork_cal_enabled: false,
+		dl_current: 0,
+		username: "",
+		email_server: true,
+		custom_name: "",
+		custom_link: "",
+	})) as StorageData;
 	quick_login_toggle.checked = storageData.quick_login;
 	mute_alerts_toggle.checked = storageData.alerts_sound;
-	(document.getElementById("cant_login") as HTMLDivElement).style.display =
-		storageData.enable_login ? "none" : "block";
+	(document.getElementById("cant_login") as HTMLDivElement).style.display = storageData.enable_login
+		? "none"
+		: "block";
 	(document.getElementById("cal_moodle") as HTMLAnchorElement).style.display =
 		storageData.enable_login && storageData.moodle_cal_enabled && storageData.quick_login ? "block" : "none";
-	(document.getElementById("cal_cs") as HTMLAnchorElement).style.display =
-		storageData.cs_cal_enabled ? "block" : "none";
+	(document.getElementById("cal_cs") as HTMLAnchorElement).style.display = storageData.cs_cal_enabled
+		? "block"
+		: "none";
 	(document.getElementById("cal_webwork") as HTMLAnchorElement).style.display =
 		storageData.enable_login && storageData.quick_login && storageData.webwork_cal_enabled ? "block" : "none";
 
@@ -107,26 +131,28 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 			(document.getElementById(calendarIDs[i]) as HTMLDivElement).className = "major hw";
 	}
 
-	if (storageData.dl_current !== 0) (document.getElementById("downloads") as HTMLAnchorElement).classList.add("active");
+	if (storageData.dl_current !== 0)
+		(document.getElementById("downloads") as HTMLAnchorElement).classList.add("active");
 
 	const printerLinks = printScreen.querySelectorAll("a"),
-		id: string = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1])) || "הקלד מספר זהות כאן";
+		id: string =
+			reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1])) || "הקלד מספר זהות כאן";
 	for (let i = 0; i < printerLinks.length; i++) {
-		const emailURL = storageData.email_preference === "gmail"
-			? `https://mail.google.com/mail/u/0/?view=cm&fs=1&to=print.${printerLinks[i].id}@campus.technion.ac.il&su=${id}`
-			: storageData.email_preference === "outlook"
-				? `https://outlook.office.com/mail/deeplink/compose?login_hint=${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il&to=print.${printerLinks[i].id}@campus.technion.ac.il&subject=${id}`
-				: `mailto:print.${printerLinks[i].id}@campus.technion.ac.il?subject=${id}`;
+		const emailURL =
+			storageData.email_preference === "gmail"
+				? `https://mail.google.com/mail/u/0/?view=cm&fs=1&to=print.${printerLinks[i].id}@campus.technion.ac.il&su=${id}`
+				: storageData.email_preference === "outlook"
+					? `https://outlook.office.com/mail/deeplink/compose?login_hint=${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il&to=print.${printerLinks[i].id}@campus.technion.ac.il&subject=${id}`
+					: `mailto:print.${printerLinks[i].id}@campus.technion.ac.il?subject=${id}`;
 		printerLinks[i].setAttribute("href", emailURL);
 		if (id !== "הקלד מספר זהות כאן" && id !== "") continue;
 		printerLinks[i].addEventListener("click", async () => {
 			await chrome.runtime.sendMessage({
 				mess_t: "silent_notification",
-				message: 'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.',
+				message:
+					'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.',
 			});
-			if (chrome.runtime.lastError)
-				console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
-
+			if (chrome.runtime.lastError) console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
 		});
 	}
 
@@ -143,11 +169,14 @@ import {resetBadge, reverseString, xorStrings} from './utils.js';
 			authURL = "https://students.technion.ac.il/auth/oidc/";
 		}
 		if (!storageData.enable_login || !storageData.quick_login) return;
-		let urlParts = authURL.split("?");
+		const urlParts = authURL.split("?");
 		const urlParams = new URLSearchParams(urlParts[1]);
 		urlParams.delete("prompt");
-		urlParams.append("login_hint", storageData.username + "@" + (storageData.email_server ? "campus." : "") + "technion.ac.il");
-		window.open((urlParts[0] + "?" + urlParams.toString()) || authURL, "_blank");
+		urlParams.append(
+			"login_hint",
+			storageData.username + "@" + (storageData.email_server ? "campus." : "") + "technion.ac.il"
+		);
+		window.open(urlParts[0] + "?" + urlParams.toString() || authURL, "_blank");
 		clearInterval(loadingInterval);
 		studentsLink.textContent = "Students";
 	});

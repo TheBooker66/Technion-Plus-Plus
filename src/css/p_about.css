@@ -1,39 +1,42 @@
 p {
-    padding: 4px 8px 8px;
-    margin: 0;
+	padding: 4px 8px 8px;
+	margin: 0;
 }
 
 a.button {
-    display: block;
-    margin: 10px auto 5px;
-    text-decoration: none;
-    padding: 8px;
-    width: 132px;
-    border-radius: 4px;
-    text-align: center;
-    background-color: var(--sec-light);
-    color: #0c0c0d !important;
-    border: 0;
-    font-weight: 500;
-    box-shadow: 0 3px 1px -2px rgb(255, 214, 214, 0.2), 0 2px 2px 0 rgb(0, 0, 0, 0.14), 0 1px 5px 0 rgb(0, 0, 0, .12);
-    letter-spacing: 0.05rem;
-    cursor: pointer;
+	display: block;
+	margin: 10px auto 5px;
+	text-decoration: none;
+	padding: 8px;
+	width: 132px;
+	border-radius: 4px;
+	text-align: center;
+	background-color: var(--sec-light);
+	color: #0c0c0d !important;
+	border: 0;
+	font-weight: 500;
+	box-shadow:
+		0 3px 1px -2px rgb(255, 214, 214, 0.2),
+		0 2px 2px 0 rgb(0, 0, 0, 0.14),
+		0 1px 5px 0 rgb(0, 0, 0, 0.12);
+	letter-spacing: 0.05rem;
+	cursor: pointer;
 }
 
 a.button:hover {
-    background-color: var(--sec-norm);
+	background-color: var(--sec-norm);
 }
 
 h3 {
-    padding: 0 8px;
-    margin-bottom: 0;
-    margin-top: 8px;
+	padding: 0 8px;
+	margin-bottom: 0;
+	margin-top: 8px;
 }
 
 small {
-    color: #38383d;
+	color: #38383d;
 }
 
 .donation {
-    vertical-align: text-bottom;
+	vertical-align: text-bottom;
 }

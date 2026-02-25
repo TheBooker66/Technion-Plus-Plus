@@ -5,7 +5,7 @@ import {CommonPopup} from "./common_popup.js";
 export class CommonCalendar {
 	private readonly common: CommonPopup;
 	private readonly system: HWSystem;
-	private readonly flags: { moodle: 1; cs: 2; webwork: 4 };
+	private readonly flags: {moodle: 1; cs: 2; webwork: 4};
 	private readonly organiser: boolean;
 
 	constructor(popup: CommonPopup, system: "moodle" | "cs" | "webwork", context: string) {
@@ -19,7 +19,10 @@ export class CommonCalendar {
 		const tabButtons = document.getElementById("tabs")?.querySelectorAll("div");
 		if (!tabButtons) return;
 
-		const assignmentTabs = [document.getElementById("new_assignments"), document.getElementById("finished_assignments")];
+		const assignmentTabs = [
+			document.getElementById("new_assignments"),
+			document.getElementById("finished_assignments"),
+		];
 		for (let tabIndex = 0; tabIndex < tabButtons.length; tabIndex++) {
 			tabButtons[tabIndex].addEventListener("click", () => {
 				for (let listIndex = 0; listIndex < 2; listIndex++) {
@@ -41,48 +44,68 @@ export class CommonCalendar {
 	}
 
 	async insertAssignments(newAssignmentsList: HWAssignment[], finishedAssignmentsList: HWAssignment[]) {
-		const createAssignmentElement =
-			(assignmentData: HWAssignment, template: DocumentFragment, containerId: "new_assignments" | "finished_assignments") => {
-				const newAssigment = template.querySelector(".list_item") as HTMLDivElement;
-				if (assignmentData.newEh) newAssigment.classList.add("starred");
-				newAssigment.querySelector(".assignment_name")!.textContent = assignmentData.name;
-				newAssigment.querySelector(".course_name")!.textContent += assignmentData.course;
-				newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
-				newAssigment.querySelector(".end_time")!.textContent += assignmentData.finalDate;
-				const actionButtons = newAssigment.querySelectorAll("img");
-				actionButtons[1].addEventListener("click", () => toggleDoneOriginal(this.system, assignmentData.eventID, newAssigment, true));
-				actionButtons[2].addEventListener("click", () => toggleDoneOriginal(this.system, assignmentData.eventID, newAssigment, false));
-				actionButtons[0].title = "moodle" === this.system ? "עבור להגשה במודל" : "עבור לאתר הקורס";
-				actionButtons[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
-				newAssigment.querySelector(".assignment_name")!.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
-				document.getElementById(containerId)?.appendChild(newAssigment);
-			};
+		const createAssignmentElement = (
+			assignmentData: HWAssignment,
+			template: DocumentFragment,
+			containerId: "new_assignments" | "finished_assignments"
+		) => {
+			const newAssigment = template.querySelector(".list_item") as HTMLDivElement;
+			if (assignmentData.newEh) newAssigment.classList.add("starred");
+			newAssigment.querySelector(".assignment_name")!.textContent = assignmentData.name;
+			newAssigment.querySelector(".course_name")!.textContent += assignmentData.course;
+			newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
+			newAssigment.querySelector(".end_time")!.textContent += assignmentData.finalDate;
+			const actionButtons = newAssigment.querySelectorAll("img");
+			actionButtons[1].addEventListener("click", () =>
+				toggleDoneOriginal(this.system, assignmentData.eventID, newAssigment, true)
+			);
+			actionButtons[2].addEventListener("click", () =>
+				toggleDoneOriginal(this.system, assignmentData.eventID, newAssigment, false)
+			);
+			actionButtons[0].title = "moodle" === this.system ? "עבור להגשה במודל" : "עבור לאתר הקורס";
+			actionButtons[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
+			newAssigment
+				.querySelector(".assignment_name")!
+				.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
+			document.getElementById(containerId)?.appendChild(newAssigment);
+		};
 		await this.common.useTemplatesFile("calendar", (documentContext: Document) => {
 			const assignmentTemplate = this.common.loadTemplate("assignment", documentContext);
-			newAssignmentsList.forEach(assignment =>
-				createAssignmentElement(assignment, assignmentTemplate.cloneNode(true) as DocumentFragment, "new_assignments"));
-			finishedAssignmentsList.forEach(assignment =>
-				createAssignmentElement(assignment, assignmentTemplate.cloneNode(true) as DocumentFragment, "finished_assignments"));
-			0 === newAssignmentsList.length + finishedAssignmentsList.length && insertMessage("לא נמצאו אירועים קרובים לתצוגה.", false);
+			newAssignmentsList.forEach((assignment) =>
+				createAssignmentElement(
+					assignment,
+					assignmentTemplate.cloneNode(true) as DocumentFragment,
+					"new_assignments"
+				)
+			);
+			finishedAssignmentsList.forEach((assignment) =>
+				createAssignmentElement(
+					assignment,
+					assignmentTemplate.cloneNode(true) as DocumentFragment,
+					"finished_assignments"
+				)
+			);
+			if (newAssignmentsList.length + finishedAssignmentsList.length === 0)
+				insertMessage("לא נמצאו אירועים קרובים לתצוגה.", false);
 			stopSpinning();
 		});
 	}
 
-	async progress(promiseCreator: () => Promise<{ new_list: HWAssignment[], finished_list: HWAssignment[] }>) {
-		if (this.organiser)
-			await addAssignmentsToList(promiseCreator, this.system);
-		else promiseCreator()
-			.then(result => this.insertAssignments(result.new_list, result.finished_list))
-			.catch((err: any) => insertMessage(err.msg, err.is_error));
+	async progress(promiseCreator: () => Promise<{new_list: HWAssignment[]; finished_list: HWAssignment[]}>) {
+		if (this.organiser) await addAssignmentsToList(promiseCreator, this.system);
+		else
+			promiseCreator()
+				.then((result) => this.insertAssignments(result.new_list, result.finished_list))
+				.catch((err) => insertMessage(err.msg, err.is_error));
 	}
 }
 
-
 function checkForEmpty() {
-	["new_assignments", "finished_assignments"].forEach(tabID => {
+	["new_assignments", "finished_assignments"].forEach((tabID) => {
 		const tab = document.getElementById(tabID);
 		if (!tab) return;
-		tab.childNodes.length === 0 ? tab.classList.add("empty_list") : tab.classList.remove("empty_list");
+		if (tab.childNodes.length === 0) tab.classList.add("empty_list");
+		else tab.classList.remove("empty_list");
 	});
 }
 
@@ -103,12 +126,14 @@ export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: H
 	checkForEmpty();
 
 	const keyMap: Record<string, keyof StorageData> = {
-		webwork: "webwork_cal_events", moodle: "moodle_cal_finished", cs: "cs_cal_finished",
+		webwork: "webwork_cal_events",
+		moodle: "moodle_cal_finished",
+		cs: "cs_cal_finished",
 	};
 	const key = keyMap[sys];
 	if (!key) return;
 
-	const storageData = await chrome.storage.local.get(key) as StorageData;
+	const storageData = (await chrome.storage.local.get(key)) as StorageData;
 	if (chrome.runtime.lastError) return console.error(`TE_cal: ${chrome.runtime.lastError.message}`);
 
 	let newCalendar;
@@ -117,7 +142,8 @@ export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: H
 		newCalendar[eventID].done = !newCalendar[eventID].done;
 	} else {
 		newCalendar = storageData[key] as StorageData["moodle_cal_finished"] | StorageData["cs_cal_finished"];
-		finishEh ? newCalendar.push(eventID) : newCalendar.splice(newCalendar.indexOf(eventID), 1);
+		if (finishEh) newCalendar.push(eventID);
+		else newCalendar.splice(newCalendar.indexOf(eventID), 1);
 	}
 
 	await chrome.storage.local.set({[key]: newCalendar});
@@ -132,7 +158,8 @@ function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => void
 	} catch (err) {
 		assignmentItem.style.borderRadius = "3px;";
 		assignmentItem.style.backgroundColor = "var(--status-danger) !important;";
-		setTimeout(() => assignmentItem.style.backgroundColor = "", 1E3);
+		setTimeout(() => (assignmentItem.style.backgroundColor = ""), 1e3);
+		console.error(`TE_cal: ${err instanceof Error ? err.message : err}`);
 	} finally {
 		spinner.style.display = "block";
 		spinner.parentElement?.classList.remove("small_spinner");

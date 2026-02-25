@@ -30,22 +30,29 @@ export class CommonPopup {
 	useTemplatesFile = async (templateFileName: string, callback: (documentContext: Document) => void) => {
 		const template = await fetch("../html/templates/" + templateFileName + ".html");
 		const text = await template.text();
-		const doc = (new DOMParser).parseFromString(text, "text/html");
+		const doc = new DOMParser().parseFromString(text, "text/html");
 		callback(doc);
 	};
 
 	loadTemplate = (templateID: string, documentContext: Document = document) => {
-		return document.importNode((documentContext.querySelector(`template#${templateID}`) as HTMLTemplateElement)?.content, true);
+		return document.importNode(
+			(documentContext.querySelector(`template#${templateID}`) as HTMLTemplateElement)?.content,
+			true
+		);
 	};
 
 	buttonsSetup() {
 		document.getElementById("goToSettings")?.addEventListener("click", async () => {
 			await chrome.runtime.openOptionsPage();
-			if (chrome.runtime.lastError)
-				console.error("TE_p: " + chrome.runtime.lastError.message);
+			if (chrome.runtime.lastError) console.error("TE_p: " + chrome.runtime.lastError.message);
 		});
-		document.getElementById("goToAbout")?.addEventListener("click", () => window.location.href = "../html/p_about.html");
-		if (this.title !== "") document.getElementById("returnHome")?.addEventListener("click", () => window.location.href = "../html/popup.html");
+		document
+			.getElementById("goToAbout")
+			?.addEventListener("click", () => (window.location.href = "../html/p_about.html"));
+		if (this.title !== "")
+			document
+				.getElementById("returnHome")
+				?.addEventListener("click", () => (window.location.href = "../html/popup.html"));
 	}
 
 	async XHR(URL: string, responseType: string, bodyData: string = "") {
@@ -62,38 +69,36 @@ export class CommonPopup {
 		if (bodyData !== "") {
 			fetchOptions.method = "POST";
 			fetchOptions.body = bodyData;
-			(fetchOptions.headers as {
-				[key: string]: string
-			})["Content-type"] = "application/x-www-form-urlencoded";
+			(
+				fetchOptions.headers as {
+					[key: string]: string;
+				}
+			)["Content-type"] = "application/x-www-form-urlencoded";
 		}
 
 		if (responseType === "csv") {
-			(fetchOptions.headers as { [key: string]: string })["Content-type"] = "text/csv;charset=UTF-8";
+			(fetchOptions.headers as {[key: string]: string})["Content-type"] = "text/csv;charset=UTF-8";
 		}
 
-		try {
-			const response = await fetch(URL, fetchOptions);
+		const response = await fetch(URL, fetchOptions);
 
-			if (!response.ok) {
-				throw new Error(response.statusText);
-			}
-
-			let data;
-			switch (responseType) {
-				case "json":
-					data = await response.json();
-					break;
-				case "document":
-					const text = await response.text();
-					data = new DOMParser().parseFromString(text, "text/html");
-					break;
-				default:
-					data = await response.text();
-			}
-
-			return {response: data, responseURL: response.url};
-		} catch (error) {
-			throw error;
+		if (!response.ok) {
+			throw new Error(response.statusText);
 		}
+
+		let data;
+		switch (responseType) {
+			case "json":
+				data = await response.json();
+				break;
+			case "document":
+				const text = await response.text();
+				data = new DOMParser().parseFromString(text, "text/html");
+				break;
+			default:
+				data = await response.text();
+		}
+
+		return {response: data, responseURL: response.url};
 	}
 }

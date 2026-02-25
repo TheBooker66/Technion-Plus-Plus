@@ -1,117 +1,118 @@
 @import "colours.css";
 
 body {
-    font-family: 'Segoe UI', arial, sans-serif;
-    font-size: 15px;
-    margin: 0;
-    min-height: 100vh;
-    box-sizing: border-box;
-    background-image: linear-gradient(to bottom, #efefef, #f7f7f7);
-    color: #0c0c0c;
+	font-family: "Segoe UI", arial, sans-serif;
+	font-size: 15px;
+	margin: 0;
+	min-height: 100vh;
+	box-sizing: border-box;
+	background-image: linear-gradient(to bottom, #efefef, #f7f7f7);
+	color: #0c0c0c;
 }
 
 header {
-    font-size: 24px;
-    color: #fff;
-    height: 48px;
-    line-height: 48px;
-    padding: 20px;
-    margin-bottom: 20px;
-    background-image: linear-gradient(15deg, var(--prim-cool) 50%, var(--prim-dark) 100%);
-    box-shadow: 0 1px 4px 2px rgb(0, 0, 0, 0.5);
-    border-bottom: 1px solid #000;
+	font-size: 24px;
+	color: #fff;
+	height: 48px;
+	line-height: 48px;
+	padding: 20px;
+	margin-bottom: 20px;
+	background-image: linear-gradient(15deg, var(--prim-cool) 50%, var(--prim-dark) 100%);
+	box-shadow: 0 1px 4px 2px rgb(0, 0, 0, 0.5);
+	border-bottom: 1px solid #000;
 }
 
-#header_content, main {
-    max-width: 1000px;
-    margin: 0 auto;
+#header_content,
+main {
+	max-width: 1000px;
+	margin: 0 auto;
 }
 
 .TP_name {
-    direction: ltr;
-    display: inline-block;
+	direction: ltr;
+	display: inline-block;
 }
 
 #logo {
-    line-height: 34px;
-    float: left;
+	line-height: 34px;
+	float: left;
 }
 
 #logo img {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 a {
-    color: #0060df;
-    text-decoration: none;
+	color: #0060df;
+	text-decoration: none;
 }
 
 a:hover {
-    color: var(--prim-dark);
-    cursor: pointer;
+	color: var(--prim-dark);
+	cursor: pointer;
 }
 
 section {
-    display: table;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 40px auto;
-    width: 90%;
-    border: 1px solid rgb(0, 0, 0, 0.15);
+	display: table;
+	background: #fff;
+	padding: 20px;
+	border-radius: 10px;
+	margin: 40px auto;
+	width: 90%;
+	border: 1px solid rgb(0, 0, 0, 0.15);
 }
 
 .section_name {
-    display: table-cell;
-    width: 180px;
-    text-align: center;
-    font-size: 18px;
-    vertical-align: top;
-    padding: 0;
+	display: table-cell;
+	width: 180px;
+	text-align: center;
+	font-size: 18px;
+	vertical-align: top;
+	padding: 0;
 }
 
 .section_name img {
-    width: 24px;
-    height: 24px;
-    vertical-align: middle;
+	width: 24px;
+	height: 24px;
+	vertical-align: middle;
 }
 
 .section_name span {
-    vertical-align: middle;
-    display: inline-block;
+	vertical-align: middle;
+	display: inline-block;
 }
 
 .section_info {
-    display: table-cell;
-    font-size: 13px;
-    vertical-align: top;
-    padding: 0 10px 0 0;
+	display: table-cell;
+	font-size: 13px;
+	vertical-align: top;
+	padding: 0 10px 0 0;
 }
 
 .section_info ul {
-    margin-top: 10px;
-    margin-bottom: 25px;
-    list-style-type: circle;
+	margin-top: 10px;
+	margin-bottom: 25px;
+	list-style-type: circle;
 }
 
 html[tplus="dm"] body {
-    background-image: linear-gradient(to bottom, #222, #171717);
-    color: #f9f9fa;
+	background-image: linear-gradient(to bottom, #222, #171717);
+	color: #f9f9fa;
 }
 
 html[tplus="dm"] header {
-    box-shadow: 0 1px 4px 2px rgba(0, 0, 0, 0.8);
+	box-shadow: 0 1px 4px 2px rgba(0, 0, 0, 0.8);
 }
 
 html[tplus="dm"] section {
-    background: #333;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+	background: #333;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 html[tplus="dm"] a {
-    color: var(--prim-cooler);
+	color: var(--prim-cooler);
 }
 
 html[tplus="dm"] a:hover {
-    color: var(--sec-light);
+	color: var(--sec-light);
 }

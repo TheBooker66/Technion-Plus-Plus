@@ -11,21 +11,21 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 			// noinspection DuplicatedCode
 			const actions = {
 				get CourseNames() {
-					return courseList.map(course => course.querySelector("h3")!.textContent);
+					return courseList.map((course) => course.querySelector("h3")!.textContent);
 				},
 				get CourseLinks() {
-					return courseList.map(course => course.getAttribute("onClick")!.split("='")[1]);
+					return courseList.map((course) => course.getAttribute("onClick")!.split("='")[1]);
 				},
 				get WebworkForm() {
 					const form = doc.querySelector("form");
 					if (!form) return null;
 
-					const formData: { [key: string]: string } = {};
+					const formData: {[key: string]: string} = {};
 					const elements = form.elements;
 					for (let i = 0; i < elements.length; i++) {
 						const element = elements[i] as HTMLFormElement;
 						if (element.name) {
-							if (element.type === 'checkbox' || element.type === 'radio') {
+							if (element.type === "checkbox" || element.type === "radio") {
 								if (element.checked) {
 									formData[element.name] = element.value;
 								}
@@ -44,17 +44,19 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 					const missionsContainer = doc.getElementById("set-list-container");
 					if (!missionsContainer) return [];
 					const missions = missionsContainer.querySelectorAll("li > div.ms-3.me-auto");
-					return Array.from(missions).map(mission => {
+					return Array.from(missions).map((mission) => {
 						return {
-							name: mission.querySelector("div > a.fw-bold.set-id-tooltip")?.textContent.trim() ??
-								mission.querySelector("div > span.set-id-tooltip")?.textContent.trim() ?? "מטלה ללא שם",
+							name:
+								mission.querySelector("div > a.fw-bold.set-id-tooltip")?.textContent.trim() ??
+								mission.querySelector("div > span.set-id-tooltip")?.textContent.trim() ??
+								"מטלה ללא שם",
 							due: mission.querySelector("div.font-sm")?.textContent.trim() ?? "אין תאריך הגשה",
 						};
 					});
 				},
 				get WebworkLinks() {
 					const elements = doc.querySelectorAll(".mod_index .lastcol a") as NodeListOf<HTMLAnchorElement>;
-					return Array.from(elements).map(link => ({
+					return Array.from(elements).map((link) => ({
 						text: link.textContent,
 						href: link.href,
 					}));
@@ -73,7 +75,7 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 				},
 			};
 
-			let returnObj: { [key: string]: any } = {};
+			const returnObj: {[key: string]: any} = {};
 			for (const key of message.dataNeeded) {
 				if (actions[key as keyof typeof actions] !== undefined)
 					returnObj[key] = actions[key as keyof typeof actions];

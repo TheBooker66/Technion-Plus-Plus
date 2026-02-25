@@ -1,481 +1,533 @@
 @import "colours.css";
 
 :root {
-    --main-text: #212529;
-    --border-radius-base: 4px;
+	--main-text: #212529;
+	--border-radius-base: 4px;
 
-    --table-header-bg: #e9ecef;
-    --table-border-dotted: rgba(0, 0, 0, .1);
-    --table-row-hover-bg: #e0f2ff;
+	--table-header-bg: #e9ecef;
+	--table-border-dotted: rgba(0, 0, 0, 0.1);
+	--table-row-hover-bg: #e0f2ff;
 
-    --input-bg: #f8f9fa;
-    --input-border: #ced4da;
-    --input-disabled-text: #6c757d;
+	--input-bg: #f8f9fa;
+	--input-border: #ced4da;
+	--input-disabled-text: #6c757d;
 
-    --button-default-bg: #f0f0f0;
-    --button-default-text: #343a40;
-    --button-default-border: #adb5bd;
-    --button-default-hover-bg: #e2e6ea;
-    --button-default-hover-border: #6c757d;
+	--button-default-bg: #f0f0f0;
+	--button-default-text: #343a40;
+	--button-default-border: #adb5bd;
+	--button-default-hover-bg: #e2e6ea;
+	--button-default-hover-border: #6c757d;
 }
 
 body {
-    padding: 0;
-    margin: 0;
-    z-index: 0;
-    display: grid;
-    grid-template-rows: min-content 1fr max-content;
-    height: 100vh;
-    min-width: 1180px;
+	padding: 0;
+	margin: 0;
+	z-index: 0;
+	display: grid;
+	grid-template-rows: min-content 1fr max-content;
+	height: 100vh;
+	min-width: 1180px;
 }
 
-.section, #stats h3, body h2 {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: var(--border-radius-base);
+.section,
+#stats h3,
+body h2 {
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	border-radius: var(--border-radius-base);
 }
 
 #stats h3 {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 body h2 {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-table, #add_grade_form, #buttons {
-    margin: 5px auto 5ch;
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
+table,
+#add_grade_form,
+#buttons {
+	margin: 5px auto 5ch;
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
 }
 
 .grades {
-    user-select: text;
-    -webkit-user-select: text;
+	user-select: text;
+	-webkit-user-select: text;
 }
 
 .grades thead tr {
-    font-weight: 600;
-    background-color: var(--table-header-bg);
-    line-height: 200%;
-    border-radius: var(--border-radius-base) var(--border-radius-base) 0 0;
+	font-weight: 600;
+	background-color: var(--table-header-bg);
+	line-height: 200%;
+	border-radius: var(--border-radius-base) var(--border-radius-base) 0 0;
 }
 
 body .grades thead th:first-of-type {
-    border-radius: 0 var(--border-radius-base) var(--border-radius-base) 0 !important;
-    width: 6ch;
+	border-radius: 0 var(--border-radius-base) var(--border-radius-base) 0 !important;
+	width: 6ch;
 }
 
 body .grades thead th:last-of-type {
-    border-radius: var(--border-radius-base) 0 0 var(--border-radius-base) !important;
+	border-radius: var(--border-radius-base) 0 0 var(--border-radius-base) !important;
 }
 
 .grades thead th.operator {
-    text-align: center;
-    padding: 1px;
+	text-align: center;
+	padding: 1px;
 }
 
-table td, table th, .grades td, .grades th {
-    padding: 4px 5px;
-    text-align: right;
-    width: auto;
+table td,
+table th,
+.grades td,
+.grades th {
+	padding: 4px 5px;
+	text-align: right;
+	width: auto;
 }
 
-body tbody tr, body .grades tbody tr {
-    background-color: rgba(0, 0, 0, 0.02);
-    border-bottom: 1px dotted var(--table-border-dotted);
+body tbody tr,
+body .grades tbody tr {
+	background-color: rgba(0, 0, 0, 0.02);
+	border-bottom: 1px dotted var(--table-border-dotted);
 }
 
-body tbody tr:nth-of-type(even), body .grades tbody tr:nth-of-type(even) {
-    background-color: transparent;
+body tbody tr:nth-of-type(even),
+body .grades tbody tr:nth-of-type(even) {
+	background-color: transparent;
 }
 
-body tbody tr:last-of-type, body .grades tbody tr:last-of-type {
-    border-bottom: 0;
+body tbody tr:last-of-type,
+body .grades tbody tr:last-of-type {
+	border-bottom: 0;
 }
 
 .grades td.grade {
-    min-width: 16.5ch;
+	min-width: 16.5ch;
 }
 
 .grades td.center {
-    text-align: center;
-    font-size: 0;
+	text-align: center;
+	font-size: 0;
 }
 
 body .grades tbody tr:hover {
-    background-color: var(--table-row-hover-bg);
+	background-color: var(--table-row-hover-bg);
 }
 
 .grades tr.ignored > td.course_name::after {
-    content: "התעלמות קבועה";
-    display: inline-block;
-    font-size: 0.8em;
-    font-weight: bold;
-    color: var(--status-warning);
-    margin-right: 1ch;
-    padding: 2px 8px;
-    border-radius: 10px;
-    background-color: var(--sec-darker);
+	content: "התעלמות קבועה";
+	display: inline-block;
+	font-size: 0.8em;
+	font-weight: bold;
+	color: var(--status-warning);
+	margin-right: 1ch;
+	padding: 2px 8px;
+	border-radius: 10px;
+	background-color: var(--sec-darker);
 }
 
 .stats_grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 60px;
-    grid-row-gap: 30px;
-    margin-top: 15px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-column-gap: 60px;
+	grid-row-gap: 30px;
+	margin-top: 15px;
 }
 
 #stats {
-    grid-template-columns: repeat(3, 1fr);
-    grid-column-gap: 20px;
+	grid-template-columns: repeat(3, 1fr);
+	grid-column-gap: 20px;
 }
 
-body h2, body h3 {
-    border-radius: var(--border-radius-base);
-    margin: 0;
-    padding: 6px;
-    text-align: center;
+body h2,
+body h3 {
+	border-radius: var(--border-radius-base);
+	margin: 0;
+	padding: 6px;
+	text-align: center;
 }
 
 body h2 {
-    background-color: var(--prim-cool);
-    color: white;
-    margin-bottom: 10px;
-    font-size: 18px;
-    font-weight: 500;
+	background-color: var(--prim-cool);
+	color: white;
+	margin-bottom: 10px;
+	font-size: 18px;
+	font-weight: 500;
 }
 
 body h3 {
-    background-color: var(--sec-light);
-    color: black;
-    font-size: 16px;
-    font-weight: 500;
+	background-color: var(--sec-light);
+	color: black;
+	font-size: 16px;
+	font-weight: 500;
 }
 
 #stats h3 {
-    margin: 0 10px;
+	margin: 0 10px;
 }
 
 body input {
-    font-size: 15px;
-    font-family: 'Segoe UI', arial, sans-serif;
-    margin: 5px 2px;
-    padding: 4px 4px;
-    border: 1px solid var(--input-border);
-    border-radius: var(--border-radius-base);
-    box-sizing: border-box;
-    background-color: var(--input-bg);
-    color: var(--main-text);
+	font-size: 15px;
+	font-family: "Segoe UI", arial, sans-serif;
+	margin: 5px 2px;
+	padding: 4px 4px;
+	border: 1px solid var(--input-border);
+	border-radius: var(--border-radius-base);
+	box-sizing: border-box;
+	background-color: var(--input-bg);
+	color: var(--main-text);
 }
 
-body input:focus, body select:focus {
-    outline: none;
-    border-color: var(--prim-cooler);
-    box-shadow: 0 0 0 2px rgba(6, 62, 111, 0.3);
+body input:focus,
+body select:focus {
+	outline: none;
+	border-color: var(--prim-cooler);
+	box-shadow: 0 0 0 2px rgba(6, 62, 111, 0.3);
 }
 
 .grades button {
-    padding: 4px 8px;
-    font-size: 12px;
-    margin: 4px 2px;
-    background-color: var(--prim-cooler);
-    min-width: 7ch;
-    text-align: center;
-    border: 0;
-    color: white;
-    border-radius: var(--border-radius-base);
-    font-family: 'Segoe UI', arial, sans-serif;
-    box-sizing: border-box;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+	padding: 4px 8px;
+	font-size: 12px;
+	margin: 4px 2px;
+	background-color: var(--prim-cooler);
+	min-width: 7ch;
+	text-align: center;
+	border: 0;
+	color: white;
+	border-radius: var(--border-radius-base);
+	font-family: "Segoe UI", arial, sans-serif;
+	box-sizing: border-box;
+	cursor: pointer;
+	transition:
+		background-color 0.2s ease,
+		transform 0.1s ease;
 }
 
 .grades button:hover {
-    background-color: var(--prim-cool);
-    transform: translateY(-1px);
+	background-color: var(--prim-cool);
+	transform: translateY(-1px);
 }
 
 .grades button:focus {
-    background-color: var(--prim-cool);
+	background-color: var(--prim-cool);
 }
 
 .grades button:active {
-    transform: translateY(0);
+	transform: translateY(0);
 }
 
 .danger button {
-    background-color: var(--status-danger);
+	background-color: var(--status-danger);
 }
 
 .danger button:hover {
-    background-color: var(--status-dangerer);
+	background-color: var(--status-dangerer);
 }
 
 .danger button:focus {
-    background-color: var(--status-dangerer);
+	background-color: var(--status-dangerer);
 }
 
-input[type=checkbox]:hover, input[type=checkbox]:focus, #add_grade_form input:not([type=submit]):hover,
-#add_grade_form input:not([type=submit]):focus, #add_grade_form select:hover, #add_grade_form select:focus {
-    border-color: #007bff;
-    background-color: #f0f8ff;
+input[type="checkbox"]:hover,
+input[type="checkbox"]:focus,
+#add_grade_form input:not([type="submit"]):hover,
+#add_grade_form input:not([type="submit"]):focus,
+#add_grade_form select:hover,
+#add_grade_form select:focus {
+	border-color: #007bff;
+	background-color: #f0f8ff;
 }
 
-.grades input[type=checkbox]:hover, .grades input[type=checkbox]:focus,
-#add_grade_form input:not([type=checkbox]):not([type=submit]):hover, #add_grade_form input:not([type=checkbox]):not([type=submit]):focus,
-#add_grade_form select:hover, #add_grade_form select:focus {
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+.grades input[type="checkbox"]:hover,
+.grades input[type="checkbox"]:focus,
+#add_grade_form input:not([type="checkbox"]):not([type="submit"]):hover,
+#add_grade_form input:not([type="checkbox"]):not([type="submit"]):focus,
+#add_grade_form select:hover,
+#add_grade_form select:focus {
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .grades input[type="number"]:disabled {
-    color: var(--input-disabled-text);
-    border: 0;
-    background-color: transparent;
-    -webkit-appearance: textfield;
+	color: var(--input-disabled-text);
+	border: 0;
+	background-color: transparent;
+	-webkit-appearance: textfield;
 }
 
 .grades input[type="number"] {
-    margin: 0;
-    font-size: inherit;
-    background-color: var(--input-bg);
-    border: 1px solid transparent;
-    border-radius: 2px;
-    color: var(--prim-cooler);
-    width: 6ch;
-    -webkit-appearance: textfield;
+	margin: 0;
+	font-size: inherit;
+	background-color: var(--input-bg);
+	border: 1px solid transparent;
+	border-radius: 2px;
+	color: var(--prim-cooler);
+	width: 6ch;
+	-webkit-appearance: textfield;
 }
 
 .grades .failed input[type="number"]:disabled {
-    color: var(--status-danger);
+	color: var(--status-danger);
 }
 
-body .failed, body form.failed * {
-    color: var(--status-danger);
-    border-color: var(--status-danger);
-    transition: color 0.5s linear, border-color 0.5s linear;
+body .failed,
+body form.failed * {
+	color: var(--status-danger);
+	border-color: var(--status-danger);
+	transition:
+		color 0.5s linear,
+		border-color 0.5s linear;
 }
 
 footer {
-    text-align: right;
-    font-family: 'Segoe UI', arial, sans-serif;
-    position: relative;
-    border-radius: 0 !important;
-    box-sizing: border-box;
-    grid-column-gap: 100px;
-    grid-template-columns: max-content max-content 1fr;
+	text-align: right;
+	font-family: "Segoe UI", arial, sans-serif;
+	position: relative;
+	border-radius: 0 !important;
+	box-sizing: border-box;
+	grid-column-gap: 100px;
+	grid-template-columns: max-content max-content 1fr;
 }
 
 a {
-    margin-top: 4px;
-    min-width: 132px;
+	margin-top: 4px;
+	min-width: 132px;
 }
 
 #disclaimer {
-    font-weight: 500;
-    text-align: center;
+	font-weight: 500;
+	text-align: center;
 }
 
-.temporary_remove, .temporary .center button:not(.temporary_remove) {
-    display: none;
+.temporary_remove,
+.temporary .center button:not(.temporary_remove) {
+	display: none;
 }
 
 .temporary .temporary_remove {
-    display: inline-block;
+	display: inline-block;
 }
 
 body tr.animate td {
-    animation: rowinsert 1.2s linear 0s;
+	animation: rowinsert 1.2s linear 0s;
 }
 
 #grades_list {
-    --color: var(--status-success);
+	--color: var(--status-success);
 }
 
 #ignore_list {
-    --color: var(--status-danger);
+	--color: var(--status-danger);
 }
 
 #grades_list .grade:disabled {
-    border-bottom-color: var(--input-border);
+	border-bottom-color: var(--input-border);
 }
 
 @keyframes rowinsert {
-    from {
-        color: transparent;
-        background-color: var(--color);
-    }
+	from {
+		color: transparent;
+		background-color: var(--color);
+	}
 }
 
-#add_grade_form input, #add_grade_form select {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px 10px;
+#add_grade_form input,
+#add_grade_form select {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 8px 10px;
 }
 
-#add_grade_form .inputs, #add_grade_form .labels {
-    display: grid;
-    grid-template-columns: 15% 1fr 10% 10% 10% 10% 10%;
-    gap: 15px;
-    align-items: center;
+#add_grade_form .inputs,
+#add_grade_form .labels {
+	display: grid;
+	grid-template-columns: 15% 1fr 10% 10% 10% 10% 10%;
+	gap: 15px;
+	align-items: center;
 }
 
 #add_grade_form .submit-button {
-    display: block;
-    margin: 20px auto 10px;
-    padding: 10px 25px;
-    background-color: var(--prim-cool);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius-base);
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
+	display: block;
+	margin: 20px auto 10px;
+	padding: 10px 25px;
+	background-color: var(--prim-cool);
+	color: white;
+	border: none;
+	border-radius: var(--border-radius-base);
+	cursor: pointer;
+	font-size: 18px;
+	font-weight: bold;
 }
 
 #add_grade_form .submit-button:hover {
-    background-color: var(--prim-cool);
-    transform: translateY(-1px);
+	background-color: var(--prim-cool);
+	transform: translateY(-1px);
 }
 
 #add_grade_form .submit-button:focus {
-    background-color: var(--prim-cool);
+	background-color: var(--prim-cool);
 }
 
 #add_grade_form .submit-button:active {
-    transform: translateY(0);
+	transform: translateY(0);
 }
 
 #add_grade_form label {
-    white-space: nowrap;
-    text-align: center;
-    font-weight: 500;
+	white-space: nowrap;
+	text-align: center;
+	font-weight: 500;
 }
 
-#buttons input[type=button], #buttons label {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 12px 18px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    border: 1px solid var(--button-default-border);
-    border-radius: var(--border-radius-base);
-    background-color: var(--button-default-bg);
-    color: var(--button-default-text);
-    cursor: pointer;
-    transition: background-color 1s ease, border-color 2s ease, color 1s ease, transform 0.1s ease;
-    box-sizing: border-box;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    appearance: none;
+#buttons input[type="button"],
+#buttons label {
+	display: block;
+	width: 100%;
+	margin: 10px 0;
+	padding: 12px 18px;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+	border: 1px solid var(--button-default-border);
+	border-radius: var(--border-radius-base);
+	background-color: var(--button-default-bg);
+	color: var(--button-default-text);
+	cursor: pointer;
+	transition:
+		background-color 1s ease,
+		border-color 2s ease,
+		color 1s ease,
+		transform 0.1s ease;
+	box-sizing: border-box;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	appearance: none;
 }
 
-#buttons input[type=button]:hover, #buttons label:hover {
-    background-color: var(--button-default-hover-bg);
-    border-color: var(--button-default-hover-border);
-    transform: translateY(-1px);
+#buttons input[type="button"]:hover,
+#buttons label:hover {
+	background-color: var(--button-default-hover-bg);
+	border-color: var(--button-default-hover-border);
+	transform: translateY(-1px);
 }
 
-#buttons input[type=button]:focus, #buttons label:focus {
-    background-color: var(--button-default-hover-bg);
-    border-color: var(--button-default-hover-border);
+#buttons input[type="button"]:focus,
+#buttons label:focus {
+	background-color: var(--button-default-hover-bg);
+	border-color: var(--button-default-hover-border);
 }
 
-#buttons input[type=button]:active, #buttons label:active {
-    transform: translateY(0);
+#buttons input[type="button"]:active,
+#buttons label:active {
+	transform: translateY(0);
 }
 
 input#delete_grades {
-    background-color: var(--status-danger);
-    color: white;
-    border-color: var(--status-danger);
+	background-color: var(--status-danger);
+	color: white;
+	border-color: var(--status-danger);
 }
 
 input#delete_grades:hover {
-    background-color: var(--status-dangerer);
-    border-color: var(--status-dangerer);
+	background-color: var(--status-dangerer);
+	border-color: var(--status-dangerer);
 }
 
 input#delete_grades:focus {
-    background-color: var(--status-dangerer);
-    border-color: var(--status-dangerer);
+	background-color: var(--status-dangerer);
+	border-color: var(--status-dangerer);
 }
 
 select {
-    appearance: none;
-    background-image: url("../icons/arrowhead-down.svg");
-    background-repeat: no-repeat;
-    background-position: left 8px center;
-    background-size: 16px;
-    padding-left: 30px;
+	appearance: none;
+	background-image: url("../icons/arrowhead-down.svg");
+	background-repeat: no-repeat;
+	background-position: left 8px center;
+	background-size: 16px;
+	padding-left: 30px;
 }
 
-[tplus=dm] {
-    color-scheme: dark;
-    --main-text: #e0e0e0;
+[tplus="dm"] {
+	color-scheme: dark;
+	--main-text: #e0e0e0;
 
-    --table-header-bg: #2c3e50;
-    --table-border-dotted: #34495e;
-    --table-row-hover-bg: #3e5772;
+	--table-header-bg: #2c3e50;
+	--table-border-dotted: #34495e;
+	--table-row-hover-bg: #3e5772;
 
-    --input-bg: #34495e;
-    --input-border: #4a6572;
-    --input-disabled-text: #bdbdbd;
+	--input-bg: #34495e;
+	--input-border: #4a6572;
+	--input-disabled-text: #bdbdbd;
 
-    --button-default-bg: #3a475a;
-    --button-default-text: #e0e0e0;
-    --button-default-border: #bdbdbd;
-    --button-default-hover-bg: #2e3948;
-    --button-default-hover-border: #bdbdbd;
+	--button-default-bg: #3a475a;
+	--button-default-text: #e0e0e0;
+	--button-default-border: #bdbdbd;
+	--button-default-hover-bg: #2e3948;
+	--button-default-hover-border: #bdbdbd;
 }
 
-[tplus=dm] body {
-    color: #f9f9fa;
+[tplus="dm"] body {
+	color: #f9f9fa;
 }
 
-[tplus=dm] main {
-    background-color: #222;
+[tplus="dm"] main {
+	background-color: #222;
 }
 
-[tplus=dm] select {
-    background-color: var(--input-bg);
+[tplus="dm"] select {
+	background-color: var(--input-bg);
 }
 
-[tplus=dm] body tbody tr, [tplus=dm] body .grades tbody tr {
-    background-color: rgba(255, 255, 255, 0.02);
+[tplus="dm"] body tbody tr,
+[tplus="dm"] body .grades tbody tr {
+	background-color: rgba(255, 255, 255, 0.02);
 }
 
-[tplus=dm] body tbody tr:nth-of-type(2n), [tplus=dm] body .grades tbody tr:nth-of-type(2n) {
-    background-color: transparent;
+[tplus="dm"] body tbody tr:nth-of-type(2n),
+[tplus="dm"] body .grades tbody tr:nth-of-type(2n) {
+	background-color: transparent;
 }
 
-[tplus=dm] header {
-    box-shadow: 0 6px 10px rgba(255, 255, 255, 0.08), 0 3px 6px rgba(0, 0, 0, 0.6);
+[tplus="dm"] header {
+	box-shadow:
+		0 6px 10px rgba(255, 255, 255, 0.08),
+		0 3px 6px rgba(0, 0, 0, 0.6);
 }
 
-[tplus=dm] #stats h3 {
-    box-shadow: 0 3px 8px rgba(255, 255, 255, 0.05), 0 1px 3px rgba(0, 0, 0, 0.7);
+[tplus="dm"] #stats h3 {
+	box-shadow:
+		0 3px 8px rgba(255, 255, 255, 0.05),
+		0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
-[tplus=dm] body h2 {
-    box-shadow: 0 3px 8px rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.6);
+[tplus="dm"] body h2 {
+	box-shadow:
+		0 3px 8px rgba(255, 255, 255, 0.06),
+		0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
-[tplus=dm] #buttons input[type=button], [tplus=dm] #buttons label {
-    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05), 0 2px 5px rgba(0, 0, 0, 0.5);
+[tplus="dm"] #buttons input[type="button"],
+[tplus="dm"] #buttons label {
+	box-shadow:
+		0 4px 15px rgba(255, 255, 255, 0.05),
+		0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-[tplus=dm] input[type=checkbox]:hover, [tplus=dm] input[type=checkbox]:focus,
-[tplus=dm] #add_grade_form input:not([type=submit]):hover, [tplus=dm] #add_grade_form input:not([type=submit]):focus,
-[tplus=dm] #add_grade_form select:hover, [tplus=dm] #add_grade_form select:focus {
-    border-color: #66afe9;
-    background-color: #444;
+[tplus="dm"] input[type="checkbox"]:hover,
+[tplus="dm"] input[type="checkbox"]:focus,
+[tplus="dm"] #add_grade_form input:not([type="submit"]):hover,
+[tplus="dm"] #add_grade_form input:not([type="submit"]):focus,
+[tplus="dm"] #add_grade_form select:hover,
+[tplus="dm"] #add_grade_form select:focus {
+	border-color: #66afe9;
+	background-color: #444;
 }
 
-[tplus=dm] .grades input[type=checkbox]:hover, [tplus=dm] .grades input[type=checkbox]:focus,
-[tplus=dm] #add_grade_form input:not([type=checkbox]):not([type=submit]):hover, [tplus=dm] #add_grade_form input:not([type=checkbox]):not([type=submit]):focus,
-[tplus=dm] #add_grade_form select:hover, [tplus=dm] #add_grade_form select:focus {
-    box-shadow: 0 0 8px rgba(102, 175, 233, 0.7);
+[tplus="dm"] .grades input[type="checkbox"]:hover,
+[tplus="dm"] .grades input[type="checkbox"]:focus,
+[tplus="dm"] #add_grade_form input:not([type="checkbox"]):not([type="submit"]):hover,
+[tplus="dm"] #add_grade_form input:not([type="checkbox"]):not([type="submit"]):focus,
+[tplus="dm"] #add_grade_form select:hover,
+[tplus="dm"] #add_grade_form select:focus {
+	box-shadow: 0 0 8px rgba(102, 175, 233, 0.7);
 }

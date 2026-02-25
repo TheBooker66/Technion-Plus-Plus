@@ -24,7 +24,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 		element.addEventListener("click", async () => {
 			if (busData.MinutesToArrivalList[arrivalTimeIndex] <= parseInt(common_DOM.minSelect.value)) {
 				element.classList.add("blat");
-				setTimeout(() => element.classList.remove("blat"), 1E3);
+				setTimeout(() => element.classList.remove("blat"), 1e3);
 			} else {
 				if (arrivalTimeIndex > 0) {
 					await chrome.runtime.sendMessage({
@@ -32,7 +32,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 						message: "ניתן ליצור התראה רק לאוטובוס הראשון המופיע ברשימה עבור קו ספציפי בכיוון ספציפי.\n",
 					});
 					element.classList.add("blat");
-					setTimeout(() => element.classList.remove("blat"), 1E3);
+					setTimeout(() => element.classList.remove("blat"), 1e3);
 				} else {
 					await TE_toggleBusAlert(busData.Shilut);
 					element.classList.toggle("chosen");
@@ -57,7 +57,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 			const apiResponse: BusLine[] = await res.json();
 
 			const fragment = document.createDocumentFragment();
-			const allArrivals: { bus: BusLine, index: number, time: number }[] = [];
+			const allArrivals: {bus: BusLine; index: number; time: number}[] = [];
 
 			for (const bus of apiResponse) {
 				if (!bus.MinutesToArrivalList) continue;
@@ -72,7 +72,11 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 				fragment.appendChild(createBusLineElement(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""]));
 			} else {
 				for (const arrival of allArrivals) {
-					const el = createBusLineElement([arrival.bus.Shilut, arrival.bus.DestinationQuarterName, arrival.time]) as HTMLDivElement;
+					const el = createBusLineElement([
+						arrival.bus.Shilut,
+						arrival.bus.DestinationQuarterName,
+						arrival.time,
+					]) as HTMLDivElement;
 					setupBusLineClickEvent(el, arrival.bus, arrival.index);
 					fragment.appendChild(el);
 				}
@@ -116,9 +120,12 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 	const popup = new CommonPopup("אוטובוסים קרובים - זמן אמת", ["buses"], document.title);
 
 	try {
-		currentState = await chrome.storage.local.get({
-			bus_station: 41205, bus_time: 10, allow_timings: false, bus_alerts: [],
-		}) as StorageData;
+		currentState = (await chrome.storage.local.get({
+			bus_station: 41205,
+			bus_time: 10,
+			allow_timings: false,
+			bus_alerts: [],
+		})) as StorageData;
 	} catch (err) {
 		console.error("TE_bus_err: " + err);
 		displayError("שגיאה באחזור נתונים מהגדרות הדפדפן, אנא נסה שנית.");
@@ -134,16 +141,22 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 	common_DOM.minSelect.addEventListener("change", saveSettings);
 
 	const busStops = [
-		{name: 'מל"ל/הצפירה', val: 43016}, {name: "טכניון/מעונות נווה אמריקה", val: 43280},
-		{name: "טכניון/בניין הספורט", val: 43015}, {name: "טכניון/הנדסה אזרחית", val: 43022},
-		{name: "הנדסה אזרחית", val: 42644}, {name: "טכניון/הנדסה חקלאית", val: 43076},
-		{name: "טכניון/הנדסה כימית", val: 40311}, {name: "טכניון/ביוטכנולוגיה ומזון", val: 43073},
-		{name: "טכניון/בית ספר להנדסאים", val: 40309}, {name: "טכניון/הנדסת חומרים", val: 41205},
-		{name: "טכניון/מרכז המבקרים", val: 43078}, {name: "טכניון/מעונות העמים", val: 41200},
+		{name: 'מל"ל/הצפירה', val: 43016},
+		{name: "טכניון/מעונות נווה אמריקה", val: 43280},
+		{name: "טכניון/בניין הספורט", val: 43015},
+		{name: "טכניון/הנדסה אזרחית", val: 43022},
+		{name: "הנדסה אזרחית", val: 42644},
+		{name: "טכניון/הנדסה חקלאית", val: 43076},
+		{name: "טכניון/הנדסה כימית", val: 40311},
+		{name: "טכניון/ביוטכנולוגיה ומזון", val: 43073},
+		{name: "טכניון/בית ספר להנדסאים", val: 40309},
+		{name: "טכניון/הנדסת חומרים", val: 41205},
+		{name: "טכניון/מרכז המבקרים", val: 43078},
+		{name: "טכניון/מעונות העמים", val: 41200},
 	];
 
 	const fragment = document.createDocumentFragment();
-	busStops.forEach(stopData => {
+	busStops.forEach((stopData) => {
 		const option = document.createElement("option");
 		option.value = stopData.val.toString();
 		option.textContent = stopData.name;
@@ -156,7 +169,7 @@ import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 	const intervalID = setInterval(async () => {
 		clearBusTable();
 		await fetchBusData(intervalID);
-	}, 3E4);
+	}, 3e4);
 
 	await fetchBusData(intervalID);
 })();

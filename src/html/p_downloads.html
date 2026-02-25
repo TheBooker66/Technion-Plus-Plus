@@ -1,43 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html dir="rtl" lang="he">
-<head>
-    <meta charset="utf-8">
-    <title>Technion++</title>
-    <link rel="stylesheet" href="../css/p_popup.css" type="text/css">
-    <link rel="stylesheet" href="../css/p_downloads.css" type="text/css">
-    <script type="module" src="../js/common_popup.js"></script>
-</head>
-<body>
-<div class="wrapper">
-    <div class="main-content">
-        <h4>כרגע בהורדה:</h4>
-        <div id="current">
-            <div><span style="max-height: 50px; overflow-y: auto; word-wrap: break-word;"></span></div>
-            <div id="myform">
-                <div style="text-align: right"><b>מצב: </b><span></span></div>
-                <div id="progress"><span></span></div>
-                <input type="button" class="submit" value="השהה / המשך" id="pause"/>
-                <input type="button" class="submit" value="בטל" id="cancel"/>
-                <input type="button" class="submit" value="בטל הכל" id="cancelAll"/>
-            </div>
-        </div>
-        <h3>הורדות בהמתנה</h3>
-        <div id="queue">
+	<head>
+		<meta charset="utf-8" />
+		<title>Technion++</title>
+		<link rel="stylesheet" href="../css/p_popup.css" type="text/css" />
+		<link rel="stylesheet" href="../css/p_downloads.css" type="text/css" />
+		<script type="module" src="../js/common_popup.js"></script>
+	</head>
+	<body>
+		<div class="wrapper">
+			<div class="main-content">
+				<h4>כרגע בהורדה:</h4>
+				<div id="current">
+					<div><span style="max-height: 50px; overflow-y: auto; word-wrap: break-word"></span></div>
+					<div id="myform">
+						<div style="text-align: right"><b>מצב: </b><span></span></div>
+						<div id="progress"><span></span></div>
+						<input type="button" class="submit" value="השהה / המשך" id="pause" />
+						<input type="button" class="submit" value="בטל" id="cancel" />
+						<input type="button" class="submit" value="בטל הכל" id="cancelAll" />
+					</div>
+				</div>
+				<h3>הורדות בהמתנה</h3>
+				<div id="queue"></div>
+			</div>
+		</div>
 
-        </div>
-    </div>
-</div>
+		<template id="dl_item">
+			<div class="list_item">
+				<span><img class="dl_from" alt="מקור הורדה" /></span>
+				<div>
+					<b class="dl_name"></b>
+				</div>
+				<span><img src="../icons/cross.svg" title="הסר" class="remove" alt="הסר" /></span>
+			</div>
+		</template>
 
-<template id="dl_item">
-    <div class="list_item">
-        <span><img class="dl_from" alt="מקור הורדה"/></span>
-        <div>
-            <b class="dl_name"></b>
-        </div>
-        <span><img src="../icons/cross.svg" title="הסר" class="remove" alt="הסר"/></span>
-    </div>
-</template>
-
-<script type="module" src="../js/p_downloads.js"></script>
-</body>
+		<script type="module" src="../js/p_downloads.js"></script>
+	</body>
 </html>

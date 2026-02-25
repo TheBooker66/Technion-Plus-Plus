@@ -1,16 +1,17 @@
 (async function () {
-	type ExtendedStorageData = StorageData & { username_ext: string, password: string };
+	type ExtendedStorageData = StorageData & {username_ext: string; password: string};
 
 	// Duplicate of util.js due to the login script being executed in a different context
 
 	function reverseString(str: string): string {
-		return str.split('').reverse().join('');
+		return str.split("").reverse().join("");
 	}
 
 	function xorStrings(str1: string, str2: string): string {
-		return str1.split('').map((_, i) =>
-			String.fromCharCode(str1.charCodeAt(i) ^ str2.charCodeAt(i)),
-		).join('');
+		return str1
+			.split("")
+			.map((_, i) => String.fromCharCode(str1.charCodeAt(i) ^ str2.charCodeAt(i)))
+			.join("");
 	}
 
 	// End of duplicate
@@ -30,12 +31,19 @@
 		const handleMicrosoftLogin = () => {
 			const loginForm = document.forms.namedItem("f1"),
 				microsoftLoginButton = document.getElementById("idSIButton9");
-			if (loginForm && !document.getElementById("passwordError") &&
-				(location.pathname.includes("/oauth2/authorize") || location.pathname.includes("/saml2"))) {
+			if (
+				loginForm &&
+				!document.getElementById("passwordError") &&
+				(location.pathname.includes("/oauth2/authorize") || location.pathname.includes("/saml2"))
+			) {
 				const SelectAccountPageEh = location.href.includes("select_account");
 				const LoginHintPresentInUrlEh = location.href.includes("login_hint");
-				if (loginForm["passwd"] || !document.getElementById("tilesHolder")
-					|| SelectAccountPageEh || LoginHintPresentInUrlEh) {
+				if (
+					loginForm["passwd"] ||
+					!document.getElementById("tilesHolder") ||
+					SelectAccountPageEh ||
+					LoginHintPresentInUrlEh
+				) {
 					if (!SelectAccountPageEh && LoginHintPresentInUrlEh) {
 						document.title = "Technion++ - חיבור אוטומטי";
 						loginForm["passwd"].value = storageData.password;
@@ -47,19 +55,30 @@
 
 						urlParameters.delete("prompt");
 						urlParameters.delete("login_hint");
-						urlParameters.append("login_hint", `${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il`);
+						urlParameters.append(
+							"login_hint",
+							`${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il`
+						);
 						location.href = `${urlParts[0]}?${urlParameters.toString()}`;
 					}
 				}
 			} else {
-				if (document.forms[0] && microsoftLoginButton &&
-					location.href === "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/login") {
+				if (
+					document.forms[0] &&
+					microsoftLoginButton &&
+					location.href === "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/login"
+				) {
 					microsoftLoginButton.click();
 				}
 			}
 		};
-		document.querySelector(".banner-logo") ? handleMicrosoftLogin() : (new MutationObserver(_ => handleMicrosoftLogin()))
-			.observe(document.forms[0] ?? document.body, {childList: true, attributes: false, subtree: true});
+		if (document.querySelector(".banner-logo")) handleMicrosoftLogin();
+		else
+			new MutationObserver(() => handleMicrosoftLogin()).observe(document.forms[0] ?? document.body, {
+				childList: true,
+				attributes: false,
+				subtree: true,
+			});
 	}
 
 	function techwww(storageData: ExtendedStorageData) {
@@ -76,8 +95,7 @@
 
 	function moodle(storageData: StorageData, website: string) {
 		if (document.querySelectorAll(".navbar").length === 0 || !document.querySelector(".usermenu > .login")) return;
-		if (storageData.external_enable)
-			window.location.href = "https://techwww.technion.ac.il/tech_ident/";
+		if (storageData.external_enable) window.location.href = "https://techwww.technion.ac.il/tech_ident/";
 		else {
 			const specificMoodleNumber = website.match(/moodle([0-9]+)\.technion\.ac\.il/)?.[1] || "25";
 			window.location.href = `https://moodle${specificMoodleNumber}.technion.ac.il/auth/oidc/`;
@@ -100,8 +118,10 @@
 	}
 
 	function sap(storageData: ExtendedStorageData) {
-		if (!document.getElementById("divChangeContent") &&
-			(!document.getElementById("certLogonForm") || document.referrer.includes("portalex"))) {
+		if (
+			!document.getElementById("divChangeContent") &&
+			(!document.getElementById("certLogonForm") || document.referrer.includes("portalex"))
+		) {
 			const form = document.createElement("form");
 			appendInfo(form, "j_username", storageData.username.toString());
 			appendInfo(form, "j_password", storageData.password.toString());
@@ -115,9 +135,12 @@
 
 	function panopto() {
 		if (document.getElementById("loginButton") && window.location.href.includes("Pages/Home.aspx"))
-			window.location.href = (-1 === window.location.href.indexOf("?") ? "?" : "&") + "instance=TechnionAuthentication";
+			window.location.href =
+				(-1 === window.location.href.indexOf("?") ? "?" : "&") + "instance=TechnionAuthentication";
 
-		const button = document.getElementById("PageContentPlaceholder_loginControl_externalLoginButton") as HTMLElement | null;
+		const button = document.getElementById(
+			"PageContentPlaceholder_loginControl_externalLoginButton"
+		) as HTMLElement | null;
 		if (button) {
 			(document.getElementById("providerDropdown") as HTMLInputElement).value = "TechnionAuthentication";
 			button.click();
@@ -136,8 +159,15 @@
 	if (chrome.extension.inIncognitoContext) return;
 	if (window.location.protocol !== "https:") return;
 	const storageData: ExtendedStorageData = await chrome.storage.local.get({
-		username: "", email_server: true, phrase: "", term: "", maor_p: "maor", uidn_arr: ["", ""],
-		quick_login: true, enable_login: false, external_enable: false,
+		username: "",
+		email_server: true,
+		phrase: "",
+		term: "",
+		maor_p: "maor",
+		uidn_arr: ["", ""],
+		quick_login: true,
+		enable_login: false,
+		external_enable: false,
 	});
 	if (chrome.runtime.lastError) {
 		console.error("TE_login: " + chrome.runtime.lastError.message);
@@ -148,8 +178,7 @@
 	const website = window.location.hostname;
 	if (storageData.enable_login && !storageData.external_enable) {
 		storageData.password = reverseString(xorStrings(storageData.term + storageData.phrase, storageData.maor_p));
-		if (/moodle[0-9]*.technion.ac.il/.test(website))
-			moodle(storageData, website);
+		if (/moodle[0-9]*.technion.ac.il/.test(website)) moodle(storageData, website);
 		else if (website === "panoptotech.cloud.panopto.eu") {
 			panopto();
 		} else if (website === "portalex.technion.ac.il") {

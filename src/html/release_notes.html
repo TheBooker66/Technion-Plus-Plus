@@ -1,109 +1,116 @@
-<!DOCTYPE html>
+<!doctype html>
 <html dir="rtl" lang="he">
-<head>
-    <meta charset="utf-8">
-    <title>יומן שינויים</title>
-    <link rel="stylesheet" href="../css/release_notes.css" type="text/css">
-</head>
-<body>
-<header>
-    <div id="header_content">
-        <!--TODO: Update version in manifest.json and release date and the list of changes here.-->
-        <span id="date" hidden="hidden">2026-2-26</span>
-        <span id="title"></span>
-        <span id="logo">
-            <span class="TP_name">Technion<sup>++</sup></span>
-            <img src="../icons/technion_plus_plus/logo.svg" alt="לוגו טכניון++"/>
-        </span>
-    </div>
-</header>
-<main>
-    <div style="text-align: center;">
-        תוסף <span class="TP_name">Technion<sup>++</sup></span>
-        שברשותך עודכן לגרסה האחרונה! דף זה מספק מידע אודות השינויים בגרסה זו
-        (<span dir="rtl">x.</span><span id="version_range"></span>)
-        של התוסף.<br/>
-        <small>
-            במידת הצורך, ניתן לפנות אל מפתח התוסף בכל עת דרך חלונית האודות של התוסף. <br>
-            אם אהבתם את השינויים, מוזמנים לתת כוכבים בדף של
-            <span class="TP_name">Technion<sup>++</sup></span>
-            בקטלוג התוספים של
-            <a id="chromeStoreLink" target="_blank"
-               href="https://chromewebstore.google.com/detail/technion-plus-plus/pfhjnidbfndnjhpcpfecngcigdjebemk">Chrome</a>
-            או בקטלוג התוספים של
-            <a id="firefoxStoreLink" target="_blank"
-               href="https://addons.mozilla.org/en-GB/firefox/addon/technion-plus-plus/">FireFox</a>.
-        </small>
-    </div>
+	<head>
+		<meta charset="utf-8" />
+		<title>יומן שינויים</title>
+		<link rel="stylesheet" href="../css/release_notes.css" type="text/css" />
+	</head>
+	<body>
+		<header>
+			<div id="header_content">
+				<!--TODO: Update version in manifest.json and release date and the list of changes here.-->
+				<span id="date" hidden="hidden">2026-2-26</span>
+				<span id="title"></span>
+				<span id="logo">
+					<span class="TP_name">Technion<sup>++</sup></span>
+					<img src="../icons/technion_plus_plus/logo.svg" alt="לוגו טכניון++" />
+				</span>
+			</div>
+		</header>
+		<main>
+			<div style="text-align: center">
+				תוסף <span class="TP_name">Technion<sup>++</sup></span> שברשותך עודכן לגרסה האחרונה! דף זה מספק מידע
+				אודות השינויים בגרסה זו (<span dir="rtl">x.</span><span id="version_range"></span>) של התוסף.<br />
+				<small>
+					במידת הצורך, ניתן לפנות אל מפתח התוסף בכל עת דרך חלונית האודות של התוסף. <br />
+					אם אהבתם את השינויים, מוזמנים לתת כוכבים בדף של
+					<span class="TP_name">Technion<sup>++</sup></span>
+					בקטלוג התוספים של
+					<a
+						id="chromeStoreLink"
+						target="_blank"
+						href="https://chromewebstore.google.com/detail/technion-plus-plus/pfhjnidbfndnjhpcpfecngcigdjebemk"
+						>Chrome</a
+					>
+					או בקטלוג התוספים של
+					<a
+						id="firefoxStoreLink"
+						target="_blank"
+						href="https://addons.mozilla.org/en-GB/firefox/addon/technion-plus-plus/"
+						>FireFox</a
+					>.
+				</small>
+			</div>
 
-    <section>
-        <div class="section_name">
-            <img src="../icons/release_notes/added.svg" alt="פלוס ירוק"/> <span>חדש</span>
-        </div>
-        <div class="section_info">
-            <b>כללי</b><br/>
-            <ul>
-                <li>
-                    נוסף מצב לילה אוטומטי בתוסף, כלומר שהמצב הלילה יופעל בהתאם להגדרות מערכת ההפעלה.
-                    כך ניתן, למשל, לתזמן שיפעל משקיעה עד זריחה, ולא תמיד ברצף.
-                </li>
-                <li>החלטתי שצריך גם מצב לילה בדף הזה. הללויה! החופש של סוף מועדי א'!</li>
-                <!--                <li>לא נוסף דבר חדש בגרסה זו.</li>-->
-            </ul>
-            <small>אם יש לכם רעיונות לשיפור, אתם מוזמנים לפנות אליי.</small>
-        </div>
-    </section>
-    <section>
-        <div class="section_name">
-            <img src="../icons/release_notes/refresh.svg" alt="חץ מעגלי"/> <span>שונה ותוקן</span>
-        </div>
-        <div class="section_info">
-            <b>מדמ"ח</b><br/>
-            <ul>
-                <li>
-                    כל הפיצ'רים של אתר מדמ"ח
-                    (העתקת סיסמת יומן, לינקים לאתרי קורסים מהאתר הראשי, שמות כרטיסיות, הורדת קבצי קורס לפי סוגם)
-                    חזרו לעבוד.
-                </li>
-                <li>
-                    תוקן אורך סיסמה מדמ"ח האפשרי בתוסף, כך שבסמסטר הבא מטלות מדמ"ח יעבדו שוב.
-                    תודה להצפנה הפוסט־קוונטית של הפקולטה למדמ"ח. מאוד מועיל, חבר'ה.
-                    הצפנה פוסט־קוונטית היא פיצ'ר נחוץ ומבוקש.
-                </li>
-            </ul>
-            <b>כללי</b><br/>
-            <ul>
-                <li>האוטובוסים הקרובים כעת ממיונים לפי זמן הגעה.</li>
-                <li>סוף כל סוף (!!) חלונית האוכל מעודכנת כמו שצריך עם שירותי האוכל בקמפוס (לפי המיילים של אס"ט).</li>
-                <li>עודכנה השנה ברירת המחדל בהוספת ציון חדש במחשבון הציונים.</li>
-            </ul>
-        </div>
-    </section>
-    <section>
-        <div class="section_name">
-            <img src="../icons/release_notes/removed.svg" alt="סמל אין כניסה"/> <span>בוטל</span>
-        </div>
-        <div class="section_info">
-            <ul>
-                <li>לא היה מה להסיר :shrug:</li>
-            </ul>
-        </div>
-    </section>
-    <section>
-        <div class="section_name">
-            <img src="../icons/release_notes/bug.svg" alt="באגים ידועים"/> <span>באגים ידועים</span>
-        </div>
-        <div class="section_info">
-            <ul>
-                <li>
-                    לא ניתן לראות את ההיסטוגרמות מצ'יזפורק בסאפ הרגיל.
-                    כן ניתן לראות אותן אם מגיעים לסאפ דרך קישור ישיר לקורס (למשל מפירוט על הקורס באתר צ'יזפורק).
-                    זה לא ניתן לתיקון כרגע עקב מגבלות עם אופן הפעולה הנוכחי של הסאפ.
-                </li>
-            </ul>
-        </div>
-    </section>
-</main>
-<script type="module" src="../js/release_notes.js"></script>
-</body>
+			<section>
+				<div class="section_name">
+					<img src="../icons/release_notes/added.svg" alt="פלוס ירוק" /> <span>חדש</span>
+				</div>
+				<div class="section_info">
+					<b>כללי</b><br />
+					<ul>
+						<li>
+							נוסף מצב לילה אוטומטי בתוסף, כלומר שהמצב הלילה יופעל בהתאם להגדרות מערכת ההפעלה. כך ניתן,
+							למשל, לתזמן שיפעל משקיעה עד זריחה, ולא תמיד ברצף.
+						</li>
+						<li>החלטתי שצריך גם מצב לילה בדף הזה. הללויה! החופש של סוף מועדי א'!</li>
+						<!--                <li>לא נוסף דבר חדש בגרסה זו.</li>-->
+					</ul>
+					<small>אם יש לכם רעיונות לשיפור, אתם מוזמנים לפנות אליי.</small>
+				</div>
+			</section>
+			<section>
+				<div class="section_name">
+					<img src="../icons/release_notes/refresh.svg" alt="חץ מעגלי" /> <span>שונה ותוקן</span>
+				</div>
+				<div class="section_info">
+					<b>מדמ"ח</b><br />
+					<ul>
+						<li>
+							כל הפיצ'רים של אתר מדמ"ח (העתקת סיסמת יומן, לינקים לאתרי קורסים מהאתר הראשי, שמות כרטיסיות,
+							הורדת קבצי קורס לפי סוגם) חזרו לעבוד.
+						</li>
+						<li>
+							תוקן אורך סיסמה מדמ"ח האפשרי בתוסף, כך שבסמסטר הבא מטלות מדמ"ח יעבדו שוב. תודה להצפנה
+							הפוסט־קוונטית של הפקולטה למדמ"ח. מאוד מועיל, חבר'ה. הצפנה פוסט־קוונטית היא פיצ'ר נחוץ
+							ומבוקש.
+						</li>
+					</ul>
+					<b>כללי</b><br />
+					<ul>
+						<li>האוטובוסים הקרובים כעת ממיונים לפי זמן הגעה.</li>
+						<li>
+							סוף כל סוף (!!) חלונית האוכל מעודכנת כמו שצריך עם שירותי האוכל בקמפוס (לפי המיילים של אס"ט).
+						</li>
+						<li>עודכנה השנה ברירת המחדל בהוספת ציון חדש במחשבון הציונים.</li>
+					</ul>
+				</div>
+			</section>
+			<section>
+				<div class="section_name">
+					<img src="../icons/release_notes/removed.svg" alt="סמל אין כניסה" /> <span>בוטל</span>
+				</div>
+				<div class="section_info">
+					<ul>
+						<li>לא היה מה להסיר :shrug:</li>
+					</ul>
+				</div>
+			</section>
+			<section>
+				<div class="section_name">
+					<img src="../icons/release_notes/bug.svg" alt="באגים ידועים" /> <span>באגים ידועים</span>
+				</div>
+				<div class="section_info">
+					<ul>
+						<li>
+							לא ניתן לראות את ההיסטוגרמות מצ'יזפורק בסאפ הרגיל. כן ניתן לראות אותן אם מגיעים לסאפ דרך
+							קישור ישיר לקורס (למשל מפירוט על הקורס באתר צ'יזפורק). זה לא ניתן לתיקון כרגע עקב מגבלות עם
+							אופן הפעולה הנוכחי של הסאפ.
+						</li>
+					</ul>
+				</div>
+			</section>
+		</main>
+		<script type="module" src="../js/release_notes.js"></script>
+	</body>
 </html>
