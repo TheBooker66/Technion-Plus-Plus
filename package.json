@@ -3,10 +3,10 @@
 	"scripts": {
 		"dev": "vite build --watch --mode development",
 		"build": "vite build",
-		"lint": "eslint ./src --ext .js,.ts",
-		"lint:fix": "eslint ./src --ext .js,.ts --fix",
-		"format": "prettier --check ./src",
-		"format:fix": "prettier --write ./src",
+		"lint": "eslint .",
+		"lint:fix": "eslint --fix .",
+		"format": "prettier --check .",
+		"format:fix": "prettier --write .",
 		"check": "npm run format && npm run lint",
 		"fix": "npm run format:fix && npm run lint:fix"
 	},

@@ -9,7 +9,6 @@ import {minify as minifyHTMLSVG} from "html-minifier-next";
 import {transform as minifyCSS} from "lightningcss";
 import archiver from "archiver";
 
-
 function cleanPlugin(outDir: string) {
 	return {
 		name: "clean",
@@ -37,7 +36,7 @@ function cleanPlugin(outDir: string) {
 function downloadPlugin(url: string, destRelative: string, isProd: boolean) {
 	return {
 		name: "download",
-		async writeBundle(options: { dir?: string }) {
+		async writeBundle(options: {dir?: string}) {
 			const outDir = options.dir;
 			const fullDestPath = resolve(outDir, destRelative);
 
@@ -60,7 +59,6 @@ function downloadPlugin(url: string, destRelative: string, isProd: boolean) {
 
 				fs.writeFileSync(fullDestPath, finalCode, "utf8");
 				console.log(`${basename(destRelative)} processed successfully.`);
-
 			} catch (err) {
 				this.error(`Failed to download or process ${basename(destRelative)}: ${err.message}`);
 			}
@@ -78,10 +76,11 @@ function zipPlugin(outDir: string, isProd: boolean) {
 			const distOutput = fs.createWriteStream(resolve(projectRoot, outDir + ".zip")),
 				sourceOutput = fs.createWriteStream(resolve(projectRoot, "source.zip"));
 			const distArchiver = archiver("zip", {
-				zlib: {level: 9},
-			}), sourceArchiver = archiver("zip", {
-				zlib: {level: 9},
-			});
+					zlib: {level: 9},
+				}),
+				sourceArchiver = archiver("zip", {
+					zlib: {level: 9},
+				});
 
 			new Promise<void>((resolvePromise, reject) => {
 				distOutput.on("close", () => {
@@ -113,15 +112,18 @@ function zipPlugin(outDir: string, isProd: boolean) {
 				sourceArchiver.pipe(sourceOutput);
 				sourceArchiver.glob("**/*", {
 					cwd: projectRoot,
-					ignore: [
-						".git**", ".idea/**", "node_modules/**", "package-lock.json",
-						outDir + "/**", outDir + ".zip", "source.zip",
-					],
+					ignore: ["node_modules/**", outDir + "/**", outDir + ".zip", "source.zip"],
 				});
 				// create lib folder structure in source zip
-				sourceArchiver.file(resolve(projectRoot, "node_modules/pdfjs-dist/build/pdf.min.mjs"), {name: "src/lib/pdfjs/pdf.min.mjs"});
-				sourceArchiver.file(resolve(projectRoot, "node_modules/pdfjs-dist/build/pdf.worker.min.mjs"), {name: "src/lib/pdfjs/pdf.worker.min.mjs"});
-				sourceArchiver.file(resolve(projectRoot, outDir + "/lib/cheesefork/share-histograms.js"), {name: "src/lib/cheesefork/share-histograms.js"});
+				sourceArchiver.file(resolve(projectRoot, "node_modules/pdfjs-dist/build/pdf.min.mjs"), {
+					name: "src/lib/pdfjs/pdf.min.mjs",
+				});
+				sourceArchiver.file(resolve(projectRoot, "node_modules/pdfjs-dist/build/pdf.worker.min.mjs"), {
+					name: "src/lib/pdfjs/pdf.worker.min.mjs",
+				});
+				sourceArchiver.file(resolve(projectRoot, outDir + "/lib/cheesefork/share-histograms.js"), {
+					name: "src/lib/cheesefork/share-histograms.js",
+				});
 				sourceArchiver.finalize();
 			});
 		},
@@ -132,7 +134,7 @@ const entryPoints = Object.fromEntries(
 	globSync("src/js/**/*.ts", {ignore: "src/js/**/*.d.ts"}).map((file) => [
 		basename(file, extname(file)),
 		fileURLToPath(new URL(file, import.meta.url)),
-	]),
+	])
 );
 
 export default defineConfig(({mode}) => {
@@ -156,9 +158,7 @@ export default defineConfig(({mode}) => {
 			},
 		},
 		plugins: [
-			cleanPlugin(
-				outDir,
-			),
+			cleanPlugin(outDir),
 			viteStaticCopy({
 				targets: [
 					{
@@ -168,13 +168,15 @@ export default defineConfig(({mode}) => {
 							return relative(resolve(import.meta.dirname, "src/html"), fullPath);
 						},
 						transform: (contents) =>
-							isProd ? minifyHTMLSVG(contents.toString(), {
-								collapseWhitespace: true,
-								conservativeCollapse: true,
-								removeComments: true,
-								minifyCSS: true,
-								minifyJS: true,
-							}) : contents,
+							isProd
+								? minifyHTMLSVG(contents.toString(), {
+										collapseWhitespace: true,
+										conservativeCollapse: true,
+										removeComments: true,
+										minifyCSS: true,
+										minifyJS: true,
+									})
+								: contents,
 					},
 					{
 						src: "src/css/**/*.css",
@@ -199,13 +201,15 @@ export default defineConfig(({mode}) => {
 							return relative(resolve(import.meta.dirname, "src/icons"), fullPath);
 						},
 						transform: (contents) =>
-							isProd ? minifyHTMLSVG(contents.toString(), {
-								collapseWhitespace: true,
-								conservativeCollapse: true,
-								removeComments: true,
-								minifyCSS: true,
-								minifyJS: true,
-							}) : contents,
+							isProd
+								? minifyHTMLSVG(contents.toString(), {
+										collapseWhitespace: true,
+										conservativeCollapse: true,
+										removeComments: true,
+										minifyCSS: true,
+										minifyJS: true,
+									})
+								: contents,
 					},
 					{
 						src: "src/icons/**/*.png",
@@ -223,12 +227,9 @@ export default defineConfig(({mode}) => {
 			downloadPlugin(
 				"https://raw.githubusercontent.com/michael-maltsev/cheese-fork/gh-pages/share-histograms.js",
 				"lib/cheesefork/share-histograms.js",
-				isProd,
+				isProd
 			),
-			zipPlugin(
-				outDir,
-				isProd,
-			),
+			zipPlugin(outDir, isProd),
 		],
 		resolve: {
 			alias: {
