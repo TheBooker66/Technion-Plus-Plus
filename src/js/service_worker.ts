@@ -5,8 +5,11 @@ const courseRegex = /(?<cname>.+)\s-\s(?<cnum>\d{6,8})/,
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function TE_setStorage(data: Partial<StorageData>, callerName = "unknown") {
-	await chrome.storage.local.set(data);
-	if (chrome.runtime.lastError) console.error(`TE_bg_${callerName}: ${chrome.runtime.lastError.message}`);
+	try {
+		await chrome.storage.local.set(data);
+	} catch (err) {
+		console.error(`TPP: error in saving data in ${callerName} —`, err);
+	}
 }
 
 async function XHR(url: string, resType: string, info: string[] = [], body = "", reqType = false) {
@@ -51,8 +54,7 @@ async function XHR(url: string, resType: string, info: string[] = [], body = "",
 
 						const formData: {[key: string]: string} = {};
 						const elements = form.elements;
-						for (let i = 0; i < elements.length; i++) {
-							const element = elements[i] as HTMLFormElement;
+						for (const element of elements as unknown as HTMLInputElement[]) {
 							if (element.name) {
 								if (element.type === "checkbox" || element.type === "radio") {
 									if (element.checked) {
@@ -128,7 +130,7 @@ async function XHR(url: string, resType: string, info: string[] = [], body = "",
 	}
 	console.assert(
 		responsePayload !== undefined && responsePayload !== null,
-		"XHR: response payload is null or undefined"
+		"TPP XHR: response payload is null or undefined"
 	);
 
 	return {
@@ -147,7 +149,7 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 			headRequestEh
 		);
 		if (!initialResponse.responseURL.includes("microsoft")) {
-			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
+			console.log(`TPP Auto login: Connection was made at ${Date.now()}`);
 			return initialResponse;
 		}
 
@@ -157,7 +159,7 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 			enable_login: false,
 		});
 		if (!loginDetails.enable_login) {
-			console.error("No username/password");
+			console.error("TPP: No username/password");
 			return {response: "Error", responseURL: ""};
 		}
 
@@ -185,19 +187,17 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 					"",
 					headRequestEh
 				);
-				console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
+				console.log(`TPP Auto login: Connection was made at ${Date.now()}`);
 				return finalResponse;
 			}
 			await delay(RETRY_DELAY);
 		}
 
 		await chrome.tabs.remove(tabId);
-		console.error("Could not login to moodle, possibly wrong username/password (normal).");
+		console.error("TPP: Could not login to moodle, possibly wrong username/password.");
 		return {response: "Error", responseURL: ""};
 	} catch (err) {
-		console.error(
-			`TE_back_M_login: could not connect to moodle. {reason: ${(err as {message: string}).message}} at ${Date.now()}`
-		);
+		console.error(`TPP Auto login: could not connect to moodle at ${Date.now()}`, err);
 		return {response: "Error", responseURL: ""};
 	}
 }
@@ -210,7 +210,7 @@ async function TE_AutoLoginExternal() {
 			"CourseLinks",
 		]);
 		if (initialResponse.response["UserText"]) {
-			console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
+			console.log(`TPP Auto login: Connection was made at ${Date.now()}`);
 			return initialResponse;
 		}
 
@@ -230,7 +230,7 @@ async function TE_AutoLoginExternal() {
 				]);
 				if (finalResponse.response["UserText"]) {
 					await chrome.tabs.remove(tabId);
-					console.log(`TE_auto_login: connection was made! At ${Date.now()}`);
+					console.log(`TPP Auto login: Connection was made at ${Date.now()}`);
 					return finalResponse;
 				}
 			} catch {
@@ -241,12 +241,10 @@ async function TE_AutoLoginExternal() {
 		}
 
 		await chrome.tabs.remove(tabId);
-		console.error("Could not login to moodle, possibly wrong username/password (external).");
+		console.error("TPP: Could not login to moodle, possibly wrong username/password.");
 		return {response: "Error", responseURL: ""};
 	} catch (err) {
-		console.error(
-			`TE_back_M_login: could not connect to moodle. {reason: ${(err as {message: string}).message}} at ${Date.now()}`
-		);
+		console.error(`TPP Auto login: could not connect to moodle at ${Date.now()}`, err);
 		return {response: "Error", responseURL: ""};
 	}
 }
@@ -276,19 +274,17 @@ async function TE_notification(message: string, silentEh: boolean, notificationI
 	await chrome.notifications.create(notificationId, notificationOptions);
 	if (silentEh) return;
 
-	const storageData = (await chrome.storage.local.get({notif_vol: 1, alerts_sound: true})) as StorageData;
-	if (chrome.runtime.lastError) {
-		console.error("TE_bg_notification_err: " + chrome.runtime.lastError.message);
-	} else if (storageData.alerts_sound) {
-		if (typeof browser !== "undefined") {
-			const audio = new Audio(chrome.runtime.getURL("../resources/notification.mp3"));
-			audio.volume = storageData.notif_vol;
-			await audio.play();
-		} else {
-			await TE_setupOffscreenDocument();
-			await chrome.runtime.sendMessage({mess_t: "audio notification", volume: storageData.notif_vol});
-			await chrome.offscreen.closeDocument();
-		}
+	const storageData: StorageData = await chrome.storage.local.get({notif_vol: 1, alerts_sound: true});
+	if (!storageData.alerts_sound) return;
+
+	if (typeof browser !== "undefined") {
+		const audio = new Audio(chrome.runtime.getURL("../resources/notification.mp3"));
+		audio.volume = storageData.notif_vol;
+		await audio.play();
+	} else {
+		await TE_setupOffscreenDocument();
+		await chrome.runtime.sendMessage({mess_t: "audio notification", volume: storageData.notif_vol});
+		await chrome.offscreen.closeDocument();
 	}
 }
 
@@ -311,18 +307,14 @@ async function TE_alertNewHW(sourceIndex: number) {
 
 	await TE_setBadge(false);
 
-	const storageData = (await chrome.storage.local.get({cal_seen: 0, hw_alerts: true})) as StorageData;
-	if (chrome.runtime.lastError) {
-		console.error("TE_bg_HWA: " + chrome.runtime.lastError.message);
-		return;
-	}
+	const storageData: StorageData = await chrome.storage.local.get({cal_seen: 0, hw_alerts: true});
 	await TE_setStorage({cal_seen: storageData.cal_seen | sourceInfo.flag}, "HWA");
 	if (storageData.hw_alerts) await TE_notification(`יש לך מטלות חדשות ב${sourceInfo.name}!`, false);
 }
 
 async function TE_getCoursesMoodle(moodleData: {response: any}) {
 	if (!moodleData.response["CourseNames"] || moodleData.response["CourseNames"].length === 0) {
-		console.error("TE_login: failed to fetch moodle courses.");
+		console.error("TPP: failed to fetch moodle courses.");
 		return;
 	}
 
@@ -353,10 +345,10 @@ async function TE_checkCalendarProp(calendarProp: string) {
 
 		const exportResponse = await XHR(mainPageResponse.responseURL, "document", ["CalendarURL"], postBody);
 		const calendarUrl = exportResponse.response["CalendarURL"];
-		const userProp = "userid=" + calendarUrl.split("userid=")[1].split("&preset_what=all")[0];
+		const userProp = `userid=${calendarUrl.split("userid=")[1].split("&preset_what=all")[0]}`;
 		await TE_setStorage({moodle_cal_prop: userProp}, "cal2");
 	} catch (err) {
-		console.error("TE_back_prop_err: " + err);
+		console.error(`TPP: failed to fetch Moodle calendar prop`, err);
 	}
 }
 
@@ -385,7 +377,7 @@ async function TE_alertMoodleCalendar(
 		let latestEventId = maxEventId;
 
 		if (events?.length <= 1) {
-			console.log("No Moodle calendar events found to process.");
+			console.log("TPP: No Moodle calendar events found to process.");
 			return;
 		}
 
@@ -410,7 +402,7 @@ async function TE_alertMoodleCalendar(
 
 		if (latestEventId > maxEventId) await TE_alertNewHW(0);
 	} catch (err) {
-		console.error("TE_back_moodle_cal_err: " + err);
+		console.error(`TPP: failed to check Moodle calendar homework`, err);
 	}
 }
 
@@ -419,7 +411,7 @@ async function TE_csCalendarCheck(
 	csPassword: string,
 	seenStatus: {[key: string]: string[]}
 ) {
-	const UID = reverseString(xorStrings(uidArray[0] + "", uidArray[1]));
+	const UID = reverseString(xorStrings(uidArray[0].toString(), uidArray[1]));
 	if (!UID || !csPassword) return;
 
 	const calendarUrl = `https://grades.cs.technion.ac.il/cal/${UID}/${encodeURIComponent(csPassword)}`;
@@ -427,7 +419,7 @@ async function TE_csCalendarCheck(
 		const calendarData = await XHR(calendarUrl, "document", ["HWList"]);
 		const events: string[] = calendarData.response["HWList"];
 		if (events?.length <= 1) {
-			console.log("No cs calendar events found to process.");
+			console.log("TPP: No CS calendar events found to process.");
 			return;
 		}
 
@@ -449,7 +441,7 @@ async function TE_csCalendarCheck(
 
 			if (eventText.includes("icspasswordexpired")) {
 				newHWSet.clear();
-				console.error("TE_cs_cal_err: CS password expired.");
+				console.error("TPP: CS password expired.");
 				await TE_notification(
 					'סיסמת היומן של הצגת המטלות של מדמ"ח פגה! כנס בדחיפות להגדרות התוסף להוראות חידוש הסיסמה!',
 					false
@@ -481,7 +473,7 @@ async function TE_csCalendarCheck(
 		await TE_setStorage({cs_cal_update: now}, "cal332122");
 		if (newHWSet.size > 0) await TE_alertNewHW(1);
 	} catch (err) {
-		console.error("TE_back_cal_cs_err: " + err);
+		console.error(`TPP: failed to check CS calendar homework`, err);
 	}
 }
 
@@ -509,10 +501,16 @@ async function TE_webworkStep(url: string | FormData, body = "") {
 }
 
 async function TE_webworkScan() {
-	const storageData = (await chrome.storage.local.get({
-		webwork_cal_courses: {},
-		webwork_cal_events: {},
-	})) as StorageData;
+	let storageData: StorageData;
+	try {
+		storageData = await chrome.storage.local.get({
+			webwork_cal_courses: {},
+			webwork_cal_events: {},
+		});
+	} catch (err) {
+		console.error(`TPP: failed to scan WebWork`, err);
+		return;
+	}
 	const newWebworkCal = {},
 		ignoreRegex = /^ייפתח|^סגור|^Answers available for review./,
 		dateRegex = /(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4}) @ (?<hour>\d{2}):(?<minute>\d{2})/;
@@ -544,7 +542,7 @@ async function TE_webworkScan() {
 			const mission = missions[i];
 			if (ignoreRegex.test(mission.due)) continue;
 			const hwName = mission.name;
-			const assignmentId = parseInt((courseData as WebworkCourse).lti + "000" + i.toString());
+			const assignmentId = parseInt(`${(courseData as WebworkCourse).lti}000${i.toString()}`);
 
 			let seen = false,
 				done = false;
@@ -558,7 +556,7 @@ async function TE_webworkScan() {
 			const dateMatch = dateRegex.exec(mission.due)?.groups;
 			if (!dateMatch) {
 				console.error(
-					`TE_webwork_scan: failed to parse date for assignment ${hwName} in course ${(courseData as WebworkCourse).name}.`
+					`TPP: failed to parse date for assignment ${hwName} in course ${(courseData as WebworkCourse).name} during WebWork scan.`
 				);
 				continue;
 			}
@@ -589,7 +587,7 @@ async function TE_getWebwork(
 	existingWebworkCourses: {[key: string]: {name: string; lti: string}}
 ) {
 	if (!moodleData.response["CourseNames"] || moodleData.response["CourseNames"].length === 0) {
-		console.error("TE_login: failed to fetch webwork courses.");
+		console.error("TPP: failed to fetch webwork courses.");
 		return;
 	}
 
@@ -753,12 +751,8 @@ async function TE_getWebwork(
 			"WebworkLinks",
 		]);
 		const links: {text: string; href: string}[] = ltiPage.response["WebworkLinks"];
-		for (const link of links) {
-			if (webworkRegex.test(link.text)) {
-				newWebworkCourses[courseID] = {name: cname.trim(), lti: link.href!.split("id=")[1]};
-				break;
-			}
-		}
+		const match = links.find((link) => webworkRegex.test(link.text));
+		if (match) newWebworkCourses[courseID] = {name: cname.trim(), lti: match.href!.split("id=")[1]};
 	}
 
 	await TE_setStorage({webwork_cal_courses: newWebworkCourses}, "webworkCourses");
@@ -766,64 +760,67 @@ async function TE_getWebwork(
 }
 
 async function TE_single_download(link: string, name: string) {
-	await chrome.downloads.download({url: link, filename: name, saveAs: false});
-	if (chrome.runtime.lastError) console.error("TE_bg_dl: " + chrome.runtime.lastError.message);
+	try {
+		await chrome.downloads.download({url: link, filename: name, saveAs: false});
+	} catch (err) {
+		console.error(`TPP: failed downloading a file`, err);
+		await TE_notification(
+			`ההורדה של ${name} נכשלה. ייתכן שהקובץ כבר הורד או שהקישור אינו תקין.`,
+			true,
+			"singleDownload"
+		);
+	}
 }
 
 async function TE_doDownloads(chunk: DownloadItem) {
-	const storageData = (await chrome.storage.local.get({dl_queue: []})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({dl_queue: []});
 	storageData.dl_queue.push(chunk);
-	await TE_setStorage({dl_queue: storageData.dl_queue}, "doDownloads");
-	if (chrome.runtime.lastError) {
-		console.error("TE_bg_download_fail: " + chrome.runtime.lastError.message);
+	try {
+		await TE_setStorage({dl_queue: storageData.dl_queue}, "doDownloads");
+	} catch (err) {
+		console.error(`TPP: failed adding downloads to the queue`, err);
 		const sizeError: string =
 			JSON.stringify(storageData.dl_queue).length > 1e6
 				? "ייתכן שהתוסף מנסה להוריד יותר מידי קבצים בו זמנית."
 				: "";
 		await TE_notification(`שליחת הקבצים להורדה נכשלה. ${sizeError}\n`, true, "downloads");
-	} else {
-		const newMessage = `${chunk.list.length} פריטים נשלחו להורדה. ${storageData.dl_queue.length > 1 ? "התוסף יוריד אותם מיד לאחר הקבצים שכבר נמצאים בהורדה." : ""}\n`;
-		await TE_notification(newMessage, true, "downloads");
-		await TE_nextDownload();
+		return;
 	}
+	const newMessage = `${chunk.list.length} פריטים נשלחו להורדה. ${storageData.dl_queue.length > 1 ? "התוסף יוריד אותם מיד לאחר הקבצים שכבר נמצאים בהורדה." : ""}\n`;
+	await TE_notification(newMessage, true, "downloads");
+	await TE_nextDownload();
 }
 
 async function TE_nextDownload() {
 	const urlPrefixes = [
-		"https://moodle25.technion.ac.il/blocks/material_download/download_materialien.php?courseid=",
-		"https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/",
-		"https://grades.cs.technion.ac.il/fetch/file?",
-		"https://webcourse.cs.technion.ac.il/",
-	];
-	const storageData = (await chrome.storage.local.get({dl_current: 0, dl_queue: []})) as StorageData;
+			"https://moodle25.technion.ac.il/blocks/material_download/download_materialien.php?courseid=",
+			"https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/",
+			"https://grades.cs.technion.ac.il/fetch/file?",
+			"https://webcourse.cs.technion.ac.il/",
+		],
+		storageData: StorageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []});
 	if (storageData.dl_current === 0 && storageData.dl_queue.length > 0) {
 		const currentQueueItem: DownloadItem = storageData.dl_queue[0];
 		const downloadItem = currentQueueItem.list.shift() as DownloadItem["list"][0];
 		const fullUrl = urlPrefixes[currentQueueItem.sys] + currentQueueItem.sub_pre + downloadItem.u;
 
-		chrome.downloads.download(
-			{
-				url: fullUrl,
-				filename: downloadItem.n,
-				saveAs: false,
-			},
-			async (downloadId) => {
-				if (chrome.runtime.lastError) {
-					console.error("TE_bg_dls: " + chrome.runtime.lastError.message);
-					console.log(` - filename: ${downloadItem.n}\n - url: ${fullUrl}`);
-				} else {
-					storageData.dl_current = downloadId;
-					await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
-					setTimeout(async () => {
-						await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-128.png"});
-						setTimeout(async () => {
-							await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
-						}, 250);
-					}, 250);
-					await TE_setStorage({dl_current: storageData.dl_current, dl_queue: storageData.dl_queue});
-				}
-			}
-		);
+		let downloadID;
+		try {
+			downloadID = await chrome.downloads.download({url: fullUrl, filename: downloadItem.n, saveAs: false});
+		} catch (err) {
+			console.error(`TPP: failed a queuing the next download`, err);
+			console.log(` - filename: ${downloadItem.n}\n - url: ${fullUrl}`);
+			return;
+		}
+		storageData.dl_current = downloadID;
+		await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
+		setTimeout(async () => {
+			await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-128.png"});
+			setTimeout(async () => {
+				await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-green.png"});
+			}, 250);
+		}, 250);
+		await TE_setStorage({dl_current: storageData.dl_current, dl_queue: storageData.dl_queue}, "downloadComplete");
 	}
 }
 
@@ -843,12 +840,12 @@ export async function TE_updateVideosInfo(timestamp: number, callbacks: any = nu
 		const dbData = (await response.json()) as {_id: string; _rev: string; data: {[key: number]: RecordingCourse}};
 
 		if (!dbData["data"] || !dbData["_id"]) {
-			console.error("TE_back_video_update_err: video-update bad request.");
+			console.error("TPP: failed updating the videos — bad request.");
 			if (callbacks) callbacks[1]();
 		}
 
 		const coursesList: string[][] = [],
-			videosData: {[key: string]: RecordingCourse["v"]} = {};
+			videosData: StorageData["videos_data"] = {};
 		for (const courseId in dbData.data) {
 			const courseInfo = dbData.data[courseId];
 			const courseEntry = [courseId, courseInfo["n"]];
@@ -856,17 +853,17 @@ export async function TE_updateVideosInfo(timestamp: number, callbacks: any = nu
 			coursesList.push(courseEntry);
 			videosData[courseId] = courseInfo["v"];
 		}
-		console.log(`TE_back: found ${coursesList.length} courses for videos-db (${timestamp})`);
+		console.log(`TPP: found ${coursesList.length} courses for videos-db (${timestamp})`);
 		await TE_setStorage({videos_courses: coursesList, videos_data: videosData, videos_update: timestamp}, "uc");
 		if (callbacks) callbacks[0](coursesList, videosData);
 	} catch (err) {
-		console.error("TE_back_video_update_err: " + err);
+		console.error(`TPP: failed updating the videos:`, err);
 		if (callbacks) callbacks[1]();
 	}
 }
 
 export async function TE_updateInfo() {
-	const storageData = (await chrome.storage.local.get({
+	const storageData: StorageData = await chrome.storage.local.get({
 		uidn_arr: ["", ""],
 		quick_login: true,
 		enable_login: false,
@@ -885,11 +882,7 @@ export async function TE_updateInfo() {
 		webwork_cal_courses: {},
 		user_agenda: {},
 		videos_update: 0,
-	})) as StorageData;
-	if (chrome.runtime.lastError) {
-		console.error("TE_bg_Alarm: " + chrome.runtime.lastError.message);
-		return;
-	}
+	});
 
 	const THIRTY_DAYS = 2592e5,
 		EIGHT_HOURS = 288e5,
@@ -920,7 +913,7 @@ export async function TE_updateInfo() {
 				await TE_getWebwork(moodleData, storageData.webwork_cal_courses);
 			}
 		} catch (err) {
-			console.error("TE_back: forced_login_err -- " + err);
+			console.error(`TPP: forced_login_err:`, err);
 		}
 	}
 
@@ -940,11 +933,7 @@ export async function TE_updateInfo() {
 }
 
 export async function TE_toggleBusAlert(busLine: string) {
-	const storageData = (await chrome.storage.local.get({bus_alerts: []})) as StorageData;
-	if (chrome.runtime.lastError) {
-		console.error("TE_back_bus_err: " + chrome.runtime.lastError.message);
-		return;
-	}
+	const storageData: StorageData = await chrome.storage.local.get({bus_alerts: []});
 	if (storageData.bus_alerts.length === 0)
 		await chrome.alarms.create("TE_buses_start", {
 			delayInMinutes: 1,
@@ -962,7 +951,6 @@ export async function TE_toggleBusAlert(busLine: string) {
 }
 
 export async function TE_shutBusesAlerts() {
-	console.log("TE_shutBusesAlerts");
 	await TE_setStorage({bus_alerts: []}, "shutBuses");
 	await chrome.alarms.clear("TE_buses_start");
 }
@@ -982,7 +970,7 @@ async function TE_busAlertNow(arrivingBuses: BusLine[]) {
 	}
 	await TE_notification(messageBody, false);
 
-	const storageData = (await chrome.storage.local.get({bus_alerts: []})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({bus_alerts: []});
 	const alertedLines = arrivingBuses.map((bus) => bus["Shilut"]);
 	storageData.bus_alerts = storageData.bus_alerts.filter((line: string) => !alertedLines.includes(line));
 	await TE_setStorage({bus_alerts: storageData.bus_alerts}, "removeAlertedBuses");
@@ -991,16 +979,11 @@ async function TE_busAlertNow(arrivingBuses: BusLine[]) {
 }
 
 async function TE_checkBuses() {
-	console.log("TE_checkBuses");
-	const storageData = (await chrome.storage.local.get({
+	const storageData: StorageData = await chrome.storage.local.get({
 		bus_station: 41205,
 		bus_time: 10,
 		bus_alerts: [],
-	})) as StorageData;
-	if (chrome.runtime.lastError) {
-		console.error("TE_bg_checkBuses_err: " + chrome.runtime.lastError.message);
-		return;
-	}
+	});
 	if (storageData.bus_alerts.length === 0) return;
 
 	try {
@@ -1028,8 +1011,11 @@ async function TE_sendMessageToTabs(data: {mess_t: string; angle?: number | unkn
 	const tabs = await chrome.tabs.query({});
 	const moodleTabs = tabs.filter((tab) => (tab.url as string).includes("moodle"));
 	for (const tab of moodleTabs) {
-		await chrome.tabs.sendMessage(tab.id as number, data);
-		if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError.message);
+		try {
+			await chrome.tabs.sendMessage(tab.id as number, data);
+		} catch (err) {
+			console.error(`TPP: failed recolouring the Moodle (probably lost connection)`, err);
+		}
 	}
 }
 
@@ -1082,13 +1068,13 @@ chrome.runtime.onMessage.addListener(async (message) => {
 });
 
 chrome.downloads.onChanged.addListener(async (delta) => {
-	const storageData = (await chrome.storage.local.get({dl_current: 0, dl_queue: []})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []});
 	if (delta.id !== storageData.dl_current) return;
 
 	const finishDownload = async (isError = false) => {
 		if (isError) {
 			const systemName = ["moodle", "panopto", "GR++", "webcourse"][storageData.dl_queue[0]?.sys] ?? "unknown";
-			console.error(`TE_dlFailed ${delta.id} : ${systemName}`);
+			console.error(`TPP: failed downloading: ${delta.id}, ${systemName}`);
 		}
 
 		if (storageData.dl_queue[0]?.list.length === 0) storageData.dl_queue.shift();
@@ -1120,7 +1106,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 			await TE_checkBuses();
 			break;
 		default:
-			console.error("Unknown alarm name: " + alarm.name);
+			console.error(`Unknown alarm name: ${alarm.name}`);
 	}
 });
 

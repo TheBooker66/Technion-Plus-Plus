@@ -1,18 +1,10 @@
 import {resolveTheme} from "./utils";
 
 const semesterOrder = {
-	חורף: 1,
-	אביב: 2,
-	קיץ: 3,
+	"חורף": 1,
+	"אביב": 2,
+	"קיץ": 3,
 };
-
-function handleStorageError(operation: string) {
-	if (chrome.runtime.lastError) {
-		console.error(`TE_calculator_${operation}: ${chrome.runtime.lastError.message}`);
-		return true;
-	}
-	return false;
-}
 
 function calculateTableStats(tableSelector: string) {
 	const gradeElements = document.querySelectorAll(`${tableSelector} .grade`) as NodeListOf<HTMLInputElement>,
@@ -102,7 +94,7 @@ function createCourseRowElement(courseData: CalculatorCourse, mainList: string) 
 
 	const cellElements = rowElement.querySelectorAll("td");
 	cellElements[0].textContent = courseData.num.toString();
-	cellElements[0].id = "course_" + courseData.num.toString();
+	cellElements[0].id = `course_${courseData.num.toString()}`;
 	cellElements[1].textContent = courseData.name;
 	(cellElements[2].querySelector(".points") as HTMLInputElement).value = courseData.points.toString();
 	cellElements[4].textContent = courseData.semester;
@@ -131,15 +123,22 @@ function createCourseRowElement(courseData: CalculatorCourse, mainList: string) 
 	return rowElement;
 }
 
-async function handleGradesListClick(event: PointerEvent) {
-	const target = event.target as HTMLElement;
+async function handleListClick(
+	target: HTMLElement,
+	listType: "grades_list" | "ignore_list"
+): Promise<{
+	rowElement: HTMLTableRowElement;
+	allGrades: CalculatorCourse[];
+	courseNum: string;
+	courseData: CalculatorCourse;
+} | void> {
 	if (!target) return;
 
 	const rowElement = target.closest("tr");
 	if (!rowElement) return;
 	if (rowElement.parentElement?.tagName !== "TBODY") return;
 
-	if (target.matches("td input[type='checkbox'].select_course")) {
+	if (listType === "grades_list" && target.matches("td input[type='checkbox'].select_course")) {
 		if ((target as HTMLInputElement).checked) rowElement.classList.add("selected");
 		else rowElement.classList.remove("selected");
 		updateSelectedCoursesStats();
@@ -148,15 +147,23 @@ async function handleGradesListClick(event: PointerEvent) {
 
 	if (!target.matches("td button")) return;
 
-	const storageData = (await chrome.storage.local.get({grades: []})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({grades: []});
 	const allGrades = storageData.grades;
 	const courseNum = (rowElement.querySelector("td:first-child") as HTMLTableCellElement).textContent;
 	const courseData = allGrades.find((course: CalculatorCourse) => course.num === courseNum);
 
 	if (!courseData) {
-		console.error("Course not found in storage for num:", courseNum);
+		console.error("TPP: Course not found in storage for num:", courseNum);
 		return;
 	}
+
+	return {rowElement, allGrades, courseNum, courseData};
+}
+
+async function handleGradesListClick(event: PointerEvent) {
+	const target = event.target as HTMLElement;
+	const {rowElement, allGrades, courseNum, courseData} = (await handleListClick(target, "grades_list")) ?? {};
+	if (!rowElement || !allGrades || !courseNum || !courseData) return;
 
 	const gradeInput = rowElement.querySelector(".grade") as HTMLInputElement;
 	switch (target.textContent) {
@@ -194,7 +201,6 @@ async function handleGradesListClick(event: PointerEvent) {
 		case "תמיד":
 			courseData.perm_ignored = true;
 			await chrome.storage.local.set({grades: allGrades});
-			handleStorageError("ignore_grade");
 		// eslint-disable-next-line no-fallthrough
 		case "התעלם":
 			rowElement.remove();
@@ -217,23 +223,8 @@ async function handleGradesListClick(event: PointerEvent) {
 
 async function handleIgnoreListClick(event: PointerEvent) {
 	const target = event.target as HTMLElement;
-	if (!target) return;
-
-	const rowElement = target.closest("tr");
-	if (!rowElement) return;
-	if (rowElement.parentElement?.tagName !== "TBODY") return;
-
-	if (!target.matches("td button")) return;
-
-	const storageData = (await chrome.storage.local.get({grades: []})) as StorageData;
-	const allGrades = storageData.grades;
-	const courseNum = (rowElement.querySelector("td:first-child") as HTMLTableCellElement).textContent;
-	const courseData = allGrades.find((course: CalculatorCourse) => course.num === courseNum);
-
-	if (!courseData) {
-		console.error("Course not found in storage for num:", courseNum);
-		return;
-	}
+	const {rowElement, allGrades, courseNum, courseData} = (await handleListClick(target, "ignore_list")) ?? {};
+	if (!rowElement || !allGrades || !courseNum || !courseData) return;
 
 	switch (target.textContent) {
 		case "שחזר":
@@ -245,7 +236,6 @@ async function handleIgnoreListClick(event: PointerEvent) {
 				?.querySelector("tbody")
 				?.prepend(createCourseRowElement(courseData, "grades_list"));
 			await chrome.storage.local.set({grades: allGrades});
-			handleStorageError("restore_grade");
 			break;
 		case "מחק":
 			const sureEh = confirm("האם אתם בטוחים שברצונכם למחוק את הקורס הזה?");
@@ -255,14 +245,13 @@ async function handleIgnoreListClick(event: PointerEvent) {
 			document.getElementById("grades_list")?.querySelector(`#course_${courseNum}`)?.closest("tr")?.remove();
 			const updatedGrades = allGrades.filter((course: CalculatorCourse) => course.num !== courseNum);
 			await chrome.storage.local.set({grades: updatedGrades});
-			handleStorageError("delete_grade");
 			break;
 	}
 	updateAllStats();
 }
 
 /**
- * Validates course input data, for both form and CSV inputs.
+ * Validates course input data, for both PDF and CSV inputs.
  * @param {CalculatorCourse} course - The course object to validate.
  * @returns {{isValid: boolean, message: string}} - An object indicating validity and a message if invalid.
  */
@@ -348,7 +337,7 @@ function setUpButtons() {
 			return;
 		}
 
-		const storageData = (await chrome.storage.local.get({grades: []})) as StorageData;
+		const storageData: StorageData = await chrome.storage.local.get({grades: []});
 		if (storageData.grades.some((course) => course.num === newCourse.num)) {
 			alert(`קורס עם המספר ${newCourse.num} כבר קיים ברשימה.`);
 			addGradeForm.classList.add("failed");
@@ -357,7 +346,6 @@ function setUpButtons() {
 		}
 		storageData.grades.push(newCourse);
 		await chrome.storage.local.set({grades: storageData.grades});
-		handleStorageError("add_grade");
 		const newRow = createCourseRowElement(newCourse, "grades_list");
 		document.getElementById("grades_list")?.querySelector("tbody")?.prepend(newRow);
 
@@ -411,7 +399,7 @@ function setUpButtons() {
 		const downloadLink = document.createElement("a");
 		const csvBlob = new Blob(["\ufeff", csvContent], {type: "text/csv;charset=utf-8;"});
 		downloadLink.href = window.URL.createObjectURL(csvBlob);
-		downloadLink.download = "ציונים_" + Date.now() + ".csv";
+		downloadLink.download = `ציונים_${Date.now()}.csv`;
 		downloadLink.click();
 		downloadLink.remove();
 	});
@@ -434,7 +422,7 @@ function setUpButtons() {
 			) {
 				const validationResult = validateCourseInput(course);
 				if (!validationResult.isValid) {
-					console.warn(`Validation failed for row: ${line} - ${validationResult.message}`);
+					console.log(`Validation failed for row: ${line} - ${validationResult.message}`);
 					return false;
 				}
 
@@ -452,7 +440,6 @@ function setUpButtons() {
 				if (newCourses.length > 0) {
 					currentStoredGrades.push(...newCourses);
 					await chrome.storage.local.set({grades: currentStoredGrades});
-					handleStorageError("import_grade");
 					await renderAllCourses();
 					alert("הייבוא הושלם!");
 				} else alert("לא נמצאו קורסים תקינים לייבוא מהקובץ.");
@@ -467,7 +454,7 @@ function setUpButtons() {
 						?.split("\n")
 						.filter((line) => line.trim() !== "")
 						.slice(1);
-					const storageData = (await chrome.storage.local.get({grades: []})) as StorageData;
+					const storageData: StorageData = await chrome.storage.local.get({grades: []});
 					const currentStoredGrades = storageData.grades;
 
 					lines.forEach((line) => {
@@ -504,7 +491,7 @@ function setUpButtons() {
 						parts.push(currentField);
 
 						if (parts.length !== 6) {
-							console.warn(
+							console.log(
 								"Skipping malformed row (incorrect number of columns) during csv import:",
 								line
 							);
@@ -534,16 +521,19 @@ function setUpButtons() {
 				const reader = new FileReader();
 				reader.readAsArrayBuffer(file);
 				reader.onload = async (event) => {
-					const pdfjsPath = "lib/pdfjs/";
-					const pdfjs = await import(chrome.runtime.getURL(pdfjsPath + "pdf.min.mjs"));
-					pdfjs.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL(pdfjsPath + "pdf.worker.min.mjs");
+					const pdfjsPathPrefix = "lib/pdfjs/pdf",
+						pdfjsPathSuffix = "min.mjs";
+					const pdfjs = await import(chrome.runtime.getURL(`${pdfjsPathPrefix}.${pdfjsPathSuffix}`));
+					pdfjs.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL(
+						`${pdfjsPathPrefix}.worker.${pdfjsPathSuffix}`
+					);
 
 					const pdf = await pdfjs.getDocument(new Uint8Array(event?.target?.result as ArrayBuffer)).promise;
 					let text = "";
 					for (let i = 1; i <= pdf.numPages; i++) {
 						const page = await pdf.getPage(i);
 						const content = await page.getTextContent();
-						text += content.items.map((item: {str: string}) => item.str).join(" ") + "\n";
+						text += `${content.items.map((item: {str: string}) => item.str).join(" ")}\n`;
 					}
 					const lines = text
 						// Add a line break before any sequence of 6 or more digits not preceded by a line break
@@ -562,14 +552,14 @@ function setUpButtons() {
 
 					const coursePattern =
 						/^(\d{6}|\d{8}) ([\w\s\p{P}\u0590-\u05FF]+?) (1?\d(?:\.\d)? |20(?:\.0)? |)(\d{1,3}|עובר|לא עובר|פטור ללא ניקוד|פטור עם ניקוד|פטור) \d{4}-(\d{4}) (חורף|אביב|קיץ) ([\u0590-\u05FF]{3}"[\u0590-\u05FF]+)$/u;
-					const storageData = (await chrome.storage.local.get({grades: []})) as StorageData;
+					const storageData: StorageData = await chrome.storage.local.get({grades: []});
 					const currentStoredGrades = storageData.grades;
 
 					lines.forEach((line) => {
 						const parts = coursePattern.exec(line);
 
 						if (!parts) {
-							console.warn("Skipping malformed row (regex didn't match) during PDF import:", line);
+							console.log("Skipping malformed row (regex didn't match) during PDF import:", line);
 							return;
 						}
 
@@ -604,12 +594,10 @@ function setUpButtons() {
 		if (!sureEh) return;
 
 		await chrome.storage.local.set({grades: []});
-		if (!handleStorageError("delete_all_grades")) {
-			document.getElementById("grades_list")!.querySelector("tbody")!.innerHTML = "";
-			document.getElementById("ignore_list")!.querySelector("tbody")!.innerHTML = "";
-			updateAllStats();
-			alert("כל הציונים נמחקו בהצלחה.");
-		} else alert("אירעה שגיאה בעת מחיקת הציונים. אנא רעננו את העמוד ונסו שנית.");
+		document.getElementById("grades_list")!.querySelector("tbody")!.innerHTML = "";
+		document.getElementById("ignore_list")!.querySelector("tbody")!.innerHTML = "";
+		updateAllStats();
+		alert("כל הציונים נמחקו בהצלחה.");
 	});
 
 	(document.getElementById("grades_list") as HTMLTableElement).addEventListener("click", handleGradesListClick);
@@ -622,7 +610,7 @@ function setUpButtons() {
 }
 
 async function renderAllCourses() {
-	const storageData = (await chrome.storage.local.get({grades: []})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({grades: []});
 	const allGrades = storageData.grades;
 	let latestYear = 1912,
 		latestSemesterOrder = 0;
@@ -646,7 +634,6 @@ async function renderAllCourses() {
 	});
 
 	await chrome.storage.local.set({grades: gradesToPersist});
-	handleStorageError("initial_selection_update");
 
 	const lists = {
 		grades_list: storageData.grades.filter((course: CalculatorCourse) => !course.perm_ignored),
@@ -666,13 +653,13 @@ async function renderAllCourses() {
 			const rowElement = createCourseRowElement(courseData, listKey);
 			fragment.prepend(rowElement);
 		});
-		document.getElementById(listKey)?.querySelector("tbody")?.appendChild(fragment);
+		document.getElementById(listKey)?.querySelector("tbody")?.append(fragment);
 	}
 	updateAllStats();
 }
 
 // Initial setup and data load
-const storageData = (await chrome.storage.local.get({theme: "light"})) as StorageData;
+const storageData: StorageData = await chrome.storage.local.get({theme: "light"});
 resolveTheme(storageData.theme);
 document.getElementById("goToSettings")?.addEventListener("click", () => chrome.runtime.openOptionsPage());
 setUpButtons();

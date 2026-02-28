@@ -24,6 +24,7 @@ export default tseslint.config(
 			"no-async-promise-executor": "off",
 			"no-case-declarations": "off",
 			"no-fallthrough": "warn",
+			"prefer-template": "warn",
 		},
 	}
 );

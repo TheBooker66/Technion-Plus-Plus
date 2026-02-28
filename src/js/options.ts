@@ -82,97 +82,41 @@ async function saveData() {
 		theme: theme,
 		custom_name: customName,
 		custom_link: customLink,
-	} as StorageData);
-	if (chrome.runtime.lastError) {
-		status_bar.textContent = "שגיאה בשמירת הנתונים, אנא נסה שנית!";
-		console.error("TE_opt: " + chrome.runtime.lastError.message);
-	} else {
-		status_bar.textContent = "השינויים נשמרו.";
-		setTimeout(() => (status_bar.textContent = ""), 2e3);
-	}
+	});
+	status_bar.textContent = "השינויים נשמרו.";
+	setTimeout(() => (status_bar.textContent = ""), 2e3);
 
 	if (moodle && loginEh && login) await TE_updateInfo();
 	else await resetBadge();
 }
 
-const commonDOM = {
-	try_vol: document.getElementById("try_vol") as HTMLAnchorElement,
-	notification_volume: document.getElementById("notification_volume") as HTMLInputElement,
-	cs_cal_enabled: document.getElementById("cs_cal_enabled") as HTMLInputElement,
-	cs_cal_div: document.getElementById("cs_cal_div") as HTMLDivElement,
-	entirePage: document.querySelector("html") as HTMLHtmlElement,
-	light: document.getElementById("light") as HTMLInputElement,
-	dark: document.getElementById("dark") as HTMLInputElement,
-	auto: document.getElementById("auto") as HTMLInputElement,
-};
+async function loadData() {
+	const storageData: StorageData = await chrome.storage.local.get({
+		username: "",
+		email_server: true,
+		phrase: "",
+		term: "",
+		maor_p: "maor",
+		uidn_arr: ["", ""],
+		email_preference: "gmail",
+		quick_login: true,
+		allow_timings: false,
+		panopto_save: true,
+		external_user: false,
+		hw_alerts: true,
+		moodle_cal_enabled: true,
+		cs_cal_enabled: false,
+		cs_cal_pass: "",
+		webwork_cal_enabled: false,
+		webwork_cal_courses: {},
+		notif_vol: 1,
+		theme: "light",
+		custom_name: "",
+		custom_link: "",
+	});
 
-document.getElementById("save")!.addEventListener("click", async () => await saveData());
-document.addEventListener("keypress", async (event) => event.key === "Enter" && (await saveData()));
-
-commonDOM.try_vol.addEventListener("click", async () => {
-	const elem = document.createElement("audio");
-	elem.setAttribute("preload", "auto");
-	elem.setAttribute("autobuffer", "true");
-	elem.volume = parseFloat(commonDOM.notification_volume.value);
-	elem.src = chrome.runtime.getURL("resources/notification.mp3");
-	await elem.play();
-});
-commonDOM.notification_volume.addEventListener("change", (event) => {
-	commonDOM.try_vol.textContent = `נסה (${100 * parseFloat((event.target as HTMLInputElement).value)}%)`;
-});
-
-commonDOM.cs_cal_enabled.addEventListener("change", (event) => {
-	commonDOM.cs_cal_div.style.marginRight = "20px !important";
-	commonDOM.cs_cal_div.style.display = (event.target as HTMLInputElement).checked ? "block" : "none";
-});
-
-commonDOM.light.addEventListener(
-	"change",
-	(event) => (event.target as HTMLInputElement).checked && commonDOM.entirePage.removeAttribute("tplus")
-);
-commonDOM.dark.addEventListener(
-	"change",
-	(event) => (event.target as HTMLInputElement).checked && commonDOM.entirePage.setAttribute("tplus", "dm")
-);
-commonDOM.auto.addEventListener("change", (event) => {
-	if (!(event.target as HTMLInputElement).checked) return;
-	if (window.matchMedia("(prefers-color-scheme: dark)").matches) commonDOM.entirePage.setAttribute("tplus", "dm");
-	else commonDOM.entirePage.removeAttribute("tplus");
-});
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
-	if (commonDOM.auto.checked && event.matches) commonDOM.entirePage.setAttribute("tplus", "dm");
-	else commonDOM.entirePage.removeAttribute("tplus");
-});
-
-const storageData = (await chrome.storage.local.get({
-	username: "",
-	email_server: true,
-	phrase: "",
-	term: "",
-	maor_p: "maor",
-	uidn_arr: ["", ""],
-	email_preference: "gmail",
-	quick_login: true,
-	allow_timings: false,
-	panopto_save: true,
-	external_user: false,
-	hw_alerts: true,
-	moodle_cal_enabled: true,
-	cs_cal_enabled: false,
-	cs_cal_pass: "",
-	webwork_cal_enabled: false,
-	webwork_cal_courses: {},
-	notif_vol: 1,
-	theme: "light",
-	custom_name: "",
-	custom_link: "",
-})) as StorageData;
-if (chrome.runtime.lastError) {
-	console.error("TE_opt: " + chrome.runtime.lastError.message);
-	document.querySelector(".wrapper")!.textContent = "שגיאה באחזור הנתונים, אנא נסה שנית.";
-} else {
 	const decryptedPassword = reverseString(xorStrings(storageData.term + storageData.phrase, storageData.maor_p)),
-		decryptedID = reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1]));
+		decryptedID = reverseString(xorStrings(`${storageData.uidn_arr[0]}`, storageData.uidn_arr[1]));
 	(document.getElementById("username") as HTMLInputElement).value = storageData.username;
 	(document.getElementById("campus") as HTMLOptionElement).selected = storageData.email_server;
 	(document.getElementById("technion") as HTMLOptionElement).selected = !storageData.email_server;
@@ -219,16 +163,69 @@ if (chrome.runtime.lastError) {
 
 	if (storageData.webwork_cal_enabled) {
 		const webworkCoursesElement = document.getElementById("ww_current") as HTMLSpanElement,
-			webworkCourseNames = Object.values(storageData.webwork_cal_courses).map(
-				(course) => (course as WebWorkCourse).name
-			);
+			webworkCourseNames = Object.values(storageData.webwork_cal_courses).map((course) => course.name);
 		webworkCoursesElement.style.display = "block";
 		if (0 < webworkCourseNames.length)
 			webworkCoursesElement.querySelector("span")!.textContent = webworkCourseNames.join(", ");
 	}
 }
 
-const extensionSize = ((await chrome.storage.local.getBytesInUse(null)) / 1000).toFixed(3),
-	extensionVersion = chrome.runtime.getManifest().version;
-(document.getElementById("ext_version") as HTMLSpanElement).textContent += ` ${extensionVersion}`;
-(document.getElementById("storageVol") as HTMLSpanElement).textContent += ` ${extensionSize}kB`;
+async function setupPage() {
+	const commonDOM = {
+		try_vol: document.getElementById("try_vol") as HTMLAnchorElement,
+		notification_volume: document.getElementById("notification_volume") as HTMLInputElement,
+		cs_cal_enabled: document.getElementById("cs_cal_enabled") as HTMLInputElement,
+		cs_cal_div: document.getElementById("cs_cal_div") as HTMLDivElement,
+		entirePage: document.querySelector("html") as HTMLHtmlElement,
+		light: document.getElementById("light") as HTMLInputElement,
+		dark: document.getElementById("dark") as HTMLInputElement,
+		auto: document.getElementById("auto") as HTMLInputElement,
+	};
+
+	document.getElementById("save")!.addEventListener("click", async () => await saveData());
+	document.addEventListener("keypress", async (event) => event.key === "Enter" && (await saveData()));
+
+	commonDOM.try_vol.addEventListener("click", async () => {
+		const elem = document.createElement("audio");
+		elem.setAttribute("preload", "auto");
+		elem.setAttribute("autobuffer", "true");
+		elem.volume = parseFloat(commonDOM.notification_volume.value);
+		elem.src = chrome.runtime.getURL("resources/notification.mp3");
+		await elem.play();
+	});
+	commonDOM.notification_volume.addEventListener("change", (event) => {
+		commonDOM.try_vol.textContent = `נסה (${100 * parseFloat((event.target as HTMLInputElement).value)}%)`;
+	});
+
+	commonDOM.cs_cal_enabled.addEventListener("change", (event) => {
+		commonDOM.cs_cal_div.style.marginRight = "20px !important";
+		commonDOM.cs_cal_div.style.display = (event.target as HTMLInputElement).checked ? "block" : "none";
+	});
+
+	commonDOM.light.addEventListener(
+		"change",
+		(event) => (event.target as HTMLInputElement).checked && commonDOM.entirePage.removeAttribute("tplus")
+	);
+	commonDOM.dark.addEventListener(
+		"change",
+		(event) => (event.target as HTMLInputElement).checked && commonDOM.entirePage.setAttribute("tplus", "dm")
+	);
+	commonDOM.auto.addEventListener("change", (event) => {
+		if (!(event.target as HTMLInputElement).checked) return;
+		if (window.matchMedia("(prefers-color-scheme: dark)").matches) commonDOM.entirePage.setAttribute("tplus", "dm");
+		else commonDOM.entirePage.removeAttribute("tplus");
+	});
+	window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+		if (commonDOM.auto.checked && event.matches) commonDOM.entirePage.setAttribute("tplus", "dm");
+		else commonDOM.entirePage.removeAttribute("tplus");
+	});
+
+	await loadData();
+
+	const extensionSize = ((await chrome.storage.local.getBytesInUse(null)) / 1000).toFixed(3),
+		extensionVersion = chrome.runtime.getManifest().version;
+	(document.getElementById("ext_version") as HTMLSpanElement).textContent += ` ${extensionVersion}`;
+	(document.getElementById("storageVol") as HTMLSpanElement).textContent += ` ${extensionSize}kB`;
+}
+
+await setupPage();

@@ -6,6 +6,7 @@ const config: Config = {
 	trailingComma: "es5",
 	bracketSpacing: false,
 	printWidth: 120,
+	quoteProps: "preserve",
 };
 
 export default config;

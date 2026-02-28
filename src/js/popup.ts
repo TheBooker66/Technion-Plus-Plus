@@ -1,20 +1,19 @@
 import {CommonPopup} from "./common_popup.js";
 import {resetBadge, reverseString, xorStrings} from "./utils.js";
 
-(async function () {
-	function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[]) {
-		for (let i = 0; i < tabs.length; i++) {
-			tabs[i].addEventListener("click", () => {
-				if (tabs[i].classList.contains("current")) return;
-				for (let j = 0; j < tabs.length; j++) {
-					tabs[j].className = j === i ? "tab current" : "tab";
-					popup[j].style.display = j === i ? "block" : "none";
-				}
-			});
-		}
+function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[]) {
+	for (let i = 0; i < tabs.length; i++) {
+		tabs[i].addEventListener("click", () => {
+			if (tabs[i].classList.contains("current")) return;
+			for (let j = 0; j < tabs.length; j++) {
+				tabs[j].className = j === i ? "tab current" : "tab";
+				popup[j].style.display = j === i ? "block" : "none";
+			}
+		});
 	}
+}
 
-	new CommonPopup("", ["main"], document.title);
+async function setup() {
 	const badgeColours = await chrome.action.getBadgeBackgroundColor({});
 	if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34)
 		// Error colours
@@ -37,7 +36,7 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 		});
 	});
 
-	const popup_window = {
+	const popup_window: chrome.windows.CreateData = {
 			type: "popup",
 			focused: true,
 			state: "normal",
@@ -46,7 +45,7 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 			width: Math.min(window.screen.width - 20, 1200),
 			top: 0,
 			left: 0,
-		} as chrome.windows.CreateData,
+		},
 		toolLinks = (document.getElementById("tools_content") as HTMLDivElement).querySelectorAll("a");
 	popup_window.top = parseInt(((window.screen.height - (popup_window.height as number)) / 2).toString());
 	popup_window.left = parseInt(((window.screen.width - (popup_window.width as number)) / 2).toString());
@@ -61,7 +60,7 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 	);
 	for (let i = 0; i < toolLinks.length; i++) {
 		if ([0, 4, 5, 7].includes(i)) continue; // 0 - release notes, 4 - Organiser, 5 - calculator, 7 - printer
-		toolLinks[i].addEventListener("click", () => (window.location.href = "../html/p_" + toolLinks[i].id + ".html"));
+		toolLinks[i].addEventListener("click", () => (window.location.href = `../html/p_${toolLinks[i].id}.html`));
 	}
 
 	const mainScreensLinks = document.querySelectorAll("#tools_and_links > div") as NodeListOf<HTMLDivElement>,
@@ -77,23 +76,27 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 	((document.getElementById("cant_login") as HTMLDivElement).querySelector("u") as HTMLElement).addEventListener(
 		"click",
 		async () => {
-			await chrome.runtime.openOptionsPage();
-			if (chrome.runtime.lastError) console.error("TE_p: " + chrome.runtime.lastError.message);
+			try {
+				await chrome.runtime.openOptionsPage();
+			} catch (err) {
+				console.error("TPP: failed to open options page", err);
+				window.open("../html/options.html", "_blank");
+			}
 		}
 	);
 
 	const quick_login_toggle = document.getElementById("quick_login_toggle") as HTMLInputElement,
 		mute_alerts_toggle = document.getElementById("mute_alerts_toggle") as HTMLInputElement;
-	quick_login_toggle.addEventListener("change", async () => {
-		await chrome.storage.local.set({quick_login: quick_login_toggle.checked});
-		if (chrome.runtime.lastError) console.error("TE_popup_login: " + chrome.runtime.lastError.message);
-	});
-	mute_alerts_toggle.addEventListener("change", async () => {
-		await chrome.storage.local.set({alerts_sound: mute_alerts_toggle.checked});
-		if (chrome.runtime.lastError) console.error("TE_popup_mute_alerts: " + chrome.runtime.lastError.message);
-	});
+	quick_login_toggle.addEventListener(
+		"change",
+		async () => await chrome.storage.local.set({quick_login: quick_login_toggle.checked})
+	);
+	mute_alerts_toggle.addEventListener(
+		"change",
+		async () => await chrome.storage.local.set({alerts_sound: mute_alerts_toggle.checked})
+	);
 
-	const storageData = (await chrome.storage.local.get({
+	const storageData: StorageData = await chrome.storage.local.get({
 		enable_login: false,
 		quick_login: true,
 		alerts_sound: true,
@@ -110,7 +113,7 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 		email_server: true,
 		custom_name: "",
 		custom_link: "",
-	})) as StorageData;
+	});
 	quick_login_toggle.checked = storageData.quick_login;
 	mute_alerts_toggle.checked = storageData.alerts_sound;
 	(document.getElementById("cant_login") as HTMLDivElement).style.display = storageData.enable_login
@@ -127,7 +130,7 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 	const calendarIDs = ["cal_moodle", "cal_cs", "cal_webwork"];
 	for (let i = 0; i < calendarIDs.length; i++) {
 		// noinspection JSBitwiseOperatorUsage
-		if (storageData.cal_seen & Math.pow(2, i))
+		if (storageData.cal_seen & (1 << i))
 			(document.getElementById(calendarIDs[i]) as HTMLDivElement).className = "major hw";
 	}
 
@@ -135,24 +138,26 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 		(document.getElementById("downloads") as HTMLAnchorElement).classList.add("active");
 
 	const printerLinks = printScreen.querySelectorAll("a"),
-		id: string =
-			reverseString(xorStrings(storageData.uidn_arr[0] + "", storageData.uidn_arr[1])) || "הקלד מספר זהות כאן";
-	for (let i = 0; i < printerLinks.length; i++) {
+		id = reverseString(xorStrings(`${storageData.uidn_arr[0]}`, storageData.uidn_arr[1])) || "הקלד מספר זהות כאן";
+	for (const printerLink of printerLinks) {
 		const emailURL =
 			storageData.email_preference === "gmail"
-				? `https://mail.google.com/mail/u/0/?view=cm&fs=1&to=print.${printerLinks[i].id}@campus.technion.ac.il&su=${id}`
+				? `https://mail.google.com/mail/u/0/?view=cm&fs=1&to=print.${printerLink.id}@campus.technion.ac.il&su=${id}`
 				: storageData.email_preference === "outlook"
-					? `https://outlook.office.com/mail/deeplink/compose?login_hint=${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il&to=print.${printerLinks[i].id}@campus.technion.ac.il&subject=${id}`
-					: `mailto:print.${printerLinks[i].id}@campus.technion.ac.il?subject=${id}`;
-		printerLinks[i].setAttribute("href", emailURL);
+					? `https://outlook.office.com/mail/deeplink/compose?login_hint=${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il&to=print.${printerLink.id}@campus.technion.ac.il&subject=${id}`
+					: `mailto:print.${printerLink.id}@campus.technion.ac.il?subject=${id}`;
+		printerLink.setAttribute("href", emailURL);
 		if (id !== "הקלד מספר זהות כאן" && id !== "") continue;
-		printerLinks[i].addEventListener("click", async () => {
-			await chrome.runtime.sendMessage({
-				mess_t: "silent_notification",
-				message:
-					'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.',
-			});
-			if (chrome.runtime.lastError) console.error("TE_popup_printers: " + chrome.runtime.lastError.message);
+		printerLink.addEventListener("click", async () => {
+			try {
+				await chrome.runtime.sendMessage({
+					mess_t: "silent_notification",
+					message:
+						'מיד ייפתח חלון לשליחת מייל בהתאם לבחירתך. עלייך למלא מספר ת"ז בנושא ולצרף את הקבצים המבוקשים להדפסה.',
+				});
+			} catch (err) {
+				console.error("TPP: failed to notify about printing", err);
+			}
 		});
 	}
 
@@ -160,7 +165,7 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 		customLink = document.getElementById("custom_link") as HTMLAnchorElement;
 	studentsLink.addEventListener("click", async () => {
 		const loadingInterval = setInterval(() => {
-			studentsLink.textContent = 7 > studentsLink.textContent.length ? studentsLink.textContent + "." : "טוען";
+			studentsLink.textContent = 7 > studentsLink.textContent.length ? `${studentsLink.textContent}.` : "טוען";
 		}, 500);
 		let authURL;
 		try {
@@ -174,9 +179,9 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 		urlParams.delete("prompt");
 		urlParams.append(
 			"login_hint",
-			storageData.username + "@" + (storageData.email_server ? "campus." : "") + "technion.ac.il"
+			`${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il`
 		);
-		window.open(urlParts[0] + "?" + urlParams.toString() || authURL, "_blank");
+		window.open(`${urlParts[0]}?${urlParams.toString()}`, "_blank");
 		clearInterval(loadingInterval);
 		studentsLink.textContent = "Students";
 	});
@@ -190,4 +195,7 @@ import {resetBadge, reverseString, xorStrings} from "./utils.js";
 		customLink.title = "מאגר קורסים מצולמים";
 		customLink.setAttribute("href", "https://panoptotech.cloud.panopto.eu");
 	}
-})();
+}
+
+new CommonPopup("", ["main"], document.title);
+await setup();

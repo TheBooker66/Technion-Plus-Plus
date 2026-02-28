@@ -1,9 +1,9 @@
-(async function () {
-	const storageData = (await chrome.storage.local.get({
+async function main() {
+	const storageData: StorageData = await chrome.storage.local.get({
 		email_preference: "gmail",
 		username: "",
 		email_server: true,
-	})) as StorageData;
+	});
 	const contactInfo = {ad: "ethan.amiran@gmail.com", su: "יצירת קשר - Technion"},
 		button = document.getElementById("mail_to_me") as HTMLAnchorElement;
 	let emailURL: string;
@@ -21,4 +21,7 @@
 			break;
 	}
 	button.setAttribute("href", emailURL);
-})();
+}
+
+await main();
+export {};

@@ -13,5 +13,5 @@ const date = new Date((document.getElementById("date") as HTMLSpanElement).textC
 	version_number.indexOf(".", version_number.indexOf(".") + 1)
 );
 
-const storageData = (await chrome.storage.local.get({theme: "light"})) as StorageData;
+const storageData: StorageData = await chrome.storage.local.get({theme: "light"});
 resolveTheme(storageData.theme);

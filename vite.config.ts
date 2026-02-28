@@ -15,7 +15,7 @@ function cleanPlugin(outDir: string) {
 		buildStart() {
 			const projectRoot = resolve(import.meta.dirname);
 			const fullOut = resolve(projectRoot, outDir),
-				zipOut = fullOut + ".zip",
+				zipOut = `${fullOut}.zip`,
 				sourceZipOut = resolve(projectRoot, "source.zip");
 			if (fs.existsSync(fullOut)) {
 				console.log(`Removing existing output directory: ${fullOut}`);
@@ -73,7 +73,7 @@ function zipPlugin(outDir: string, isProd: boolean) {
 		name: "zip-bundle",
 		async closeBundle() {
 			const projectRoot = resolve(import.meta.dirname);
-			const distOutput = fs.createWriteStream(resolve(projectRoot, outDir + ".zip")),
+			const distOutput = fs.createWriteStream(resolve(projectRoot, `${outDir}.zip`)),
 				sourceOutput = fs.createWriteStream(resolve(projectRoot, "source.zip"));
 			const distArchiver = archiver("zip", {
 					zlib: {level: 9},
@@ -85,7 +85,7 @@ function zipPlugin(outDir: string, isProd: boolean) {
 			new Promise<void>((resolvePromise, reject) => {
 				distOutput.on("close", () => {
 					console.log(`\n📦 Zip complete. Total bytes: ${distArchiver.pointer()}.`);
-					console.log(`Output archive written to: ${resolve(projectRoot, outDir + ".zip")}`);
+					console.log(`Output archive written to: ${resolve(projectRoot, `${outDir}.zip`)}`);
 					resolvePromise();
 				});
 
@@ -112,7 +112,7 @@ function zipPlugin(outDir: string, isProd: boolean) {
 				sourceArchiver.pipe(sourceOutput);
 				sourceArchiver.glob("**/*", {
 					cwd: projectRoot,
-					ignore: ["node_modules/**", outDir + "/**", outDir + ".zip", "source.zip"],
+					ignore: ["node_modules/**", `${outDir}/**`, `${outDir}.zip`, "source.zip"],
 				});
 				// create lib folder structure in source zip
 				sourceArchiver.file(resolve(projectRoot, "node_modules/pdfjs-dist/build/pdf.min.mjs"), {
@@ -121,7 +121,7 @@ function zipPlugin(outDir: string, isProd: boolean) {
 				sourceArchiver.file(resolve(projectRoot, "node_modules/pdfjs-dist/build/pdf.worker.min.mjs"), {
 					name: "src/lib/pdfjs/pdf.worker.min.mjs",
 				});
-				sourceArchiver.file(resolve(projectRoot, outDir + "/lib/cheesefork/share-histograms.js"), {
+				sourceArchiver.file(resolve(projectRoot, `${outDir}/lib/cheesefork/share-histograms.js`), {
 					name: "src/lib/cheesefork/share-histograms.js",
 				});
 				sourceArchiver.finalize();

@@ -6,11 +6,11 @@ export class CommonPopup {
 		if (context === "ארגונית++") return;
 
 		void this.useTemplatesFile("popup", (documentContext: Document) => {
-			for (let i = 0; i < css_list.length; i++) {
+			for (const item of css_list) {
 				const linkTemplate = this.loadTemplate("head-stylesheets", documentContext);
 				const element = linkTemplate.querySelector("link");
-				if (element) element.setAttribute("href", "../css/p_" + css_list[i] + ".css");
-				document.head.appendChild(linkTemplate);
+				if (element) element.setAttribute("href", `../css/p_${item}.css`);
+				document.head.append(linkTemplate);
 			}
 
 			const wrapper = document.querySelector(".wrapper") as HTMLElement;
@@ -28,7 +28,7 @@ export class CommonPopup {
 	}
 
 	useTemplatesFile = async (templateFileName: string, callback: (documentContext: Document) => void) => {
-		const template = await fetch("../html/templates/" + templateFileName + ".html");
+		const template = await fetch(`../html/templates/${templateFileName}.html`);
 		const text = await template.text();
 		const doc = new DOMParser().parseFromString(text, "text/html");
 		callback(doc);
@@ -42,10 +42,9 @@ export class CommonPopup {
 	};
 
 	buttonsSetup() {
-		document.getElementById("goToSettings")?.addEventListener("click", async () => {
-			await chrome.runtime.openOptionsPage();
-			if (chrome.runtime.lastError) console.error("TE_p: " + chrome.runtime.lastError.message);
-		});
+		document
+			.getElementById("goToSettings")
+			?.addEventListener("click", async () => await chrome.runtime.openOptionsPage());
 		document
 			.getElementById("goToAbout")
 			?.addEventListener("click", () => (window.location.href = "../html/p_about.html"));

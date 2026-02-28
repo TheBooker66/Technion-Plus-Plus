@@ -85,6 +85,8 @@ type StorageData = {
 	dl_queue: DownloadItem[];
 };
 
+type ExtendedStorageData = StorageData & {username_ext: string; password: string};
+
 type HWSystem = "moodle" | "cs" | "webwork" | "ua";
 
 // If a property is not present, it is due to the assignment being a user-added assignment ("ua")

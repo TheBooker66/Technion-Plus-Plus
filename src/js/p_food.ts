@@ -1,29 +1,16 @@
 import {CommonPopup} from "./common_popup.js";
 
-(async function () {
-	function oops(message: string) {
-		const element = document.getElementById("info") as HTMLDivElement;
-		element.className = "error_bar";
-		element.style.display = "block";
-		element.textContent = message;
-	}
+function oops(message: string) {
+	const element = document.getElementById("info") as HTMLDivElement;
+	element.className = "error_bar";
+	element.style.display = "block";
+	element.textContent = message;
+}
 
-	const popup = new CommonPopup("מסעדות פתוחות בטכניון", [""], document.title);
-	const storageData = await chrome.storage.local.get({allow_timings: false});
-
-	if (chrome.runtime.lastError) {
-		oops("שגיאה באחזור נתונים מהגדרות הדפדפן.");
-		return;
-	}
-	if (!storageData.allow_timings) {
-		oops('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.');
-		return;
-	}
-
+async function main() {
 	const restaurants = (await popup.XHR("../resources/food.json", "json")).response;
 	const foodTable = document.getElementById("food_table") as HTMLDivElement;
 	let counter = 0;
-
 	const currentDate = new Date();
 	const currentDayKey = {
 		0: "ש'",
@@ -34,9 +21,7 @@ import {CommonPopup} from "./common_popup.js";
 		5: "א'-ה'",
 		6: "ו'",
 	}[currentDate.getDay()]!;
-	const currentTime =
-		currentDate.getHours().toString().padStart(2, "0") + ":" + currentDate.getMinutes().toString().padStart(2, "0");
-
+	const currentTime = `${currentDate.getHours().toString().padStart(2, "0")}:${currentDate.getMinutes().toString().padStart(2, "0")}`;
 	for (const item of restaurants) {
 		let openEh = false,
 			hoursToday = "";
@@ -67,24 +52,23 @@ import {CommonPopup} from "./common_popup.js";
 		if (counter !== 0) {
 			const divider = document.createElement("div");
 			divider.className = "divider";
-			foodTable.appendChild(divider);
+			foodTable.append(divider);
 		}
-		foodTable.appendChild(node);
+		foodTable.append(node);
 		counter++;
 	}
-
 	const info = document.getElementById("info") as HTMLDivElement;
-	if (counter === 0) info.textContent = "כל המסעדות בבית הסטודנט סגורות כעת.";
+	if (counter === 0) info.append("כל המסעדות בבית הסטודנט סגורות כעת.");
 	else {
-		const b = document.createElement("b");
-		b.textContent = "הפתוחים כעת";
-		info.appendChild(document.createTextNode("הרשימה מציגה מסעדות ועסקים "));
-		info.appendChild(b);
-		info.appendChild(
-			document.createTextNode(
-				" בקמפוס הטכניון. הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. " +
-					'כל המידע באדיבות המיילים השבועיים של אס"ט. עודכן לאחרונה ב־24.2.26.'
-			)
+		info.append(
+			"הרשימה מציגה מסעדות ועסקים ",
+			(document.createElement("b").textContent = "הפתוחים כעת"),
+			` בקמפוס הטכניון. הרשימה אינה עדכנית לחגים ושאר מועדים מיוחדים. כל המידע באדיבות המיילים השבועיים של אס"ט. עודכן לאחרונה ב־24.2.26.`
 		);
 	}
-})();
+}
+
+const popup = new CommonPopup("מסעדות פתוחות בטכניון", [""], document.title);
+const storageData: StorageData = await chrome.storage.local.get({allow_timings: false});
+if (storageData.allow_timings) await main();
+else oops('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.');

@@ -25,7 +25,7 @@ function openAssignment(assignment: HTMLDivElement, gotoFunction: () => void) {
 	} catch (err) {
 		assignment.style.background = "var(--status-danger) !important;";
 		setTimeout(() => (assignment.style.background = ""), 1e3);
-		console.error("TE_organizer: " + err);
+		console.error("TPP: failed to open assignment", err);
 	} finally {
 		button.classList.remove("small_spinner");
 		button.textContent = originalText;
@@ -59,12 +59,9 @@ function sortElements(a: HTMLDivElement, b: HTMLDivElement, considerPins: boolea
 
 async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElement, finishEh: boolean) {
 	if (sys === "ua") {
-		const storageData = (await chrome.storage.local.get({user_agenda: {}})) as StorageData;
-		if (chrome.runtime.lastError) console.error("TE_organizer: " + chrome.runtime.lastError.message);
-		else {
-			storageData.user_agenda[eventID].done = !storageData.user_agenda[eventID].done;
-			await chrome.storage.local.set({user_agenda: storageData.user_agenda});
-		}
+		const storageData: StorageData = await chrome.storage.local.get({user_agenda: {}});
+		storageData.user_agenda[eventID].done = !storageData.user_agenda[eventID].done;
+		await chrome.storage.local.set({user_agenda: storageData.user_agenda});
 	} else await toggleDoneOriginal(sys, eventID, element, finishEh);
 
 	let targetList: HTMLElement;
@@ -73,17 +70,24 @@ async function toggleDone(sys: HWSystem, eventID: number, element: HTMLDivElemen
 		element.classList.remove("pinned");
 	} else {
 		targetList = document.getElementById("new_assignments")!;
-		const storageData = (await chrome.storage.local.get({pinned_assignments: []})) as StorageData;
+		const storageData: StorageData = await chrome.storage.local.get({pinned_assignments: []});
 		if (storageData.pinned_assignments.includes(eventID)) {
 			element.classList.add("pinned");
 		}
 	}
-	targetList.appendChild(element);
+	targetList.append(element);
 
 	const assignments = Array.from(targetList.children) as HTMLDivElement[];
 	assignments.sort((a, b) => sortElements(a, b, targetList.id === "new_assignments"));
-	assignments.forEach((el) => targetList.appendChild(el));
+	targetList.append(...assignments);
 	checkForEmpty();
+}
+
+function loadTemplate(templateID: string, documentContext: Document | Element = document) {
+	return document.importNode(
+		(documentContext.querySelector(`template#${templateID}`) as HTMLTemplateElement)?.content,
+		true
+	);
 }
 
 function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: HWAssignment[]) {
@@ -111,11 +115,11 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 			};
 			courses.add(assignmentData.course!);
 			(newAssigment.querySelector(".system") as HTMLImageElement).src =
-				"../icons/" + icons[assignmentData.sys][0];
-			(newAssigment.querySelector(".system") as HTMLImageElement).title = "מטלת" + icons[assignmentData.sys][1];
+				`../icons/${icons[assignmentData.sys][0]}`;
+			(newAssigment.querySelector(".system") as HTMLImageElement).title = `מטלת${icons[assignmentData.sys][1]}`;
 			newAssigment.querySelector(".assignment_name")!.textContent = assignmentData.name;
 			newAssigment.querySelector(".course_name")!.textContent += assignmentData.course;
-			newAssigment.dataset.course = "#" + assignmentData.course;
+			newAssigment.dataset.course = `#${assignmentData.course}`;
 			newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
 			newAssigment.querySelector(".end_time > span")!.textContent = assignmentData.finalDate!;
 			const buttonElements = newAssigment.querySelectorAll("a.button");
@@ -135,7 +139,7 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 			newAssigment
 				.querySelector(".assignment_name")!
 				.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
-			document.getElementById(targetListID)!.appendChild(newAssigment);
+			document.getElementById(targetListID)!.append(newAssigment);
 		}
 	};
 
@@ -164,8 +168,7 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 }
 
 async function togglePinned(eventID: number, sys: HWSystem, element: HTMLDivElement) {
-	const storageData = (await chrome.storage.local.get({pinned_assignments: [], user_agenda: {}})) as StorageData;
-
+	const storageData: StorageData = await chrome.storage.local.get({pinned_assignments: [], user_agenda: {}});
 	const pinnedList: number[] = storageData.pinned_assignments;
 	const alreadyPinnedEh = pinnedList.includes(eventID);
 
@@ -187,16 +190,15 @@ async function togglePinned(eventID: number, sys: HWSystem, element: HTMLDivElem
 	const container = element.parentElement as HTMLDivElement;
 	const assignments = Array.from(container.children) as HTMLDivElement[];
 	assignments.sort((a, b) => sortElements(a, b, container.id === "new_assignments"));
-
-	assignments.forEach((assignment) => container.appendChild(assignment));
+	container.append(...assignments);
 	checkForEmpty();
 }
 
 async function editUA(assignmentID: number) {
-	const storageData = (await chrome.storage.local.get({user_agenda: {}})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({user_agenda: {}});
 	const userAgenda: {[key: string]: HWAssignment} = storageData.user_agenda;
 
-	tabHeaders[2].click();
+	(document.querySelectorAll("#tabs > .tab") as NodeListOf<HTMLDivElement>)[2].click();
 	form.subject.value = userAgenda[assignmentID].name;
 	form.notes.value = userAgenda[assignmentID].description;
 	form.edit.value = assignmentID;
@@ -212,7 +214,7 @@ async function editUA(assignmentID: number) {
 }
 
 async function removeUA(assignmentID: number) {
-	const storageData = (await chrome.storage.local.get({user_agenda: {}})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({user_agenda: {}});
 	if (!Object.hasOwn(storageData.user_agenda, assignmentID)) return;
 	if (!window.confirm(`המטלה "${storageData.user_agenda[assignmentID].name}" תימחק!`)) return;
 
@@ -238,7 +240,7 @@ function insertUserAssignment(
 		textareaElement = container.querySelector(".assignment_description textarea") as HTMLTextAreaElement,
 		inputElement = container.querySelector(".end_time > span") as HTMLInputElement;
 	textareaElement.textContent = assignmentData.description;
-	textareaElement.style.height = textareaHeight + "px";
+	textareaElement.style.height = `${textareaHeight}px`;
 	if (0 < assignmentData.timestamp) {
 		inputElement.parentElement!.style.visibility = "visible";
 		inputElement.textContent = new Date(assignmentData.timestamp).toLocaleString("he-IL", {
@@ -277,9 +279,10 @@ export async function addAssignmentsToList(
 	calendarType: HWSystem
 ) {
 	assignmentPromises[calendarType] = calendarPromise;
+	const CALENDARS: number = 3; // moodle, webwork, cs
 	if (Object.keys(assignmentPromises).length !== CALENDARS) return;
 
-	const storageData = (await chrome.storage.local.get({
+	const storageData: StorageData = await chrome.storage.local.get({
 		quick_login: true,
 		enable_login: true,
 		user_agenda: {},
@@ -287,7 +290,7 @@ export async function addAssignmentsToList(
 		cs_cal_enabled: false,
 		webwork_cal_enabled: false,
 		pinned_assignments: [],
-	})) as StorageData;
+	});
 	const userAgendaData = storageData.user_agenda,
 		enabledCalendars = {
 			moodle: storageData.quick_login && storageData.enable_login && storageData.moodle_cal_enabled,
@@ -354,7 +357,7 @@ async function saveUA() {
 		alert("תאריך הסיום שבחרת כבר עבר, נא לבחור תאריך סיום חדש.");
 		return;
 	}
-	const storageData = (await chrome.storage.local.get({user_agenda: {}})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({user_agenda: {}});
 	const userAgenda = storageData.user_agenda;
 	const assignmentID = parseInt(form.edit.value);
 	const isExistingAssignment = 0 < assignmentID ? Object.hasOwn(userAgenda, assignmentID) : false;
@@ -385,7 +388,7 @@ async function saveUA() {
 		assignmentElement = loadTemplate("userAgenda").cloneNode(true) as HTMLDivElement;
 		insertUserAssignment(userAgenda[finalAssignmentID], assignmentElement, "new_assignments", true);
 		checkForEmpty();
-		tabHeaders[0].click();
+		(document.querySelector("#tabs > .tab") as HTMLDivElement).click();
 	}
 	resetUAForm();
 }
@@ -401,7 +404,7 @@ async function setUpFilters() {
 
 	typeFilterToggle.addEventListener("click", () => {
 		if (typeFilterToggle.textContent === "בטל סינון") {
-			for (let i = 0; i < typeFilters.length; i++) typeFilters[i].checked = false;
+			for (const typeFilter of typeFilters) typeFilter.checked = false;
 			typeFilters[0].dispatchEvent(new Event("change"));
 			typeFilterToggle.textContent = "סינון מטלות לפי סוג";
 		} else typeFilterToggle.textContent = "בטל סינון";
@@ -417,24 +420,18 @@ async function setUpFilters() {
 		if (typeFilterToggle.textContent === "סינון מטלות לפי סוג") filtersDiv.classList.toggle("hidden");
 	});
 
-	for (let i = 0; i < typeFilters.length; i++) {
-		typeFilters[i].addEventListener("change", async () => {
-			const storageData = (await chrome.storage.local.get({
+	for (const typeFilter of typeFilters) {
+		typeFilter.addEventListener("change", async () => {
+			const storageData: StorageData = await chrome.storage.local.get({
 				filter_toggles: {appeals: false, zooms: false, attendance: false, reserveDuty: false},
-			})) as StorageData;
-			if (chrome.runtime.lastError) {
-				console.error("TE_cal: " + chrome.runtime.lastError.message);
-				insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
-				return;
-			}
+			});
 			for (const type in storageData.filter_toggles)
 				storageData.filter_toggles[type as keyof StorageData["filter_toggles"]] = (
 					document.getElementById(type) as HTMLInputElement
 				).checked;
 
 			await chrome.storage.local.set({filter_toggles: storageData.filter_toggles});
-			if (chrome.runtime.lastError) console.error("TE_popup_remoodle: " + chrome.runtime.lastError);
-			else location.reload();
+			location.reload();
 		});
 	}
 	courseFilters.addEventListener("change", () => {
@@ -451,14 +448,9 @@ async function setUpFilters() {
 		checkForEmpty();
 	});
 
-	const storageData = (await chrome.storage.local.get({
+	const storageData: StorageData = await chrome.storage.local.get({
 		filter_toggles: {appeals: false, zooms: false, attendance: false, reserveDuty: false},
-	})) as StorageData;
-	if (chrome.runtime.lastError) {
-		console.error("TE_cal: " + chrome.runtime.lastError.message);
-		insertMessage("שגיאה בניסיון לגשת לנתוני הדפדפן, אנא נסו שנית.");
-		return;
-	}
+	});
 	let filtersEnabledEh = false;
 	for (const type in storageData.filter_toggles) {
 		(document.getElementById(type) as HTMLInputElement).checked =
@@ -472,22 +464,9 @@ async function setUpFilters() {
 	}
 }
 
-// Initial setup and data load
-const form = document.querySelector("form") as HTMLFormElement,
-	tabContents = document.querySelectorAll("#bodies > .body") as NodeListOf<HTMLDivElement>,
-	tabHeaders = document.querySelectorAll("#tabs > .tab") as NodeListOf<HTMLDivElement>,
-	loadTemplate = (templateID: string, documentContext: Document | Element = document) => {
-		return document.importNode(
-			(documentContext.querySelector(`template#${templateID}`) as HTMLTemplateElement)?.content,
-			true
-		);
-	},
-	assignmentPromises: {
-		[key: string]: () => Promise<{new_list: HWAssignment[]; finished_list: HWAssignment[]}>;
-	} = {},
-	CALENDARS: number = 3; // moodle, webwork, cs
-
-if (document.title === "ארגונית++") {
+async function setup() {
+	const tabContents = document.querySelectorAll("#bodies > .body") as NodeListOf<HTMLDivElement>,
+		tabHeaders = document.querySelectorAll("#tabs > .tab") as NodeListOf<HTMLDivElement>;
 	form.addEventListener("submit", async (event) => {
 		event.preventDefault();
 		await saveUA();
@@ -534,7 +513,7 @@ if (document.title === "ארגונית++") {
 	form.no_end.addEventListener("input", () => (form.end_time.disabled = form.no_end.checked));
 	await setUpFilters();
 
-	const storageData = (await chrome.storage.local.get({organizer_fullscreen: false, theme: "light"})) as StorageData;
+	const storageData: StorageData = await chrome.storage.local.get({organizer_fullscreen: false, theme: "light"});
 	const fullscreenCheckbox = document.getElementById("fullscreen") as HTMLInputElement;
 	if (storageData.organizer_fullscreen) {
 		fullscreenCheckbox.checked = true;
@@ -549,3 +528,10 @@ if (document.title === "ארגונית++") {
 	resolveTheme(storageData.theme);
 	document.getElementById("goToSettings")!.addEventListener("click", () => chrome.runtime.openOptionsPage());
 }
+
+const form = document.querySelector("form") as HTMLFormElement,
+	assignmentPromises: {
+		[key: string]: () => Promise<{new_list: HWAssignment[]; finished_list: HWAssignment[]}>;
+	} = {};
+
+if (document.title === "ארגונית++") await setup();

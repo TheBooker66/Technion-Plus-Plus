@@ -22,8 +22,7 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 
 					const formData: {[key: string]: string} = {};
 					const elements = form.elements;
-					for (let i = 0; i < elements.length; i++) {
-						const element = elements[i] as HTMLFormElement;
+					for (const element of elements as unknown as HTMLInputElement[]) {
 						if (element.name) {
 							if (element.type === "checkbox" || element.type === "radio") {
 								if (element.checked) {

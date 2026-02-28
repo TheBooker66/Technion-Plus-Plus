@@ -67,7 +67,7 @@ export class CommonCalendar {
 			newAssigment
 				.querySelector(".assignment_name")!
 				.addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
-			document.getElementById(containerId)?.appendChild(newAssigment);
+			document.getElementById(containerId)?.append(newAssigment);
 		};
 		await this.common.useTemplatesFile("calendar", (documentContext: Document) => {
 			const assignmentTemplate = this.common.loadTemplate("assignment", documentContext);
@@ -122,7 +122,7 @@ function insertMessage(msg: string, errorEh: boolean) {
 }
 
 export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: HTMLDivElement, finishEh: boolean) {
-	document.getElementById(finishEh ? "finished_assignments" : "new_assignments")?.appendChild(item);
+	document.getElementById(finishEh ? "finished_assignments" : "new_assignments")?.append(item);
 	checkForEmpty();
 
 	const keyMap: Record<string, keyof StorageData> = {
@@ -133,9 +133,7 @@ export async function toggleDoneOriginal(sys: HWSystem, eventID: number, item: H
 	const key = keyMap[sys];
 	if (!key) return;
 
-	const storageData = (await chrome.storage.local.get(key)) as StorageData;
-	if (chrome.runtime.lastError) return console.error(`TE_cal: ${chrome.runtime.lastError.message}`);
-
+	const storageData: StorageData = await chrome.storage.local.get(key);
 	let newCalendar;
 	if (sys === "webwork") {
 		newCalendar = storageData[key] as StorageData["webwork_cal_events"];
@@ -159,7 +157,7 @@ function openAssignment(assignmentItem: HTMLDivElement, openFunction: () => void
 		assignmentItem.style.borderRadius = "3px;";
 		assignmentItem.style.backgroundColor = "var(--status-danger) !important;";
 		setTimeout(() => (assignmentItem.style.backgroundColor = ""), 1e3);
-		console.error(`TE_cal: ${err instanceof Error ? err.message : err}`);
+		console.error("TPP: failed to open assignment", err);
 	} finally {
 		spinner.style.display = "block";
 		spinner.parentElement?.classList.remove("small_spinner");
