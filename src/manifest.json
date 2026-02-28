@@ -49,7 +49,7 @@
 	],
 	"content_scripts": [
 		{
-			"js": ["js/login_script.js", "js/utils.js"],
+			"js": ["js/login_script.js"],
 			"css": ["css/colours.css"],
 			"matches": [
 				"https://panoptotech.cloud.panopto.eu/*",
@@ -59,7 +59,7 @@
 			]
 		},
 		{
-			"js": ["js/login_script.js", "js/utils.js"],
+			"js": ["js/login_script.js"],
 			"css": ["css/colours.css"],
 			"matches": [
 				"https://moodle2222.technion.ac.il/",

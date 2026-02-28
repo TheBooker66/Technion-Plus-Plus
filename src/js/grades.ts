@@ -1,4 +1,4 @@
-function main() {
+(async function () {
 	const path = document.location.pathname.toLowerCase();
 	if ("/index.aspx" === path || "/indexeng.aspx" === path) {
 		const lang = "/index.aspx" === path ? 0 : 1;
@@ -34,6 +34,4 @@ function main() {
 			(document.head || document.documentElement).append(script);
 		});
 	}
-}
-
-main();
+})();
