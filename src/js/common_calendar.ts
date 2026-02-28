@@ -92,11 +92,15 @@ export class CommonCalendar {
 	}
 
 	async progress(promiseCreator: () => Promise<{new_list: HWAssignment[]; finished_list: HWAssignment[]}>) {
-		if (this.organiser) await addAssignmentsToList(promiseCreator, this.system);
-		else
-			promiseCreator()
-				.then((result) => this.insertAssignments(result.new_list, result.finished_list))
-				.catch((err) => insertMessage(err.msg, err.is_error));
+		if (this.organiser) await addAssignmentsToList(this.system, promiseCreator);
+		else {
+			try {
+				const lists = await promiseCreator();
+				await this.insertAssignments(lists.new_list, lists.finished_list);
+			} catch (err) {
+				insertMessage((err as Error).message, true);
+			}
+		}
 	}
 }
 

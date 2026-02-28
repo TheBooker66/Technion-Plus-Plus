@@ -275,8 +275,8 @@ function insertUserAssignment(
 }
 
 export async function addAssignmentsToList(
-	calendarPromise: () => Promise<{new_list: HWAssignment[]; finished_list: HWAssignment[]}>,
-	calendarType: HWSystem
+	calendarType: HWSystem,
+	calendarPromise: () => Promise<{new_list: HWAssignment[]; finished_list: HWAssignment[]}>
 ) {
 	assignmentPromises[calendarType] = calendarPromise;
 	const CALENDARS: number = 3; // moodle, webwork, cs
@@ -311,16 +311,16 @@ export async function addAssignmentsToList(
 		if (enabledCalendars[type as "moodle" | "cs" | "webwork"]) promisesList.push(assignmentPromises[type]);
 	let completedPromises = 0;
 	for (const calendarPromise of promisesList) {
-		calendarPromise()
-			.then((calendarData) => {
-				newAssignmentsList = newAssignmentsList.concat(calendarData.new_list);
-				finishedAssignmentsList = finishedAssignmentsList.concat(calendarData.finished_list);
-			})
-			.catch((err) => insertMessage(err.msg, err.is_error))
-			.finally(() => {
-				if (++completedPromises === promisesList.length)
-					insertAssignments(newAssignmentsList, finishedAssignmentsList);
-			});
+		try {
+			const lists = await calendarPromise();
+			newAssignmentsList = newAssignmentsList.concat(lists.new_list);
+			finishedAssignmentsList = finishedAssignmentsList.concat(lists.finished_list);
+		} catch (error) {
+			insertMessage((error as Error).message, true);
+		} finally {
+			if (++completedPromises === promisesList.length)
+				insertAssignments(newAssignmentsList, finishedAssignmentsList);
+		}
 	}
 	if (promisesList.length === 0) {
 		insertAssignments(newAssignmentsList, finishedAssignmentsList);

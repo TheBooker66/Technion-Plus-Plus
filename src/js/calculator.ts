@@ -123,15 +123,7 @@ function createCourseRowElement(courseData: CalculatorCourse, mainList: string) 
 	return rowElement;
 }
 
-async function handleListClick(
-	target: HTMLElement,
-	listType: "grades_list" | "ignore_list"
-): Promise<{
-	rowElement: HTMLTableRowElement;
-	allGrades: CalculatorCourse[];
-	courseNum: string;
-	courseData: CalculatorCourse;
-} | void> {
+async function handleListClick(target: HTMLElement, listType: "grades_list" | "ignore_list") {
 	if (!target) return;
 
 	const rowElement = target.closest("tr");

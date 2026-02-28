@@ -21,7 +21,6 @@ export default tseslint.config(
 		},
 		rules: {
 			"@typescript-eslint/no-explicit-any": "warn",
-			"no-async-promise-executor": "off",
 			"no-case-declarations": "off",
 			"no-fallthrough": "warn",
 			"prefer-template": "warn",
