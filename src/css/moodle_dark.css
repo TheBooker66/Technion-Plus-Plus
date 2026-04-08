@@ -71,7 +71,6 @@
 [tplus="dm"] #page div#learningcontent {
 	position: relative;
 	margin-top: 0;
-	/*background-color: rgb(5, 5, 5, 0.95) !important;*/
 	padding: 2rem !important;
 	background-color: #070707 !important;
 }
@@ -94,7 +93,9 @@
 [tplus="dm"] .que .history,
 [tplus="dm"] .userprofile .profile_tree section,
 [tplus="dm"] .groupinfobox,
-[tplus="dm"] .well {
+[tplus="dm"] .well,
+[tplus="dm"] .box.progress_bar,
+[tplus="dm"] .message-app .list-group {
 	background-color: rgb(255, 255, 255, 0.05) !important;
 }
 
@@ -118,6 +119,7 @@
 [tplus="dm"] div#topofscroll.main-inner,
 [tplus="dm"] #page .main-inner-wrapper .main-inner,
 [tplus="dm"] #page.drawers .main-inner,
+[tplus="dm"] #page.drawer .bg-white,
 [tplus="dm"] #region-main,
 [tplus="dm"] .page-header-headings,
 [tplus="dm"] .activity-item,
@@ -574,6 +576,10 @@ nav.navbar.navbar-dark.bg-primary {
 	color: #0c0c0d;
 }
 
+[tplus="dm"] .message-app {
+	background-color: #070707 !important;
+}
+
 [tplus="dm"] section.card.tplus_block {
 	border-color: transparent;
 	color: #eee;
@@ -594,10 +600,6 @@ nav.navbar.navbar-dark.bg-primary {
 
 [tplus="dm"] .hsuforum-thread {
 	background-color: #121212;
-}
-
-[tplus="dm"] .box.progress_bar {
-	background-color: rgb(255, 255, 255, 0.05);
 }
 
 [tplus="dm"] .box.progress_bar .progress {
