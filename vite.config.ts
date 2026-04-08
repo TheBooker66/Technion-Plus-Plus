@@ -1,10 +1,8 @@
 import {defineConfig} from "vite";
-import {resolve, relative, dirname, basename, extname} from "node:path";
-import {fileURLToPath} from "node:url";
+import {resolve, dirname, basename} from "node:path";
 import {viteStaticCopy} from "vite-plugin-static-copy";
 import fs from "node:fs";
 import {globSync} from "glob";
-import {minify as minifyJS} from "terser";
 import {minify as minifyHTMLSVG} from "html-minifier-next";
 import {transform as minifyCSS} from "lightningcss";
 import archiver from "archiver";
@@ -33,10 +31,85 @@ function cleanPlugin(outDir: string) {
 	};
 }
 
-function downloadPlugin(url: string, destRelative: string, isProd: boolean) {
+function copyPlugin(isProd: boolean) {
+	return viteStaticCopy({
+		targets: [
+			{
+				src: "src/html/**/*.html",
+				dest: "html",
+				rename: {stripBase: 2},
+				async transform(contents) {
+					if (!isProd) return contents;
+					return minifyHTMLSVG(contents.toString(), {
+						collapseWhitespace: true,
+						conservativeCollapse: true,
+						removeComments: true,
+						minifyCSS: true,
+						minifyJS: true,
+					});
+				},
+			},
+			{
+				src: "src/css/**/*.css",
+				dest: "css",
+				rename: {stripBase: 2},
+				async transform(contents, fullPath) {
+					if (!isProd) return contents;
+					const {code} = minifyCSS({
+						filename: fullPath,
+						code: Buffer.from(contents.toString()),
+						minify: true,
+					});
+					return code.toString();
+				},
+			},
+			{
+				src: "src/icons/**/*.svg",
+				dest: "icons",
+				rename: {stripBase: 2},
+				async transform(contents) {
+					if (!isProd) return contents;
+					return minifyHTMLSVG(contents.toString(), {
+						collapseWhitespace: true,
+						conservativeCollapse: true,
+						removeComments: true,
+						minifyCSS: true,
+						minifyJS: true,
+					});
+				},
+			},
+			{
+				src: "src/icons/**/*.png",
+				dest: "icons",
+				rename: {stripBase: 2},
+			},
+			{
+				src: "src/resources/**/*",
+				dest: "resources",
+				rename: {stripBase: 2},
+			},
+			{
+				src: "src/manifest.json",
+				dest: ".",
+				rename: {stripBase: 1},
+			},
+			{
+				src: "node_modules/pdfjs-dist/build/pdf.min.mjs",
+				dest: "lib/pdfjs",
+				rename: {stripBase: true},
+			},
+			{
+				src: "node_modules/pdfjs-dist/build/pdf.worker.min.mjs",
+				dest: "lib/pdfjs",
+				rename: {stripBase: true},
+			},
+		],
+	});
+}
+function downloadPlugin(url: string, destRelative: string) {
 	return {
 		name: "download",
-		async writeBundle(options: {dir?: string}) {
+		async writeBundle(options: {dir: string}) {
 			const outDir = options.dir;
 			const fullDestPath = resolve(outDir, destRelative);
 
@@ -46,21 +119,14 @@ function downloadPlugin(url: string, destRelative: string, isProd: boolean) {
 			try {
 				const response = await fetch(url);
 				if (!response.ok) {
-					throw new Error(`Download failed with status: ${response.status} ${response.statusText}`);
+					throw new Error(`Download failed: ${response.status} ${response.statusText}`);
 				}
 
-				let finalCode = await response.text();
-
-				if (isProd) {
-					console.log(`Minifying ${basename(destRelative)}...`);
-					const result = await minifyJS(finalCode);
-					finalCode = result.code ?? "";
-				}
-
-				fs.writeFileSync(fullDestPath, finalCode, "utf8");
+				console.log(`Minifying ${basename(destRelative)}...`);
+				fs.writeFileSync(fullDestPath, await response.text(), "utf8");
 				console.log(`${basename(destRelative)} processed successfully.`);
 			} catch (err) {
-				this.error(`Failed to download or process ${basename(destRelative)}: ${err.message}`);
+				console.error(`Failed to download or process ${basename(destRelative)}: ${err}`);
 			}
 		},
 	};
@@ -75,40 +141,28 @@ function zipPlugin(outDir: string, isProd: boolean) {
 			const projectRoot = resolve(import.meta.dirname);
 			const distOutput = fs.createWriteStream(resolve(projectRoot, `${outDir}.zip`)),
 				sourceOutput = fs.createWriteStream(resolve(projectRoot, "source.zip"));
-			const distArchiver = archiver("zip", {
-					zlib: {level: 9},
-				}),
-				sourceArchiver = archiver("zip", {
-					zlib: {level: 9},
-				});
+			const distArchiver = archiver("zip", {zlib: {level: 9}}),
+				sourceArchiver = archiver("zip", {zlib: {level: 9}});
 
-			new Promise<void>((resolvePromise, reject) => {
+			new Promise<void>((res, rej) => {
 				distOutput.on("close", () => {
 					console.log(`\n📦 Zip complete. Total bytes: ${distArchiver.pointer()}.`);
 					console.log(`Output archive written to: ${resolve(projectRoot, `${outDir}.zip`)}`);
-					resolvePromise();
+					res();
 				});
-
-				distArchiver.on("error", (err) => {
-					reject(err);
-				});
-
+				distArchiver.on("error", rej);
 				distArchiver.pipe(distOutput);
 				distArchiver.directory(resolve(projectRoot, outDir), false);
 				distArchiver.finalize();
 			});
 
-			new Promise<void>((resolvePromise, reject) => {
+			new Promise<void>((res, rej) => {
 				sourceOutput.on("close", () => {
 					console.log(`\n📦 Source Zip complete. Total bytes: ${sourceArchiver.pointer()}.`);
 					console.log(`Output archive written to: ${resolve(projectRoot, "source.zip")}`);
-					resolvePromise();
+					res();
 				});
-
-				sourceArchiver.on("error", (err) => {
-					reject(err);
-				});
-
+				sourceArchiver.on("error", rej);
 				sourceArchiver.pipe(sourceOutput);
 				sourceArchiver.glob("**/*", {
 					cwd: projectRoot,
@@ -132,8 +186,8 @@ function zipPlugin(outDir: string, isProd: boolean) {
 
 const entryPoints = Object.fromEntries(
 	globSync("src/js/**/*.ts", {ignore: "src/js/**/*.d.ts"}).map((file) => [
-		basename(file, extname(file)),
-		fileURLToPath(new URL(file, import.meta.url)),
+		basename(file, ".ts"),
+		resolve(import.meta.dirname, file),
 	])
 );
 
@@ -144,100 +198,33 @@ export default defineConfig(({mode}) => {
 	return {
 		build: {
 			outDir: outDir,
-			emptyOutDir: true,
 			sourcemap: !isProd,
-			minify: isProd ? "terser" : false,
-			terserOptions: isProd ? {compress: {drop_console: false}} : undefined,
-			cssMinify: isProd,
-			rollupOptions: {
+			minify: isProd,
+			rolldownOptions: {
 				input: entryPoints,
 				output: {
 					entryFileNames: "js/[name].js",
-					chunkFileNames: "js/chunks/[name]-[hash].js",
+					chunkFileNames: "js/[name]-[hash].js",
 				},
 			},
 		},
 		plugins: [
 			cleanPlugin(outDir),
-			viteStaticCopy({
-				targets: [
-					{
-						src: "src/html/**/*.html",
-						dest: "html",
-						rename: (_, __, fullPath) => {
-							return relative(resolve(import.meta.dirname, "src/html"), fullPath);
-						},
-						transform: (contents) =>
-							isProd
-								? minifyHTMLSVG(contents.toString(), {
-										collapseWhitespace: true,
-										conservativeCollapse: true,
-										removeComments: true,
-										minifyCSS: true,
-										minifyJS: true,
-									})
-								: contents,
-					},
-					{
-						src: "src/css/**/*.css",
-						dest: "css",
-						rename: (_, __, fullPath) => {
-							return relative(resolve(import.meta.dirname, "src/css"), fullPath);
-						},
-						async transform(contents, fullPath) {
-							if (!isProd) return contents;
-							const {code} = minifyCSS({
-								filename: fullPath,
-								code: Buffer.from(contents.toString()),
-								minify: true,
-							});
-							return code.toString();
-						},
-					},
-					{
-						src: "src/icons/**/*.svg",
-						dest: "icons",
-						rename: (_, __, fullPath) => {
-							return relative(resolve(import.meta.dirname, "src/icons"), fullPath);
-						},
-						transform: (contents) =>
-							isProd
-								? minifyHTMLSVG(contents.toString(), {
-										collapseWhitespace: true,
-										conservativeCollapse: true,
-										removeComments: true,
-										minifyCSS: true,
-										minifyJS: true,
-									})
-								: contents,
-					},
-					{
-						src: "src/icons/**/*.png",
-						dest: "icons",
-						rename: (_, __, fullPath) => {
-							return relative(resolve(import.meta.dirname, "src/icons"), fullPath);
-						},
-					},
-					{src: "src/resources/**/*", dest: "resources"},
-					{src: "src/manifest.json", dest: "."},
-					{src: "node_modules/pdfjs-dist/build/pdf.min.mjs", dest: "lib/pdfjs"},
-					{src: "node_modules/pdfjs-dist/build/pdf.worker.min.mjs", dest: "lib/pdfjs"},
-				],
-			}),
+			copyPlugin(isProd),
 			downloadPlugin(
 				"https://raw.githubusercontent.com/michael-maltsev/cheese-fork/gh-pages/share-histograms.js",
-				"lib/cheesefork/share-histograms.js",
-				isProd
+				"lib/cheesefork/share-histograms.js"
 			),
 			zipPlugin(outDir, isProd),
 		],
 		resolve: {
-			alias: {
-				"@": resolve(import.meta.dirname, "src"),
-			},
+			tsconfigPaths: true,
 		},
 		define: {
 			"window.IS_PRODUCTION": JSON.stringify(isProd),
+		},
+		server: {
+			forwardConsole: !isProd,
 		},
 	};
 });
