@@ -28,7 +28,9 @@
 				return;
 
 			clearInterval(pollingInterval);
-			const tableRows = (document.getElementById("listViewContainer") as HTMLTableElement).querySelectorAll("tr");
+			const tableRows = (document.getElementById("listViewContainer") as HTMLTableElement).querySelectorAll(
+				"tr.list-view-row"
+			);
 			for (const tableRow of tableRows) {
 				const titleElement = tableRow.querySelector(".item-title") as HTMLElement;
 				if (titleElement.querySelectorAll(".tplus_download").length !== 0) continue;
@@ -339,26 +341,14 @@
 		}).observe(document.getElementById("viewerContent") as HTMLElement, {childList: true, subtree: true});
 	}
 
-	function toggleDarkMode(styleSheet: CSSStyleSheet) {
-		if (!styleSheet.cssRules.length)
-			[
-				".player, #viewer, #playControlsWrapper {background-color: #000 !important;}",
-				"#viewerHeader, .transport-button, #timeElapsed, #timeRemaining, #tplusRealTime, #positionControl, .viewer .transport-button .clicked, #volumeFlyout, #playSpeedExpander, #qualityButton, #qualityExpander, #inlineMessageLetterbox, .next-delivery-thumb, #thumbnailList, #thumbnailList img, .thumbnail-timestamp {filter:invert(1);}",
-				"#leftPane aside, #header {background-color: #eee; filter: invert(1);}",
-				"#leftPane, #pageBody, .top-level-items > div, .top-level-items > ul {background-color: #111;}",
-				"#playControls {background-color: #000; border-top: 1px solid #555; opacity: 0.8;}",
-				"#playControls:hover, #playControls:focus {opacity: 1;}",
-				"#thumbnailList {background-color: #eee;}",
-				"#leftPane #eventTabs #eventTabControl .event-tab-header {filter:invert(0.05);}",
-				"#leftPane #searchRegion input {background-color: transparent}",
-				"#transportControls {background-color: transparent !important; border-left-color: #0c0c0d !important;}",
-				"#playSpeedExpander > div, #qualityExpander > div {filter: none !important;}",
-				"#thumbnailList img {opacity: 0.5;}",
-				"#thumbnailList img:hover{opacity: 1}",
-				".top-level-items {background: linear-gradient(transparent, transparent) padding-box, #111 content-box !important; background-clip: padding-box !important; border-width: 1px 1px 0 0; border-style: solid; border-color: #444;}",
-				"#playlistContainer > div:not(:first-child) {background-image: none;}",
-			].forEach((cssRule) => styleSheet.insertRule(cssRule, 0));
-		else while (styleSheet.cssRules.length > 0) styleSheet.deleteRule(0);
+	function toggleDarkMode(darkModeEh: boolean, theme: StorageData["theme"] = "light") {
+		const entirePage = document.querySelector("html") as HTMLHtmlElement;
+		if (
+			darkModeEh &&
+			(theme !== "auto" || (theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches))
+		)
+			entirePage.setAttribute("tplus", "dm");
+		else entirePage.removeAttribute("tplus");
 	}
 
 	async function saveSetting(
@@ -484,7 +474,7 @@
 		rateInfo.textContent = `\t(x1, `;
 		rateInfo.id = "tplusRealTimeRate";
 		extensionInfo.textContent = `T++`;
-		extensionInfo.style.color = "var(--sec-light)";
+		extensionInfo.style.color = "var(--prim-cool)";
 		literalBracket.textContent = `)`;
 		extraText.append(rateInfo, extensionInfo, literalBracket);
 		newTimeElement.append(realTime, extraText);
@@ -533,7 +523,10 @@
             <a id="m_expand" class="tplus_hidden">פצל לשני מסכים</a>
             <a id="m_float" class="tplus_hidden">פתח בחלון צף</a>
             <a id="m_speed">
-                <div><span>2.25</span><span>2.5</span><span>2.75</span><span>3</span>
+                <div>
+                <span>0.25</span><span>0.50</span><span>0.75</span><span>1.00</span>
+                <span>1.25</span><span>1.50</span><span>1.75</span><span>2.00</span>
+                <span>2.25</span><span>2.50</span><span>2.75</span><span>3.00</span>
                 <div id="custom_speed">מהירות מותאמת אישית</div></div>
                 <span style="display: block">מהירויות נוספות</span>
             </a>
@@ -566,7 +559,7 @@
 		snapshotHandler();
 
 		(document.getElementById("m_dark_mode") as HTMLInputElement).addEventListener("change", async () => {
-			toggleDarkMode(darkModeStyle);
+			toggleDarkMode((document.getElementById("m_dark_mode") as HTMLInputElement).checked);
 			await saveSetting("dark_mode");
 		});
 
@@ -751,6 +744,7 @@
 		setTimeout(() => {
 			if (storageData.panopto_hide_thumbnails && thumbnailsButton?.style.display !== "none")
 				thumbnailsButton.click();
+
 			if (
 				storageData.panopto_hide_sidebar &&
 				sidebarButton?.parentElement!.style.visibility !== "hidden" &&
@@ -758,7 +752,8 @@
 			)
 				sidebarButton.click();
 
-			(document.getElementById("tplus_menu") as HTMLDivElement).classList.remove("start");
+			document.getElementById("tplus_menu")!.classList.remove("start");
+			document.getElementById("reactCaptionsSettingsButton")?.remove();
 		}, 2e3);
 		const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
 		videoElement.addEventListener("ratechange", async () => {
@@ -797,9 +792,12 @@
 		});
 	}
 
-	const darkModeStyle = document.head.appendChild(document.createElement("style")).sheet as CSSStyleSheet;
-	const storageData: StorageData = await chrome.storage.local.get({panopto_save: true, panopto_dark_mode: false});
-	if (storageData.panopto_save && storageData.panopto_dark_mode) toggleDarkMode(darkModeStyle);
+	const storageData: StorageData = await chrome.storage.local.get({
+		panopto_save: true,
+		panopto_dark_mode: false,
+		theme: "light",
+	});
+	if (storageData.panopto_save) toggleDarkMode(storageData.panopto_dark_mode, storageData.theme);
 
 	if (window.location.href.includes("List.aspx")) await setupFolderDownloadButtons();
 	else if (window.location.href.includes("Viewer.aspx")) await setupVideoPage();

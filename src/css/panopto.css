@@ -179,7 +179,7 @@ a.tplus_panopto_action:hover {
 	position: absolute;
 	top: 0;
 	right: 0;
-	width: var(--menu-width) - 2;
+	width: calc(var(--menu-width) - 2px);
 	height: 100%;
 	display: none;
 	background-color: rgb(0, 0, 0, 0.5);
@@ -311,4 +311,84 @@ floating speed control panel
 
 #tplus_floating_speed_controller input[type="number"] {
 	appearance: textfield;
+}
+
+[tplus="dm"] {
+	#pageBody {
+		background-color: #111;
+	}
+
+	.player,
+	#viewer,
+	#playControlsWrapper,
+	#playControls,
+	#leftPane {
+		background-color: #000 !important;
+	}
+
+	#viewerHeader,
+	#timeElapsed,
+	#timeRemaining,
+	#tplusRealTime,
+	#positionControl,
+	#volumeFlyout,
+	#playSpeedExpander,
+	#qualityExpander,
+	#inlineMessageLetterbox,
+	.next-delivery-thumb,
+	#thumbnailList,
+	#thumbnailList img,
+	#playlistContainer,
+	#playlistContainer img,
+	.thumbnail-timestamp,
+	#leftPane aside,
+	#header,
+	.subfolder-bar,
+	#noResultsPlaceholder,
+	.detail-cell,
+	.detail-cell .tplus_download,
+	#navBar,
+	#createMenuButton {
+		filter: invert(1);
+	}
+
+	#navBar {
+		position: relative;
+		z-index: 9999;
+	}
+
+	#playControls {
+		border-top: 1px solid #555;
+		opacity: 0.8;
+
+		&:hover,
+		&:focus {
+			opacity: 1;
+		}
+	}
+
+	#thumbnailList {
+		background-color: #eee;
+
+		img {
+			opacity: 0.5;
+
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
+
+	#leftPane #searchRegion input {
+		background-color: transparent;
+	}
+
+	#transportControls {
+		background-color: transparent !important;
+		border-left-color: #0c0c0d !important;
+	}
+
+	#playlistContainer > div:not(:first-child) {
+		background-image: none;
+	}
 }

@@ -258,16 +258,16 @@
 
 		let darkModeEnabled = storageData.remoodle;
 		const theme = storageData.theme;
-		const setDarkMode = (darkmodeEh: boolean, theme: "light" | "dark" | "auto") => {
+		const setDarkMode = (darkModeEh: boolean, theme: StorageData["theme"]) => {
 			const entirePage = document.querySelector("html") as HTMLHtmlElement;
 			if (
-				darkmodeEh &&
+				darkModeEh &&
 				(theme !== "auto" || (theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches))
 			)
 				entirePage.setAttribute("tplus", "dm");
 			else entirePage.removeAttribute("tplus");
 			const checkbox = document.getElementById("tp_darkmode_input") as HTMLInputElement;
-			if (checkbox) checkbox.checked = darkmodeEh;
+			if (checkbox) checkbox.checked = darkModeEh;
 		};
 		themeProperties(storageData.remoodle_angle).forEach((property) =>
 			document.documentElement.style.setProperty(property[0], property[1])
