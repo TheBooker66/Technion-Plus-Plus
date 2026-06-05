@@ -330,7 +330,7 @@ function setUpButtons() {
 		}
 
 		const storageData: StorageData = await chrome.storage.local.get({grades: []});
-		if (storageData.grades.some((course) => course.num === newCourse.num)) {
+		if (!newCourse.num.startsWith("0394") && storageData.grades.some((course) => course.num === newCourse.num)) {
 			alert(`קורס עם המספר ${newCourse.num} כבר קיים ברשימה.`);
 			addGradeForm.classList.add("failed");
 			setTimeout(() => addGradeForm.classList.remove("failed"), 1000);
@@ -419,8 +419,9 @@ function setUpButtons() {
 				}
 
 				if (
-					currentStoredGrades.some((c: CalculatorCourse) => c.num === course.num) ||
-					newCourses.some((c: CalculatorCourse) => c.num === course.num)
+					!course.num.startsWith("0394") &&
+					(currentStoredGrades.some((c: CalculatorCourse) => c.num === course.num) ||
+						newCourses.some((c: CalculatorCourse) => c.num === course.num))
 				) {
 					console.log(`Skipping duplicate course during import: ${course.num}`);
 					return false;
