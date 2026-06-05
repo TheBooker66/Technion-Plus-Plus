@@ -5,7 +5,7 @@ import fs from "node:fs";
 import {globSync} from "glob";
 import {minify as minifyHTMLSVG} from "html-minifier-next";
 import {transform as minifyCSS} from "lightningcss";
-import archiver from "archiver";
+import {ZipArchive} from "archiver";
 
 function cleanPlugin(outDir: string) {
 	return {
@@ -141,8 +141,8 @@ function zipPlugin(outDir: string, isProd: boolean) {
 			const projectRoot = resolve(import.meta.dirname);
 			const distOutput = fs.createWriteStream(resolve(projectRoot, `${outDir}.zip`)),
 				sourceOutput = fs.createWriteStream(resolve(projectRoot, "source.zip"));
-			const distArchiver = archiver("zip", {zlib: {level: 9}}),
-				sourceArchiver = archiver("zip", {zlib: {level: 9}});
+			const distArchiver = new ZipArchive({zlib: {level: 9}}),
+				sourceArchiver = new ZipArchive({zlib: {level: 9}});
 
 			new Promise<void>((res, rej) => {
 				distOutput.on("close", () => {
