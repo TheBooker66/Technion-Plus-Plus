@@ -382,7 +382,7 @@ async function TE_alertMoodleCalendar(
 		}
 
 		for (let i = 1; i < events.length; i++) {
-			const eventText = events[i];
+			const eventText = events[i].replace(/\r?\n[ \t]/g, "");
 			const summary = eventText.split("SUMMARY:")[1].split("\n")[0].trim();
 
 			const appealEh = filterToggles.appeals && summary.includes("ערעור"),
@@ -434,7 +434,7 @@ async function TE_csCalendarCheck(
 			};
 
 		for (let i = 1; i < events.length; i++) {
-			const eventText = events[i];
+			const eventText = events[i].replace(/\r?\n[ \t]/g, ""); // According to RFC 5545
 			const summary = eventText.match(regexes.summary)![1];
 			const trimmedSummary = summary.split("(")[0].trim();
 			if (regexes.banned.test(trimmedSummary)) continue;

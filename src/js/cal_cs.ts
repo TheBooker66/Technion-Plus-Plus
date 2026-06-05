@@ -23,7 +23,8 @@ await calendar.progress(async () => {
 	let eventSections: string[];
 	try {
 		const responseData: {response: string; responseURL: string} = await popup.XHR(calendarUrl, "text");
-		eventSections = responseData.response.split("BEGIN:VEVENT");
+		const unfoldedResponse = responseData.response.replace(/\r?\n[ \t]/g, "");
+		eventSections = unfoldedResponse.split("BEGIN:VEVENT");
 	} catch (errCode) {
 		const errorMessages = [
 			'אירעה שגיאה בניסיון לגשת אל שרת הפקולטה למדמ"ח, אנא נסה שנית מאוחר יותר.',
@@ -83,8 +84,9 @@ await calendar.progress(async () => {
 		}
 		const formattedDate = `יום ${DAYS[dueDate.getDay()]}, ${timeMatch.D}.${timeMatch.M}.${timeMatch.Y}`;
 
-		const description = (eventSections[i].match(regexPatterns.description) as RegExpMatchArray)[1],
-			eventURL = (eventSections[i].match(regexPatterns.url) as RegExpMatchArray)[1];
+		const description = (eventSections[i].match(regexPatterns.description) as RegExpMatchArray)?.[1] ?? "",
+			eventURL =
+				(eventSections[i].match(regexPatterns.url) as RegExpMatchArray)?.[1] ?? "https://www.technion.ac.il";
 
 		courseName = summary.split("(")[1].split(")")[0];
 		if (!Object.hasOwn(seenItems, courseName)) seenItems[courseName] = "";

@@ -72,7 +72,7 @@ await calendar.progress(async () => {
 		}
 	}
 
-	let calendarData;
+	let calendarData: {response: string; responseURL: string};
 	try {
 		calendarData = await popup.XHR(
 			`https://moodle25.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&${storageData.moodle_cal_prop}`,
@@ -92,7 +92,8 @@ await calendar.progress(async () => {
 			throw new Error("לא ניתן למשוך מטלות מהמודל. נסה שנית מאוחר יותר, אם התקלה נמשכת - צור קשר עם המפתח.");
 		}
 	}
-	const cal: string[] = calendarData.response.split("BEGIN:VEVENT");
+	const unfoldedResponse = calendarData.response.replace(/\r?\n[ \t]/g, "");
+	const cal: string[] = unfoldedResponse.split("BEGIN:VEVENT");
 	if (cal.length === 1) {
 		await chrome.storage.local.set({
 			cal_seen: await calendar.removeCalendarAlert(storageData.cal_seen),
@@ -169,12 +170,10 @@ await calendar.progress(async () => {
 					(semesterNum ? ` - ${semesters[semesterNum as "200" | "201" | "202"]}` : "")
 				: courseInfo.toString();
 
-		let eventDescription: string = cal[i]
-			.split("DESCRIPTION:")[1]
-			.split("CLASS:")[0]
-			.replace(/\\n/g, " ")
-			.replace(/\\,/g, ",")
-			.trim();
+		const eventDescriptionText = cal[i].split("DESCRIPTION:")[1];
+		let eventDescription: string = eventDescriptionText
+			? eventDescriptionText.split("CLASS:")[0].replace(/\\n/g, " ").replace(/\\,/g, ",").trim()
+			: "";
 		eventDescription = 95 < eventDescription.length ? `${eventDescription.slice(0, 90)}...` : eventDescription;
 
 		const finishedEh = (storageData.moodle_cal_finished as number[]).includes(eventID);
