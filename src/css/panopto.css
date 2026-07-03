@@ -227,6 +227,14 @@ a.tplus_panopto_action:hover {
 	grid-template-columns: repeat(2, 1fr);
 }
 
+#tplus_content a#m_download_anyway:hover > div {
+	display: block;
+	max-width: 240px;
+	padding: 8px;
+	letter-spacing: normal;
+	line-height: 1.3;
+}
+
 #tplus_content a:hover > div > span,
 #m_vid_list.tplus_persist > span,
 #m_vid_list.tplus_persist > div {

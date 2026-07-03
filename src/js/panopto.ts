@@ -151,7 +151,7 @@
 		});
 	}
 
-	function setupVideoDownloadButtons() {
+	async function setupVideoDownloadButtons() {
 		const videoID = window.location.href.split("?")[1].split("id=")[1].split("&")[0],
 			videoTitle = document.title.replace(/[^a-zA-Z\u05d0-\u05ea0-9\- ]/g, ""),
 			downloads: {[key in "3" | "4"]: {url: string; name: string}} = {
@@ -166,23 +166,105 @@
 					name: `${videoTitle}.mp4`,
 				},
 			};
-		Object.keys(downloads).forEach(async (downloadType) => {
-			if (downloadType !== "3" && downloadType !== "4") throw new Error("How did this happen¿");
+		// Same-origin request, so the real status tells us whether downloads are enabled.
+		const podcastAvailable: {[key in "3" | "4"]: boolean} = {"3": false, "4": false};
+		await Promise.all(
+			(Object.keys(downloads) as ("3" | "4")[]).map(async (downloadType) => {
+				try {
+					const response = await fetch(downloads[downloadType].url, {method: "HEAD"});
+					if (!response.ok) return;
+				} catch {
+					return;
+				}
+				podcastAvailable[downloadType] = true;
 
-			const response = await fetch(downloads[downloadType].url, {method: "head", mode: "no-cors"});
-			if (response.status !== 0) return;
+				(document.getElementById("m_cant_download") as HTMLDivElement).classList.add("tplus_hidden");
+				const downloadButton = document.getElementById(`m_download_mp${downloadType}`) as HTMLAnchorElement;
+				downloadButton.classList.remove("tplus_hidden");
+				downloadButton.addEventListener("click", async () => {
+					await chrome.runtime.sendMessage({
+						mess_t: "single_download",
+						link: downloads[downloadType].url,
+						name: downloads[downloadType].name,
+					});
+				});
+			})
+		);
 
-			(document.getElementById("m_cant_download") as HTMLDivElement).classList.add("tplus_hidden");
-			const downloadButton = document.getElementById(`m_download_mp${downloadType}`) as HTMLAnchorElement;
-			downloadButton.classList.remove("tplus_hidden");
-			downloadButton.addEventListener("click", async () => {
+		// When the direct download is blocked, offer a per-video bypass through the delivery API.
+		if (podcastAvailable["4"]) return;
+		const bypassButton = document.getElementById("m_download_anyway") as HTMLAnchorElement;
+		const bypassLabel = bypassButton.querySelector("span") as HTMLSpanElement;
+		const bypassLabelText = bypassLabel.textContent;
+		bypassButton.classList.remove("tplus_hidden");
+		bypassButton.addEventListener("click", async () => {
+			if (bypassButton.dataset.tplusBusy === "1") return;
+			bypassButton.dataset.tplusBusy = "1";
+			try {
+				bypassLabel.textContent = "מאתר…";
+				const streamUrl = await getDeliveryStreamUrl(videoID);
+				if (!streamUrl) {
+					window.alert("לא נמצאה גרסת וידאו זמינה להורדה דרך ה-API.");
+					return;
+				}
 				await chrome.runtime.sendMessage({
 					mess_t: "single_download",
-					link: downloads[downloadType].url,
-					name: downloads[downloadType].name,
+					link: streamUrl,
+					name: `${videoTitle}.mp4`,
 				});
-			});
+			} finally {
+				bypassLabel.textContent = bypassLabelText;
+				delete bypassButton.dataset.tplusBusy;
+			}
 		});
+	}
+
+	function getPanoptoCookie(name: string): string {
+		const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
+		return match ? decodeURIComponent(match[1]) : "";
+	}
+
+	async function getDeliveryStreamUrl(videoID: string): Promise<string | null> {
+		try {
+			const csrfToken = getPanoptoCookie("csrfToken");
+			const headers: {[key: string]: string} = {
+				"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+			};
+			if (csrfToken) headers["x-csrf-token"] = csrfToken;
+
+			const response = await fetch(
+				"https://panoptotech.cloud.panopto.eu/Panopto/Pages/Viewer/DeliveryInfo.aspx",
+				{
+					method: "POST",
+					headers,
+					body: new URLSearchParams({
+						deliveryId: videoID,
+						isLiveNotes: "false",
+						refreshAuthCookie: "true",
+						isActiveBroadcast: "false",
+						isEditing: "false",
+						isKollectiveAgentInstalled: "false",
+						isEmbed: "false",
+						responseType: "json",
+					}).toString(),
+				}
+			);
+			if (!response.ok) return null;
+
+			const delivery = (await response.json())?.Delivery;
+			if (!delivery) return null;
+
+			// Prefer the podcast rendition: the single combined (screen + camera) video when it exists.
+			const podcast = (delivery.PodcastStreams ?? []).find((s: {StreamUrl?: string}) => s.StreamUrl);
+			if (podcast?.StreamUrl) return podcast.StreamUrl;
+
+			const streams: {StreamUrl?: string; IsPrimary?: boolean}[] = delivery.Streams ?? [];
+			const primaryStream = streams.find((stream) => stream.IsPrimary) ?? streams[0];
+			return primaryStream?.StreamUrl ?? null;
+		} catch (err) {
+			console.error("TPP: failed fetching Panopto delivery info", err);
+			return null;
+		}
 	}
 
 	function snapshotHandler() {
@@ -506,7 +588,8 @@
     <div id="tplus_menu" class="start">
         <div id="tplus_content">
             <div id="tplus_overlay"></div>
-            <div id="m_cant_download"><a><i>הורדת ההקלטה נחסמה על ידי צוות הקורס</i></a></div>
+            <div id="m_cant_download"><a><i>הורדת ההקלטה נחסמה על ידי צוות הקורס</i></a>
+            <a id="m_download_anyway" class="tplus_hidden"><div><i>ההורדה מתבצעת דרך ה-API של פנופטו, שלא באמצעות כפתור ההורדה הרשמי, ועל אחריות המשתמש בלבד.</i></div><span style="display: block">הורד בכל זאת</span></a></div>
             <a id="m_download_mp4" class="tplus_hidden">הורדת הקלטה</a>
             <a id="m_download_mp3" class="tplus_hidden">הורדת שמע</a>
             <div id="m_vid_list" class="tplus_hidden">
@@ -545,7 +628,7 @@
 			.getElementById("tplus_menu_container") as HTMLDivElement;
 		for (const menuButton of menu.querySelectorAll("a"))
 			if (menuButton.id)
-				menuButton.style.backgroundImage = `url(${chrome.runtime.getURL(`icons/panopto/${menuButton.id.replace(/_mp[34]/, "")}.svg`)})`;
+				menuButton.style.backgroundImage = `url(${chrome.runtime.getURL(`icons/panopto/${menuButton.id.replace(/_mp[34]|_anyway/, "")}.svg`)})`;
 
 		const bigBossElement = document.getElementById("transportControls") as HTMLDivElement;
 		bigBossElement
