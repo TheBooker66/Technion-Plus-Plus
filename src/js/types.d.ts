@@ -107,6 +107,7 @@ type HWAssignment = {
 type Semester = "חורף" | "אביב" | "קיץ";
 
 type CalculatorCourse = {
+	id: string;
 	num: string;
 	name: string;
 	points: number;
