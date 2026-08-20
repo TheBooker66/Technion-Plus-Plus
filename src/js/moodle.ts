@@ -25,7 +25,7 @@
 				parent,
 				isLight ? "tplus_download_light" : "tplus_download",
 				{
-					href: `https://${window.location.hostname}/blocks/material_download/download_materialien.php?courseid=${courseID}"&ccsectid=${isLight}`,
+					href: `https://${window.location.hostname}/blocks/material_download/download_materialien.php?courseid=${courseID}&ccsectid=${isLight}`,
 				},
 				linkText
 			);
@@ -160,7 +160,9 @@
 			}
 			if (Object.keys(userCourses).length > 0) await chrome.storage.local.set({moodle_cal_courses: userCourses});
 		} else {
-			const moodleNum = window.location.href.split("?id=")[1],
+			const moodleNum = Array.from(document.body.classList)
+					.find((cls) => cls.startsWith("course-"))!
+					.split("-")[1],
 				course = document.title.match(/(?<cname>.+)\s-\s(?<csemester>.+)\s-\s(?<cnum>[0-9]+)/),
 				buttons = await create_tp_buttons();
 
@@ -168,11 +170,7 @@
 			if (course_num) {
 				create_download(buttons, parseInt(moodleNum), 0, "הורדת כל הקבצים בקורס");
 				const semester =
-					{
-						"חורף": "200",
-						"אביב": "201",
-						"קיץ": "202",
-					}[course?.groups?.csemester as string] ?? "200";
+					{"חורף": "200", "אביב": "201", "קיץ": "202"}[course?.groups?.csemester as string] ?? "200";
 				create_element(
 					"a",
 					buttons,
