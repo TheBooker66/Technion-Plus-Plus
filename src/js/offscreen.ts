@@ -1,9 +1,9 @@
-chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 	switch (message.mess_t) {
 		case "audio notification":
 			const audio = new Audio(chrome.runtime.getURL("../resources/notification.mp3"));
 			audio.volume = message.volume;
-			await audio.play();
+			void audio.play();
 			break;
 		case "DOMParser":
 			const doc = new DOMParser().parseFromString(message.data, "text/html");

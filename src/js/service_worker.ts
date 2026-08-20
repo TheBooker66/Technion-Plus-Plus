@@ -37,7 +37,7 @@ async function XHR(url: string, resType: string, info: string[] = [], body = "",
 			responsePayload = await response.json();
 			break;
 		case "document":
-			if (typeof browser !== "undefined" && browser) {
+			if (typeof DOMParser !== "undefined") {
 				const doc = new DOMParser().parseFromString(await response.text(), "text/html");
 				const courseList = Array.from(doc.querySelectorAll(".tilecontainer"));
 				// noinspection DuplicatedCode
@@ -277,7 +277,7 @@ async function TE_notification(message: string, silentEh: boolean, notificationI
 	const storageData: StorageData = await chrome.storage.local.get({notif_vol: 1, alerts_sound: true});
 	if (!storageData.alerts_sound) return;
 
-	if (typeof browser !== "undefined") {
+	if (typeof Audio !== "undefined") {
 		const audio = new Audio(chrome.runtime.getURL("../resources/notification.mp3"));
 		audio.volume = storageData.notif_vol;
 		await audio.play();
