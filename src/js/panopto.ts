@@ -1,5 +1,31 @@
 (async function () {
 	let speed = 1.0;
+	let transientSpeedChangeUntilMs = 0;
+	let shiftSpeedBoostActiveEh = false;
+	const TRANSIENT_SPEED_CHANGE_GRACE_MS = 400;
+	const SPEED_STEP = 0.25,
+		MIN_SPEED = 0.25,
+		MAX_SPEED = 10.0;
+
+	function transientSpeedChangeEh() {
+		return Date.now() <= transientSpeedChangeUntilMs;
+	}
+
+	function setPlaybackRateForAllVideos(playbackRate: number, transientEh = false) {
+		if (transientEh) transientSpeedChangeUntilMs = Date.now() + TRANSIENT_SPEED_CHANGE_GRACE_MS;
+
+		for (const video of document.querySelectorAll(".video-js"))
+			(video as HTMLVideoElement).playbackRate = playbackRate;
+	}
+
+	function shouldSkipPlaybackShortcuts(event: KeyboardEvent) {
+		if (event.altKey || event.ctrlKey || event.metaKey) return true;
+		const target = event.target as HTMLElement | null;
+		if (!target) return false;
+		if (target.isContentEditable) return true;
+		const targetTagName = target.tagName.toLowerCase();
+		return targetTagName === "input" || targetTagName === "textarea" || targetTagName === "select";
+	}
 
 	async function setupListDownloadButtons(
 		downloadAllButton: HTMLAnchorElement,
@@ -82,7 +108,7 @@
 			const response = await fetch(
 				`https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Podcast.ashx?courseid=${folderId}&type=mp4`
 			);
-			if (200 !== response.status) {
+			if (!response.ok) {
 				window.alert("שגיאה בניסיון הורדת הקורס, אנא נסה שנית מאוחר יותר.");
 				return;
 			}
@@ -169,8 +195,8 @@
 		Object.keys(downloads).forEach(async (downloadType) => {
 			if (downloadType !== "3" && downloadType !== "4") throw new Error("How did this happen¿");
 
-			const response = await fetch(downloads[downloadType].url, {method: "head", mode: "no-cors"});
-			if (response.status !== 0) return;
+			const response = await fetch(downloads[downloadType].url, {method: "head"});
+			if (!response.ok) return;
 
 			(document.getElementById("m_cant_download") as HTMLDivElement).classList.add("tplus_hidden");
 			const downloadButton = document.getElementById(`m_download_mp${downloadType}`) as HTMLAnchorElement;
@@ -358,6 +384,7 @@
 			| "return_backwards"
 			| "floating_speed"
 			| "scroll_volume"
+			| "volume_boost"
 			| "settings"
 			| "show_hide_thumbnails"
 			| "show_hide_sidebar"
@@ -383,6 +410,11 @@
 			case "scroll_volume":
 				settingsObj.panopto_scroll_volume = (
 					document.getElementById("m_scroll_volume") as HTMLInputElement
+				).checked;
+				break;
+			case "volume_boost":
+				settingsObj.panopto_volume_boost = (
+					document.getElementById("m_volume_boost") as HTMLInputElement
 				).checked;
 				break;
 			case "settings":
@@ -490,12 +522,84 @@
 
 	function applyCustomSpeed(speedValue: string) {
 		const parsedSpeed = parseFloat(speedValue);
-		if (isNaN(parsedSpeed) || parsedSpeed < 0.1 || parsedSpeed > 6.7) {
+		if (isNaN(parsedSpeed) || parsedSpeed < 0.25 || parsedSpeed > 10.0) {
 			window.alert("הכנסת ערך לא חוקי, אנא נסה שנית.");
 			return;
 		}
-		for (const video of document.querySelectorAll(".video-js"))
-			(video as HTMLVideoElement).playbackRate = parsedSpeed;
+		setPlaybackRateForAllVideos(parsedSpeed);
+	}
+
+	function setupShiftHoldSpeedBoost() {
+		let holdSpeed = 2.0,
+			shiftPressedEh = false,
+			playbackRateBeforeHold = 1.0;
+
+		const clampSpeed = (nextSpeed: number) => Math.max(MIN_SPEED, Math.min(MAX_SPEED, nextSpeed));
+		const shiftKeyEh = (event: KeyboardEvent) =>
+			event.key === "Shift" || event.code === "ShiftLeft" || event.code === "ShiftRight";
+		const arrowUpEh = (event: KeyboardEvent) => event.code === "ArrowUp" || event.key === "ArrowUp";
+		const arrowDownEh = (event: KeyboardEvent) => event.code === "ArrowDown" || event.key === "ArrowDown";
+
+		document.addEventListener(
+			"keydown",
+			(event) => {
+				if (shouldSkipPlaybackShortcuts(event)) return;
+
+				if (shiftKeyEh(event)) {
+					if (!shiftPressedEh) {
+						playbackRateBeforeHold = (document.getElementById("primaryVideo") as HTMLVideoElement)
+							.playbackRate;
+						shiftPressedEh = true;
+						shiftSpeedBoostActiveEh = true;
+					}
+					setPlaybackRateForAllVideos(holdSpeed, true);
+					return;
+				}
+
+				if (!shiftPressedEh) return;
+				if (!arrowUpEh(event) && !arrowDownEh(event)) return;
+
+				event.stopPropagation();
+				event.stopImmediatePropagation();
+				event.preventDefault();
+				holdSpeed = clampSpeed(holdSpeed + (arrowUpEh(event) ? SPEED_STEP : -SPEED_STEP));
+				setPlaybackRateForAllVideos(holdSpeed, true);
+			},
+			true
+		);
+
+		document.addEventListener("keyup", (event) => {
+			if (!shiftKeyEh(event)) return;
+			if (!shiftPressedEh) return;
+
+			shiftPressedEh = false;
+			shiftSpeedBoostActiveEh = false;
+			setPlaybackRateForAllVideos(playbackRateBeforeHold, true);
+		});
+
+		document.addEventListener(
+			"wheel",
+			(event) => {
+				if (!shiftPressedEh) return;
+				if (
+					event.target instanceof HTMLElement &&
+					(event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA")
+				)
+					return;
+				event.preventDefault();
+				event.stopPropagation();
+				holdSpeed = clampSpeed(holdSpeed + (event.deltaY < 0 ? SPEED_STEP : -SPEED_STEP));
+				setPlaybackRateForAllVideos(holdSpeed, true);
+			},
+			{capture: true, passive: false}
+		);
+
+		window.addEventListener("blur", () => {
+			if (!shiftPressedEh) return;
+			shiftPressedEh = false;
+			shiftSpeedBoostActiveEh = false;
+			setPlaybackRateForAllVideos(playbackRateBeforeHold, true);
+		});
 	}
 
 	function setupMenu() {
@@ -528,10 +632,11 @@
                 <span>1.25</span><span>1.50</span><span>1.75</span><span>2.00</span>
                 <span>2.25</span><span>2.50</span><span>2.75</span><span>3.00</span>
                 <div id="custom_speed">מהירות מותאמת אישית</div></div>
-                <span style="display: block">מהירויות נוספות</span>
+                <span style="display: block">מהירות הקלטה</span>
             </a>
             <label for="m_floating_speed"><a>חלונית שליטת מהירויות צפה<input id="m_floating_speed" type="checkbox" /></a></label>
             <label for="m_scroll_volume"><a>שינוי עוצמת שמע עם גלגלת העכבר<input id="m_scroll_volume" type="checkbox" /></a></label>
+            <label for="m_volume_boost"><a>הגברת עוצמת שמע עד 200%<input id="m_volume_boost" type="checkbox" /></a></label>
             <label for="m_return_backwards"><a>חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_return_backwards" type="checkbox" /></a></label>
             <label for="m_dark_mode"><a>מצב לילה<input id="m_dark_mode" type="checkbox" /></a></label>
             <label for="m_save"><a>זכור הגדרות<input id="m_save" type="checkbox" /></a></label>
@@ -578,6 +683,10 @@
 		(document.getElementById("m_scroll_volume") as HTMLInputElement).addEventListener("change", () =>
 			saveSetting("scroll_volume")
 		);
+		(document.getElementById("m_volume_boost") as HTMLInputElement).addEventListener("change", () => {
+			saveSetting("volume_boost");
+			applyExtendedVolume((document.getElementById("primaryVideo") as HTMLVideoElement).volume);
+		});
 		(document.getElementById("m_save") as HTMLInputElement).addEventListener("change", () =>
 			saveSetting("settings")
 		);
@@ -596,8 +705,7 @@
 
 		for (const speedButton of document.querySelectorAll("#m_speed span"))
 			speedButton.addEventListener("click", () => {
-				for (const video of document.querySelectorAll(".video-js"))
-					(video as HTMLVideoElement).playbackRate = parseFloat(speedButton.textContent);
+				setPlaybackRateForAllVideos(parseFloat(speedButton.textContent));
 			});
 
 		(document.querySelector("#custom_speed") as HTMLDivElement).addEventListener("click", () => {
@@ -675,33 +783,135 @@
 		});
 	}
 
-	function changeVolume(delta: number) {
+	let panoptoAudioContext: AudioContext | null = null;
+	let panoptoAudioSource: MediaElementAudioSourceNode | null = null;
+	let panoptoAudioGainNode: GainNode | null = null;
+	let extendedVolume = 1;
+	let volumeIndicatorHideTimeout: number | null = null;
+
+	function showVolumeIndicator() {
+		let volumeIndicator = document.getElementById("tplus_volume_indicator") as HTMLDivElement | null;
+		if (!volumeIndicator) {
+			volumeIndicator = document.createElement("div");
+			volumeIndicator.id = "tplus_volume_indicator";
+			volumeIndicator.setAttribute(
+				"style",
+				[
+					"position: fixed",
+					"left: 50%",
+					"bottom: 64px",
+					"transform: translateX(-50%)",
+					"background: rgba(0, 0, 0, 0.82)",
+					"color: #fff",
+					"padding: 8px 12px",
+					"border-radius: 7px",
+					"font-size: 13px",
+					"line-height: 1",
+					"z-index: 9999",
+					"pointer-events: none",
+					"opacity: 0",
+					"transition: opacity 140ms ease",
+				].join(";")
+			);
+			document.body.append(volumeIndicator);
+		}
+
+		volumeIndicator.textContent = `Volume: ${Math.round(extendedVolume * 100)}%`;
+		volumeIndicator.style.opacity = "1";
+		if (volumeIndicatorHideTimeout !== null) clearTimeout(volumeIndicatorHideTimeout);
+		volumeIndicatorHideTimeout = window.setTimeout(() => {
+			volumeIndicator!.style.opacity = "0";
+			volumeIndicatorHideTimeout = null;
+		}, 900);
+	}
+
+	function setupPanoptoAudioBoost(videoElement: HTMLVideoElement) {
+		if (panoptoAudioContext && panoptoAudioGainNode && panoptoAudioSource) return;
+
+		panoptoAudioContext = new AudioContext();
+		panoptoAudioSource = panoptoAudioContext.createMediaElementSource(videoElement);
+		panoptoAudioGainNode = panoptoAudioContext.createGain();
+		panoptoAudioSource.connect(panoptoAudioGainNode);
+		panoptoAudioGainNode.connect(panoptoAudioContext.destination);
+		panoptoAudioGainNode.gain.value = 1;
+	}
+
+	function updatePanoptoVolumeUI(volumeValue: number) {
+		const volumeLevelBar = document.getElementById("volumeLevel") as HTMLDivElement,
+			volumeHandle = document.querySelector('#volumeSlider a[role="slider"]') as HTMLAnchorElement;
+		const volumePercent = Math.round(volumeValue * 100);
+		const sliderPercent = Math.min(100, volumePercent);
+		volumeHandle.style.bottom = `${sliderPercent}%`;
+		volumeLevelBar.style.height = `${sliderPercent}%`;
+		volumeHandle.setAttribute("aria-valuenow", volumePercent.toString());
+		volumeHandle.setAttribute("aria-valuetext", `${volumePercent} percent`);
+	}
+
+	function applyExtendedVolume(volumeValue: number) {
 		const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
 		if (!videoElement) return;
 
-		const volumeStep = 0.05;
-		let newVolume = videoElement.volume;
-		if (delta < 0) newVolume = Math.min(1.0, newVolume + volumeStep);
-		else if (delta > 0) newVolume = Math.max(0.0, newVolume - volumeStep);
-		else return;
-		videoElement.volume = newVolume;
+		const over100Eh = (document.getElementById("m_volume_boost") as HTMLInputElement | null)?.checked ?? false;
+		const maxVolume = over100Eh ? 2 : 1;
+		extendedVolume = Math.max(0, Math.min(maxVolume, volumeValue));
+		if (over100Eh) setupPanoptoAudioBoost(videoElement);
+		if (panoptoAudioContext && panoptoAudioContext.state === "suspended") void panoptoAudioContext.resume();
+
+		if (over100Eh && extendedVolume > 1 && panoptoAudioGainNode) {
+			videoElement.volume = 1;
+			panoptoAudioGainNode.gain.value = extendedVolume;
+		} else {
+			videoElement.volume = Math.min(1, extendedVolume);
+			if (panoptoAudioGainNode) panoptoAudioGainNode.gain.value = 1;
+		}
 
 		const muteButton = document.getElementById("muteButton") as HTMLDivElement;
-		if (newVolume > 0 && videoElement.muted) {
+		if (extendedVolume > 0 && videoElement.muted) {
 			videoElement.muted = false;
 			muteButton.classList.remove("muted");
-		} else if (newVolume === 0 && !videoElement.muted) {
+		} else if (extendedVolume === 0 && !videoElement.muted) {
 			videoElement.muted = true;
 			muteButton.classList.add("muted");
 		}
 
-		const volumeLevelBar = document.getElementById("volumeLevel") as HTMLDivElement,
-			volumeHandle = document.querySelector('#volumeSlider a[role="slider"]') as HTMLAnchorElement;
-		const volumePercent = Math.round(newVolume * 100);
-		volumeHandle.style.bottom = `${volumePercent}%`;
-		volumeLevelBar.style.height = `${volumePercent}%`;
-		volumeHandle.setAttribute("aria-valuenow", volumePercent.toString());
-		volumeHandle.setAttribute("aria-valuetext", `${volumePercent} percent`);
+		updatePanoptoVolumeUI(extendedVolume);
+		showVolumeIndicator();
+	}
+
+	function changeVolume(delta: number) {
+		const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
+		if (!videoElement) return;
+		const over100Eh = (document.getElementById("m_volume_boost") as HTMLInputElement | null)?.checked ?? false;
+		if (over100Eh && panoptoAudioGainNode && videoElement.volume === 1 && panoptoAudioGainNode.gain.value > 1)
+			extendedVolume = panoptoAudioGainNode.gain.value;
+		else extendedVolume = videoElement.volume;
+
+		const volumeStep = 0.05;
+		let newVolume = extendedVolume;
+		if (delta < 0) newVolume += volumeStep;
+		else if (delta > 0) newVolume -= volumeStep;
+		else return;
+		applyExtendedVolume(newVolume);
+	}
+
+	function setupArrowKeyVolumeControl() {
+		const arrowUpEh = (event: KeyboardEvent) => event.code === "ArrowUp" || event.key === "ArrowUp";
+		const arrowDownEh = (event: KeyboardEvent) => event.code === "ArrowDown" || event.key === "ArrowDown";
+
+		document.addEventListener(
+			"keydown",
+			(event) => {
+				if (shiftSpeedBoostActiveEh || event.shiftKey) return;
+				if (shouldSkipPlaybackShortcuts(event)) return;
+				if (!arrowUpEh(event) && !arrowDownEh(event)) return;
+
+				event.stopPropagation();
+				event.stopImmediatePropagation();
+				event.preventDefault();
+				changeVolume(arrowUpEh(event) ? -1 : 1);
+			},
+			true
+		);
 	}
 
 	async function fullScreenToggleHandler(event: KeyboardEvent) {
@@ -720,6 +930,7 @@
 			panopto_return_backwards: false,
 			panopto_floating_speed: false,
 			panopto_scroll_volume: false,
+			panopto_volume_boost: false,
 			panopto_save: true,
 			panopto_hide_thumbnails: false,
 			panopto_hide_sidebar: false,
@@ -727,7 +938,10 @@
 		setupDetachableVideoPlayer();
 		setupTimer();
 		setupMenu();
+		setupShiftHoldSpeedBoost();
+		setupArrowKeyVolumeControl();
 		document.addEventListener("keydown", (event) => fullScreenToggleHandler(event));
+		extendedVolume = (document.getElementById("primaryVideo") as HTMLVideoElement).volume;
 
 		if (!storageData.panopto_save) return;
 
@@ -737,6 +951,7 @@
 			storageData.panopto_return_backwards;
 		(document.getElementById("m_floating_speed") as HTMLInputElement).checked = storageData.panopto_floating_speed;
 		(document.getElementById("m_scroll_volume") as HTMLInputElement).checked = storageData.panopto_scroll_volume;
+		(document.getElementById("m_volume_boost") as HTMLInputElement).checked = storageData.panopto_volume_boost;
 		const thumbnailsButton = document.getElementById("toggleThumbnailsButton") as HTMLDivElement,
 			sidebarButton = document.querySelector("#eventsExpanderButton > div[role=button]") as HTMLDivElement;
 		thumbnailsButton?.addEventListener("click", async () => await saveSetting("show_hide_thumbnails"));
@@ -758,6 +973,7 @@
 		const videoElement = document.getElementById("primaryVideo") as HTMLVideoElement;
 		videoElement.addEventListener("ratechange", async () => {
 			if (
+				!transientSpeedChangeEh() &&
 				(document.getElementById("m_return_backwards") as HTMLInputElement).checked &&
 				videoElement.playbackRate < speed
 			) {
@@ -765,7 +981,7 @@
 			}
 			speed = videoElement.playbackRate;
 			updateRealTime();
-			await saveSetting("speed");
+			if (!transientSpeedChangeEh()) await saveSetting("speed");
 
 			const checkmarkDiv = document.querySelector(
 				"#captionSettings > div > ul > li > div:nth-of-type(2)"
@@ -787,9 +1003,19 @@
 				: document.body;
 			fullscreenParent.append(floatingController);
 		});
-		document.addEventListener("wheel", (event) => {
-			if ((document.getElementById("m_scroll_volume") as HTMLInputElement).checked) changeVolume(event.deltaY);
-		});
+		document.addEventListener(
+			"wheel",
+			(event) => {
+				if (shiftSpeedBoostActiveEh) {
+					event.preventDefault();
+					event.stopPropagation();
+					return;
+				}
+				if ((document.getElementById("m_scroll_volume") as HTMLInputElement).checked)
+					changeVolume(event.deltaY);
+			},
+			{capture: true, passive: false}
+		);
 	}
 
 	const storageData: StorageData = await chrome.storage.local.get({
