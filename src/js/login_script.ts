@@ -37,40 +37,39 @@
 				!document.getElementById("passwordError") &&
 				(location.pathname.includes("/oauth2/authorize") || location.pathname.includes("/saml2"))
 			) {
-				const SelectAccountPageEh = location.href.includes("select_account");
-				const LoginHintPresentInUrlEh = location.href.includes("login_hint");
+				const selectAccountPageEh = location.href.includes("select_account");
+				const enterPasswordPageEh = location.href.includes("login_hint");
 				if (
-					loginForm["passwd"] ||
-					!document.getElementById("tilesHolder") ||
-					SelectAccountPageEh ||
-					LoginHintPresentInUrlEh
-				) {
-					if (!SelectAccountPageEh && LoginHintPresentInUrlEh) {
-						document.title = "Technion++ - חיבור אוטומטי";
-						loginForm["passwd"].value = storageData.password;
-						loginForm.submit();
-					} else {
-						document.title = "Technion++ - חיבור אוטומטי";
-						const urlParts = location.href.split("?");
-						const urlParameters = new URLSearchParams(urlParts[1]);
+					!loginForm["passwd"] &&
+					!selectAccountPageEh &&
+					!enterPasswordPageEh &&
+					document.getElementById("tilesHolder")
+				)
+					return;
 
-						urlParameters.delete("prompt");
-						urlParameters.delete("login_hint");
-						urlParameters.append(
-							"login_hint",
-							`${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il`
-						);
-						location.href = `${urlParts[0]}?${urlParameters.toString()}`;
-					}
+				if (!selectAccountPageEh && enterPasswordPageEh) {
+					document.title = "Technion++ - חיבור אוטומטי";
+					loginForm["passwd"].value = storageData.password;
+					loginForm.submit();
+				} else {
+					document.title = "Technion++ - חיבור אוטומטי";
+					const urlParts = location.href.split("?");
+					const urlParameters = new URLSearchParams(urlParts[1]);
+
+					urlParameters.delete("prompt");
+					urlParameters.delete("login_hint");
+					urlParameters.append(
+						"login_hint",
+						`${storageData.username}@${storageData.email_server ? "campus." : ""}technion.ac.il`
+					);
+					location.href = `${urlParts[0]}?${urlParameters.toString()}`;
 				}
-			} else {
-				if (
-					document.forms[0] &&
-					microsoftLoginButton &&
-					location.href === "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/login"
-				) {
-					microsoftLoginButton.click();
-				}
+			} else if (
+				document.forms[0] &&
+				microsoftLoginButton &&
+				location.href === "https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/login"
+			) {
+				microsoftLoginButton.click();
 			}
 		};
 		if (document.querySelector(".banner-logo")) handleMicrosoftLogin();

@@ -122,7 +122,10 @@
 			return main;
 		}
 
-		if (".ac.il/" === window.location.href.split("technion")[1]) {
+		if (window.location.href.split("?")[0].endsWith(".pdf")) {
+			// PDF files
+			return;
+		} else if (window.location.href.endsWith(".ac.il/")) {
 			// Moodle main page
 			if (document.querySelector(".usermenu > .login")) return;
 
