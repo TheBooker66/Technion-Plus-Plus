@@ -2,6 +2,7 @@
 
 html {
 	overflow: hidden;
+	height: fit-content;
 }
 
 body {
@@ -14,6 +15,7 @@ body {
 	user-select: none;
 	-webkit-user-select: none;
 	overflow: hidden;
+	height: fit-content;
 }
 
 .wrapper {
