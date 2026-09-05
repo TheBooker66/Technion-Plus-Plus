@@ -74,7 +74,7 @@ type StorageData = {
 	panopto_hide_sidebar: boolean;
 
 	// --- Module: Bus Lines ---
-	bus_alerts: BusLine["Shilut"][];
+	bus_alerts: BusArrival.lineNumber[];
 	bus_station: number;
 	bus_time: number;
 	allow_timings: boolean;
@@ -146,11 +146,27 @@ type RecordingCourse = {
 	a?: string; // Course Alias
 };
 
-type BusLine = {
-	Shilut: string; // Bus line number
-	DestinationQuarterName: string; // Bus line destination
-	MinutesToArrival: number; // Minutes to arrival for the first bus of a line
-	MinutesToArrivalList: number[]; // Minutes to arrival for all buses of a line
+type BusVisit = {
+	// Not the full data, only the relevant parts for the extension
+	line_name: string;
+	eta: string;
+	static_info: {
+		route: {
+			destination: {
+				name: {
+					HE?: string;
+				};
+			};
+		};
+	};
+};
+
+type BusArrival = {
+	// Processed bus arrival data for display
+	lineNumber: string;
+	destination: string;
+	timeInMinutes: number;
+	firstEh?: boolean;
 };
 
 type DownloadItem = {

@@ -45,7 +45,8 @@
 	"host_permissions": [
 		"*://*.technion.ac.il/*",
 		"*://panoptotech.cloud.panopto.eu/*",
-		"https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*"
+		"https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*",
+		"https://curlbus.app/*"
 	],
 	"content_scripts": [
 		{

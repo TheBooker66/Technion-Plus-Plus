@@ -1,4 +1,5 @@
 import {CommonPopup} from "./common_popup.js";
+import {calculateBuses} from "./utils.js";
 import {TE_shutBusesAlerts, TE_toggleBusAlert} from "./service_worker.js";
 
 const commonDOM = {
@@ -15,20 +16,15 @@ function createBusLineElement(lineDetails: (string | number)[]) {
 	return busLineTemplate.querySelector(".drow") as Node;
 }
 
-function setupBusLineClickEvent(
-	element: HTMLDivElement,
-	busData: BusLine,
-	arrivalTimeIndex: number,
-	busAlerts: StorageData["bus_alerts"]
-) {
-	if (busAlerts.includes(busData.Shilut) && arrivalTimeIndex === 0) element.classList.add("chosen");
+function setupBusLineClickEvent(element: HTMLDivElement, arrival: BusArrival, busAlerts: StorageData["bus_alerts"]) {
+	if (busAlerts.includes(arrival.lineNumber) && arrival.firstEh) element.classList.add("chosen");
 
 	element.addEventListener("click", async () => {
-		if (busData.MinutesToArrivalList[arrivalTimeIndex] <= parseInt(commonDOM.minSelect.value)) {
+		if (arrival.timeInMinutes <= parseInt(commonDOM.minSelect.value)) {
 			element.classList.add("blat");
 			setTimeout(() => element.classList.remove("blat"), 1e3);
 		} else {
-			if (arrivalTimeIndex > 0) {
+			if (!arrival.firstEh) {
 				await chrome.runtime.sendMessage({
 					mess_t: "silent_notification",
 					message: "ניתן ליצור התראה רק לאוטובוס הראשון המופיע ברשימה עבור קו ספציפי בכיוון ספציפי.\n",
@@ -36,7 +32,7 @@ function setupBusLineClickEvent(
 				element.classList.add("blat");
 				setTimeout(() => element.classList.remove("blat"), 1e3);
 			} else {
-				await TE_toggleBusAlert(busData.Shilut);
+				await TE_toggleBusAlert(arrival.lineNumber);
 				element.classList.toggle("chosen");
 			}
 		}
@@ -52,37 +48,20 @@ function displayError(msg: string) {
 }
 
 async function fetchBusData(intervalID: number, busAlerts: StorageData["bus_alerts"]) {
-	const url = `https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/${commonDOM.stationSelect.value}/he/false`;
-
 	try {
-		const res = await fetch(encodeURI(url));
-		const apiResponse: BusLine[] = await res.json();
-
+		const buses = await calculateBuses(parseInt(commonDOM.stationSelect.value));
 		const fragment = document.createDocumentFragment();
-		const allArrivals: {bus: BusLine; index: number; time: number}[] = [];
-
-		for (const bus of apiResponse) {
-			if (!bus.MinutesToArrivalList) continue;
-			for (let i = 0; i < bus.MinutesToArrivalList.length; i++) {
-				allArrivals.push({bus, index: i, time: bus.MinutesToArrivalList[i]});
-			}
-		}
-
-		allArrivals.sort((a, b) => a.time - b.time);
-
-		if (allArrivals.length === 0) {
-			fragment.append(createBusLineElement(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""]));
-		} else {
-			for (const arrival of allArrivals) {
+		if (buses.length === 0) fragment.append(createBusLineElement(["", "לא נמצאו קווי אוטובוס לתצוגה.", ""]));
+		else
+			for (const bus of buses) {
 				const element = createBusLineElement([
-					arrival.bus.Shilut,
-					arrival.bus.DestinationQuarterName,
-					arrival.time,
+					bus.lineNumber,
+					bus.destination,
+					bus.timeInMinutes,
 				]) as HTMLDivElement;
-				setupBusLineClickEvent(element, arrival.bus, arrival.index, busAlerts);
+				setupBusLineClickEvent(element, bus, busAlerts);
 				fragment.append(element);
 			}
-		}
 
 		commonDOM.busTable.append(fragment);
 	} catch (err) {
@@ -128,7 +107,6 @@ async function main() {
 		{name: "טכניון/מעונות נווה אמריקה", val: 43280},
 		{name: "טכניון/בניין הספורט", val: 43015},
 		{name: "טכניון/הנדסה אזרחית", val: 43022},
-		{name: "הנדסה אזרחית", val: 42644},
 		{name: "טכניון/הנדסה חקלאית", val: 43076},
 		{name: "טכניון/הנדסה כימית", val: 40311},
 		{name: "טכניון/ביוטכנולוגיה ומזון", val: 43073},

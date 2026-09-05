@@ -24,4 +24,29 @@ function resolveTheme(theme: string): void {
 	else entirePage.removeAttribute("tplus");
 }
 
-export {reverseString, xorStrings, resetBadge, resolveTheme};
+async function calculateBuses(stationID: number): Promise<BusArrival[]> {
+	const url = `https://curlbus.app/${stationID}`;
+	const res = await fetch(url, {headers: {"Accept": "application/json"}});
+	const rawBuses: BusVisit[] = (await res.json())["visits"][stationID];
+
+	const now = Date.now();
+	const busArrivals: BusArrival[] = rawBuses.map((bus) => {
+		const etaMs = new Date(bus.eta.replace(" ", "T")).getTime();
+		return {
+			lineNumber: bus.line_name,
+			destination: bus.static_info?.route?.destination?.name?.HE || "",
+			timeInMinutes: Math.max(0, Math.floor((etaMs - now) / 60000)),
+		};
+	});
+
+	busArrivals.sort((a, b) => a.timeInMinutes - b.timeInMinutes);
+	const seenLines = new Set<string>();
+	return busArrivals.map((arrival) => {
+		const key = `${arrival.lineNumber}-${arrival.destination}`;
+		const firstEh = !seenLines.has(key);
+		seenLines.add(key);
+		return {...arrival, firstEh: firstEh};
+	});
+}
+
+export {reverseString, xorStrings, resetBadge, resolveTheme, calculateBuses};

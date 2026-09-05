@@ -1,4 +1,4 @@
-import {reverseString, xorStrings} from "./utils.js";
+import {reverseString, xorStrings, calculateBuses} from "./utils.js";
 
 const courseRegex = /(?<cname>.+)\s-\s(?<cnum>\d{6,8})/,
 	semesterRegex = / - (?:קיץ|חורף|אביב)/;
@@ -12,7 +12,13 @@ async function TE_setStorage(data: Partial<StorageData>, callerName = "unknown")
 	}
 }
 
-async function XHR(url: string, resType: string, info: string[] = [], body = "", reqType = false) {
+async function XHR(
+	url: string,
+	resType: "json" | "document" | "text",
+	info: string[] = [],
+	body = "",
+	reqType = false
+) {
 	const options: RequestInit = {
 		method: reqType ? "HEAD" : "GET",
 		headers: {},
@@ -963,15 +969,15 @@ async function TE_busAlertError() {
 	await TE_shutBusesAlerts();
 }
 
-async function TE_busAlertNow(arrivingBuses: BusLine[]) {
+async function TE_busAlertNow(arrivingBuses: BusArrival[]) {
 	let messageBody = "";
 	for (const bus of arrivingBuses) {
-		messageBody += `קו ${bus["Shilut"]} יגיע לתחנה בעוד ${bus["MinutesToArrival"]} דקות.\n`;
+		messageBody += `קו ${bus.lineNumber} יגיע לתחנה בעוד ${bus.timeInMinutes} דקות.\n`;
 	}
 	await TE_notification(messageBody, false);
 
 	const storageData: StorageData = await chrome.storage.local.get({bus_alerts: []});
-	const alertedLines = arrivingBuses.map((bus) => bus["Shilut"]);
+	const alertedLines = arrivingBuses.map((bus) => bus.lineNumber);
 	storageData.bus_alerts = storageData.bus_alerts.filter((line: string) => !alertedLines.includes(line));
 	await TE_setStorage({bus_alerts: storageData.bus_alerts}, "removeAlertedBuses");
 
@@ -987,20 +993,13 @@ async function TE_checkBuses() {
 	if (storageData.bus_alerts.length === 0) return;
 
 	try {
-		const busData = await XHR(
-			`https://bus.gov.il/WebApi/api/passengerinfo/GetRealtimeBusLineListByBustop/${storageData.bus_station}/he/false`,
-			"json"
+		const buses = await calculateBuses(storageData.bus_station);
+		const busesToAlert = buses.filter(
+			(bus) =>
+				bus.firstEh &&
+				storageData.bus_alerts.includes(bus.lineNumber) &&
+				bus.timeInMinutes <= storageData.bus_time
 		);
-		const realtimeData: BusLine[] = busData.response;
-		if (!Array.isArray(realtimeData)) {
-			await TE_busAlertError();
-			return;
-		}
-
-		const busesToAlert = realtimeData.filter(
-			(bus) => storageData.bus_alerts.includes(bus["Shilut"]) && bus["MinutesToArrival"] <= storageData.bus_time
-		);
-
 		if (busesToAlert.length > 0) await TE_busAlertNow(busesToAlert);
 	} catch {
 		await TE_busAlertError();
