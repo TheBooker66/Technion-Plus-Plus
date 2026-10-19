@@ -148,7 +148,7 @@ async function XHR(
 async function TE_AutoLoginNormal(headRequestEh: boolean) {
 	try {
 		const initialResponse = await XHR(
-			"https://moodle25.technion.ac.il/auth/oidc/",
+			"https://moodle26.technion.ac.il/auth/oidc/",
 			"document",
 			["CourseNames", "CourseLinks"],
 			"",
@@ -184,10 +184,10 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 			RETRY_DELAY = 500;
 		for (let retryCount = 0; retryCount < MAX_RETRIES; retryCount++) {
 			const currentTab = await chrome.tabs.get(tabId);
-			if (currentTab.url === "https://moodle25.technion.ac.il/") {
+			if (currentTab.url === "https://moodle26.technion.ac.il/") {
 				await chrome.tabs.remove(tabId);
 				const finalResponse = await XHR(
-					"https://moodle25.technion.ac.il/auth/oidc/",
+					"https://moodle26.technion.ac.il/auth/oidc/",
 					"document",
 					["CourseNames", "CourseLinks"],
 					"",
@@ -210,7 +210,7 @@ async function TE_AutoLoginNormal(headRequestEh: boolean) {
 
 async function TE_AutoLoginExternal() {
 	try {
-		const initialResponse = await XHR("https://moodle25.technion.ac.il/", "document", [
+		const initialResponse = await XHR("https://moodle26.technion.ac.il/", "document", [
 			"CourseNames",
 			"UserText",
 			"CourseLinks",
@@ -220,7 +220,7 @@ async function TE_AutoLoginExternal() {
 			return initialResponse;
 		}
 
-		const tab = await chrome.tabs.create({url: "https://moodle25.technion.ac.il/", active: false});
+		const tab = await chrome.tabs.create({url: "https://moodle26.technion.ac.il/", active: false});
 		const tabId = tab.id as number;
 
 		const MAX_RETRIES = 8,
@@ -229,7 +229,7 @@ async function TE_AutoLoginExternal() {
 
 		while (retryCount < MAX_RETRIES) {
 			try {
-				const finalResponse = await XHR("https://moodle25.technion.ac.il/", "document", [
+				const finalResponse = await XHR("https://moodle26.technion.ac.il/", "document", [
 					"CourseNames",
 					"UserText",
 					"CourseLinks",
@@ -343,7 +343,7 @@ async function TE_checkCalendarProp(calendarProp: string) {
 	if (calendarProp !== "") return;
 
 	try {
-		const mainPageResponse = await XHR("https://moodle25.technion.ac.il/calendar/export.php", "document", [
+		const mainPageResponse = await XHR("https://moodle26.technion.ac.il/calendar/export.php", "document", [
 			"SessionKey",
 		]);
 		const SessionKey = mainPageResponse.response["SessionKey"];
@@ -376,7 +376,7 @@ async function TE_alertMoodleCalendar(
 	}
 	if (calendarProp === "0") return;
 
-	const calendarUrl = `https://moodle25.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&${calendarProp}`;
+	const calendarUrl = `https://moodle26.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&${calendarProp}`;
 	try {
 		const calendarData = await XHR(calendarUrl, "document", ["HWList"]);
 		const events: string[] = calendarData.response["HWList"];
@@ -529,7 +529,7 @@ async function TE_webworkScan() {
 
 	for (const courseData of Object.values(storageData.webwork_cal_courses)) {
 		const step1 = await TE_webworkStep(
-			`https://moodle25.technion.ac.il/mod/lti/launch.php?id=${(courseData as WebworkCourse).lti}`
+			`https://moodle26.technion.ac.il/mod/lti/launch.php?id=${(courseData as WebworkCourse).lti}`
 		);
 		if (!step1) continue;
 
@@ -616,7 +616,7 @@ async function TE_getWebwork(
 			newWebworkCourses[courseID] = existingWebworkCourses[courseID];
 			continue;
 		}
-		const ltiPage = await XHR(`https://moodle25.technion.ac.il/mod/lti/index.php?id=${courseID}`, "document", [
+		const ltiPage = await XHR(`https://moodle26.technion.ac.il/mod/lti/index.php?id=${courseID}`, "document", [
 			"WebworkLinks",
 		]);
 		const links: {text: string; href: string}[] = ltiPage.response["WebworkLinks"];
@@ -662,7 +662,7 @@ async function TE_doDownloads(chunk: DownloadItem) {
 
 async function TE_nextDownload() {
 	const urlPrefixes = [
-			"https://moodle25.technion.ac.il/blocks/material_download/download_materialien.php?courseid=",
+			"https://moodle26.technion.ac.il/blocks/material_download/download_materialien.php?courseid=",
 			"https://panoptotech.cloud.panopto.eu/Panopto/Podcast/Syndication/",
 			"https://grades.cs.technion.ac.il/fetch/file?",
 			"https://webcourse.cs.technion.ac.il/",

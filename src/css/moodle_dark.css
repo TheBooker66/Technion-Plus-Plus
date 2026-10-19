@@ -470,7 +470,8 @@ nav.navbar.navbar-dark.bg-primary {
 	box-shadow: var(--shadow);
 }
 
-[tplus="dm"] .nav-tabs .nav-link.active {
+[tplus="dm"] .nav-tabs .nav-link.active,
+[tplus="dm"] .moremenu .nav-link.active {
 	background-color: var(--navbar_bg) !important;
 	border-color: var(--navbar_bottom) !important;
 }
@@ -590,11 +591,7 @@ nav.navbar.navbar-dark.bg-primary {
 	background-color: var(--navbar_bottom);
 }
 
-[tplus="dm"] #tp_colour_switcher {
-	display: flex !important;
-}
-
-[tplus="dm"] #coursecontentcollapseid2 .tplus_main_actions > div {
+[tplus="dm"] #coursecontentcollapseid15 .tplus_main_actions > div {
 	background-color: #0004;
 }
 
@@ -652,4 +649,11 @@ nav.navbar.navbar-dark.bg-primary {
 [tplus="dm"] .content-item-container.selected {
 	background-color: var(--navbar_bg);
 	border-color: var(--navbar_bg);
+}
+
+[tplus="dm"] .card,
+[tplus="dm"] .card-body,
+[tplus="dm"] .courseindex .courseindex-item .courseindex-link,
+[tplus="dm"] .courseindex .courseindex-item .courseindex-chevron {
+	color: #ddd !important;
 }

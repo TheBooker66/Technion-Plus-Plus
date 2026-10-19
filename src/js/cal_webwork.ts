@@ -41,7 +41,7 @@ await calendar.progress(async () => {
 	for (const assignment of sortedAssignments) {
 		const courseLTI = assignment[0].toString().substring(0, assignment[0].toString().indexOf("000"));
 		const eventID = assignment[0],
-			eventURL = `https://moodle25.technion.ac.il/mod/lti/launch.php?id=${courseLTI}`;
+			eventURL = `https://moodle26.technion.ac.il/mod/lti/launch.php?id=${courseLTI}`;
 		const assignmentObject: HWAssignment = {
 			name: assignment[1].h,
 			description: "",

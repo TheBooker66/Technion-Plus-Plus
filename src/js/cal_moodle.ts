@@ -5,7 +5,7 @@ import {TE_AutoLogin} from "./service_worker.js";
 function openMoodle(eventID: number, eventTimestamp: number): () => void {
 	return async () => {
 		try {
-			const eventURL = `https://moodle25.technion.ac.il/calendar/view.php?view=day&course=1&time=${eventTimestamp / 1e3}#event_${eventID}`;
+			const eventURL = `https://moodle26.technion.ac.il/calendar/view.php?view=day&course=1&time=${eventTimestamp / 1e3}#event_${eventID}`;
 			await TE_AutoLogin(true);
 			const response = await popup.XHR(eventURL, "document");
 			const eventLinks = response.response.querySelectorAll(`.event[data-event-id='${eventID}'] a`);
@@ -28,7 +28,7 @@ async function initializeCalendarProperties() {
 	if (storageData.moodle_cal_prop !== "")
 		throw new Error("אירעה שגיאה בניסיון לגשת אל שרת ה-Moodle, אנא נסה שנית מאוחר יותר.");
 	try {
-		const res = await popup.XHR("https://moodle25.technion.ac.il/calendar/export.php", "document");
+		const res = await popup.XHR("https://moodle26.technion.ac.il/calendar/export.php", "document");
 		const sessionKey: string = res.response.querySelector("[name='sesskey']").value;
 		const exportResponse = await popup.XHR(
 			res.responseURL,
@@ -75,7 +75,7 @@ await calendar.progress(async () => {
 	let calendarData: {response: string; responseURL: string};
 	try {
 		calendarData = await popup.XHR(
-			`https://moodle25.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&${storageData.moodle_cal_prop}`,
+			`https://moodle26.technion.ac.il/calendar/export_execute.php?preset_what=all&preset_time=recentupcoming&${storageData.moodle_cal_prop}`,
 			"text"
 		);
 	} catch (err) {

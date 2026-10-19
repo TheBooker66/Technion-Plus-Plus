@@ -54,7 +54,7 @@ a.tplus_download_light {
 	color: #16253d;
 }
 
-#coursecontentcollapseid2 .tplus_block {
+#coursecontentcollapseid15 .tplus_block {
 	margin-top: 8px;
 	border-radius: 8px;
 }
@@ -73,7 +73,7 @@ a.tplus_download_light {
 	color: #eee;
 }
 
-#coursecontentcollapseid2 .tplus_block h5.card-title {
+#coursecontentcollapseid15 .tplus_block h5.card-title {
 	padding: 10px 0 0 40px;
 	border: 0;
 	border-radius: 8px;
@@ -86,24 +86,24 @@ a.tplus_download_light {
 	margin-bottom: 0;
 }
 
-.tplus_block .switch input {
+.tplus_block .custom-switch input {
 	display: none;
 }
 
-.tplus_block .switch input:not(:checked) ~ #tp_darkmode_label::after {
+.tplus_block .custom-switch input:not(:checked) ~ #tp_darkmode_label::after {
 	transform: translateY(2%);
 }
 
-.tplus_block .switch input:checked + label::before {
+.tplus_block .custom-switch input:checked + label::before {
 	background-color: var(--dark_bg);
 }
 
-.tplus_block .switch input:checked ~ #tp_darkmode_label::after {
-	transform: translate(-0.9375rem, 2%);
+.tplus_block .custom-switch input:checked ~ #tp_darkmode_label::after {
+	transform: translate(-0.7rem, 2%);
 }
 
 #tp_colour_switcher {
-	display: none;
+	display: flex;
 	align-items: center;
 }
 
@@ -173,13 +173,13 @@ a.tplus_download_light {
 	grid-row-gap: 0.5rem;
 }
 
-#coursecontentcollapseid2 .tplus_main_actions {
+#coursecontentcollapseid15 .tplus_main_actions {
 	display: flex;
 	gap: 8px;
 	text-align: right;
 }
 
-#coursecontentcollapseid2 .tplus_main_actions > div {
+#coursecontentcollapseid15 .tplus_main_actions > div {
 	background-color: #fff1;
 	padding: 8px;
 	border-radius: 8px;
@@ -187,6 +187,15 @@ a.tplus_download_light {
 	flex: 0 1 100%;
 }
 
-#coursecontentcollapseid2 .tplus_main_actions > div.custom-switch {
+#coursecontentcollapseid15 .tplus_main_actions > div.custom-switch {
 	padding-right: calc(2.6875rem + 8px);
+}
+
+.courseindex .courseindex-item.pageitem,
+.maincalendar .calendarmonth td.today .day-number-circle {
+	background-color: var(--navbar_bg) !important;
+}
+
+a {
+	color: var(--a_color);
 }

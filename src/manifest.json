@@ -10,7 +10,7 @@
 		"48": "icons/technion_plus_plus/icon-48.png",
 		"128": "icons/technion_plus_plus/icon-128.png"
 	},
-	"version": "4.6.1",
+	"version": "4.7.0",
 	"manifest_version": 3,
 	"browser_specific_settings": {
 		"gecko": {
@@ -83,6 +83,10 @@
 				"https://moodle25.technion.ac.il/my/",
 				"https://moodle25.technion.ac.il/*.php?*",
 				"https://moodle25.technion.ac.il/login/index.php",
+				"https://moodle26.technion.ac.il/",
+				"https://moodle26.technion.ac.il/my/",
+				"https://moodle26.technion.ac.il/*.php?*",
+				"https://moodle26.technion.ac.il/login/index.php",
 				"https://grades.technion.ac.il/*",
 				"https://grades.cs.technion.ac.il/*",
 				"https://webcourse.cs.technion.ac.il/*",
@@ -114,7 +118,8 @@
 				"https://moodle2223.technion.ac.il/*",
 				"https://moodle2324.technion.ac.il/*",
 				"https://moodle24.technion.ac.il/*",
-				"https://moodle25.technion.ac.il/*"
+				"https://moodle25.technion.ac.il/*",
+				"https://moodle26.technion.ac.il/*"
 			],
 			"run_at": "document_start"
 		},

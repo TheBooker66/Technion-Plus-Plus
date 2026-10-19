@@ -131,7 +131,7 @@
 
 			const buttons = await create_tp_buttons();
 			const parentNode = buttons.parentNode as HTMLHeadingElement,
-				container = document.getElementById("coursecontentcollapseid2") as HTMLElement;
+				container = document.getElementById("coursecontentcollapseid15") as HTMLElement;
 			parentNode.removeChild(buttons);
 			container.prepend(parentNode.parentNode as Node);
 			parentNode.style.padding = "8px";
@@ -179,7 +179,7 @@
 					buttons,
 					"tplus_download",
 					{
-						href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2025/${semester}/SM/${course_num}`,
+						href: `https://portalex.technion.ac.il/ovv/?sap-theme=sap_belize&sap-language=HE&sap-ui-language=HE#/details/2026/${semester}/SM/${course_num}`,
 						target: "_blank",
 					},
 					"דף הקורס בסאפ"
