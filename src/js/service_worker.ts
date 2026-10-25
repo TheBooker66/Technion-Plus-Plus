@@ -977,43 +977,51 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 		console.log("Technion++: Welcome!"); // TODO: Do something in the future
 	else if (details.reason === "update") await chrome.tabs.create({url: "html/release_notes.html"});
 
-	if (details.reason === "update" && details.previousVersion && details.previousVersion < "4.5.0") {
-		const storageData = await chrome.storage.local.get({dark_mode: false});
-		const newTheme = storageData.dark_mode ? "dark" : "light";
-		await TE_setStorage({theme: newTheme}, "update450");
-		console.log(`Technion++: Updated theme to ${newTheme} due to version 4.5.0 update.`);
-	}
-
-	if (details.reason === "update" && details.previousVersion && details.previousVersion < "4.6.0") {
-		function generateCourseId(courseNum: string, year: number, semester: Semester) {
-			let hash = 0;
-			const source = `${courseNum}|${year}|${semester}`;
-			for (let i = 0; i < source.length; i++) {
-				hash = (hash << 5) - hash + source.charCodeAt(i);
-				hash |= 0;
-			}
-			return `course_${(hash >>> 0).toString(16).padStart(8, "0")}`;
+	if (details.reason === "update" && details.previousVersion) {
+		if (details.previousVersion < "4.5.0") {
+			const storageData = await chrome.storage.local.get({dark_mode: false});
+			const newTheme = storageData.dark_mode ? "dark" : "light";
+			await TE_setStorage({theme: newTheme}, "update450");
+			console.log(`Technion++: Updated theme to ${newTheme} due to version 4.5.0 update.`);
 		}
 
-		function normalizeStoredCourses(courses: CalculatorCourse[]) {
-			const seenCourseIds = new Set<string>();
-			return courses.map((course) => {
-				const baseCourseId = generateCourseId(course.num, course.year, course.semester);
-				let courseId = baseCourseId;
-				let index = 1;
-				while (seenCourseIds.has(courseId)) {
-					courseId = `${baseCourseId}_${index}`;
-					index++;
+		if (details.previousVersion < "4.6.0") {
+			function generateCourseId(courseNum: string, year: number, semester: Semester) {
+				let hash = 0;
+				const source = `${courseNum}|${year}|${semester}`;
+				for (let i = 0; i < source.length; i++) {
+					hash = (hash << 5) - hash + source.charCodeAt(i);
+					hash |= 0;
 				}
-				seenCourseIds.add(courseId);
-				return {...course, id: courseId};
-			});
-		}
+				return `course_${(hash >>> 0).toString(16).padStart(8, "0")}`;
+			}
 
-		const storageData: StorageData = await chrome.storage.local.get({grades: []});
-		const normalizedGrades = normalizeStoredCourses(storageData.grades);
-		await TE_setStorage({grades: normalizedGrades}, "update460");
-		console.log(`Technion++: Normalized courses in the academic calculator's storage due to version 4.6.0 update.`);
+			function normalizeStoredCourses(courses: CalculatorCourse[]) {
+				const seenCourseIds = new Set<string>();
+				return courses.map((course) => {
+					const baseCourseId = generateCourseId(course.num, course.year, course.semester);
+					let courseId = baseCourseId;
+					let index = 1;
+					while (seenCourseIds.has(courseId)) {
+						courseId = `${baseCourseId}_${index}`;
+						index++;
+					}
+					seenCourseIds.add(courseId);
+					return {...course, id: courseId};
+				});
+			}
+
+			const storageData: StorageData = await chrome.storage.local.get({grades: []});
+			const normalizedGrades = normalizeStoredCourses(storageData.grades);
+			await TE_setStorage({grades: normalizedGrades}, "update460");
+			console.log(
+				`Technion++: Normalized courses in the academic calculator's storage due to version 4.6.0 update.`
+			);
+		}
+		if (details.previousVersion < "4.7.1") {
+			await TE_setStorage({moodle_cal_prop: ""}, "update471");
+			console.log(`Technion++: Reset Moodle calendar property due to new model version.`);
+		}
 	}
 
 	await TE_startExtension();
