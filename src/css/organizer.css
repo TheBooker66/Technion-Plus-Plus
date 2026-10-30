@@ -238,7 +238,7 @@ b.assignment_name {
 	font-weight: 700;
 }
 
-.end_time span {
+.end_time span:nth-of-type(2) {
 	color: var(--sec-dark);
 }
 
@@ -537,6 +537,6 @@ input[type="hidden"][value="0"] + div::before {
 	background-color: rgb(255, 255, 255, 0.1);
 }
 
-[tplus="dm"] .end_time span {
+[tplus="dm"] .end_time span:nth-of-type(2) {
 	color: var(--sec-norm);
 }

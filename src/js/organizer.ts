@@ -116,12 +116,19 @@ function insertAssignments(newAssignments: HWAssignment[], finishedAssignments: 
 			courses.add(assignmentData.course!);
 			(newAssigment.querySelector(".system") as HTMLImageElement).src =
 				`../icons/${icons[assignmentData.sys][0]}`;
-			(newAssigment.querySelector(".system") as HTMLImageElement).title = `מטלת${icons[assignmentData.sys][1]}`;
+			(newAssigment.querySelector(".system") as HTMLImageElement).title = ` מטלת${icons[assignmentData.sys][1]}`;
+
+			if (assignmentData.name.includes("נפתח ב")) {
+				assignmentData.name = assignmentData.name.replace("נפתח ב", "נפתח: ").trim();
+				(newAssigment.querySelector(".assignment_name") as HTMLElement).title = "מטלה זו תיפתח בעתיד";
+				newAssigment.querySelectorAll(".end_time > span")[0]!.textContent = "תאריך פתיחה:";
+			}
 			newAssigment.querySelector(".assignment_name")!.textContent = assignmentData.name;
-			newAssigment.querySelector(".course_name")!.textContent += assignmentData.course;
+			newAssigment.querySelector(".course_name")!.textContent += `קורס: ${assignmentData.course}`;
 			newAssigment.dataset.course = `#${assignmentData.course}`;
 			newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
-			newAssigment.querySelector(".end_time > span")!.textContent = assignmentData.finalDate!;
+			newAssigment.querySelectorAll(".end_time > span")[1]!.textContent = assignmentData.finalDate!;
+
 			const buttonElements = newAssigment.querySelectorAll("a.button");
 			buttonElements[0].addEventListener("click", () => openAssignment(newAssigment, assignmentData.goToFunc!));
 			buttonElements[1].addEventListener("click", () =>
