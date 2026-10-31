@@ -869,7 +869,7 @@ async function TE_checkBuses() {
 	}
 }
 
-async function TE_sendMessageToTabs(data: {mess_t: string; angle?: number | unknown}) {
+async function TE_sendMessageToTabs(data: {mess_t: string; angle?: number; colour?: string; source?: number}) {
 	const tabs = await chrome.tabs.query({});
 	const moodleTabs = tabs.filter((tab) => (tab.url as string).includes("moodle"));
 	for (const tab of moodleTabs) {
@@ -918,11 +918,22 @@ chrome.runtime.onMessage.addListener(async (message) => {
 		case "loud_notification":
 			await TE_notification(message.message, false);
 			break;
-		case "TE_moodle_colour":
-			await TE_sendMessageToTabs({mess_t: "TE_moodle_colour", angle: message.angle});
+		case "TE_moodle_preset_colour":
+			await TE_sendMessageToTabs({
+				mess_t: "TE_moodle_preset_colour",
+				angle: message.angle,
+				source: message.source,
+			});
 			break;
-		case "TE_moodle_darkmode":
-			await TE_sendMessageToTabs({mess_t: "TE_moodle_darkmode"});
+		case "TE_moodle_custom_colour":
+			await TE_sendMessageToTabs({
+				mess_t: "TE_moodle_custom_colour",
+				colour: message.colour,
+				source: message.source,
+			});
+			break;
+		case "TE_moodle_darkMode":
+			await TE_sendMessageToTabs({mess_t: "TE_moodle_darkMode"});
 			break;
 		default:
 			break;

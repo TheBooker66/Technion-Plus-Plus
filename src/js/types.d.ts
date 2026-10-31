@@ -16,8 +16,12 @@ type StorageData = {
 	email_preference: "gmail" | "outlook" | "program";
 	custom_name: string;
 	custom_link: string;
-	remoodle: boolean;
-	remoodle_angle: number;
+
+	// --- Moodle Customization ---
+	moodle_dark_mode: boolean;
+	moodle_colour_source: "default" | "preset" | "picker";
+	moodle_colour_angle: number;
+	moodle_custom_colour: string;
 
 	// --- Notifications ---
 	hw_alerts: boolean;

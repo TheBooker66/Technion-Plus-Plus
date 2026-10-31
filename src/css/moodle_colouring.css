@@ -1,0 +1,217 @@
+@scope (html[tplus-colours]) {
+	:scope:not([tplus-darkMode]) {
+		nav.navbar,
+		nav.navbar a,
+		nav.navbar span,
+		nav.navbar .nav-link,
+		nav.navbar .usertext {
+			color: #16253d !important;
+		}
+	}
+
+	.aabtn.focus,
+	.aabtn:focus,
+	.btn-link.focus,
+	.btn-link:focus,
+	.nav-link.focus,
+	.nav-link:focus,
+	.editor_atto_toolbar button.focus,
+	.editor_atto_toolbar button:focus,
+	.editor_atto_toolbar .atto_toolbar_row.focus,
+	.editor_atto_toolbar .atto_toolbar_row:focus,
+	[role="button"].focus,
+	[role="button"]:focus,
+	.list-group-item-action.focus,
+	.list-group-item-action:focus,
+	input[type="checkbox"].focus,
+	input[type="checkbox"]:focus,
+	input[type="radio"].focus,
+	input[type="radio"]:focus,
+	input[type="file"].focus,
+	input[type="file"]:focus,
+	input[type="image"].focus,
+	input[type="image"]:focus,
+	.visually-hidden-focusable.focus,
+	.visually-hidden-focusable:focus,
+	a.dropdown-toggle.focus,
+	a.dropdown-toggle:focus,
+	.moodle-dialogue-base .closebutton.focus,
+	.moodle-dialogue-base .closebutton:focus,
+	button.btn-close.focus,
+	button.btn-close:focus,
+	.form-autocomplete-selection.focus,
+	.form-autocomplete-selection:focus,
+	[role="treeitem"]:not([aria-expanded="true"]).focus,
+	[role="treeitem"]:not([aria-expanded="true"]):focus {
+		outline: 0 !important;
+		box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--navbar_bottom) 75%, transparent) !important;
+	}
+
+	.iconset a.iconbtn {
+		color: var(--a_navlink);
+	}
+
+	.iconset a.iconbtn:hover {
+		color: var(--a_hover_navlink);
+	}
+
+	#page-footer {
+		border-image: linear-gradient(to right, transparent 5%, var(--navbar_bg), transparent 95%) 1;
+	}
+
+	.card-body a,
+	section#region-main a,
+	.activity-navigation a,
+	.breadcrumb a {
+		color: var(--a_color);
+	}
+
+	.card-body a:hover,
+	section#region-main a:hover,
+	.activity-navigation a:hover {
+		color: var(--a_hover_color);
+	}
+
+	.qn-question {
+		background-color: #165179 !important;
+	}
+
+	#page-mod-questionnaire-complete .raterow:hover,
+	#page-mod-questionnaire-preview .raterow:hover {
+		background-color: var(--calendar_today);
+	}
+
+	a.nav-link.active {
+		border-bottom-color: var(--navbar_bottom) !important;
+	}
+
+	.nav-link:hover,
+	.navbar a:hover:not(.dropdown-item),
+	a.nav-link:hover,
+	.navbar a:hover .usertext {
+		color: var(--a_hover_navlink) !important;
+	}
+
+	nav.navbar,
+	nav.navbar.fixed-top.custom-color,
+	nav.navbar.navbar-dark.bg-dark,
+	nav.navbar.navbar-dark.bg-primary {
+		border-bottom: 0 solid var(--navbar_bottom);
+		box-shadow: 0 0 4px 4px rgb(0, 0, 0, 0.5) !important;
+		background-color: var(--navbar_bg) !important;
+		color: var(--navbar_text, #fff) !important;
+	}
+
+	nav.navbar .navbar-brand,
+	nav.navbar .nav-link,
+	nav.navbar .navbar-nav > .nav-item > a,
+	nav.navbar .usertext {
+		color: var(--navbar_text, #fff) !important;
+	}
+
+	:scope[tplus-darkMode] nav.navbar,
+	:scope[tplus-darkMode] nav.navbar a,
+	:scope[tplus-darkMode] nav.navbar span,
+	:scope[tplus-darkMode] nav.navbar .nav-link,
+	:scope[tplus-darkMode] nav.navbar .usertext {
+		color: var(--navbar_text, #fff) !important;
+	}
+
+	.course-section-header {
+		background-color: var(--navbar_bg);
+		padding: 0.8em;
+	}
+
+	.section li.activity:not(.modtype_label):hover {
+		background-color: var(--calendar_today) !important;
+	}
+
+	.path-grade-report-user .user-grade tbody tr:hover,
+	.grade-report-user .user-grade tbody tr:hover {
+		background-color: var(--calendar_today) !important;
+	}
+
+	.minicalendar .today {
+		background-color: var(--calendar_today);
+	}
+
+	.minicalendar .calendar-controls {
+		background-color: var(--navbar_bg);
+	}
+
+	.activity-navigation {
+		background-color: var(--dark_bg) !important;
+	}
+
+	nav .list-group-item.active {
+		background-color: var(--navbar_bg) !important;
+		border-color: var(--navbar_bg) !important;
+	}
+
+	a.left.carousel-control .fa-chevron-left:hover,
+	a.right.carousel-control .fa-chevron-right:hover {
+		color: var(--a_color) !important;
+	}
+
+	.btn.btn-primary,
+	.btn.btn-primary:link,
+	.btn.btn-primary:visited,
+	a#blocksliderbutton:visited,
+	a#blocksliderbutton:link {
+		background-color: var(--navbar_bg) !important;
+		border-color: var(--navbar_bg) !important;
+		color: var(--navbar_text, #fff) !important;
+	}
+
+	.btn.btn-primary:hover,
+	.btn.btn-primary:focus,
+	a#blocksliderbutton:hover,
+	a#blocksliderbutton:focus {
+		background-color: var(--dark_bg) !important;
+	}
+
+	.page-item.active .page-link {
+		background-color: var(--navbar_bottom) !important;
+		border-color: var(--navbar_bottom) !important;
+	}
+
+	.custom-control-input:checked ~ .custom-control-label::before {
+		border-color: var(--navbar_bottom) !important;
+		background-color: var(--navbar_bottom) !important;
+	}
+
+	::-webkit-scrollbar-track {
+		background: var(--dark_bg) !important;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: var(--navbar_bottom) linear-gradient(#fff6, #fff6) !important;
+		border: solid var(--dark_bg) !important;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: var(--navbar_bottom) linear-gradient(#fff8, #fffa) !important;
+	}
+
+	::-webkit-scrollbar-thumb:active {
+		background: var(--navbar_bottom) linear-gradient(#fffc, #fffe) !important;
+	}
+
+	.content-item-container.unread {
+		background-color: var(--dark_bg);
+	}
+
+	.content-item-container.selected {
+		background-color: var(--navbar_bg);
+		border-color: var(--navbar_bg);
+	}
+
+	.courseindex .courseindex-item.pageitem,
+	.maincalendar .calendarmonth td.today .day-number-circle {
+		background-color: var(--navbar_bg) !important;
+	}
+
+	a {
+		color: var(--a_color) !important;
+	}
+}

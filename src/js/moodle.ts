@@ -56,18 +56,19 @@
 			const main = create_element("div", cardBody, "card-text mt-3", {
 				style: "display: grid; text-align: center; grid-row-gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(128,128,128,.3);",
 			}) as HTMLDivElement;
+			const isMainPage = window.location.href.endsWith(".ac.il/");
 
 			const actionsContainer = create_element(
 				"div",
 				cardBody,
-				"card-text mt-3 tplus_main_actions"
+				`card-text mt-3 tplus_main_actions${isMainPage ? "" : " tplus_course_actions"}`
 			) as HTMLDivElement;
 			const darkModeContainer = create_element("div", actionsContainer, "custom-control custom-switch", {
-				id: "tp_darkmode_switch",
+				id: "tp_darkMode_switch",
 				style: "text-align: right",
 			}) as HTMLDivElement;
 			const darkModeCheckbox = create_element("input", darkModeContainer, "custom-control-input", {
-				id: "tp_darkmode_input",
+				id: "tp_darkMode_input",
 				type: "checkbox",
 			}) as HTMLInputElement;
 			create_element(
@@ -75,43 +76,101 @@
 				darkModeContainer,
 				"custom-control-label",
 				{
-					id: "tp_darkmode_label",
-					for: "tp_darkmode_input",
+					id: "tp_darkMode_label",
+					for: "tp_darkMode_input",
 				},
 				"מצב לילה"
 			);
 			const colourSliderContainer = create_element("div", actionsContainer, "", {
 				id: "tp_colour_switcher",
 			}) as HTMLDivElement;
+			const customColourSwitch = create_element(
+				"div",
+				isMainPage ? colourSliderContainer : actionsContainer,
+				"custom-control custom-switch",
+				{
+					id: "tp_custom_colour_switch",
+				}
+			) as HTMLDivElement;
+			if (!isMainPage) actionsContainer.insertBefore(customColourSwitch, colourSliderContainer);
+			const customColourCheckbox = create_element("input", customColourSwitch, "custom-control-input", {
+				id: "tp_custom_colour_enabled",
+				type: "checkbox",
+			}) as HTMLInputElement;
 			create_element(
 				"label",
-				colourSliderContainer,
-				"",
+				customColourSwitch,
+				"custom-control-label tplus_moodle_colour_label",
 				{
-					for: "tp_colour_slider",
-					style: "text-align: right; width: 8rem",
+					id: "tp_custom_colour_label",
+					for: "tp_custom_colour_enabled",
 				},
-				"צבע משני"
+				"צבעי המודל"
 			);
+			if (isMainPage)
+				create_element("span", colourSliderContainer, "tplus_colour_separator", {"aria-hidden": "true"});
 			const colourSlider = create_element("input", colourSliderContainer, "", {
 				id: "tp_colour_slider",
 				type: "range",
 				min: "0",
 				max: "330",
 				step: "30",
+				"aria-label": "צבע משני",
+			}) as HTMLInputElement;
+			const customColour = create_element("input", colourSliderContainer, "", {
+				id: "tp_custom_colour_input",
+				type: "color",
+				title: "צבע מותאם אישית",
 			}) as HTMLInputElement;
 
-			const storageData: StorageData = await chrome.storage.local.get({remoodle: false, remoodle_angle: 120});
-			darkModeCheckbox.checked = storageData.remoodle;
-			colourSlider.value = storageData.remoodle_angle.toString();
+			const storageData: StorageData = await chrome.storage.local.get({
+				moodle_dark_mode: false,
+				moodle_colour_angle: 120,
+				moodle_custom_colour: "#86c232",
+				moodle_colour_source: "default",
+			});
+			darkModeCheckbox.checked = storageData.moodle_dark_mode;
+			colourSlider.value = storageData.moodle_colour_angle.toString();
+			customColourCheckbox.checked = storageData.moodle_colour_source !== "default";
+			customColour.value = storageData.moodle_custom_colour;
+			let selectedColourSource = storageData.moodle_colour_source;
 			darkModeCheckbox.addEventListener("change", async () => {
-				await chrome.storage.local.set({remoodle: darkModeCheckbox.checked});
-				await chrome.runtime.sendMessage({mess_t: "TE_moodle_darkmode"});
+				await chrome.storage.local.set({moodle_dark_mode: darkModeCheckbox.checked});
+				await chrome.runtime.sendMessage({mess_t: "TE_moodle_darkMode"});
 			});
 			colourSlider.addEventListener("change", async () => {
 				const newAngle = parseInt(colourSlider.value);
-				await chrome.storage.local.set({remoodle_angle: newAngle});
-				await chrome.runtime.sendMessage({mess_t: "TE_moodle_colour", angle: newAngle});
+				await chrome.storage.local.set({moodle_colour_angle: newAngle});
+				if (customColourCheckbox.checked) {
+					selectedColourSource = "preset";
+					await chrome.storage.local.set({moodle_colour_source: "preset"});
+				}
+				await chrome.runtime.sendMessage({
+					mess_t: "TE_moodle_preset_colour",
+					angle: newAngle,
+					source: customColourCheckbox.checked ? "preset" : "default",
+				});
+			});
+			customColourCheckbox.addEventListener("change", async () => {
+				selectedColourSource = customColourCheckbox.checked ? "preset" : "default";
+				await chrome.storage.local.set({moodle_colour_source: selectedColourSource});
+				await chrome.runtime.sendMessage({
+					mess_t: "TE_moodle_custom_colour",
+					colour: customColour.value,
+					source: selectedColourSource,
+				});
+			});
+			customColour.addEventListener("input", async () => {
+				await chrome.storage.local.set({moodle_custom_colour: customColour.value});
+				if (customColourCheckbox.checked) {
+					selectedColourSource = "picker";
+					await chrome.storage.local.set({moodle_colour_source: "picker"});
+					await chrome.runtime.sendMessage({
+						mess_t: "TE_moodle_custom_colour",
+						colour: customColour.value,
+						source: "picker",
+					});
+				}
 			});
 			let colorGradientString = "";
 			for (let gradientStep = 0; gradientStep < 12; gradientStep++) {
@@ -241,53 +300,106 @@
 
 	async function colourPage() {
 		if (window.location.href.includes("pluginfile.php")) return;
-		const themeProperties = (hueOffset: number) => [
-			["--a_color", `hsl(${80 + hueOffset}, 90%, 80%)`],
-			["--a_hover_color", `hsl(${80 + hueOffset}, 90%, 45%)`],
-			["--a_navlink", `hsl(${90 + hueOffset}, 80%, 85%)`],
-			["--a_hover_navlink", `hsl(${90 + hueOffset}, 100%, 80%)`],
-			["--navbar_bottom", `hsl(${82 + hueOffset}, 100%, 41%)`],
-			["--navbar_bg", `hsl(${82 + hueOffset}, 100%, 25%)`],
-			["--dark_bg", `hsl(${90 + hueOffset}, 100%, 10%)`],
-			["--calendar_today", `hsla(${70 + hueOffset}, 100%, 20%, 0.5)`],
-		];
+		const themeProperties = (hueOffset: number, darkMode: boolean) =>
+			darkMode
+				? [
+						["--a_color", `hsl(${80 + hueOffset}, 90%, 80%)`],
+						["--a_hover_color", `hsl(${80 + hueOffset}, 90%, 45%)`],
+						["--a_navlink", `hsl(${90 + hueOffset}, 80%, 85%)`],
+						["--a_hover_navlink", `hsl(${90 + hueOffset}, 100%, 80%)`],
+						["--navbar_bottom", `hsl(${82 + hueOffset}, 100%, 41%)`],
+						["--navbar_bg", `hsl(${82 + hueOffset}, 100%, 25%)`],
+						["--dark_bg", `hsl(${90 + hueOffset}, 100%, 10%)`],
+						["--calendar_today", `hsla(${70 + hueOffset}, 100%, 20%, 0.5)`],
+						["--navbar_text", "#fff"],
+					]
+				: [
+						["--a_color", `hsl(${80 + hueOffset}, 75%, 28%)`],
+						["--a_hover_color", `hsl(${80 + hueOffset}, 75%, 20%)`],
+						["--a_navlink", `hsl(${90 + hueOffset}, 60%, 25%)`],
+						["--a_hover_navlink", `hsl(${90 + hueOffset}, 70%, 18%)`],
+						["--navbar_bottom", `hsl(${82 + hueOffset}, 70%, 58%)`],
+						["--navbar_bg", `hsl(${82 + hueOffset}, 65%, 82%)`],
+						["--dark_bg", `hsl(${90 + hueOffset}, 55%, 16%)`],
+						["--calendar_today", `hsla(${70 + hueOffset}, 70%, 55%, 0.22)`],
+						["--navbar_text", "#16253d"],
+					];
+		const customColourHue = (color: string) => {
+			const red = parseInt(color.slice(1, 3), 16) / 255,
+				green = parseInt(color.slice(3, 5), 16) / 255,
+				blue = parseInt(color.slice(5, 7), 16) / 255,
+				max = Math.max(red, green, blue),
+				min = Math.min(red, green, blue),
+				delta = max - min;
+			if (!delta) return 0;
+			const hue =
+				max === red
+					? ((green - blue) / delta) % 6
+					: max === green
+						? (blue - red) / delta + 2
+						: (red - green) / delta + 4;
+			return Math.round(hue * 60 + (hue < 0 ? 360 : 0)) - 80;
+		};
 		const storageData: StorageData = await chrome.storage.local.get({
-			remoodle: false,
-			remoodle_angle: 120,
+			moodle_dark_mode: false,
+			moodle_colour_angle: 120,
+			moodle_custom_colour: "#86c232",
+			moodle_colour_source: "default",
 			theme: "light",
 		});
 
-		let darkModeEnabled = storageData.remoodle;
+		let darkModeEnabled = storageData.moodle_dark_mode;
+		let customColourSource = storageData.moodle_colour_source;
 		const theme = storageData.theme;
+		const setColours = (angle: number, source: StorageData["moodle_colour_source"], color: string) => {
+			const entirePage = document.documentElement;
+			if (source === "default") {
+				entirePage.removeAttribute("tplus-colours");
+				themeProperties(angle, darkModeEnabled).forEach((property) =>
+					entirePage.style.removeProperty(property[0])
+				);
+				return;
+			}
+			if (source === "picker" && !/^#[\da-f]{6}$/i.test(color)) {
+				console.error("Ignoring invalid Moodle picker colour:", color);
+				return;
+			}
+			const hue = source === "picker" ? customColourHue(color) : angle;
+			entirePage.setAttribute("tplus-colours", source);
+			themeProperties(hue, darkModeEnabled).forEach((property) =>
+				entirePage.style.setProperty(property[0], property[1], "important")
+			);
+		};
 		const setDarkMode = (darkModeEh: boolean, theme: StorageData["theme"]) => {
-			const entirePage = document.querySelector("html") as HTMLHtmlElement;
-			if (
-				darkModeEh &&
-				(theme !== "auto" || (theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches))
-			)
-				entirePage.setAttribute("tplus", "dm");
-			else entirePage.removeAttribute("tplus");
-			const checkbox = document.getElementById("tp_darkmode_input") as HTMLInputElement;
+			const shouldEnableDarkMode =
+				darkModeEh && (theme !== "auto" || window.matchMedia("(prefers-color-scheme: dark)").matches);
+			if (shouldEnableDarkMode) document.documentElement.setAttribute("tplus-darkMode", "");
+			else document.documentElement.removeAttribute("tplus-darkMode");
+			const checkbox = document.getElementById("tp_darkMode_input") as HTMLInputElement;
 			if (checkbox) checkbox.checked = darkModeEh;
 		};
-		themeProperties(storageData.remoodle_angle).forEach((property) =>
-			document.documentElement.style.setProperty(property[0], property[1])
-		);
+		setColours(storageData.moodle_colour_angle, customColourSource, storageData.moodle_custom_colour);
 		setDarkMode(darkModeEnabled, theme);
 		chrome.runtime.onMessage.addListener((message) => {
 			switch (message.mess_t) {
-				case "TE_moodle_darkmode":
-					setDarkMode(!darkModeEnabled, theme);
+				case "TE_moodle_darkMode":
 					darkModeEnabled = !darkModeEnabled;
+					setDarkMode(darkModeEnabled, theme);
+					setColours(storageData.moodle_colour_angle, customColourSource, storageData.moodle_custom_colour);
 					break;
-				case "TE_moodle_colour":
-					themeProperties(message.angle).forEach((property) =>
-						document.documentElement.style.setProperty(property[0], property[1])
-					);
+				case "TE_moodle_preset_colour":
+					storageData.moodle_colour_angle = message.angle;
+					if (message.source) customColourSource = message.source;
+					setColours(message.angle, customColourSource, storageData.moodle_custom_colour);
 					const colorSlider = document.querySelector(
 						"#tp_colour_switcher input[type=range]"
 					) as HTMLInputElement;
 					if (colorSlider) colorSlider.value = message.angle;
+					break;
+				case "TE_moodle_custom_colour":
+					storageData.moodle_custom_colour = message.colour;
+					customColourSource = message.source;
+					setColours(storageData.moodle_colour_angle, customColourSource, storageData.moodle_custom_colour);
 					break;
 			}
 		});

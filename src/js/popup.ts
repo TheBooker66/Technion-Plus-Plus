@@ -102,8 +102,6 @@ async function setup() {
 		alerts_sound: true,
 		email_preference: "gmail",
 		moodle_cal_enabled: true,
-		remoodle: false,
-		remoodle_angle: 120,
 		cal_seen: 0,
 		cs_cal_enabled: false,
 		uidn_arr: ["", ""],

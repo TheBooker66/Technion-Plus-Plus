@@ -1,5 +1,18 @@
 @import "colours.css";
 
+html[tplus-colours] {
+	--a_color: #c3f083;
+	--a_hover_color: #86c232;
+	--a_navlink: #90b955;
+	--a_hover_navlink: #759745;
+	--navbar_bottom: #557e22;
+	--navbar_bg: #385c0c;
+	--dark_bg: rgb(0, 51, 0);
+	--calendar_today: rgb(85, 139, 18, 0.1);
+	--navbar_text: #fff;
+	--shadow: 0 16px 24px 2px rgb(0, 0, 0, 0.14), 0 6px 30px 5px rgb(0, 0, 0, 0.12), 0 8px 10px -7px rgb(0, 0, 0, 0.2);
+}
+
 a.tplus_download {
 	background-color: var(--sec-light);
 	color: #0c0c0d !important;
@@ -90,24 +103,46 @@ a.tplus_download_light {
 	display: none;
 }
 
-.tplus_block .custom-switch input:not(:checked) ~ #tp_darkmode_label::after {
+.tplus_block .custom-switch input:not(:checked) ~ .custom-control-label::after {
 	transform: translateY(2%);
 }
 
-.tplus_block .custom-switch input:checked + label::before {
+.tplus_block .custom-switch input:checked + .custom-control-label::before {
 	background-color: var(--dark_bg);
 }
 
-.tplus_block .custom-switch input:checked ~ #tp_darkmode_label::after {
+.tplus_block .custom-switch input:checked ~ .custom-control-label::after {
 	transform: translate(-0.7rem, 2%);
 }
 
 #tp_colour_switcher {
 	display: flex;
 	align-items: center;
+	gap: 0.4rem;
+}
+
+#tp_custom_colour_switch {
+	flex: 0 0 auto;
+	text-align: right;
+}
+
+.tplus_colour_separator {
+	align-self: stretch;
+	border-inline-start: 1px solid currentColor;
+	opacity: 0.35;
+}
+
+#tp_custom_colour_input {
+	flex: 0 0 auto;
+	width: 2.2rem;
+	height: 1.6rem;
+	padding: 0;
+	cursor: pointer;
 }
 
 #tp_colour_switcher input[type="range"] {
+	flex: 1 1 12rem;
+	min-width: 6rem;
 	cursor: pointer;
 	-webkit-appearance: none;
 	appearance: none;
@@ -175,6 +210,7 @@ a.tplus_download_light {
 
 #coursecontentcollapseid15 .tplus_main_actions {
 	display: flex;
+	flex-wrap: nowrap;
 	gap: 8px;
 	text-align: right;
 }
@@ -191,11 +227,21 @@ a.tplus_download_light {
 	padding-right: calc(2.6875rem + 8px);
 }
 
-.courseindex .courseindex-item.pageitem,
-.maincalendar .calendarmonth td.today .day-number-circle {
-	background-color: var(--navbar_bg) !important;
+#coursecontentcollapseid15 .tplus_main_actions:not(.tplus_course_actions) > #tp_darkMode_switch {
+	flex: 1 1 0;
 }
 
-a {
-	color: var(--a_color);
+#coursecontentcollapseid15 .tplus_main_actions:not(.tplus_course_actions) > #tp_colour_switcher {
+	flex: 2 1 0;
+}
+
+.tplus_main_actions.tplus_course_actions {
+	display: grid !important;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px;
+}
+
+.tplus_main_actions.tplus_course_actions #tp_colour_switcher {
+	grid-column: 1 / -1;
+	width: 100%;
 }
