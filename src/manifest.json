@@ -45,7 +45,7 @@
 	"host_permissions": [
 		"*://*.technion.ac.il/*",
 		"*://panoptotech.cloud.panopto.eu/*",
-		"https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*",
+		"https://login.microsoftonline.com/*",
 		"https://passwordreset.microsoftonline.com/*",
 		"https://curlbus.app/*"
 	],
@@ -56,7 +56,7 @@
 			"matches": [
 				"https://panoptotech.cloud.panopto.eu/*",
 				"https://bookme.technion.ac.il/*",
-				"https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*",
+				"https://login.microsoftonline.com/*",
 				"https://students.technion.ac.il/login/index.php"
 			]
 		},

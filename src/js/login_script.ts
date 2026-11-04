@@ -35,7 +35,10 @@
 			if (
 				loginForm &&
 				!document.getElementById("passwordError") &&
-				(location.pathname.includes("/oauth2/authorize") || location.pathname.includes("/saml2"))
+				(location.pathname.includes("/oauth2/authorize") ||
+					location.pathname.includes("/saml2") ||
+					location.pathname.includes("/oauth2/v2.0/authorize")) &&
+				document.getElementById("displayName")?.textContent.includes("technion.ac.il")
 			) {
 				const selectAccountPageEh = location.href.includes("select_account");
 				const enterPasswordPageEh = location.href.includes("login_hint");
@@ -72,6 +75,7 @@
 				microsoftLoginButton.click();
 			}
 		};
+
 		if (document.querySelector(".banner-logo")) handleMicrosoftLogin();
 		else
 			new MutationObserver(() => handleMicrosoftLogin()).observe(document.forms[0] ?? document.body, {
