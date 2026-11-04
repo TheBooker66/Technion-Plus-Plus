@@ -1,4 +1,4 @@
-@scope (html[tplus-darkMode]) {
+html[tplus-darkMode] {
 	:scope:not([tplus-colours]) {
 		--a_color: initial !important;
 		--a_hover_color: initial !important;

@@ -1,4 +1,4 @@
-@scope (html[tplus-colours]) {
+html[tplus-colours] {
 	--a_color: #c3f083;
 	--a_hover_color: #86c232;
 	--a_navlink: #90b955;
