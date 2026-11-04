@@ -74,6 +74,7 @@ type StorageData = {
 	panopto_floating_speed: boolean;
 	panopto_scroll_volume: boolean;
 	panopto_volume_boost: boolean;
+	panopto_speed_boost: boolean;
 	panopto_hide_thumbnails: boolean;
 	panopto_hide_sidebar: boolean;
 

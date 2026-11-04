@@ -381,6 +381,7 @@
 		settingsKey:
 			| "dark_mode"
 			| "speed"
+			| "speed_boost"
 			| "return_backwards"
 			| "floating_speed"
 			| "scroll_volume"
@@ -396,6 +397,11 @@
 				break;
 			case "speed":
 				settingsObj.panopto_speed = (document.getElementById("primaryVideo") as HTMLVideoElement).playbackRate;
+				break;
+			case "speed_boost":
+				settingsObj.panopto_speed_boost = (
+					document.getElementById("m_speed_boost") as HTMLInputElement
+				).checked;
 				break;
 			case "return_backwards":
 				settingsObj.panopto_return_backwards = (
@@ -544,6 +550,7 @@
 			"keydown",
 			(event) => {
 				if (shouldSkipPlaybackShortcuts(event)) return;
+				if (!(document.getElementById("m_speed_boost") as HTMLInputElement).checked) return;
 
 				if (shiftKeyEh(event)) {
 					if (!shiftPressedEh) {
@@ -634,12 +641,18 @@
                 <div id="custom_speed">מהירות מותאמת אישית</div></div>
                 <span style="display: block">מהירות הקלטה</span>
             </a>
-            <label for="m_floating_speed"><a>חלונית שליטת מהירויות צפה<input id="m_floating_speed" type="checkbox" /></a></label>
-            <label for="m_scroll_volume"><a>שינוי עוצמת שמע עם גלגלת העכבר<input id="m_scroll_volume" type="checkbox" /></a></label>
-            <label for="m_volume_boost"><a>הגברת עוצמת שמע עד 200%<input id="m_volume_boost" type="checkbox" /></a></label>
-            <label for="m_return_backwards"><a>חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_return_backwards" type="checkbox" /></a></label>
-            <label for="m_dark_mode"><a>מצב לילה<input id="m_dark_mode" type="checkbox" /></a></label>
-            <label for="m_save"><a>זכור הגדרות<input id="m_save" type="checkbox" /></a></label>
+            <a id="m_settings">
+                הגדרות
+                <div id="m_settings_options">
+                    <label for="m_floating_speed">חלונית שליטת מהירויות צפה<input id="m_floating_speed" type="checkbox" /></label>
+                    <label for="m_scroll_volume">שינוי עוצמת שמע עם גלגלת העכבר<input id="m_scroll_volume" type="checkbox" /></label>
+                    <label for="m_volume_boost">הגברת עוצמת שמע עד 200%<input id="m_volume_boost" type="checkbox" /></label>
+                    <label for="m_speed_boost">הגברת מהירות עם Shift<input id="m_speed_boost" type="checkbox" /></label>
+                    <label for="m_return_backwards">חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_return_backwards" type="checkbox" /></label>
+                    <label for="m_dark_mode">מצב לילה<input id="m_dark_mode" type="checkbox" /></label>
+                    <label for="m_save">זכור הגדרות<input id="m_save" type="checkbox" /></label>
+                </div>
+            </a>
         </div>
         <div id="tplus_koteret">Technion<sup>++</sup></div>
     </div>
@@ -650,7 +663,9 @@
 			.getElementById("tplus_menu_container") as HTMLDivElement;
 		for (const menuButton of menu.querySelectorAll("a"))
 			if (menuButton.id)
-				menuButton.style.backgroundImage = `url(${chrome.runtime.getURL(`icons/panopto/${menuButton.id.replace(/_mp[34]/, "")}.svg`)})`;
+				menuButton.style.backgroundImage = `url(${chrome.runtime.getURL(
+					`icons/panopto/${menuButton.id === "m_settings" ? "m_speed" : menuButton.id.replace(/_mp[34]/, "")}.svg`
+				)})`;
 
 		const bigBossElement = document.getElementById("transportControls") as HTMLDivElement;
 		bigBossElement
@@ -687,6 +702,10 @@
 			saveSetting("volume_boost");
 			applyExtendedVolume((document.getElementById("primaryVideo") as HTMLVideoElement).volume);
 		});
+		(document.getElementById("m_speed_boost") as HTMLInputElement).addEventListener(
+			"change",
+			async () => await saveSetting("speed_boost")
+		);
 		(document.getElementById("m_save") as HTMLInputElement).addEventListener("change", () =>
 			saveSetting("settings")
 		);
@@ -926,6 +945,7 @@
 	async function setupVideoPage() {
 		const storageData: StorageData = await chrome.storage.local.get({
 			panopto_speed: 1.0,
+			panopto_speed_boost: true,
 			panopto_dark_mode: false,
 			panopto_return_backwards: false,
 			panopto_floating_speed: false,
@@ -938,6 +958,7 @@
 		setupDetachableVideoPlayer();
 		setupTimer();
 		setupMenu();
+		(document.getElementById("m_speed_boost") as HTMLInputElement).checked = storageData.panopto_speed_boost;
 		setupShiftHoldSpeedBoost();
 		setupArrowKeyVolumeControl();
 		document.addEventListener("keydown", (event) => fullScreenToggleHandler(event));

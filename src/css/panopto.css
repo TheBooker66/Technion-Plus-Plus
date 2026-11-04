@@ -3,7 +3,7 @@
 /* Configure main menu width */
 :root {
 	--menu-width: 140px;
-	--speed-width: 120px; /* speed and snapshot menu width, 20 px less than menu width */
+	--submenu-width: calc(var(--menu-width) - 20px); /* settings and speed submenus width */
 }
 
 /* mark videos that the user already watched */
@@ -159,7 +159,7 @@ a.tplus_panopto_action:hover {
 	padding: 2px;
 	border: 1px solid #000;
 	display: none;
-	margin: -11px var(--speed-width) -11px 0;
+	margin: -11px var(--submenu-width) -11px 0;
 	border-radius: 4px;
 	box-shadow:
 		0 4px 5px 0 rgb(0, 0, 0, 0.14),
@@ -171,6 +171,40 @@ a.tplus_panopto_action:hover {
 	letter-spacing: 2px;
 	color: #bbb;
 	vertical-align: middle;
+}
+
+#tplus_content a#m_settings:hover > div {
+	display: block;
+}
+
+#m_settings_options {
+	width: 220px;
+	margin: -11px var(--submenu-width) -11px 0 !important;
+	text-align: right !important;
+	font-style: normal !important;
+	letter-spacing: normal !important;
+	transform: translateY(calc(-100% + 22px));
+}
+
+#m_settings_options label {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 8px;
+	border-radius: 4px;
+	color: #f9f9fa;
+	font-size: 12px;
+	font-weight: 400;
+	cursor: pointer;
+}
+
+#m_settings_options label:hover {
+	background-color: var(--prim-cool);
+}
+
+#m_settings_options input[type="checkbox"] {
+	cursor: pointer;
+	margin-right: auto;
 }
 
 /* overlay */
@@ -198,7 +232,7 @@ a.tplus_panopto_action:hover {
 #m_vid_list.tplus_persist {
 	display: flex;
 	align-items: center;
-	margin: 0 var(--speed-width) 0 0;
+	margin: 0 var(--submenu-width) 0 0;
 	z-index: 3;
 }
 
