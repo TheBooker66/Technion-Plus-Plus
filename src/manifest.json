@@ -46,6 +46,7 @@
 		"*://*.technion.ac.il/*",
 		"*://panoptotech.cloud.panopto.eu/*",
 		"https://login.microsoftonline.com/f1502c4c-ee2e-411c-9715-c855f6753b84/*",
+		"https://passwordreset.microsoftonline.com/*",
 		"https://curlbus.app/*"
 	],
 	"content_scripts": [
@@ -125,7 +126,10 @@
 		},
 		{
 			"js": ["js/t_manager.js"],
-			"matches": ["https://techwww.technion.ac.il/cgi-bin/newuser/newuser.pl"]
+			"matches": [
+				"https://techwww.technion.ac.il/cgi-bin/newuser/newuser.pl",
+				"https://passwordreset.microsoftonline.com/*"
+			]
 		},
 		{
 			"css": ["css/sap.css"],
