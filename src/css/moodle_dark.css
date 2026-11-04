@@ -668,4 +668,12 @@
 	.courseindex .courseindex-item .courseindex-chevron {
 		color: #ddd !important;
 	}
+
+	.activity-details {
+		background-color: var(--navbar_bg) !important;
+	}
+
+	.path-mod .activity-dates .date-item {
+		color: #aaa !important;
+	}
 }
