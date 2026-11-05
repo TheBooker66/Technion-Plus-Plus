@@ -84,7 +84,7 @@ async function XHR(
 						return Array.from(missions).map((mission) => {
 							return {
 								name:
-									mission.querySelector("div > a.fw-bold.set-id-tooltip")?.textContent.trim() ??
+									mission.querySelector("a.fw-bold")?.textContent.trim() ??
 									mission.querySelector("div > span.set-id-tooltip")?.textContent.trim() ??
 									"מטלה ללא שם",
 								due: mission.querySelector("div.font-sm")?.textContent.trim() ?? "אין תאריך הגשה",
