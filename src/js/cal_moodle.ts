@@ -118,7 +118,7 @@ await calendar.progress(async () => {
 
 		if (!cal[i].includes("CATEGORIES")) continue;
 
-		const eventTitle = cal[i].split("SUMMARY:")[1].split("\n")[0].trim();
+		let eventTitle = cal[i].split("SUMMARY:")[1].split("\n")[0].trim();
 		const filterToggles = storageData.filter_toggles;
 		if (
 			(filterToggles.appeals && eventTitle.includes("ערעור")) ||
@@ -127,6 +127,8 @@ await calendar.progress(async () => {
 			(filterToggles.reserveDuty && eventTitle.includes("מילואים"))
 		)
 			continue;
+
+		if (eventTitle.includes("נפתח ב")) eventTitle = eventTitle.replace("נפתח ב", "נפתח: ").trim();
 
 		const titleWords = eventTitle.split(" ");
 		if (!("opens" !== titleWords[titleWords.length - 1] && "opens)" !== titleWords[titleWords.length - 1]))

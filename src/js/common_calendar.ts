@@ -52,8 +52,13 @@ export class CommonCalendar {
 			const newAssigment = template.querySelector(".list_item") as HTMLDivElement;
 			if (assignmentData.newEh) newAssigment.classList.add("starred");
 			newAssigment.querySelector(".assignment_name")!.textContent = assignmentData.name;
-			newAssigment.querySelector(".course_name")!.textContent += assignmentData.course;
+			newAssigment.querySelector(".course_name")!.textContent += `קורס: ${assignmentData.course}`;
 			newAssigment.querySelector(".assignment_description")!.textContent = assignmentData.description;
+
+			if (assignmentData.name.includes("נפתח:"))
+				newAssigment.querySelector(".end_time")!.textContent = "תאריך פתיחה: ";
+			else newAssigment.querySelector(".end_time")!.textContent = "תאריך סיום: ";
+
 			newAssigment.querySelector(".end_time")!.textContent += assignmentData.finalDate;
 			const actionButtons = newAssigment.querySelectorAll("img");
 			actionButtons[1].addEventListener("click", () =>
