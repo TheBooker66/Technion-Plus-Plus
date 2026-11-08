@@ -119,19 +119,12 @@ await calendar.progress(async () => {
 		if (!cal[i].includes("CATEGORIES")) continue;
 
 		const eventTitle = cal[i].split("SUMMARY:")[1].split("\n")[0].trim();
+		const filterToggles = storageData.filter_toggles;
 		if (
-			(storageData.filter_toggles.appeals && eventTitle.includes("ערעור")) ||
-			(storageData.filter_toggles.zooms &&
-				(eventTitle.includes("זום") ||
-					eventTitle.includes("Zoom") ||
-					eventTitle.includes("zoom") ||
-					eventTitle.includes("הרצא") ||
-					eventTitle.includes("תרגול"))) ||
-			(storageData.filter_toggles.attendance &&
-				(eventTitle.includes("נוכחות") ||
-					eventTitle.includes("Attendance") ||
-					eventTitle.includes("attendance"))) ||
-			(storageData.filter_toggles.reserveDuty && eventTitle.includes("מילואים"))
+			(filterToggles.appeals && eventTitle.includes("ערעור")) ||
+			(filterToggles.zooms && /(זום|Zoom|zoom|הרצא|תרגול|סדנה)/.test(eventTitle)) ||
+			(filterToggles.attendance && /(נוכחות|Attendance|attendance)/.test(eventTitle)) ||
+			(filterToggles.reserveDuty && eventTitle.includes("מילואים"))
 		)
 			continue;
 

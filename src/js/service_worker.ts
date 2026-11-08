@@ -391,11 +391,13 @@ async function TE_alertMoodleCalendar(
 			const eventText = events[i].replace(/\r?\n[ \t]/g, "");
 			const summary = eventText.split("SUMMARY:")[1].split("\n")[0].trim();
 
-			const appealEh = filterToggles.appeals && summary.includes("ערעור"),
-				zoomEh = filterToggles.zooms && /(זום|Zoom|zoom|הרצא|תרגול)/.test(summary),
-				attendanceEh = filterToggles.attendance && /(נוכחות|Attendance|attendance)/.test(summary),
-				reserveDutyEh = filterToggles.reserveDuty && summary.includes("מילואים");
-			if (appealEh || zoomEh || attendanceEh || reserveDutyEh) continue;
+			if (
+				(filterToggles.appeals && summary.includes("ערעור")) ||
+				(filterToggles.zooms && /(זום|Zoom|zoom|הרצא|תרגול|סדנה)/.test(summary)) ||
+				(filterToggles.attendance && /(נוכחות|Attendance|attendance)/.test(summary)) ||
+				(filterToggles.reserveDuty && summary.includes("מילואים"))
+			)
+				continue;
 
 			const summaryWords = summary.split(" ");
 			if (summaryWords.at(-1) !== "opens" && summaryWords.at(-1) !== "opens)") {

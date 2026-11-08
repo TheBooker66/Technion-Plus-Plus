@@ -41,7 +41,7 @@ await calendar.progress(async () => {
 		DAYS = "ראשון שני שלישי רביעי חמישי שישי שבת".split(" "),
 		regexPatterns = {
 			summary: /SUMMARY;LANGUAGE=en-US:(.+)/,
-			banned: /Exam|moed| - Late|הרצאה|תרגול/,
+			banned: /Exam|moed| - Late|הרצא|תרגול|סדנה/,
 			uid: /UID:[0-9.]+HW([0-9]+)/,
 			time: /(?<Y>\d{4})(?<M>\d{2})(?<D>\d{2})(T(?<TH>\d{2})(?<TM>\d{2}))?/,
 			description: /DESCRIPTION;LANGUAGE=en-US:([^,]+)/,
