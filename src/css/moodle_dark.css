@@ -594,7 +594,8 @@ html[tplus-darkMode] {
 		color: #eee;
 	}
 
-	a.tplus_download {
+	a.tplus_download,
+	a.tplus_download_light {
 		color: #111 !important;
 	}
 

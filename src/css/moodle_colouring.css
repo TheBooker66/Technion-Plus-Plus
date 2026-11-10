@@ -128,7 +128,8 @@ html[tplus-colours] {
 		color: var(--navbar_text, #fff) !important;
 	}
 
-	a.tplus_download {
+	a.tplus_download,
+	a.tplus_download_light {
 		color: #111 !important;
 	}
 
