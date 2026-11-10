@@ -287,7 +287,8 @@
 					const link = target.closest("a") as HTMLAnchorElement;
 					if (!link) return;
 
-					if (!link.href.includes("forcedownload=1")) return;
+					const mainInnerWrapper = link.closest(".main-inner-wrapper");
+					if (!mainInnerWrapper) return;
 
 					event.preventDefault();
 					event.stopImmediatePropagation();
