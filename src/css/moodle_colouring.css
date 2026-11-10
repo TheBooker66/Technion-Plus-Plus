@@ -128,6 +128,10 @@ html[tplus-colours] {
 		color: var(--navbar_text, #fff) !important;
 	}
 
+	a.tplus_download {
+		color: #111 !important;
+	}
+
 	.course-section-header {
 		background-color: var(--navbar_bg);
 		padding: 0.8em;
@@ -210,6 +214,10 @@ html[tplus-colours] {
 
 	.content-item-container.unread {
 		background-color: var(--dark_bg);
+	}
+
+	.content-item-container:hover {
+		background-color: var(--navbar_bg);
 	}
 
 	.content-item-container.selected {

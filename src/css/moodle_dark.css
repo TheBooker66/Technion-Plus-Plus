@@ -594,6 +594,10 @@ html[tplus-darkMode] {
 		color: #eee;
 	}
 
+	a.tplus_download {
+		color: #111 !important;
+	}
+
 	.custom-control-input:checked ~ .custom-control-label::before {
 		border-color: var(--navbar_bottom);
 		background-color: var(--navbar_bottom);
@@ -645,10 +649,6 @@ html[tplus-darkMode] {
 		color: #aaa;
 	}
 
-	.content-item-container:hover {
-		background-color: #222;
-	}
-
 	.content-item-container.unread {
 		background-color: var(--dark_bg);
 	}
@@ -675,5 +675,11 @@ html[tplus-darkMode] {
 
 	.path-mod .activity-dates .date-item {
 		color: #aaa !important;
+	}
+
+	.path-mod-assign td.submissiongraded,
+	.path-mod-assign td.submissionstatussubmitted,
+	.path-mod-assign td.earlysubmission {
+		color: #111 !important;
 	}
 }
