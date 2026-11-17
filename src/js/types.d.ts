@@ -59,6 +59,7 @@ type StorageData = {
 	webwork_cal_update: number;
 	webwork_cal_courses: {[key: string]: WebWorkCourse};
 	webwork_cal_events: {[key: string]: WebWorkAssignment};
+	webwork_keepalive: boolean;
 
 	// --- Module: Videos ---
 	videos_update: number;
