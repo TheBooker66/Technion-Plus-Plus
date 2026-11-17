@@ -277,25 +277,6 @@
 					"הורדת כל הקבצים בנושא"
 				).style.marginRight = "auto";
 			}
-
-			document.addEventListener(
-				"click",
-				(event: PointerEvent) => {
-					const target = event.target as HTMLElement;
-					if (!target) return;
-
-					const link = target.closest("a") as HTMLAnchorElement;
-					if (!link) return;
-
-					const mainInnerWrapper = link.closest(".main-inner-wrapper");
-					if (!mainInnerWrapper) return;
-
-					event.preventDefault();
-					event.stopImmediatePropagation();
-					window.open(link.href.replace(/\??forcedownload=1/g, ""), "_blank");
-				},
-				true
-			);
 		}
 	}
 
@@ -406,6 +387,60 @@
 		});
 	}
 
+	// Registers a click listener to normalize link navigation.
+	function handleLinkClicks() {
+		const isFileLink = (url: URL) =>
+			url.pathname.includes("/pluginfile.php/") ||
+			url.pathname.includes("/mod/resource/view.php") ||
+			url.searchParams.has("forcedownload");
+
+		document.addEventListener(
+			"click",
+			(event: MouseEvent) => {
+				// Left clicks only.
+				if (event.button !== 0) return;
+
+				if (!(event.target instanceof Element)) return;
+
+				// Clicks often land on an inner icon or span, so walk up to the <a> tag.
+				const link = event.target.closest<HTMLAnchorElement>("a[href]");
+				if (!link) return;
+
+				// Popup resources stash the real URL inside an inline window.open call.
+				const popupUrl = link.getAttribute("onclick")?.match(/window\.open\(\s*(['"])([^'"]+)\1/)?.[2];
+
+				const rawUrl = popupUrl ?? link.getAttribute("href");
+				if (!rawUrl) return;
+
+				const url = URL.parse(rawUrl, window.location.href);
+				if (!url) return;
+
+				if (popupUrl || isFileLink(url)) {
+					// Show the file in the browser instead of forcing a download.
+					url.searchParams.delete("forcedownload");
+
+					// Stop Moodle's default click and inline popup handlers from firing.
+					event.preventDefault();
+					event.stopImmediatePropagation();
+
+					// Open as a normal tab.
+					window.open(url.href, "_blank", "noopener");
+					return;
+				}
+
+				const isContentBlankLink = link.target === "_blank" && Boolean(link.closest(".main-inner-wrapper"));
+				const isUserNewTabRequest = event.ctrlKey || event.metaKey || event.shiftKey;
+
+				// Let the browser open this link in the current tab.
+				if (isContentBlankLink && !isUserNewTabRequest) {
+					link.removeAttribute("target");
+				}
+			},
+			true
+		);
+	}
+
+	handleLinkClicks();
 	await colourPage();
 	window.addEventListener("load", main);
 })();

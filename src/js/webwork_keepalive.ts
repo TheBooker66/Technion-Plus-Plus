@@ -8,7 +8,7 @@
 	if (!webwork_keepalive) return;
 
 	// URL layout is /<webwork root>/<courseID>/...
-	const [root, courseId] = location.pathname.split('/').filter(Boolean);
+	const [root, courseId] = location.pathname.split("/").filter(Boolean);
 	if (!courseId) return;
 
 	const courseUrl = new URL(`/${root}/${courseId}/`, location.origin);
