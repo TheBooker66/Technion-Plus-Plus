@@ -132,6 +132,11 @@
 			]
 		},
 		{
+			"js": ["js/webwork_keepalive.js"],
+			"matches": ["https://webwork.technion.ac.il/webwork2/*"],
+			"run_at": "document_idle"
+		},
+		{
 			"css": ["css/sap.css"],
 			"js": ["js/sap.js"],
 			"matches": ["https://portalex.technion.ac.il/irj/portal/external*", "https://portalex.technion.ac.il/ovv/*"]

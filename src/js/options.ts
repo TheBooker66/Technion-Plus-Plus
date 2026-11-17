@@ -39,6 +39,7 @@ async function saveData() {
 		login = (document.getElementById("quick_login") as HTMLInputElement).checked,
 		timings = (document.getElementById("allow_timings") as HTMLInputElement).checked,
 		panopto = (document.getElementById("panopto_save") as HTMLInputElement).checked,
+		webwork_keepalive = (document.getElementById("webwork_keepalive") as HTMLInputElement).checked,
 		external = (document.getElementById("external_user") as HTMLInputElement).checked,
 		hw_alerts = (document.getElementById("allow_hw_alerts") as HTMLInputElement).checked,
 		notif_vol = parseFloat((document.getElementById("notification_volume") as HTMLSelectElement).value),
@@ -71,6 +72,7 @@ async function saveData() {
 		quick_login: login,
 		allow_timings: timings,
 		panopto_save: panopto,
+		webwork_keepalive: webwork_keepalive,
 		external_user: external,
 		external_enable: externalEh,
 		hw_alerts: hw_alerts,
@@ -102,6 +104,7 @@ async function loadData() {
 		quick_login: true,
 		allow_timings: false,
 		panopto_save: true,
+		webwork_keepalive: true,
 		external_user: false,
 		hw_alerts: true,
 		moodle_cal_enabled: true,
@@ -125,6 +128,7 @@ async function loadData() {
 	(document.getElementById("moodle_cal_enabled") as HTMLInputElement).checked = storageData.moodle_cal_enabled;
 	(document.getElementById("allow_timings") as HTMLInputElement).checked = storageData.allow_timings;
 	(document.getElementById("panopto_save") as HTMLInputElement).checked = storageData.panopto_save;
+	(document.getElementById("webwork_keepalive") as HTMLInputElement).checked = storageData.webwork_keepalive;
 	(document.getElementById("notification_volume") as HTMLInputElement).value = storageData.notif_vol.toString();
 	(document.getElementById("try_vol") as HTMLElement).textContent = `נסה (${100 * storageData.notif_vol}%)`;
 	(document.getElementById("idn") as HTMLInputElement).value = decryptedID;
