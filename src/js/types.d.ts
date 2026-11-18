@@ -59,7 +59,6 @@ type StorageData = {
 	webwork_cal_update: number;
 	webwork_cal_courses: {[key: string]: WebWorkCourse};
 	webwork_cal_events: {[key: string]: WebWorkAssignment};
-	webwork_keepalive: boolean;
 
 	// --- Module: Videos ---
 	videos_update: number;
@@ -87,6 +86,7 @@ type StorageData = {
 
 	// --- Misc. Utilities ---
 	grades: CalculatorCourse[];
+	webwork_keepalive: boolean;
 	sap_hist: boolean;
 	dl_current: number;
 	dl_queue: DownloadItem[];
