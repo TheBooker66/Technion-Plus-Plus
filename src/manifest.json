@@ -132,7 +132,7 @@
 			]
 		},
 		{
-			"js": ["js/webwork_keepalive.js"],
+			"js": ["js/webwork.js"],
 			"matches": ["https://webwork.technion.ac.il/webwork2/*"],
 			"run_at": "document_idle"
 		},

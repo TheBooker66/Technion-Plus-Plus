@@ -13,10 +13,7 @@
 
 	const courseUrl = new URL(`/${root}/${courseId}/`, location.origin);
 
-	// Only run when actually logged in (a logout link is present on authenticated pages).
-	if (!document.querySelector('a[href*="/logout"]')) {
-		return;
-	}
+	if (!document.querySelector('a[href*="/logout"]')) return;
 
 	const ping = async () => {
 		try {
@@ -27,7 +24,6 @@
 				redirect: "follow",
 			});
 			const text = await res.text();
-			// If we got the login form back, the session is already gone; stop pinging.
 			if (/name=["']passwd["']/.test(text) && !/\/logout/.test(text)) {
 				clearInterval(timer);
 				return;
@@ -37,7 +33,6 @@
 		}
 	};
 
-	// Stop if the user turns the option off while the page is open.
 	chrome.storage.onChanged.addListener((changes, area) => {
 		if (area === "local" && changes.webwork_keepalive && !changes.webwork_keepalive.newValue) {
 			clearInterval(timer);
