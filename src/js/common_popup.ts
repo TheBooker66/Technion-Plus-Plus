@@ -56,12 +56,12 @@ export class CommonPopup {
 
 	async XHR(URL: string, responseType: string, bodyData: string = "") {
 		const fetchOptions: RequestInit = {
+			credentials: "include",
 			headers: {
 				accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 				"accept-language": "en-US,en;q=0.9",
 				"cache-control": "no-cache",
 				pragma: "no-cache",
-				"sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
 			},
 		};
 

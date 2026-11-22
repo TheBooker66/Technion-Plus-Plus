@@ -1,5 +1,5 @@
-import {toggleDoneOriginal} from "./common_calendar";
-import {resolveTheme} from "./utils";
+import {toggleDoneOriginal} from "./common_calendar.js";
+import {resolveTheme} from "./utils.js";
 
 function insertMessage(messageText: string, errorEh: boolean = true) {
 	const element = document.getElementById("error")!.appendChild(document.createElement("div"));

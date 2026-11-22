@@ -6,6 +6,7 @@
 		"format": "prettier --check .",
 		"format:fix": "prettier --write .",
 		"dev": "vite build --watch --mode development",
+		"build:safari": "node scripts/build-safari.mjs",
 		"check": "npm run format && npm run lint",
 		"fix": "npm run format:fix && npm run lint:fix",
 		"prod": "npm run fix && vite build"

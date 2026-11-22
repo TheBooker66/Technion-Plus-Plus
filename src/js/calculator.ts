@@ -1,4 +1,4 @@
-import {resolveTheme} from "./utils";
+import {resolveTheme} from "./utils.js";
 
 const semesterOrder = {
 	"חורף": 1,

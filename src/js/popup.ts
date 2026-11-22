@@ -1,5 +1,5 @@
 import {CommonPopup} from "./common_popup.js";
-import {resetBadge, reverseString, xorStrings} from "./utils.js";
+import {getBadgeLevel, resetBadge, reverseString, xorStrings} from "./utils.js";
 
 function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[]) {
 	for (let i = 0; i < tabs.length; i++) {
@@ -14,9 +14,7 @@ function makeTabsClicky(tabs: NodeListOf<HTMLDivElement>, popup: HTMLDivElement[
 }
 
 async function setup() {
-	const badgeColours = await chrome.action.getBadgeBackgroundColor({});
-	if (badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34)
-		// Error colours
+	if ((await getBadgeLevel()) === "error")
 		(document.getElementById("bus_error") as HTMLDivElement).style.display = "block";
 	await resetBadge();
 
@@ -167,7 +165,9 @@ async function setup() {
 		}, 500);
 		let authURL;
 		try {
-			authURL = (await fetch("https://students.technion.ac.il/auth/oidc/", {method: "HEAD"})).url;
+			authURL = (
+				await fetch("https://students.technion.ac.il/auth/oidc/", {method: "HEAD", credentials: "include"})
+			).url;
 		} catch {
 			authURL = "https://students.technion.ac.il/auth/oidc/";
 		}

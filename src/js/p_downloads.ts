@@ -1,3 +1,10 @@
+import {
+	controlSafariDownload,
+	ensureSafariTransferTab,
+	readQueue,
+	runSafariTransfers,
+	safariTransfers,
+} from "./safari_downloads.js";
 import {CommonPopup} from "./common_popup.js";
 
 const commonDOM = {
@@ -17,38 +24,59 @@ function updateProgressDisplay(element: HTMLElement, percentage: string) {
 }
 
 async function updateCurrentDownload() {
-	const storageData: StorageData = await chrome.storage.local.get({dl_current: 0});
-	if (storageData.dl_current !== 0)
-		chrome.downloads.search({id: storageData.dl_current}, (downloads) => {
-			if (downloads[0].filename) {
-				updateTextContent(commonDOM.currentDownloadElements[0], downloads[0].filename);
-				let statusText = downloads[0].paused ? "מושהה" : "פעיל";
-				updateTextContent(commonDOM.currentDownloadElements[1], statusText);
-				if (0 < downloads[0].totalBytes) {
-					statusText += ` - ${(downloads[0].bytesReceived / 1048576).toFixed(1)}/${(downloads[0].totalBytes / 1048576).toFixed(1)}MB`;
-					updateTextContent(commonDOM.currentDownloadElements[1], statusText);
-					updateProgressDisplay(
-						commonDOM.currentDownloadElements[2],
-						((100 * downloads[0].bytesReceived) / downloads[0].totalBytes).toFixed(1)
-					);
-				} else updateProgressDisplay(commonDOM.currentDownloadElements[2], "0");
+	const {
+		dl_current,
+		safari_progress,
+		safari_download_error,
+	}: {
+		dl_current: number;
+		safari_progress: {id: string; totalBytes: number; bytesReceived: number} | null;
+		safari_download_error: string;
+	} = await chrome.storage.local.get({
+		dl_current: 0,
+		safari_progress: null,
+		safari_download_error: "",
+	});
+	if (safariTransfers) document.getElementById("download-error")!.textContent = safari_download_error;
+	const active = safariTransfers ? (await readQueue()).safari_active : null;
+	const item = safariTransfers
+		? active && {
+				filename: active.filename,
+				paused: active.paused,
+				bytesReceived: safari_progress?.id === active.id ? safari_progress.bytesReceived : 0,
+				totalBytes: safari_progress?.id === active.id ? safari_progress.totalBytes : 0,
 			}
-		});
-	else {
-		const form = document.getElementById("myform") as HTMLFormElement;
-		if (form.style.display !== "none") form.style.display = "none";
-
+		: dl_current && (await chrome.downloads.search({id: dl_current}))[0];
+	document.getElementById("myform")!.style.display = item ? "" : "none";
+	if (!item) {
 		updateTextContent(commonDOM.currentDownloadElements[0], "אין קבצים בהורדה על ידי התוסף.");
 		updateTextContent(commonDOM.currentDownloadElements[1], "");
 		updateProgressDisplay(commonDOM.currentDownloadElements[2], "0");
+		return;
 	}
+	updateTextContent(commonDOM.currentDownloadElements[0], item.filename);
+	let status = item.paused ? "מושהה" : "פעיל";
+	if (item.totalBytes > 0)
+		status += ` - ${(item.bytesReceived / 1048576).toFixed(1)}/${(item.totalBytes / 1048576).toFixed(1)}MB`;
+	updateTextContent(commonDOM.currentDownloadElements[1], status);
+	updateProgressDisplay(
+		commonDOM.currentDownloadElements[2],
+		item.totalBytes > 0 ? Math.min(100, (100 * item.bytesReceived) / item.totalBytes).toFixed(1) : "0"
+	);
 }
 
 async function updateDownloadQueue() {
-	while (commonDOM.queueList.firstChild) commonDOM.queueList.removeChild(commonDOM.queueList.lastChild as Node);
 	const storageData: StorageData = await chrome.storage.local.get({dl_queue: []});
 	let itemCount = 0;
-	storageData.dl_queue.forEach((downloadEntry: DownloadItem) => {
+	const queue = safariTransfers
+		? (await readQueue()).safari_jobs.map((job) => ({
+				sys: job.system,
+				sub_pre: "",
+				list: [{n: job.filename, u: job.id}],
+			}))
+		: storageData.dl_queue;
+	commonDOM.queueList.replaceChildren();
+	queue.forEach((downloadEntry: DownloadItem) => {
 		for (const item of downloadEntry.list) {
 			const file = item,
 				listItem = (popup.loadTemplate("dl_item").cloneNode(true) as HTMLElement).querySelector(
@@ -58,6 +86,10 @@ async function updateDownloadQueue() {
 			(listItem.querySelector(".dl_from") as HTMLImageElement).src =
 				`../icons/${["moodle.svg", "panopto.svg", "cs.png", "cs.png"][downloadEntry.sys]}`;
 			(listItem.querySelector(".remove") as HTMLImageElement).addEventListener("click", async () => {
+				if (safariTransfers) {
+					await controlSafariDownload("remove", file.u);
+					return;
+				}
 				const fileIndex = downloadEntry.list.indexOf(file);
 				downloadEntry.list.splice(fileIndex, 1);
 				if (downloadEntry.list.length === 0)
@@ -83,8 +115,21 @@ async function updateDownloadQueue() {
 
 async function setup() {
 	await updateCurrentDownload();
-	setInterval(updateCurrentDownload, 350);
 	await updateDownloadQueue();
+	if (safariTransfers) {
+		chrome.storage.onChanged.addListener((changes) => {
+			if (changes.safari_jobs) void updateDownloadQueue();
+			if (changes.safari_active || changes.safari_progress || changes.safari_download_error)
+				void updateCurrentDownload();
+		});
+		for (const command of ["pause", "cancel", "cancelAll"] as const) {
+			document.getElementById(command)!.addEventListener("click", () => controlSafariDownload(command));
+		}
+		if (location.hash === "#transfer") void runSafariTransfers();
+		else await ensureSafariTransferTab();
+		return;
+	}
+	setInterval(updateCurrentDownload, 350);
 	chrome.downloads.onCreated.addListener(() => setTimeout(updateDownloadQueue, 1e3));
 	chrome.downloads.onChanged.addListener(async (changes) => {
 		if (changes.state || changes.paused) await updateDownloadQueue();

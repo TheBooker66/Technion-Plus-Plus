@@ -226,7 +226,10 @@ async function setupPage() {
 
 	await loadData();
 
-	const extensionSize = ((await chrome.storage.local.getBytesInUse(null)) / 1000).toFixed(3),
+	const storedBytes = chrome.storage.local.getBytesInUse
+		? await chrome.storage.local.getBytesInUse(null)
+		: new TextEncoder().encode(JSON.stringify(await chrome.storage.local.get(null))).length;
+	const extensionSize = (storedBytes / 1000).toFixed(3),
 		extensionVersion = chrome.runtime.getManifest().version;
 	(document.getElementById("ext_version") as HTMLSpanElement).textContent += ` ${extensionVersion}`;
 	(document.getElementById("storageVol") as HTMLSpanElement).textContent += ` ${extensionSize}kB`;

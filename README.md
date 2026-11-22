@@ -2,6 +2,21 @@
 
 ## _Get the Technion's web-experience out of the stone age._
 
+## Safari on macOS
+
+This macOS port packages the Hebrew interface and course tools from [Technion++ 4.7.5](https://github.com/TheBooker66/Technion-Plus-Plus/tree/7a64480) as a Safari Web Extension.
+
+With Node.js, npm, Xcode and an Apple Development signing identity installed, run these commands from the project directory.
+
+```sh
+npm ci
+./safari/build.sh
+```
+
+Copy `safari/build/Technion++ for Safari.app` to your Applications folder and open it once. To use it only in the default Personal profile, enable **Technion++** in **Safari → Settings → Extensions** and leave **Allow in Private Browsing** off. In **Settings → Profiles**, select each additional profile and leave Technion++ unchecked in its **Extensions** list. [Apple’s guide to Safari profiles](https://support.apple.com/en-us/105100)
+
+Open the Technion++ toolbar button for the organizer, grade calculator, and settings. Configure your Technion account in the extension’s settings if you want automatic sign-in and assignment updates.
+
 ![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge) ![Chrome Web Store User Count](https://img.shields.io/chrome-web-store/users/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge) ![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/stars/pfhjnidbfndnjhpcpfecngcigdjebemk?style=for-the-badge)
 
 ![Mozilla Add-on Version](https://img.shields.io/amo/v/technion-plus-plus?style=for-the-badge) ![Mozilla Add-on Users](https://img.shields.io/amo/users/technion-plus-plus?style=for-the-badge) ![Mozilla Add-on Rating](https://img.shields.io/amo/stars/technion-plus-plus?style=for-the-badge)

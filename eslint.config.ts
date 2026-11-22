@@ -5,7 +5,7 @@ import globals from "globals";
 
 export default tseslint.config(
 	{
-		ignores: ["node_modules/", "dist/", "dist.zip", "source.zip"],
+		ignores: ["node_modules/", "dist/", "safari/build/", "dist.zip", "source.zip"],
 	},
 	js.configs.recommended,
 	...tseslint.configs.recommended,

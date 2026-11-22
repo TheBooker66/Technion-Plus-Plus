@@ -69,7 +69,7 @@ async function main() {
 	}
 }
 
-const popup = new CommonPopup("מסעדות פתוחות בטכניון", [""], document.title);
+const popup = new CommonPopup("מסעדות פתוחות בטכניון", [], document.title);
 const storageData: StorageData = await chrome.storage.local.get({allow_timings: false});
 if (storageData.allow_timings) await main();
 else oops('יש לאשר שימוש ב"מסעדות פתוחות בטכניון" בהגדרות התוסף.');

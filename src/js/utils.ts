@@ -9,12 +9,26 @@ function xorStrings(str1: string, str2: string): string {
 		.join("");
 }
 
+// Safari and standalone WKWebExtension contexts use different URL schemes for the same bundle.
+export const isSafariExtension = ["safari-web-extension:", "webkit-extension:"].includes(
+	new URL(chrome.runtime.getURL("")).protocol
+);
+
+export async function getBadgeLevel(): Promise<"error" | "warning" | null> {
+	if ((await chrome.action.getBadgeText({})) !== "!") return null;
+	// Safari controls the badge colour, so retain the alert priority independently.
+	if (isSafariExtension) {
+		const {badgeError} = await chrome.storage.local.get({badgeError: false});
+		return badgeError ? "error" : "warning";
+	}
+	const [red, green, blue] = await chrome.action.getBadgeBackgroundColor({});
+	if (red === 215 && green === 0 && blue === 34) return "error";
+	if (red === 164 && green === 127 && blue === 0) return "warning";
+	return null;
+}
+
 async function resetBadge() {
-	const badgeColours = await chrome.action.getBadgeBackgroundColor({}),
-		badgeText = await chrome.action.getBadgeText({});
-	if (badgeColours[0] === 164 && badgeColours[1] === 127 && badgeColours[2] === 0 && badgeText === "!")
-		// Warning colours
-		await chrome.action.setBadgeText({text: ""});
+	if ((await getBadgeLevel()) === "warning") await chrome.action.setBadgeText({text: ""});
 }
 
 function resolveTheme(theme: string): void {

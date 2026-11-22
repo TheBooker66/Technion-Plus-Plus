@@ -1,4 +1,8 @@
-import {reverseString, xorStrings, calculateBuses} from "./utils.js";
+import {enqueueSafariFiles, ensureSafariTransferTab, nativeRequest, safariTransfers} from "./safari_downloads.js";
+import {reverseString, xorStrings, calculateBuses, getBadgeLevel, isSafariExtension} from "./utils.js";
+
+// UI modules import these helpers too. Only Safari's background page should register its event handlers.
+const isBackgroundContext = !isSafariExtension || location.pathname === "/html/safari_background.html";
 
 const courseRegex = /(?<cname>.+)\s-\s(?<cnum>\d{6,8})/,
 	semesterRegex = / - (?:קיץ|חורף|אביב)/;
@@ -21,6 +25,7 @@ async function XHR(
 ) {
 	const options: RequestInit = {
 		method: reqType ? "HEAD" : "GET",
+		credentials: "include",
 		headers: {},
 	};
 
@@ -274,10 +279,16 @@ async function TE_notification(message: string, silentEh: boolean, notificationI
 		message: `${message}\n${timestamp}`,
 	};
 
-	// @ts-expect-error For some reason the type definitions don't include this property, even though it's supported.
-	if (typeof chrome.notifications.NotificationOptions?.silent !== "undefined") notificationOptions.silent = true;
-	if (notificationId) await chrome.notifications.clear(notificationId);
-	await chrome.notifications.create(notificationId, notificationOptions);
+	if (safariTransfers) {
+		await nativeRequest({action: "notify", id: notificationId, body: notificationOptions.message}).catch(
+			console.error
+		);
+	} else {
+		// @ts-expect-error The vendor-specific NotificationOptions type is not declared.
+		if (typeof chrome.notifications.NotificationOptions?.silent !== "undefined") notificationOptions.silent = true;
+		if (notificationId) await chrome.notifications.clear(notificationId);
+		await chrome.notifications.create(notificationId, notificationOptions);
+	}
 	if (silentEh) return;
 
 	const storageData: StorageData = await chrome.storage.local.get({notif_vol: 1, alerts_sound: true});
@@ -295,13 +306,10 @@ async function TE_notification(message: string, silentEh: boolean, notificationI
 }
 
 async function TE_setBadge(errorEh: boolean) {
-	const badgeColours = await chrome.action.getBadgeBackgroundColor({});
-	const badgeText = await chrome.action.getBadgeText({});
-	if (!(badgeColours[0] === 215 && badgeColours[1] === 0 && badgeColours[2] === 34 && badgeText === "!")) {
-		// Error colours
-		await chrome.action.setBadgeBackgroundColor({color: errorEh ? [215, 0, 34, 185] : [164, 127, 0, 185]});
-		await chrome.action.setBadgeText({text: "!"});
-	}
+	if ((await getBadgeLevel()) === "error") return;
+	if (isSafariExtension) await chrome.storage.local.set({badgeError: errorEh});
+	else await chrome.action.setBadgeBackgroundColor({color: errorEh ? [215, 0, 34, 185] : [164, 127, 0, 185]});
+	await chrome.action.setBadgeText({text: "!"});
 }
 
 async function TE_alertNewHW(sourceIndex: number) {
@@ -873,7 +881,7 @@ async function TE_checkBuses() {
 
 async function TE_sendMessageToTabs(data: {mess_t: string; angle?: number; colour?: string; source?: number}) {
 	const tabs = await chrome.tabs.query({});
-	const moodleTabs = tabs.filter((tab) => (tab.url as string).includes("moodle"));
+	const moodleTabs = tabs.filter((tab) => tab.url?.includes("moodle"));
 	for (const tab of moodleTabs) {
 		try {
 			await chrome.tabs.sendMessage(tab.id as number, data);
@@ -903,141 +911,156 @@ async function TE_setupOffscreenDocument() {
 
 async function TE_startExtension() {
 	await chrome.alarms.create("TE_update_info", {delayInMinutes: 1, periodInMinutes: 60});
-	await TE_setStorage({bus_alerts: [], dl_queue: [], dl_current: 0});
+	if (safariTransfers) {
+		await TE_setStorage({bus_alerts: []});
+		await ensureSafariTransferTab();
+	} else {
+		await TE_setStorage({bus_alerts: [], dl_queue: [], dl_current: 0});
+	}
 }
 
-chrome.runtime.onMessage.addListener(async (message) => {
-	switch (message.mess_t) {
-		case "single_download":
-			await TE_single_download(message.link, message.name);
-			break;
-		case "multi_download":
-			await TE_doDownloads(message.chunk);
-			break;
-		case "silent_notification":
-			await TE_notification(message.message, true);
-			break;
-		case "loud_notification":
-			await TE_notification(message.message, false);
-			break;
-		case "TE_moodle_preset_colour":
-			await TE_sendMessageToTabs({
-				mess_t: "TE_moodle_preset_colour",
-				angle: message.angle,
-				source: message.source,
-			});
-			break;
-		case "TE_moodle_custom_colour":
-			await TE_sendMessageToTabs({
-				mess_t: "TE_moodle_custom_colour",
-				colour: message.colour,
-				source: message.source,
-			});
-			break;
-		case "TE_moodle_darkMode":
-			await TE_sendMessageToTabs({mess_t: "TE_moodle_darkMode"});
-			break;
-		default:
-			break;
-	}
-});
-
-chrome.downloads.onChanged.addListener(async (delta) => {
-	const storageData: StorageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []});
-	if (delta.id !== storageData.dl_current) return;
-
-	const finishDownload = async (isError = false) => {
-		if (isError) {
-			const systemName = ["moodle", "panopto", "GR++", "webcourse"][storageData.dl_queue[0]?.sys] ?? "unknown";
-			console.error(`TPP: failed downloading: ${delta.id}, ${systemName}`);
-		}
-
-		if (storageData.dl_queue[0]?.list.length === 0) storageData.dl_queue.shift();
-		storageData.dl_current = 0;
-		await TE_setStorage({
-			dl_current: storageData.dl_current,
-			dl_queue: storageData.dl_queue,
-		});
-		await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-128.png"});
-		await TE_nextDownload();
-	};
-
-	if (delta.state) {
-		if (delta.state.current === "complete") await finishDownload(false);
-		else if (delta.state.current === "interrupted") await finishDownload(true);
-	} else if (delta.paused && delta.paused.current === false) {
-		chrome.downloads.search({id: delta.id}, async (downloads) => {
-			if (downloads[0]?.state === "interrupted") await finishDownload(true);
-		});
-	}
-});
-
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-	switch (alarm.name) {
-		case "TE_update_info":
-			await TE_updateInfo();
-			break;
-		case "TE_buses_start":
-			await TE_checkBuses();
-			break;
-		default:
-			console.error(`Unknown alarm name: ${alarm.name}`);
-	}
-});
-
-chrome.runtime.onInstalled.addListener(async (details) => {
-	if (details.reason === "install")
-		console.log("Technion++: Welcome!"); // TODO: Do something in the future
-	else if (details.reason === "update") await chrome.tabs.create({url: "html/release_notes.html"});
-
-	if (details.reason === "update" && details.previousVersion) {
-		if (details.previousVersion < "4.5.0") {
-			const storageData = await chrome.storage.local.get({dark_mode: false});
-			const newTheme = storageData.dark_mode ? "dark" : "light";
-			await TE_setStorage({theme: newTheme}, "update450");
-			console.log(`Technion++: Updated theme to ${newTheme} due to version 4.5.0 update.`);
-		}
-
-		if (details.previousVersion < "4.6.0") {
-			function generateCourseId(courseNum: string, year: number, semester: Semester) {
-				let hash = 0;
-				const source = `${courseNum}|${year}|${semester}`;
-				for (let i = 0; i < source.length; i++) {
-					hash = (hash << 5) - hash + source.charCodeAt(i);
-					hash |= 0;
-				}
-				return `course_${(hash >>> 0).toString(16).padStart(8, "0")}`;
-			}
-
-			function normalizeStoredCourses(courses: CalculatorCourse[]) {
-				const seenCourseIds = new Set<string>();
-				return courses.map((course) => {
-					const baseCourseId = generateCourseId(course.num, course.year, course.semester);
-					let courseId = baseCourseId;
-					let index = 1;
-					while (seenCourseIds.has(courseId)) {
-						courseId = `${baseCourseId}_${index}`;
-						index++;
-					}
-					seenCourseIds.add(courseId);
-					return {...course, id: courseId};
+if (isBackgroundContext)
+	chrome.runtime.onMessage.addListener(async (message, sender) => {
+		switch (message.mess_t) {
+			case "single_download":
+				if (safariTransfers)
+					await enqueueSafariFiles({link: message.link, name: message.name}, sender.tab?.windowId);
+				else await TE_single_download(message.link, message.name);
+				break;
+			case "multi_download":
+				if (safariTransfers) {
+					await enqueueSafariFiles(message.chunk, sender.tab?.windowId);
+					await TE_notification(`${message.chunk.list.length} פריטים נשלחו להורדה.`, true, "downloads");
+				} else await TE_doDownloads(message.chunk);
+				break;
+			case "silent_notification":
+				await TE_notification(message.message, true);
+				break;
+			case "loud_notification":
+				await TE_notification(message.message, false);
+				break;
+			case "TE_moodle_preset_colour":
+				await TE_sendMessageToTabs({
+					mess_t: "TE_moodle_preset_colour",
+					angle: message.angle,
+					source: message.source,
 				});
+				break;
+			case "TE_moodle_custom_colour":
+				await TE_sendMessageToTabs({
+					mess_t: "TE_moodle_custom_colour",
+					colour: message.colour,
+					source: message.source,
+				});
+				break;
+			case "TE_moodle_darkMode":
+				await TE_sendMessageToTabs({mess_t: "TE_moodle_darkMode"});
+				break;
+			default:
+				break;
+		}
+	});
+
+if (!safariTransfers && isBackgroundContext)
+	chrome.downloads.onChanged.addListener(async (delta) => {
+		const storageData: StorageData = await chrome.storage.local.get({dl_current: 0, dl_queue: []});
+		if (delta.id !== storageData.dl_current) return;
+
+		const finishDownload = async (isError = false) => {
+			if (isError) {
+				const systemName =
+					["moodle", "panopto", "GR++", "webcourse"][storageData.dl_queue[0]?.sys] ?? "unknown";
+				console.error(`TPP: failed downloading: ${delta.id}, ${systemName}`);
 			}
 
-			const storageData: StorageData = await chrome.storage.local.get({grades: []});
-			const normalizedGrades = normalizeStoredCourses(storageData.grades);
-			await TE_setStorage({grades: normalizedGrades}, "update460");
-			console.log(
-				`Technion++: Normalized courses in the academic calculator's storage due to version 4.6.0 update.`
-			);
-		}
-		if (details.previousVersion < "4.7.1") {
-			await TE_setStorage({moodle_cal_prop: ""}, "update471");
-			console.log(`Technion++: Reset Moodle calendar property due to new model version.`);
-		}
-	}
+			if (storageData.dl_queue[0]?.list.length === 0) storageData.dl_queue.shift();
+			storageData.dl_current = 0;
+			await TE_setStorage({
+				dl_current: storageData.dl_current,
+				dl_queue: storageData.dl_queue,
+			});
+			await chrome.action.setIcon({path: "../icons/technion_plus_plus/icon-128.png"});
+			await TE_nextDownload();
+		};
 
-	await TE_startExtension();
-});
+		if (delta.state) {
+			if (delta.state.current === "complete") await finishDownload(false);
+			else if (delta.state.current === "interrupted") await finishDownload(true);
+		} else if (delta.paused && delta.paused.current === false) {
+			chrome.downloads.search({id: delta.id}, async (downloads) => {
+				if (downloads[0]?.state === "interrupted") await finishDownload(true);
+			});
+		}
+	});
 
-chrome.runtime.onStartup.addListener(TE_startExtension);
+if (isBackgroundContext)
+	chrome.alarms.onAlarm.addListener(async (alarm) => {
+		switch (alarm.name) {
+			case "TE_update_info":
+				await TE_updateInfo();
+				break;
+			case "TE_buses_start":
+				await TE_checkBuses();
+				break;
+			default:
+				console.error(`Unknown alarm name: ${alarm.name}`);
+		}
+	});
+
+if (isBackgroundContext)
+	chrome.runtime.onInstalled.addListener(async (details) => {
+		if (details.reason === "install")
+			console.log("Technion++: Welcome!"); // TODO: Do something in the future
+		else if (details.reason === "update") await chrome.tabs.create({url: "html/release_notes.html"});
+
+		if (details.reason === "update" && details.previousVersion) {
+			if (details.previousVersion < "4.5.0") {
+				const storageData = await chrome.storage.local.get({dark_mode: false});
+				const newTheme = storageData.dark_mode ? "dark" : "light";
+				await TE_setStorage({theme: newTheme}, "update450");
+				console.log(`Technion++: Updated theme to ${newTheme} due to version 4.5.0 update.`);
+			}
+
+			if (details.previousVersion < "4.6.0") {
+				function generateCourseId(courseNum: string, year: number, semester: Semester) {
+					let hash = 0;
+					const source = `${courseNum}|${year}|${semester}`;
+					for (let i = 0; i < source.length; i++) {
+						hash = (hash << 5) - hash + source.charCodeAt(i);
+						hash |= 0;
+					}
+					return `course_${(hash >>> 0).toString(16).padStart(8, "0")}`;
+				}
+
+				function normalizeStoredCourses(courses: CalculatorCourse[]) {
+					const seenCourseIds = new Set<string>();
+					return courses.map((course) => {
+						const baseCourseId = generateCourseId(course.num, course.year, course.semester);
+						let courseId = baseCourseId;
+						let index = 1;
+						while (seenCourseIds.has(courseId)) {
+							courseId = `${baseCourseId}_${index}`;
+							index++;
+						}
+						seenCourseIds.add(courseId);
+						return {...course, id: courseId};
+					});
+				}
+
+				const storageData: StorageData = await chrome.storage.local.get({grades: []});
+				const normalizedGrades = normalizeStoredCourses(storageData.grades);
+				await TE_setStorage({grades: normalizedGrades}, "update460");
+				console.log(
+					`Technion++: Normalized courses in the academic calculator's storage due to version 4.6.0 update.`
+				);
+			}
+			if (details.previousVersion < "4.7.1") {
+				await TE_setStorage({moodle_cal_prop: ""}, "update471");
+				console.log(`Technion++: Reset Moodle calendar property due to new model version.`);
+			}
+		}
+
+		await TE_startExtension();
+	});
+
+if (isBackgroundContext) chrome.runtime.onStartup?.addListener(TE_startExtension);
