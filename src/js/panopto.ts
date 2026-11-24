@@ -1,7 +1,7 @@
 (async function () {
 	let speed = 1.0;
 	let transientSpeedChangeUntilMs = 0;
-	let shiftSpeedBoostActiveEh = false;
+	let spaceSpeedBoostActiveEh = false;
 	const TRANSIENT_SPEED_CHANGE_GRACE_MS = 400;
 	const SPEED_STEP = 0.25,
 		MIN_SPEED = 0.25,
@@ -382,6 +382,7 @@
 			| "dark_mode"
 			| "speed"
 			| "speed_boost"
+			| "speed_keys"
 			| "return_backwards"
 			| "floating_speed"
 			| "scroll_volume"
@@ -402,6 +403,9 @@
 				settingsObj.panopto_speed_boost = (
 					document.getElementById("m_speed_boost") as HTMLInputElement
 				).checked;
+				break;
+			case "speed_keys":
+				settingsObj.panopto_speed_keys = (document.getElementById("m_speed_keys") as HTMLInputElement).checked;
 				break;
 			case "return_backwards":
 				settingsObj.panopto_return_backwards = (
@@ -535,78 +539,102 @@
 		setPlaybackRateForAllVideos(parsedSpeed);
 	}
 
-	function setupShiftHoldSpeedBoost() {
-		let holdSpeed = 2.0,
-			shiftPressedEh = false,
+	const clampSpeed = (nextSpeed: number) => Math.max(MIN_SPEED, Math.min(MAX_SPEED, nextSpeed));
+
+	function togglePlayback() {
+		const playButton = document.getElementById("playButton");
+		if (playButton) {
+			playButton.click();
+			return;
+		}
+		const videoElements = document.querySelectorAll(".video-js") as NodeListOf<HTMLVideoElement>;
+		const pausedEh = (document.getElementById("primaryVideo") as HTMLVideoElement).paused;
+		for (const video of videoElements)
+			if (pausedEh) void video.play();
+			else video.pause();
+	}
+
+	function setupSpaceHoldSpeedBoost() {
+		const HOLD_THRESHOLD_MS = 250,
+			HOLD_SPEED = 2.0;
+		let spacePressedEh = false,
+			holdTimeout: number | null = null,
 			playbackRateBeforeHold = 1.0;
 
-		const clampSpeed = (nextSpeed: number) => Math.max(MIN_SPEED, Math.min(MAX_SPEED, nextSpeed));
-		const shiftKeyEh = (event: KeyboardEvent) =>
-			event.key === "Shift" || event.code === "ShiftLeft" || event.code === "ShiftRight";
-		const arrowUpEh = (event: KeyboardEvent) => event.code === "ArrowUp" || event.key === "ArrowUp";
-		const arrowDownEh = (event: KeyboardEvent) => event.code === "ArrowDown" || event.key === "ArrowDown";
+		const spaceKeyEh = (event: KeyboardEvent) => event.code === "Space" || event.key === " ";
+
+		const endHold = () => {
+			if (holdTimeout !== null) clearTimeout(holdTimeout);
+			holdTimeout = null;
+			spacePressedEh = false;
+			if (!spaceSpeedBoostActiveEh) return false;
+			spaceSpeedBoostActiveEh = false;
+			setPlaybackRateForAllVideos(playbackRateBeforeHold, true);
+			return true;
+		};
 
 		document.addEventListener(
 			"keydown",
 			(event) => {
+				if (!spaceKeyEh(event)) return;
 				if (shouldSkipPlaybackShortcuts(event)) return;
 				if (!(document.getElementById("m_speed_boost") as HTMLInputElement).checked) return;
-
-				if (shiftKeyEh(event)) {
-					if (!shiftPressedEh) {
-						playbackRateBeforeHold = (document.getElementById("primaryVideo") as HTMLVideoElement)
-							.playbackRate;
-						shiftPressedEh = true;
-						shiftSpeedBoostActiveEh = true;
-					}
-					setPlaybackRateForAllVideos(holdSpeed, true);
-					return;
-				}
-
-				if (!shiftPressedEh) return;
-				if (!arrowUpEh(event) && !arrowDownEh(event)) return;
 
 				event.stopPropagation();
 				event.stopImmediatePropagation();
 				event.preventDefault();
-				holdSpeed = clampSpeed(holdSpeed + (arrowUpEh(event) ? SPEED_STEP : -SPEED_STEP));
-				setPlaybackRateForAllVideos(holdSpeed, true);
+				if (spacePressedEh) return;
+
+				spacePressedEh = true;
+				holdTimeout = window.setTimeout(() => {
+					holdTimeout = null;
+					if (!spacePressedEh) return;
+					const primaryVideo = document.getElementById("primaryVideo") as HTMLVideoElement;
+					playbackRateBeforeHold = primaryVideo.playbackRate;
+					spaceSpeedBoostActiveEh = true;
+					setPlaybackRateForAllVideos(HOLD_SPEED, true);
+					if (primaryVideo.paused) togglePlayback();
+				}, HOLD_THRESHOLD_MS);
 			},
 			true
 		);
 
-		document.addEventListener("keyup", (event) => {
-			if (!shiftKeyEh(event)) return;
-			if (!shiftPressedEh) return;
-
-			shiftPressedEh = false;
-			shiftSpeedBoostActiveEh = false;
-			setPlaybackRateForAllVideos(playbackRateBeforeHold, true);
-		});
-
 		document.addEventListener(
-			"wheel",
+			"keyup",
 			(event) => {
-				if (!shiftPressedEh) return;
-				if (
-					event.target instanceof HTMLElement &&
-					(event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA")
-				)
-					return;
-				event.preventDefault();
+				if (!spaceKeyEh(event) || !spacePressedEh) return;
+
 				event.stopPropagation();
-				holdSpeed = clampSpeed(holdSpeed + (event.deltaY < 0 ? SPEED_STEP : -SPEED_STEP));
-				setPlaybackRateForAllVideos(holdSpeed, true);
+				event.stopImmediatePropagation();
+				event.preventDefault();
+				if (!endHold()) togglePlayback();
 			},
-			{capture: true, passive: false}
+			true
 		);
 
 		window.addEventListener("blur", () => {
-			if (!shiftPressedEh) return;
-			shiftPressedEh = false;
-			shiftSpeedBoostActiveEh = false;
-			setPlaybackRateForAllVideos(playbackRateBeforeHold, true);
+			if (spacePressedEh) endHold();
 		});
+	}
+
+	function setupShiftSpeedControl() {
+		document.addEventListener(
+			"keydown",
+			(event) => {
+				if (!event.shiftKey || (event.code !== "Period" && event.code !== "Comma")) return;
+				if (shouldSkipPlaybackShortcuts(event)) return;
+				if (!(document.getElementById("m_speed_keys") as HTMLInputElement).checked) return;
+
+				event.stopPropagation();
+				event.stopImmediatePropagation();
+				event.preventDefault();
+				const currentSpeed = (document.getElementById("primaryVideo") as HTMLVideoElement).playbackRate;
+				const nextSpeed = clampSpeed(currentSpeed + (event.code === "Period" ? SPEED_STEP : -SPEED_STEP));
+				setPlaybackRateForAllVideos(nextSpeed, spaceSpeedBoostActiveEh);
+				showIndicator(`Speed: x${nextSpeed}`);
+			},
+			true
+		);
 	}
 
 	function setupMenu() {
@@ -647,7 +675,8 @@
                     <label for="m_floating_speed">חלונית שליטת מהירויות צפה<input id="m_floating_speed" type="checkbox" /></label>
                     <label for="m_scroll_volume">שינוי עוצמת שמע עם גלגלת העכבר<input id="m_scroll_volume" type="checkbox" /></label>
                     <label for="m_volume_boost">הגברת עוצמת שמע עד 200%<input id="m_volume_boost" type="checkbox" /></label>
-                    <label for="m_speed_boost">הגברת מהירות עם Shift<input id="m_speed_boost" type="checkbox" /></label>
+                    <label for="m_speed_boost">מהירות x2 בהחזקת רווח<input id="m_speed_boost" type="checkbox" /></label>
+                <label for="m_speed_keys">שינוי מהירות עם Shift ו-. / ,<input id="m_speed_keys" type="checkbox" /></label>
                     <label for="m_return_backwards">חזרה אחורה בזמן לאחר ירידת מהירות<input id="m_return_backwards" type="checkbox" /></label>
                     <label for="m_dark_mode">מצב לילה<input id="m_dark_mode" type="checkbox" /></label>
                     <label for="m_save">זכור הגדרות<input id="m_save" type="checkbox" /></label>
@@ -705,6 +734,10 @@
 		(document.getElementById("m_speed_boost") as HTMLInputElement).addEventListener(
 			"change",
 			async () => await saveSetting("speed_boost")
+		);
+		(document.getElementById("m_speed_keys") as HTMLInputElement).addEventListener(
+			"change",
+			async () => await saveSetting("speed_keys")
 		);
 		(document.getElementById("m_save") as HTMLInputElement).addEventListener("change", () =>
 			saveSetting("settings")
@@ -809,6 +842,10 @@
 	let volumeIndicatorHideTimeout: number | null = null;
 
 	function showVolumeIndicator() {
+		showIndicator(`Volume: ${Math.round(extendedVolume * 100)}%`);
+	}
+
+	function showIndicator(text: string) {
 		let volumeIndicator = document.getElementById("tplus_volume_indicator") as HTMLDivElement | null;
 		if (!volumeIndicator) {
 			volumeIndicator = document.createElement("div");
@@ -832,10 +869,13 @@
 					"transition: opacity 140ms ease",
 				].join(";")
 			);
-			document.body.append(volumeIndicator);
 		}
+		const fullscreenElement = document.fullscreenElement;
+		const indicatorParent =
+			fullscreenElement && !(fullscreenElement instanceof HTMLMediaElement) ? fullscreenElement : document.body;
+		if (volumeIndicator.parentElement !== indicatorParent) indicatorParent.append(volumeIndicator);
 
-		volumeIndicator.textContent = `Volume: ${Math.round(extendedVolume * 100)}%`;
+		volumeIndicator.textContent = text;
 		volumeIndicator.style.opacity = "1";
 		if (volumeIndicatorHideTimeout !== null) clearTimeout(volumeIndicatorHideTimeout);
 		volumeIndicatorHideTimeout = window.setTimeout(() => {
@@ -920,7 +960,7 @@
 		document.addEventListener(
 			"keydown",
 			(event) => {
-				if (shiftSpeedBoostActiveEh || event.shiftKey) return;
+				if (event.shiftKey) return;
 				if (shouldSkipPlaybackShortcuts(event)) return;
 				if (!arrowUpEh(event) && !arrowDownEh(event)) return;
 
@@ -946,6 +986,7 @@
 		const storageData: StorageData = await chrome.storage.local.get({
 			panopto_speed: 1.0,
 			panopto_speed_boost: true,
+			panopto_speed_keys: true,
 			panopto_dark_mode: false,
 			panopto_return_backwards: false,
 			panopto_floating_speed: false,
@@ -959,7 +1000,9 @@
 		setupTimer();
 		setupMenu();
 		(document.getElementById("m_speed_boost") as HTMLInputElement).checked = storageData.panopto_speed_boost;
-		setupShiftHoldSpeedBoost();
+		(document.getElementById("m_speed_keys") as HTMLInputElement).checked = storageData.panopto_speed_keys;
+		setupSpaceHoldSpeedBoost();
+		setupShiftSpeedControl();
 		setupArrowKeyVolumeControl();
 		document.addEventListener("keydown", (event) => fullScreenToggleHandler(event));
 		extendedVolume = (document.getElementById("primaryVideo") as HTMLVideoElement).volume;
@@ -1027,11 +1070,6 @@
 		document.addEventListener(
 			"wheel",
 			(event) => {
-				if (shiftSpeedBoostActiveEh) {
-					event.preventDefault();
-					event.stopPropagation();
-					return;
-				}
 				if ((document.getElementById("m_scroll_volume") as HTMLInputElement).checked)
 					changeVolume(event.deltaY);
 			},
